@@ -35,8 +35,8 @@ final case class UserAnswers(
 
   def setOrException[A](page: QuestionPage[A], value: A)(implicit writes: Writes[A]): UserAnswers =
     set(page, value) match {
-      case Success(ua) => ua
-      case Failure(ex) => throw ex
+      case Success(userAnswers) => userAnswers
+      case Failure(exception) => throw exception
     }
 
   def set[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] =
@@ -48,8 +48,8 @@ final case class UserAnswers(
           Failure(JsResultException(errors))
       }
 
-      updatedData.flatMap { d =>
-        val updatedAnswers = copy(data = d)
+      updatedData.flatMap { data =>
+        val updatedAnswers = copy(data = data)
         page.cleanup(Some(value), updatedAnswers)
       }
     }
@@ -64,8 +64,8 @@ final case class UserAnswers(
     }
 
     updatedData.flatMap {
-      d =>
-        val updatedAnswers = copy (data = d)
+      data =>
+        val updatedAnswers = copy (data = data)
         page.cleanup(None, updatedAnswers)
     }
   }
