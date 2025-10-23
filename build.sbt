@@ -1,6 +1,7 @@
 import play.sbt.routes.RoutesKeys
 import sbt.Def
 import scoverage.ScoverageKeys
+import uk.gov.hmrc.DefaultBuildSettings.{defaultSettings, scalaSettings}
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 lazy val appName: String = "cis-manage-frontend"
@@ -15,6 +16,12 @@ lazy val microservice = (project in file("."))
   .settings(ThisBuild / useSuperShell := false)
   .settings(
     name := appName,
+    scalaSettings,
+    defaultSettings(),
+    Test / parallelExecution := false,
+    Test / fork := false,
+    Runtime / fork := true,
+    routesGenerator := InjectedRoutesGenerator,
     RoutesKeys.routesImport ++= Seq(
       "models._",
       "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl"
@@ -50,7 +57,7 @@ lazy val microservice = (project in file("."))
     Assets / pipelineStages := Seq(concat)
   )
 
-lazy val testSettings: Seq[Def.Setting[_]] = Seq(
+lazy val testSettings: Seq[Def.Setting[?]] = Seq(
   fork := true,
   unmanagedSourceDirectories += baseDirectory.value / "test-utils"
 )
