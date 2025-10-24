@@ -16,7 +16,8 @@
 
 package base
 
-import controllers.actions._
+import config.FrontendAppConfig
+import controllers.actions.*
 import models.UserAnswers
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
@@ -27,6 +28,7 @@ import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
 trait SpecBase
   extends AnyFreeSpec
@@ -34,7 +36,10 @@ trait SpecBase
     with TryValues
     with OptionValues
     with ScalaFutures
+    with GuiceOneAppPerSuite
     with IntegrationPatience {
+
+  implicit lazy val applicationConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
 
   val userAnswersId: String = "id"
 
