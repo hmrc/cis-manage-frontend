@@ -47,3 +47,12 @@ signedOut.guidance = We did not save your answers.
 
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
+
+agent.retrievingClient.title = Retrieving your client list
+agent.retrievingClient.h1 = Retrieving your client list
+agent.retrievingClient.p1 = Please wait while we retrieve your authorised clients. This should only take a few moments.
+agent.retrievingClient.p2 = Do not refresh this page or use the back button.
+agent.retrievingClient.inset.h2 = Filing only service
+agent.retrievingClient.inset.p3 = You can send CIS monthly returns on behalf of a client without completing an authorisation online or form FBI-2.
+agent.retrievingClient.inset.p4 = This service is only available using commercial software.
+agent.retrievingClient.inset.link = Find commercial software for CIS returns
