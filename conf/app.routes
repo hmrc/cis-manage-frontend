@@ -1,23 +1,23 @@
 # microservice specific routes
 
-->          /manage/hmrc-frontend                               hmrcfrontend.Routes
+->          /management/hmrc-frontend                               hmrcfrontend.Routes
 
-GET         /manage                                            controllers.IndexController.onPageLoad()
+GET         /management                                            controllers.IndexController.onPageLoad()
 
-GET         /manage/assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
+GET         /management/assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /manage/language/:lang                              controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET         /management/language/:lang                              controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /manage/refresh-session                             controllers.KeepAliveController.keepAlive()
+GET         /management/refresh-session                             controllers.KeepAliveController.keepAlive()
 
-GET         /manage/there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+GET         /management/there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /manage/check-your-answers                          controllers.CheckYourAnswersController.onPageLoad()
+GET         /management/check-your-answers                          controllers.CheckYourAnswersController.onPageLoad()
 
-GET         /manage/account/sign-out-survey                     controllers.auth.AuthController.signOut()
-GET         /manage/account/sign-out                            controllers.auth.AuthController.signOutNoSurvey()
-GET         /manage/account/signed-out                          controllers.auth.SignedOutController.onPageLoad()
+GET         /management/account/sign-out-survey                     controllers.auth.AuthController.signOut()
+GET         /management/account/sign-out                            controllers.auth.AuthController.signOutNoSurvey()
+GET         /management/account/signed-out                          controllers.auth.SignedOutController.onPageLoad()
 
-GET         /manage/unauthorised                                controllers.UnauthorisedController.onPageLoad()
+GET         /management/unauthorised                                controllers.UnauthorisedController.onPageLoad()
 
-GET         /manage/agent/retrieve-client-list                  controllers.agent.RetrievingClientController.onPageLoad()
+GET         /management/agent/retrieve-client-list                  controllers.agent.RetrievingClientController.onPageLoad()
