@@ -48,7 +48,7 @@ signedOut.guidance = We did not save your answers.
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
-agent.retrievingClient.title = Retrieving your client List
+agent.retrievingClient.title = Retrieving your client list
 agent.retrievingClient.h1 = Retrieving your client list
 agent.retrievingClient.p1 = Please wait while we retrieve your authorised clients. This should only take a few moments.
 agent.retrievingClient.p2 = Do not refresh this page or use the back button.
