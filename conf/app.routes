@@ -20,4 +20,4 @@ GET         /manage/account/signed-out                          controllers.auth
 
 GET         /manage/unauthorised                                controllers.UnauthorisedController.onPageLoad()
 
-GET         /manage/agent                                       controllers.agent.RetrievingClientController.onPageLoad()
+GET         /manage/agent/retrieve-client-list                  controllers.agent.RetrievingClientController.onPageLoad()
