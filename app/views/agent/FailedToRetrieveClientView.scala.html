@@ -24,7 +24,7 @@
     h2: H2,
     paragraph: Paragraph,
     link: Link,
-    list: List
+    bulletList: BulletList
 )
 
 @()(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
@@ -43,10 +43,10 @@
 
     @h1(messages("agent.failedToRetrieveClient.heading"))
     @paragraph(messages("agent.failedToRetrieveClient.p1"))
-    @list(Seq(
-        Html(messages("agent.failedToRetrieveClient.listItem1")),
-        Html(messages("agent.failedToRetrieveClient.listItem2")),
-        Html(messages("agent.failedToRetrieveClient.listItem3"))
+    @bulletList(Seq(
+        messages("agent.failedToRetrieveClient.listItem1"),
+        messages("agent.failedToRetrieveClient.listItem2"),
+        messages("agent.failedToRetrieveClient.listItem3")
     ))
 
     @link(
