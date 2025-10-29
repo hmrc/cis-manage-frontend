@@ -33,7 +33,6 @@ class RetrievingClientViewSpec extends SpecBase {
       val html: HtmlFormat.Appendable = view()
       val doc: Document               = Jsoup.parse(html.body)
 
-
       doc.title                                 must include(messages("agent.retrievingClient.title"))
       doc.select("h1").text                     must include(messages("agent.retrievingClient.h1"))
       doc.select("p").text                      must include(messages("agent.retrievingClient.p1"))
