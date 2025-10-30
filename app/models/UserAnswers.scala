@@ -25,10 +25,10 @@ import java.time.Instant
 import scala.util.{Failure, Success, Try}
 
 final case class UserAnswers(
-                              id: String,
-                              data: JsObject = Json.obj(),
-                              lastUpdated: Instant = Instant.now
-                            ) {
+  id: String,
+  data: JsObject = Json.obj(),
+  lastUpdated: Instant = Instant.now
+) {
 
   def get[A](page: Gettable[A])(implicit rds: Reads[A]): Option[A] =
     Reads.optionNoError(Reads.at(page.path)).reads(data).getOrElse(None)
@@ -36,7 +36,7 @@ final case class UserAnswers(
   def setOrException[A](page: QuestionPage[A], value: A)(implicit writes: Writes[A]): UserAnswers =
     set(page, value) match {
       case Success(userAnswers) => userAnswers
-      case Failure(exception) => throw exception
+      case Failure(exception)   => throw exception
     }
 
   def set[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] =
@@ -53,20 +53,19 @@ final case class UserAnswers(
         page.cleanup(Some(value), updatedAnswers)
       }
     }
-    
+
   def remove[A](page: Settable[A]): Try[UserAnswers] = {
 
     val updatedData = data.removeObject(page.path) match {
       case JsSuccess(jsValue, _) =>
         Success(jsValue)
-      case JsError(_) =>
+      case JsError(_)            =>
         Success(data)
     }
 
-    updatedData.flatMap {
-      data =>
-        val updatedAnswers = copy (data = data)
-        page.cleanup(None, updatedAnswers)
+    updatedData.flatMap { data =>
+      val updatedAnswers = copy(data = data)
+      page.cleanup(None, updatedAnswers)
     }
   }
 }
@@ -79,9 +78,9 @@ object UserAnswers {
 
     (
       (__ \ "_id").read[String] and
-      (__ \ "data").read[JsObject] and
-      (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
-    ) (UserAnswers.apply _)
+        (__ \ "data").read[JsObject] and
+        (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
+    )(UserAnswers.apply _)
   }
 
   val writes: OWrites[UserAnswers] = {
@@ -90,9 +89,9 @@ object UserAnswers {
 
     (
       (__ \ "_id").write[String] and
-      (__ \ "data").write[JsObject] and
-      (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-    ) (ua => (ua.id, ua.data, ua.lastUpdated))
+        (__ \ "data").write[JsObject] and
+        (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
+    )(ua => (ua.id, ua.data, ua.lastUpdated))
   }
 
   implicit val format: OFormat[UserAnswers] = OFormat(reads, writes)
