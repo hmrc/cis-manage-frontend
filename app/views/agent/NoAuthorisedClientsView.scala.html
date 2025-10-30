@@ -14,14 +14,48 @@
  * limitations under the License.
  *@
 
+@import views.html.components._
+@import config.FrontendAppConfig
+
 @this(
-        layout: templates.Layout,
-        govukButton: GovukButton
+    layout: templates.Layout,
+    h1: H1,
+    h2: H2,
+    paragraph: Paragraph,
+    link: Link,
+    bulletListWithLinks: BulletListWithLinks
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("noAuthorisedClients.title"))) {
+@layout(
+    pageTitle = titleNoForm(messages("agent.noAuthorisedClients.title")),
+    showSignOut = false,
+    showBackLink = false
+) {
 
-    <h1 class="govuk-heading-xl">@messages("noAuthorisedClients.heading")</h1>
+    @h1(messages("agent.noAuthorisedClients.heading"))
+    @paragraph(messages("agent.noAuthorisedClients.p1"))
+    @paragraph(messages("agent.noAuthorisedClients.p2"))
+    @h2(messages("agent.noAuthorisedClients.h2"))
+    @paragraph(messages("agent.noAuthorisedClients.p3"))
+
+    @bulletListWithLinks(Seq(
+        link(
+            "agent.noAuthorisedClients.listItem1.link",
+            appConfig.registerAsAProfessionalTaxAgentWithHmrcUrl,
+            paragraphWrapped = false,
+            prefixTextKey = "agent.noAuthorisedClients.listItem1",
+        ),
+        link(
+            "agent.noAuthorisedClients.listItem2.link",
+            appConfig.taxAgentsAndAdvisorsAuthorisationFormsUrl,
+            paragraphWrapped = false,
+            prefixTextKey = "agent.noAuthorisedClients.listItem2",
+            suffixTextKey = "agent.noAuthorisedClients.listItem2.afterLinkText"
+        )
+    ))
+
+    @paragraph(messages("agent.noAuthorisedClients.p4"))
+    @link("agent.noAuthorisedClients.returnToHome.link", linkUrl = "#")
 }
