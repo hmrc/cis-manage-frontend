@@ -69,3 +69,17 @@ agent.failedToRetrieveClient.inset.h2 = Filing only service
 agent.failedToRetrieveClient.inset.p3 = You can send CIS monthly returns on behalf of a client without completing an authorisation online or form FBI-2.
 agent.failedToRetrieveClient.inset.p4 = This service is only available using commercial software.
 agent.failedToRetrieveClient.inset.link = Find commercial software for CIS returns
+
+agent.noAuthorisedClients.title = You have no authorised clients
+agent.noAuthorisedClients.heading = You have no authorised clients
+agent.noAuthorisedClients.p1 = You do not have any clients authorised to use the Construction Industry Scheme (CIS) service.
+agent.noAuthorisedClients.p2 = To file returns for a client, they must authorise you to act on their behalf.
+agent.noAuthorisedClients.h2 = What you need to do
+agent.noAuthorisedClients.p3 =Ask your client to authorise you. They can do this by either:
+agent.noAuthorisedClients.listItem1 = authorising you through their
+agent.noAuthorisedClients.listItem1.link = HMRC online account
+agent.noAuthorisedClients.listItem2 = downloading and completing
+agent.noAuthorisedClients.listItem2.link = form 64-8
+agent.noAuthorisedClients.listItem2.afterLinkText = to authorise you by post
+agent.noAuthorisedClients.p4 = It can take up to 5 working days for new authorisations to appear in your account.
+agent.noAuthorisedClients.returnToHome.link = Return to home
