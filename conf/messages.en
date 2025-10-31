@@ -57,14 +57,14 @@ agent.retrievingClient.inset.p3 = You can send CIS monthly returns on behalf of 
 agent.retrievingClient.inset.p4 = This service is only available using commercial software.
 agent.retrievingClient.inset.link = Find commercial software for CIS returns
 
-agent.failedToRetrieveClient.title = There is a problem
+agent.failedToRetrieveClient.title = We could not retrieve your client list
 agent.failedToRetrieveClient.heading = We could not retrieve your client list
 agent.failedToRetrieveClient.p1 = This could be because:
 agent.failedToRetrieveClient.listItem1 = there is a temporary problem with the service
 agent.failedToRetrieveClient.listItem2 = your authorisations are still being processed
 agent.failedToRetrieveClient.listItem3 = you do not have any authorised clients for CIS
 agent.failedToRetrieveClient.p2 = If the problem continues, contact the
-agent.failedToRetrieveClient.link = HMRC Online Services Helpdesk.
+agent.failedToRetrieveClient.link = HMRC Online Services Helpdesk
 agent.failedToRetrieveClient.inset.h2 = Filing only service
 agent.failedToRetrieveClient.inset.p3 = You can send CIS monthly returns on behalf of a client without completing an authorisation online or form FBI-2.
 agent.failedToRetrieveClient.inset.p4 = This service is only available using commercial software.
