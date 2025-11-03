@@ -43,6 +43,22 @@ class LinkSpec extends SpecBase with Matchers {
       linkElement.text mustBe linkText
     }
 
+    "must render the link with the correct suffix" in new Setup {
+      val html        = link(linkText, linkUrl, suffixTextKey = suffixText)
+      val linkElement = getLinkElement(html)
+
+      linkElement.size mustBe 1
+      linkElement.text mustBe linkText + " " + suffixText
+    }
+
+    "must render the link with the correct prefix and suffix" in new Setup {
+      val html        = link(linkText, linkUrl, prefixTextKey = prefixText, suffixTextKey = suffixText)
+      val linkElement = getLinkElement(html)
+
+      linkElement.size mustBe 1
+      linkElement.text mustBe prefixText + " " + linkText + " " + suffixText
+    }
+
     "must render with default class when extraClasses are empty" in new Setup {
       val html        = link(linkText, linkUrl, prefixTextKey = prefixText, extraClasses = "")
       val linkElement = getLinkElement(html)
@@ -85,6 +101,13 @@ class LinkSpec extends SpecBase with Matchers {
       linkRefElement.attr("target") must include("_blank")
     }
 
+    "must render the link with the full stop if true" in new Setup {
+      val html        = link(linkText, linkUrl, prefixTextKey = prefixText, hasFullStop = true)
+      val linkElement = getLinkElement(html)
+
+      linkElement.size mustBe 1
+      linkElement.text mustBe prefixText + " " + linkText + "."
+    }
   }
 
   trait Setup {
@@ -99,6 +122,7 @@ class LinkSpec extends SpecBase with Matchers {
     val linkText     = "link text"
     val linkUrl      = "https://www.gov.uk/find-hmrc-contacts/technical-support-with-hmrc-online-services"
     val prefixText   = "Jump to"
+    val suffixText   = "After link text"
     val extraClasses = "govuk-link--inverse govuk-link--no-underline"
 
     def getLinkElement(html: play.twirl.api.Html): org.jsoup.select.Elements = {
