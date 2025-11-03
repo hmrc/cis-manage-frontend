@@ -53,4 +53,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
 
   lazy val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
+
+  lazy val cisHelpWhatIsUrl: String  = configuration.get[String]("links.cis-help-what-is")
+  lazy val cisHelpMonthlyUrl: String = configuration.get[String]("links.cis-help-monthly")
+  lazy val cisHelp340Url: String     = configuration.get[String]("links.cis-help-340")
 }

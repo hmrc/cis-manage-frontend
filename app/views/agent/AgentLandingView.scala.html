@@ -1,0 +1,159 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import java.time.format.DateTimeFormatter
+@import java.time.format.TextStyle.FULL
+@import java.util.Locale.UK
+@import play.api.i18n
+@import play.api.mvc
+@import play.twirl.api.{Html, HtmlFormat}
+@import views.html.components._
+@import config.FrontendAppConfig
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import viewmodels.govuk.{summarylist => sl}
+
+@this(
+  layout: templates.LayoutWithSidebar,
+  helpAndGuidelineSidebar: templates.HelpAndGuidelineSidebar,
+  h1: H1,
+  h2: H2,
+  h3: H3,
+  paragraph: Paragraph,
+  link: Link,
+  gridRow: GridRow,
+  gridColumnOneHalf: GridColumnOneHalf,
+  caption: Caption,
+  summaryCard: SummaryCardBlock,
+  headingLink: HeadingLink,
+  linkList: LinkList,
+  sectionBreak: SectionBreak,
+  govukSummaryList: GovukSummaryList
+)
+
+@(clientName: String,
+  employerRef: String,
+  utr: String,
+  returnsDueCount: Int,
+  returnsDueBy: java.time.LocalDate,
+  newNoticesCount: Int,
+  lastSubmittedDate: java.time.LocalDate,
+  lastSubmittedTaxMonth: java.time.YearMonth
+)(implicit request: RequestHeader,
+  appConfig: FrontendAppConfig,
+  messages: Messages
+)
+
+@layout(
+  pageTitle     = s"${messages("agent.landing.title", clientName)} - GOV.UK",
+  showBackLink  = false,
+  beforeContent = Some(
+    Html(
+      s"""<a href="#" class="govuk-back-link" aria-disabled="true" onclick="return false;" tabindex="-1">${messages("agent.landing.back")}</a>"""
+      )
+    ),
+    sidebar = Some(helpAndGuidelineSidebar())
+) {
+
+  @caption(clientName)
+  @h1(messages("agent.landing.h1"))
+  @paragraph(
+    messages("agent.landing.intro", clientName),
+    false, "govuk-body", "", Nil
+  )
+
+  @govukSummaryList(
+    sl.SummaryListViewModel(Seq(
+      sl.SummaryListRowViewModel(
+        key   = sl.KeyViewModel(Text(messages("agent.landing.employerRef.key"))),
+        value = sl.ValueViewModel(Text(employerRef))
+      ),
+      sl.SummaryListRowViewModel(
+        key   = sl.KeyViewModel(Text(messages("agent.landing.utr.key"))),
+        value = sl.ValueViewModel(Text(utr))
+      )
+    ))
+  )
+
+  @h2(messages("agent.landing.h2.actionRequired"), "govuk-heading-m govuk-!-margin-top-6", None)
+
+  @gridRow() {
+    @gridColumnOneHalf {
+      @summaryCard(Html(link("agent.landing.card.returnDue.title", "#", false, "", "", "").body)) {
+        @paragraph(s"$returnsDueCount", true, "govuk-body", "govuk-!-margin-bottom-1 govuk-!-font-size-36", Nil)
+        @paragraph(messages("agent.landing.card.returnDue.dueBy", returnsDueBy.format(DateTimeFormatter.ofPattern("d MMMM yyyy"))),
+          false, "govuk-body", "govuk-!-margin-bottom-0", Nil)
+    }
+  }
+  @gridColumnOneHalf {
+    @summaryCard(Html(link("agent.landing.card.notices.title", "#", false, "", "", "").body)) {
+      @paragraph(s"$newNoticesCount", true, "govuk-body", "govuk-!-margin-bottom-1 govuk-!-font-size-36", Nil)
+      @paragraph(messages("agent.landing.card.notices.subtitle"),
+        false, "govuk-body", "govuk-!-margin-bottom-0", Nil)
+      }
+    }
+  }
+
+  @h2(messages("agent.landing.h2.manageClient"), "govuk-heading-m govuk-!-margin-top-7", None)
+
+  @gridRow() {
+    @gridColumnOneHalf {
+      @headingLink(messages("agent.landing.manage.subcontractors"), "#")
+      @paragraph(messages("agent.landing.manage.subcontractors.blurb"),
+        false, "govuk-body", "govuk-!-font-size-16", Nil)
+    }
+    @gridColumnOneHalf {
+      @headingLink(messages("agent.landing.manage.returnHistory"), "#")
+      @paragraph(messages("agent.landing.manage.returnHistory.blurb"),
+        false, "govuk-body", "govuk-!-font-size-16", Nil)
+    }
+  }
+
+  @gridRow(classes = "govuk-!-margin-top-4") {
+    @gridColumnOneHalf {
+      @headingLink(messages("agent.landing.manage.notices"), "#")
+      @paragraph(messages("agent.landing.manage.notices.blurb"),
+        false, "govuk-body", "govuk-!-font-size-16", Nil)
+    }
+    @gridColumnOneHalf {
+      @headingLink(messages("agent.landing.manage.amend"), "#")
+      @paragraph(messages("agent.landing.manage.amend.blurb"),
+        false, "govuk-body", "govuk-!-font-size-16", Nil)
+    }
+  }
+
+  @gridRow(classes = "govuk-!-margin-top-4") {
+    @gridColumnOneHalf {
+      @headingLink(messages("agent.landing.manage.clientDetails"), "#")
+      @paragraph(messages("agent.landing.manage.clientDetails.blurb"),
+        false, "govuk-body", "govuk-!-font-size-16", Nil)
+    }
+  }
+
+  @sectionBreak()
+
+  @h2(messages("agent.landing.h2.recentActivity"), "govuk-heading-m", None)
+
+  @paragraph(
+    messages(
+      "agent.landing.recentActivity.line",
+      lastSubmittedDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy")),
+      lastSubmittedTaxMonth.getMonth.getDisplayName(FULL, UK),
+      lastSubmittedTaxMonth.getYear.toString
+    ),
+    false, "govuk-body", "", Nil
+  )
+
+}
