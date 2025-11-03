@@ -24,27 +24,29 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.agent.AgentLandingView
 
-class AgentLandingController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: AgentLandingView,
-                                       appConfig: FrontendAppConfig
-                                     ) extends FrontendBaseController with I18nSupport {
-  def onPageLoad: Action[AnyContent] = (identify andThen getData) {
-    implicit request =>
-      implicit val config: FrontendAppConfig = appConfig
+class AgentLandingController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: AgentLandingView,
+  appConfig: FrontendAppConfig
+) extends FrontendBaseController
+    with I18nSupport {
+  def onPageLoad: Action[AnyContent] = (identify andThen getData) { implicit request =>
+    implicit val config: FrontendAppConfig = appConfig
 
-      Ok(view(
-        clientName            = "ABC Construction Ltd",
-        employerRef           = "123/AB45678",
-        utr                   = "1234567890",
-        returnsDueCount       = 1,
-        returnsDueBy          = java.time.LocalDate.of(2025, 10, 19),
-        newNoticesCount       = 2,
-        lastSubmittedDate     = java.time.LocalDate.of(2025, 9, 19),
+    Ok(
+      view(
+        clientName = "ABC Construction Ltd",
+        employerRef = "123/AB45678",
+        utr = "1234567890",
+        returnsDueCount = 1,
+        returnsDueBy = java.time.LocalDate.of(2025, 10, 19),
+        newNoticesCount = 2,
+        lastSubmittedDate = java.time.LocalDate.of(2025, 9, 19),
         lastSubmittedTaxMonth = java.time.YearMonth.of(2025, 8)
-      ))
+      )
+    )
   }
 }

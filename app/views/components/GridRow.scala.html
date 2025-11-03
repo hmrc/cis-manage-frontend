@@ -20,6 +20,6 @@
 
 @(classes: String = "", attributes: Map[String, String] = Map.empty)(content: Html)
 
-<div class="@toClasses("govuk-grid-row", classes)" @toAttributes(attributes)>
+<div class='@toClasses("govuk-grid-row", classes)' @toAttributes(attributes)>
   @content
 </div>

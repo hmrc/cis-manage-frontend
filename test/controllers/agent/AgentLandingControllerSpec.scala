@@ -43,18 +43,18 @@ class AgentLandingControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[AgentLandingView]
 
         val expected = view(
-          clientName            = "ABC Construction Ltd",
-          employerRef           = "123/AB45678",
-          utr                   = "1234567890",
-          returnsDueCount       = 1,
-          returnsDueBy          = LocalDate.of(2025, 10, 19),
-          newNoticesCount       = 2,
-          lastSubmittedDate     = LocalDate.of(2025, 9, 19),
+          clientName = "ABC Construction Ltd",
+          employerRef = "123/AB45678",
+          utr = "1234567890",
+          returnsDueCount = 1,
+          returnsDueBy = LocalDate.of(2025, 10, 19),
+          newNoticesCount = 2,
+          lastSubmittedDate = LocalDate.of(2025, 9, 19),
           lastSubmittedTaxMonth = YearMonth.of(2025, 8)
         )(request, appConfig, messages(application))
 
-        status(result) shouldBe OK
-        contentType(result) should contain(HTML)
+        status(result)          shouldBe OK
+        contentType(result)       should contain(HTML)
         contentAsString(result) shouldBe expected.toString
       }
     }
