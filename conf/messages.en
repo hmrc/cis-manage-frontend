@@ -87,7 +87,7 @@ agent.noAuthorisedClients.returnToHome.link = Return to home
 
 agent.landing.title = Construction Industry Scheme for {0}
 agent.landing.h1 = Manage CIS return
-agent.landing.intro = You can manage {0}'s monthly CIS returns – including dates and statements.
+agent.landing.intro = You can manage {0}''s monthly CIS returns – including dates and statements.
 agent.landing.employerRef.key = Employer reference
 agent.landing.utr.key = Unique Taxpayer Reference (UTR)
 agent.landing.h2.actionRequired = Action required
@@ -105,7 +105,7 @@ agent.landing.manage.returnHistory.blurb = View previously submitted CIS returns
 agent.landing.manage.notices = Notices and statements
 agent.landing.manage.notices.blurb = View HMRC notices, penalty warnings and confirmation statements.
 agent.landing.manage.amend = Amend a return
-agent.landing.manage.amend.blurb = Make changes to a return you've already submitted.
+agent.landing.manage.amend.blurb = Make changes to a return you''ve already submitted.
 agent.landing.manage.clientDetails = Client details
 agent.landing.manage.clientDetails.blurb = Update client information and authorisation settings.
 agent.landing.recentActivity.line = Last return submitted: {0} for tax month {1} {2}
