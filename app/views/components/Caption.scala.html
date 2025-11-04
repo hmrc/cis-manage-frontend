@@ -15,21 +15,6 @@
  *@
 
 @this()
+@(text: String, classes: String = "govuk-caption-l")
 
-@(items: Seq[(String, String)],
-  listClasses: String = "govuk-list govuk-!-font-size-16",
-  linkClasses: String = "govuk-link",
-  openInNewTab: Boolean = false
-)(implicit messages: Messages)
-
-<ul class="@listClasses">
-    @for((textKey, href) <- items) {
-        <li>
-            <a href="@href"
-               class="@linkClasses"
-               @if(openInNewTab){rel="noreferrer noopener" target="_blank"}>
-                @messages(textKey)
-            </a>
-        </li>
-    }
-</ul>
+<span class="@classes">@text</span>

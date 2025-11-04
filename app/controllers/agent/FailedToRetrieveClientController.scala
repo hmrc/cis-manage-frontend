@@ -20,13 +20,14 @@ import config.FrontendAppConfig
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.agent.NoAuthorisedClientsView
+import views.html.agent.FailedToRetrieveClientView
+
 import javax.inject.Inject
 
-class NoAuthorisedClientsController @Inject() (
+class FailedToRetrieveClientController @Inject() (
   override val messagesApi: MessagesApi,
   val controllerComponents: MessagesControllerComponents,
-  view: NoAuthorisedClientsView
+  view: FailedToRetrieveClientView
 )(implicit appConfig: FrontendAppConfig)
     extends FrontendBaseController
     with I18nSupport {

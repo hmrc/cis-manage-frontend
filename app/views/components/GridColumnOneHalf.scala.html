@@ -16,20 +16,12 @@
 
 @this()
 
-@(items: Seq[(String, String)],
-  listClasses: String = "govuk-list govuk-!-font-size-16",
-  linkClasses: String = "govuk-link",
-  openInNewTab: Boolean = false
-)(implicit messages: Messages)
+@(
+  content: Html,
+  classes: String = "",
+  attributes: Map[String, String] = Map.empty
+)
 
-<ul class="@listClasses">
-    @for((textKey, href) <- items) {
-        <li>
-            <a href="@href"
-               class="@linkClasses"
-               @if(openInNewTab){rel="noreferrer noopener" target="_blank"}>
-                @messages(textKey)
-            </a>
-        </li>
-    }
-</ul>
+<div class="govuk-grid-column-one-half">
+    @content
+</div>

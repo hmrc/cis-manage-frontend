@@ -14,22 +14,12 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.hmrcfrontend.views.Utils.{toClasses, toAttributes}
+
 @this()
 
-@(items: Seq[(String, String)],
-  listClasses: String = "govuk-list govuk-!-font-size-16",
-  linkClasses: String = "govuk-link",
-  openInNewTab: Boolean = false
-)(implicit messages: Messages)
+@(classes: String = "", attributes: Map[String, String] = Map.empty)(content: Html)
 
-<ul class="@listClasses">
-    @for((textKey, href) <- items) {
-        <li>
-            <a href="@href"
-               class="@linkClasses"
-               @if(openInNewTab){rel="noreferrer noopener" target="_blank"}>
-                @messages(textKey)
-            </a>
-        </li>
-    }
-</ul>
+<div class='@toClasses("govuk-grid-row", classes)' @toAttributes(attributes)>
+  @content
+</div>
