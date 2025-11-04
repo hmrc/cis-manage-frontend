@@ -113,6 +113,7 @@ agent.landing.help.link2 = CIS monthly returns guidance
 agent.landing.help.link3 = CIS 340: Penalties for late returns
 agent.landing.back = Back to clients
 
+introduction.title = Construction Industry Scheme (CIS)
 introduction.heading = Construction Industry Scheme (CIS)
 introduction.p1 = Use this service to:
 introduction.listItem1 = file monthly CIS returns
