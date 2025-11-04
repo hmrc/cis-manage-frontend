@@ -37,9 +37,14 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val loginContinueUrl: String                           = configuration.get[String]("urls.loginContinue")
   lazy val signOutUrl: String                                 = configuration.get[String]("urls.signOut")
   lazy val commercialSoftwareSuppliersUrl: String             = configuration.get[String]("urls.commercialSoftwareSuppliers")
-  lazy val registerAsAProfessionalTaxAgentWithHmrcUrl: String = configuration.get[String]("urls.registerAsAProfessionalTaxAgentWithHmrc")
-  lazy val taxAgentsAndAdvisorsAuthorisationFormsUrl: String  = configuration.get[String]("urls.taxAgentsAndAdvisorsAuthorisationForms")
+  lazy val registerAsAProfessionalTaxAgentWithHmrcUrl: String =
+    configuration.get[String]("urls.registerAsAProfessionalTaxAgentWithHmrc")
+  lazy val taxAgentsAndAdvisorsAuthorisationFormsUrl: String  =
+    configuration.get[String]("urls.taxAgentsAndAdvisorsAuthorisationForms")
   lazy val returnToHomeUrl: String                            = configuration.get[String]("urls.returnToHome")
+  lazy val constructionIndustrySchemeUrl: String              = configuration.get[String]("urls.constructionIndustryScheme")
+  lazy val cisMonthlyReturnGuidanceUrl: String                = configuration.get[String]("urls.cisMonthlyReturnGuidance")
+  lazy val cis340PenaltiesForLateReturnsUrl: String           = configuration.get[String]("urls.cis340PenaltiesForLateReturns")
 
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   lazy val exitSurveyUrl: String        = s"$exitSurveyBaseUrl/feedback/cis-manage-frontend"
