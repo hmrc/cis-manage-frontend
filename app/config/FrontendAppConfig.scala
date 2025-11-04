@@ -37,10 +37,16 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val loginContinueUrl: String                           = configuration.get[String]("urls.loginContinue")
   lazy val signOutUrl: String                                 = configuration.get[String]("urls.signOut")
   lazy val commercialSoftwareSuppliersUrl: String             = configuration.get[String]("urls.commercialSoftwareSuppliers")
-  lazy val technicalSupportWithHmrcOnlineServicesUrl: String  = configuration.get[String]("urls.technicalSupportWithHmrcOnlineServices")
-  lazy val registerAsAProfessionalTaxAgentWithHmrcUrl: String = configuration.get[String]("urls.registerAsAProfessionalTaxAgentWithHmrc")
-  lazy val taxAgentsAndAdvisorsAuthorisationFormsUrl: String  = configuration.get[String]("urls.taxAgentsAndAdvisorsAuthorisationForms")
+  lazy val technicalSupportWithHmrcOnlineServicesUrl: String  =
+    configuration.get[String]("urls.technicalSupportWithHmrcOnlineServices")
+  lazy val registerAsAProfessionalTaxAgentWithHmrcUrl: String =
+    configuration.get[String]("urls.registerAsAProfessionalTaxAgentWithHmrc")
+  lazy val taxAgentsAndAdvisorsAuthorisationFormsUrl: String  =
+    configuration.get[String]("urls.taxAgentsAndAdvisorsAuthorisationForms")
   lazy val returnToHomeUrl: String                            = configuration.get[String]("urls.returnToHome")
+  lazy val cisHelpWhatIsUrl: String                           = configuration.get[String]("urls.cis-help-what-is")
+  lazy val cisHelpMonthlyUrl: String                          = configuration.get[String]("urls.cis-help-monthly")
+  lazy val cisHelp340Url: String                              = configuration.get[String]("urls.cis-help-340")
 
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   lazy val exitSurveyUrl: String        = s"$exitSurveyBaseUrl/feedback/cis-manage-frontend"
@@ -57,4 +63,5 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
 
   lazy val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
+
 }
