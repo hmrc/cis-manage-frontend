@@ -19,6 +19,7 @@ package views.agent
 import base.SpecBase
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.parser.Parser
 import org.scalatest.matchers.should.Matchers._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -110,7 +111,8 @@ class AgentLandingViewSpec extends SpecBase {
       doc.text() should include(messages(app).apply("agent.landing.manage.notices.blurb"))
 
       doc.text() should include(messages(app).apply("agent.landing.manage.amend"))
-      doc.text() should include(messages(app).apply("agent.landing.manage.amend.blurb"))
+      val amendBlurb = Parser.unescapeEntities(messages(app)("agent.landing.manage.amend.blurb"), true)
+      doc.text() should include(amendBlurb)
 
       doc.text() should include(messages(app).apply("agent.landing.manage.clientDetails"))
       doc.text() should include(messages(app).apply("agent.landing.manage.clientDetails.blurb"))
