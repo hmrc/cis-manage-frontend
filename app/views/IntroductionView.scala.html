@@ -18,7 +18,8 @@
 @import config.FrontendAppConfig
 
 @this(
-    layout: templates.Layout,
+    layout: templates.LayoutWithSidebar,
+    introductionSidebarLinks: templates.IntroductionSidebarLinks,
     govukButton: GovukButton,
     govukInsetText: GovukInsetText,
     govukDetails: GovukDetails,
@@ -30,7 +31,6 @@
     link: Link,
     paragraph: Paragraph,
     bulletList: BulletList,
-    introductionSidebarLinks: templates.IntroductionSidebarLinks
 )
 
 @()(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
@@ -43,7 +43,7 @@
 }
 
 @layout(
-    pageTitle = titleNoForm(messages("")),
+    pageTitle = titleWithoutDash(messages("")),
     showSignOut = false,
     showBackLink = false,
     sidebar = Some(introductionSidebarLinks())

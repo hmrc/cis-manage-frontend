@@ -29,14 +29,7 @@
     hmrcStandardPage: HmrcStandardPage
 )
 
-@(
-    pageTitle: String,
-    showBackLink: Boolean = true,
-    timeout: Boolean = true,
-    showSignOut: Boolean = true,
-    showHmrcBanner: Boolean = false,
-    sidebar: Option[Html] = None
-)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
+@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
 
 @head = {
 
@@ -63,21 +56,7 @@
 @hmrcStandardPage(HmrcStandardPageParams(
     pageTitle = Some(pageTitle),
     templateOverrides = TemplateOverrides(
-        additionalHeadBlock = Some(head),
-        mainContentLayout   = Some({ (content: Html) =>
-            Html(
-                s"""
-                |<div class="govuk-grid-row">
-                    |  <div class="govuk-grid-column-two-thirds">
-                    |    ${content.body}
-                    |  </div>
-                    |  <div class="govuk-grid-column-one-third">
-                    |    ${sidebar.map(_.body).getOrElse("")}
-                    |  </div>
-                    |</div>
-                |""".stripMargin
-            )
-        })
+        additionalHeadBlock = Some(head)
     ),
     serviceURLs = ServiceURLs(
         serviceUrl = Some(routes.IndexController.onPageLoad().url),
