@@ -15,19 +15,15 @@
  *@
 
 @import views.html.components._
-@import config.FrontendAppConfig
 
-@this(h2: H2, linkList: LinkList)
+@this(linkList: LinkList)
 
-@(implicit messages: play.api.i18n.Messages, appConfig: config.FrontendAppConfig)
+@(title: String, links: Seq[(String, String)])(implicit messages: play.api.i18n.Messages)
 
 <aside class="app-related-items" role="complementary" aria-labelledby="subsection-title">
-    @h2(messages("introduction.sidebar.h2"), "govuk-heading-s", Some("subsection-title"))
+    <h2 id="subsection-title" class="govuk-heading-s">@messages(title)</h2>
 
-    @linkList(Seq(
-        "introduction.sidebar.link1" -> appConfig.cisHelpWhatIsUrl,
-        "introduction.sidebar.link2" -> appConfig.cisHelpMonthlyUrl,
-        "introduction.sidebar.link3" -> appConfig.cisHelp340Url,
-        "introduction.sidebar.link4" -> appConfig.registerAsAProfessionalTaxAgentWithHmrcUrl,
-    ))
+    <nav role="navigation" aria-labelledby="subsection-title">
+        @linkList(links)
+    </nav>
 </aside>

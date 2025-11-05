@@ -19,7 +19,7 @@
 
 @this(
     layout: templates.LayoutWithSidebar,
-    introductionSidebarLinks: templates.IntroductionSidebarLinks,
+    sidebarLinks: templates.SidebarLinks,
     govukInsetText: GovukInsetText,
     govukDetails: GovukDetails,
     linkList: LinkList,
@@ -45,7 +45,15 @@
     pageTitle = titleWithoutDash(messages("")),
     showSignOut = false,
     showBackLink = false,
-    sidebar = Some(introductionSidebarLinks())
+    sidebar = Some(sidebarLinks(
+        title = "introduction.sidebar.h2",
+        Seq(
+            "introduction.sidebar.link1" -> appConfig.cisHelpWhatIsUrl,
+            "introduction.sidebar.link2" -> appConfig.cisHelpMonthlyUrl,
+            "introduction.sidebar.link3" -> appConfig.cisHelp340Url,
+            "introduction.sidebar.link4" -> appConfig.registerAsAProfessionalTaxAgentWithHmrcUrl,
+        )
+    ))
 ) {
 
     @h1(messages("introduction.heading"))
