@@ -1,0 +1,105 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import components.{H1, H2, Paragraph, Link, TwoColumnGrid, SectionBreak, LandingCard, Nav, Aside}
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow, Card, CardTitle}
+@import viewmodels.contractor.ContractorLandingViewModel
+
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton,
+        govukSummaryList: GovukSummaryList,
+        h1: H1,
+        h2: H2,
+        p: Paragraph,
+        link: Link,
+        twoColumnGrid: TwoColumnGrid,
+        landingCard: LandingCard,
+        sectionBreak: SectionBreak,
+        nav: Nav,
+        aside: Aside
+)
+
+@(vm: ContractorLandingViewModel)(implicit request: Request[_], messages: Messages)
+
+@sidebar = {
+    @aside("contractorLanding.sidebar.title", nav(Seq(
+        "contractorLanding.sidebar.nav.whatIs.text" -> vm.whatIsUrl,
+        "contractorLanding.sidebar.nav.guidance.text" -> vm.guidanceUrl,
+        "contractorLanding.sidebar.nav.penalties.text" -> vm.penaltiesUrl
+    )))
+}
+
+@layout(pageTitle = titleNoForm(messages("contractorLanding.title")), sidebar = Some(sidebar)) {
+
+    @h1("contractorLanding.heading")
+    @p("contractorLanding.paragraph")
+    @govukSummaryList(
+        SummaryListViewModel(rows = Seq(
+            SummaryListRowViewModel(Key("contractorLanding.label.employerReference"), Value(vm.employerReference)),
+            SummaryListRowViewModel(Key("contractorLanding.label.utr"), Value(vm.utr))
+        ))
+    )
+
+    @h2("contractorLanding.subheading.actionRequired")
+    @twoColumnGrid(
+        landingCard(
+            link("contractorLanding.link.returnDue", "#", paragraphWrapped = false),
+            HtmlFormat.fill(Seq(
+                p(vm.returnCount.toString, bold = true, baseClass = "govuk-heading-l", extraClasses = "govuk-!-margin-bottom-1"),
+                p("contractorLanding.label.dueBy", extraClasses = "govuk-!-margin-bottom-1", args = Seq(vm.returnDueDate))
+            ))
+        ),
+        landingCard(
+            link("contractorLanding.link.newNotices", "#", paragraphWrapped = false),
+            HtmlFormat.fill(Seq(
+                p(vm.noticeCount.toString, bold = true, baseClass = "govuk-heading-l", extraClasses = "govuk-!-margin-bottom-1"),
+                p("contractorLanding.label.newNotices", extraClasses = "govuk-!-margin-bottom-1")
+            ))
+        )
+    )
+
+    @h2("contractorLanding.subheading.manage")
+
+    @twoColumnGrid(
+        HtmlFormat.fill(Seq(
+            link("contractorLanding.link.subcontractors", "#", bold = true),
+            p("contractorLanding.label.subcontractors")
+        )),
+        HtmlFormat.fill(Seq(
+            link("contractorLanding.link.history", "#", bold = true),
+            p("contractorLanding.label.history")
+        ))
+    )
+
+    @twoColumnGrid(
+        HtmlFormat.fill(Seq(
+            link("contractorLanding.link.notices", "#", bold = true),
+            p("contractorLanding.label.notices")
+        )),
+        HtmlFormat.fill(Seq(
+            link("contractorLanding.link.amend", "#", bold = true),
+            p("contractorLanding.label.amend")
+        ))
+    )
+
+    @sectionBreak()
+
+    @h2("contractorLanding.subheading.activity")
+    @p("contractorLanding.paragraph.activity", args = Seq(vm.lastSubmittedDate, vm.lastSubmittedTaxMonthYear))
+}
