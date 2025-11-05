@@ -17,21 +17,25 @@
 package viewmodels
 
 import base.SpecBase
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
+import viewmodels.contractor.ContractorLandingViewModel
 
 class ContractorDashboardViewModelSpec extends SpecBase {
 
   "ContractorDashboardViewModel" - {
 
     "should create a valid instance with all required fields" in {
-      val viewModel = ContractorDashboardViewModel(
+      val viewModel = ContractorLandingViewModel(
         employerReference = "123/AB45678",
         utr = "1234567890",
         returnCount = 1,
         returnDueDate = "19 October 2025",
         noticeCount = 2,
         lastSubmittedDate = "19 September 2025",
-        lastSubmittedTaxMonthYear = "August 2025"
+        lastSubmittedTaxMonthYear = "August 2025",
+        whatIsUrl = "#",
+        guidanceUrl = "#",
+        penaltiesUrl = "#"
       )
 
       viewModel.employerReference         shouldBe "123/AB45678"
@@ -44,14 +48,17 @@ class ContractorDashboardViewModelSpec extends SpecBase {
     }
 
     "should support case class copy" in {
-      val original = ContractorDashboardViewModel(
+      val original = ContractorLandingViewModel(
         employerReference = "123/AB45678",
         utr = "1234567890",
         returnCount = 1,
         returnDueDate = "19 October 2025",
         noticeCount = 2,
         lastSubmittedDate = "19 September 2025",
-        lastSubmittedTaxMonthYear = "August 2025"
+        lastSubmittedTaxMonthYear = "August 2025",
+        whatIsUrl = "#",
+        guidanceUrl = "#",
+        penaltiesUrl = "#"
       )
 
       val modified = original.copy(returnCount = 3, noticeCount = 5)
@@ -66,48 +73,60 @@ class ContractorDashboardViewModelSpec extends SpecBase {
     }
 
     "should support equality comparison" in {
-      val viewModel1 = ContractorDashboardViewModel(
+      val viewModel1 = ContractorLandingViewModel(
         employerReference = "123/AB45678",
         utr = "1234567890",
         returnCount = 1,
         returnDueDate = "19 October 2025",
         noticeCount = 2,
         lastSubmittedDate = "19 September 2025",
-        lastSubmittedTaxMonthYear = "August 2025"
+        lastSubmittedTaxMonthYear = "August 2025",
+        whatIsUrl = "#",
+        guidanceUrl = "#",
+        penaltiesUrl = "#"
       )
 
-      val viewModel2 = ContractorDashboardViewModel(
+      val viewModel2 = ContractorLandingViewModel(
         employerReference = "123/AB45678",
         utr = "1234567890",
         returnCount = 1,
         returnDueDate = "19 October 2025",
         noticeCount = 2,
         lastSubmittedDate = "19 September 2025",
-        lastSubmittedTaxMonthYear = "August 2025"
+        lastSubmittedTaxMonthYear = "August 2025",
+        whatIsUrl = "#",
+        guidanceUrl = "#",
+        penaltiesUrl = "#"
       )
 
       viewModel1 shouldBe viewModel2
     }
 
     "should handle different values correctly" in {
-      val viewModel1 = ContractorDashboardViewModel(
+      val viewModel1 = ContractorLandingViewModel(
         employerReference = "123/AB45678",
         utr = "1234567890",
         returnCount = 1,
         returnDueDate = "19 October 2025",
         noticeCount = 2,
         lastSubmittedDate = "19 September 2025",
-        lastSubmittedTaxMonthYear = "August 2025"
+        lastSubmittedTaxMonthYear = "August 2025",
+        whatIsUrl = "#",
+        guidanceUrl = "#",
+        penaltiesUrl = "#"
       )
 
-      val viewModel2 = ContractorDashboardViewModel(
+      val viewModel2 = ContractorLandingViewModel(
         employerReference = "456/CD12345",
         utr = "0987654321",
         returnCount = 5,
         returnDueDate = "20 November 2025",
         noticeCount = 3,
         lastSubmittedDate = "15 October 2025",
-        lastSubmittedTaxMonthYear = "September 2025"
+        lastSubmittedTaxMonthYear = "September 2025",
+        whatIsUrl = "#",
+        guidanceUrl = "#",
+        penaltiesUrl = "#"
       )
 
       viewModel1 should not be viewModel2

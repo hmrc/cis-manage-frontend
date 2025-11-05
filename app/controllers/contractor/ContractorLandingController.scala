@@ -14,40 +14,45 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.contractor
 
-import controllers.ContractorDashboardController.viewModel
+import ContractorLandingController.viewModel
+import config.FrontendAppConfig
 import controllers.actions.*
-
-import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.ContractorDashboardViewModel
-import views.html.ContractorDashboardView
+import viewmodels.contractor.ContractorLandingViewModel
+import views.html.contractor.ContractorLandingView
 
-class ContractorDashboardController @Inject() (
+import javax.inject.Inject
+
+class ContractorLandingController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   val controllerComponents: MessagesControllerComponents,
-  view: ContractorDashboardView
+  view: ContractorLandingView,
+  appConfig: FrontendAppConfig
 ) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = identify { implicit request =>
-    Ok(view(viewModel()))
+    Ok(view(viewModel(appConfig)))
   }
 }
 
-object ContractorDashboardController {
+object ContractorLandingController {
 
-  def viewModel(): ContractorDashboardViewModel = ContractorDashboardViewModel(
+  def viewModel(appConfig: FrontendAppConfig): ContractorLandingViewModel = ContractorLandingViewModel(
     "123/AB45678",
     "1234567890",
     1,
     "19 October 2025",
     2,
     "19 September 2025",
-    "August 2025"
+    "August 2025",
+    appConfig.contractorLandingWhatIsUrl,
+    appConfig.contractorLandingGuidanceUrl,
+    appConfig.contractorLandingPenaltiesUrl
   )
 }

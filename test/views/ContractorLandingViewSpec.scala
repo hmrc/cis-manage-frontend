@@ -24,10 +24,10 @@ import play.api.i18n.Messages
 import play.api.mvc.{AnyContent, Request}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import viewmodels.ContractorDashboardViewModel
-import views.html.ContractorDashboardView
+import viewmodels.contractor.ContractorLandingViewModel
+import views.html.contractor.ContractorLandingView
 
-class ContractorDashboardViewSpec extends SpecBase {
+class ContractorLandingViewSpec extends SpecBase {
 
   private val employerReference         = "123/AB45678"
   private val utr                       = "1234567890"
@@ -37,31 +37,34 @@ class ContractorDashboardViewSpec extends SpecBase {
   private val lastSubmittedDate         = "19 September 2025"
   private val lastSubmittedTaxMonthYear = "August 2025"
 
-  private val viewModel = ContractorDashboardViewModel(
+  private val viewModel = ContractorLandingViewModel(
     employerReference = employerReference,
     utr = utr,
     returnCount = returnCount,
     returnDueDate = returnDueDate,
     noticeCount = noticeCount,
     lastSubmittedDate = lastSubmittedDate,
-    lastSubmittedTaxMonthYear = lastSubmittedTaxMonthYear
+    lastSubmittedTaxMonthYear = lastSubmittedTaxMonthYear,
+    whatIsUrl = "https://www.gov.uk/what-is-the-construction-industry-scheme",
+    guidanceUrl = "https://www.gov.uk/guidance/cis-monthly-returns",
+    penaltiesUrl = "https://www.gov.uk/government/publications/cis-340"
   )
 
-  "ContractorDashboardView" - {
+  "ContractorLandingView" - {
 
     "render the page with expected header and title" in {
       val doc = render()
 
-      doc.title() shouldBe s"${messages(app)("contractorDashboard.title")} - ${messages(app)("service.name")} - GOV.UK"
+      doc.title() shouldBe s"${messages(app)("contractorLanding.title")} - ${messages(app)("service.name")} - GOV.UK"
 
       val h1 = doc.selectFirst("h1")
-      h1.text() shouldBe messages(app)("contractorDashboard.heading")
+      h1.text() shouldBe messages(app)("contractorLanding.heading")
     }
 
     "show introductory paragraph" in {
       val doc = render()
 
-      doc.text() should include(messages(app)("contractorDashboard.paragraph"))
+      doc.text() should include(messages(app)("contractorLanding.paragraph"))
     }
 
     "show employerReference and UTR in a summary list" in {
@@ -72,12 +75,12 @@ class ContractorDashboardViewSpec extends SpecBase {
 
       val employerKey   = rows.get(0).selectFirst(".govuk-summary-list__key").text()
       val employerValue = rows.get(0).selectFirst(".govuk-summary-list__value").text()
-      employerKey   shouldBe messages(app)("contractorDashboard.label.employerReference")
+      employerKey   shouldBe messages(app)("contractorLanding.label.employerReference")
       employerValue shouldBe employerReference
 
       val utrKey   = rows.get(1).selectFirst(".govuk-summary-list__key").text()
       val utrValue = rows.get(1).selectFirst(".govuk-summary-list__value").text()
-      utrKey   shouldBe messages(app)("contractorDashboard.label.utr")
+      utrKey   shouldBe messages(app)("contractorLanding.label.utr")
       utrValue shouldBe utr
     }
 
@@ -85,7 +88,7 @@ class ContractorDashboardViewSpec extends SpecBase {
       val doc = render()
 
       val headings = doc.select("h2.govuk-heading-m")
-      headings.eachText() should contain(messages(app)("contractorDashboard.subheading.actionRequired"))
+      headings.eachText() should contain(messages(app)("contractorLanding.subheading.actionRequired"))
     }
 
     "render the Return due dashboard card with count and date" in {
@@ -98,14 +101,14 @@ class ContractorDashboardViewSpec extends SpecBase {
 
       // Check the link title
       val cardTitle = returnDueCard.selectFirst(".govuk-summary-card__title")
-      cardTitle.text() should include(messages(app)("contractorDashboard.link.returnDue"))
+      cardTitle.text() should include(messages(app)("contractorLanding.link.returnDue"))
 
       // Check the count is displayed
       val content = returnDueCard.selectFirst(".govuk-summary-card__content")
       content.text() should include(returnCount.toString)
 
       // Check the due date is displayed
-      content.text() should include(messages(app)("contractorDashboard.label.dueBy", returnDueDate))
+      content.text() should include(messages(app)("contractorLanding.label.dueBy", returnDueDate))
     }
 
     "render the New notices dashboard card with count" in {
@@ -118,63 +121,63 @@ class ContractorDashboardViewSpec extends SpecBase {
 
       // Check the link title
       val cardTitle = newNoticesCard.selectFirst(".govuk-summary-card__title")
-      cardTitle.text() should include(messages(app)("contractorDashboard.link.newNotices"))
+      cardTitle.text() should include(messages(app)("contractorLanding.link.newNotices"))
 
       // Check the count is displayed
       val content = newNoticesCard.selectFirst(".govuk-summary-card__content")
       content.text() should include(noticeCount.toString)
 
       // Check the subtitle is displayed
-      content.text() should include(messages(app)("contractorDashboard.label.newNotices"))
+      content.text() should include(messages(app)("contractorLanding.label.newNotices"))
     }
 
     "render Manage your CIS section heading" in {
       val doc = render()
 
       val headings = doc.select("h2.govuk-heading-m")
-      headings.eachText() should contain(messages(app)("contractorDashboard.subheading.manage"))
+      headings.eachText() should contain(messages(app)("contractorLanding.subheading.manage"))
     }
 
     "render Subcontractors link and description" in {
       val doc = render()
 
-      doc.text() should include(messages(app)("contractorDashboard.link.subcontractors"))
-      doc.text() should include(messages(app)("contractorDashboard.label.subcontractors"))
+      doc.text() should include(messages(app)("contractorLanding.link.subcontractors"))
+      doc.text() should include(messages(app)("contractorLanding.label.subcontractors"))
     }
 
     "render Return history link and description" in {
       val doc = render()
 
-      doc.text() should include(messages(app)("contractorDashboard.link.history"))
-      doc.text() should include(messages(app)("contractorDashboard.label.history"))
+      doc.text() should include(messages(app)("contractorLanding.link.history"))
+      doc.text() should include(messages(app)("contractorLanding.label.history"))
     }
 
     "render Notices and statements link and description" in {
       val doc = render()
 
-      doc.text() should include(messages(app)("contractorDashboard.link.notices"))
-      doc.text() should include(messages(app)("contractorDashboard.label.notices"))
+      doc.text() should include(messages(app)("contractorLanding.link.notices"))
+      doc.text() should include(messages(app)("contractorLanding.label.notices"))
     }
 
     "render Amend a return link and description" in {
       val doc = render()
 
-      doc.text() should include(messages(app)("contractorDashboard.link.amend"))
-      doc.text() should include(messages(app)("contractorDashboard.label.amend"))
+      doc.text() should include(messages(app)("contractorLanding.link.amend"))
+      doc.text() should include(messages(app)("contractorLanding.label.amend"))
     }
 
     "render Recent activity section heading" in {
       val doc = render()
 
       val headings = doc.select("h2.govuk-heading-m")
-      headings.eachText() should contain(messages(app)("contractorDashboard.subheading.activity"))
+      headings.eachText() should contain(messages(app)("contractorLanding.subheading.activity"))
     }
 
     "render Recent activity paragraph with last submitted date and tax month" in {
       val doc = render()
 
       val expectedActivity =
-        messages(app)("contractorDashboard.paragraph.activity", lastSubmittedDate, lastSubmittedTaxMonthYear)
+        messages(app)("contractorLanding.paragraph.activity", lastSubmittedDate, lastSubmittedTaxMonthYear)
       doc.text() should include(expectedActivity)
     }
 
@@ -182,20 +185,20 @@ class ContractorDashboardViewSpec extends SpecBase {
       val doc = render()
 
       // Check sidebar title
-      doc.text() should include(messages(app)("contractorDashboard.sidebar.title"))
+      doc.text() should include(messages(app)("contractorLanding.sidebar.title"))
 
       // Check navigation links
-      doc.text() should include(messages(app)("contractorDashboard.sidebar.nav.whatIs.text"))
-      doc.text() should include(messages(app)("contractorDashboard.sidebar.nav.guidance.text"))
-      doc.text() should include(messages(app)("contractorDashboard.sidebar.nav.penalties.text"))
+      doc.text() should include(messages(app)("contractorLanding.sidebar.nav.whatIs.text"))
+      doc.text() should include(messages(app)("contractorLanding.sidebar.nav.guidance.text"))
+      doc.text() should include(messages(app)("contractorLanding.sidebar.nav.penalties.text"))
 
       // Verify the links have correct hrefs
       val links     = doc.select("a[href]")
       val linkTexts = links.eachText()
 
-      linkTexts should contain(messages(app)("contractorDashboard.sidebar.nav.whatIs.text"))
-      linkTexts should contain(messages(app)("contractorDashboard.sidebar.nav.guidance.text"))
-      linkTexts should contain(messages(app)("contractorDashboard.sidebar.nav.penalties.text"))
+      linkTexts should contain(messages(app)("contractorLanding.sidebar.nav.whatIs.text"))
+      linkTexts should contain(messages(app)("contractorLanding.sidebar.nav.guidance.text"))
+      linkTexts should contain(messages(app)("contractorLanding.sidebar.nav.penalties.text"))
 
       // Verify external URLs
       links.select("[href=https://www.gov.uk/what-is-the-construction-industry-scheme]").size() shouldBe 1
@@ -210,7 +213,7 @@ class ContractorDashboardViewSpec extends SpecBase {
     implicit val request: Request[AnyContent] = FakeRequest(GET, "/contractor-dashboard")
     implicit val msgs: Messages               = messages(application)
 
-    val view = application.injector.instanceOf[ContractorDashboardView]
+    val view = application.injector.instanceOf[ContractorLandingView]
     val html = view(viewModel)
 
     Jsoup.parse(html.body)

@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package viewmodels
+package viewmodels.contractor
 
-case class ContractorDashboardViewModel(
+case class ContractorLandingViewModel(
   employerReference: String,
   utr: String,
   returnCount: Int,
   returnDueDate: String,
   noticeCount: Int,
   lastSubmittedDate: String,
-  lastSubmittedTaxMonthYear: String
+  lastSubmittedTaxMonthYear: String,
+  whatIsUrl: String,
+  guidanceUrl: String,
+  penaltiesUrl: String
 )
