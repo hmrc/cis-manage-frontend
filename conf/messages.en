@@ -84,6 +84,32 @@ agent.noAuthorisedClients.listItem2.afterLinkText = to authorise you by post
 agent.noAuthorisedClients.p4 = It can take up to 5 working days for new authorisations to appear in your account.
 agent.noAuthorisedClients.returnToHome.link = Return to home
 
+contractorDashboard.title = Manage CIS return
+contractorDashboard.heading = Manage CIS return
+contractorDashboard.paragraph = You can manage ABC Construction Ltd's monthly CIS returns – including dates and statements.
+contractorDashboard.label.employerReference = Employer reference
+contractorDashboard.label.utr = Unique Taxpayer Reference (UTR)
+contractorDashboard.subheading.actionRequired = Action required
+contractorDashboard.link.returnDue = Return due
+contractorDashboard.label.dueBy = Due by {0}
+contractorDashboard.link.newNotices = New notices
+contractorDashboard.label.newNotices = Notices to view
+contractorDashboard.subheading.manage = Manage your CIS
+contractorDashboard.link.subcontractors = Subcontractors
+contractorDashboard.label.subcontractors = View, verify or manage your subcontractors.
+contractorDashboard.link.history = Return history
+contractorDashboard.label.history = View your previously submitted CIS returns.
+contractorDashboard.link.notices = Notices and statements
+contractorDashboard.label.notices = View your previously submitted CIS returns.
+contractorDashboard.link.amend = Amend a return
+contractorDashboard.label.amend = Make changes to a return you've already submitted.
+contractorDashboard.subheading.activity = Recent activity
+contractorDashboard.paragraph.activity = Last return submitted: {0} for tax month {0}
+contractorDashboard.sidebar.title = Help and guidance
+contractorDashboard.sidebar.nav.whatIs.text = What is the Construction Industry Scheme
+contractorDashboard.sidebar.nav.guidance.text = CIS monthly returns guidance
+contractorDashboard.sidebar.nav.penalties.text = CIS 340: Penalties for late returns
+
 
 agent.landing.title = Construction Industry Scheme for {0}
 agent.landing.h1 = Manage CIS return

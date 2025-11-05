@@ -24,3 +24,5 @@ GET         /agent/retrieve-client-list                             controllers.
 GET         /agent/no-client-list                                   controllers.agent.FailedToRetrieveClientController.onPageLoad()
 GET         /agent/no-authorised-clients                            controllers.agent.NoAuthorisedClientsController.onPageLoad()
 GET         /agent/authorised-client-manage-CIS-returns             controllers.agent.AgentLandingController.onPageLoad()
+
+GET         /org/manage-cis-returns                        controllers.ContractorDashboardController.onPageLoad()
