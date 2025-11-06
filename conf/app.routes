@@ -25,4 +25,6 @@ GET         /agent/no-client-list                                   controllers.
 GET         /agent/no-authorised-clients                            controllers.agent.NoAuthorisedClientsController.onPageLoad()
 GET         /agent/authorised-client-manage-CIS-returns             controllers.agent.AgentLandingController.onPageLoad()
 
+GET         /sign-into-cis                                          controllers.IntroductionController.onPageLoad()
+
 GET         /org/manage-cis-returns                                 controllers.contractor.ContractorLandingController.onPageLoad()
