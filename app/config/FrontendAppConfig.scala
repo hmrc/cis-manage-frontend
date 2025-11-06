@@ -64,4 +64,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   lazy val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 
+  lazy val contractorLandingWhatIsUrl: String    = configuration.get[String]("urls.contractorLandingWhatIsUrl")
+  lazy val contractorLandingGuidanceUrl: String  = configuration.get[String]("urls.contractorLandingGuidanceUrl")
+  lazy val contractorLandingPenaltiesUrl: String = configuration.get[String]("urls.contractorLandingPenaltiesUrl")
 }
