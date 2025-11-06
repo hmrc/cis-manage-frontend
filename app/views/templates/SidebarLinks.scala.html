@@ -16,12 +16,12 @@
 
 @import views.html.components._
 
-@this(linkList: LinkList)
+@this(h2: H2, linkList: LinkList)
 
 @(title: String, links: Seq[(String, String)])(implicit messages: play.api.i18n.Messages)
 
 <aside class="app-related-items" role="complementary" aria-labelledby="subsection-title">
-    <h2 id="subsection-title" class="govuk-heading-s">@messages(title)</h2>
+    @h2(messages(title), "govuk-heading-s", id = Some("subsection-title"))
 
     <nav role="navigation" aria-labelledby="subsection-title">
         @linkList(links)
