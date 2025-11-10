@@ -7,16 +7,17 @@ object AppDependencies {
 
   val compile: Seq[ModuleID] = Seq(
     play.sbt.PlayImport.ws,
-    "uk.gov.hmrc"       %% "play-frontend-hmrc-play-30"    % "12.17.0",
+    "uk.gov.hmrc"       %% "play-frontend-hmrc-play-30"    % "12.18.0",
     "uk.gov.hmrc"       %% "bootstrap-frontend-play-30"    % bootstrapVersion,
-    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-30"            % hmrcMongoVersion
-
+    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-30"            % hmrcMongoVersion,
+    "com.beachape"      %% "enumeratum-play"               % "1.9.0",
   )
 
   val test: Seq[ModuleID] = Seq(
     "uk.gov.hmrc"             %% "bootstrap-test-play-30"  % bootstrapVersion,
     "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-30" % hmrcMongoVersion,
-    "org.scalatestplus"       %% "scalacheck-1-17"         % "3.2.18.0"
+    "org.scalatestplus"       %% "scalacheck-1-18"         % "3.2.19.0",
+    "io.github.wolfendale"    %% "scalacheck-gen-regexp"   % "1.1.0"
   ).map(_ % Test)
 
   def apply(): Seq[ModuleID] = compile ++ test

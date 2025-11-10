@@ -14,24 +14,12 @@
  * limitations under the License.
  */
 
-package viewmodels
+package models.agent
 
-package object govuk {
+import play.api.libs.json.{Json, OFormat}
 
-  object all
-      extends ImplicitConversions
-      with BackLinkFluency
-      with ButtonFluency
-      with CheckboxFluency
-      with DateFluency
-      with ErrorSummaryFluency
-      with FieldsetFluency
-      with HintFluency
-      with InputFluency
-      with InsetTextFluency
-      with LabelFluency
-      with RadiosFluency
-      with SummaryListFluency
-      with TagFluency
-      with SelectFluency
+case class ClientListFormData(searchBy: String, searchFilter: String)
+
+object ClientListFormData {
+  implicit val format: OFormat[ClientListFormData] = Json.format[ClientListFormData]
 }

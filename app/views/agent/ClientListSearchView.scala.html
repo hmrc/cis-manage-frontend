@@ -1,0 +1,164 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import views.html.helper.CSPNonce
+@import viewmodels.InputWidth._
+@import views.html.components._
+@import viewmodels.agent.{ClientListViewModel, SearchByList}
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accessibleautocomplete.AccessibleAutocomplete
+@import config.FrontendAppConfig
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukInput: GovukInput,
+    govukButton: GovukButton,
+    govukSelect: GovukSelect,
+    govukDetails: GovukDetails,
+    paragraph: Paragraph,
+    link: Link,
+    h1: H1,
+    h2: H2,
+    appConfig: FrontendAppConfig
+)
+
+@(form: Form[_], searchByOptions: Seq[SearchByList], clientList: Seq[ClientListViewModel])(implicit request: Request[_], messages: Messages)
+
+@scripts = {
+    <script src='@controllers.routes.Assets.versioned("javascripts/jquery-3.6.3.min.js")' @{CSPNonce.attr}></script>
+    <script src='@controllers.routes.Assets.versioned("javascripts/moj-frontend.min.js")' @{CSPNonce.attr}></script>
+}
+
+@css = {
+    <link href='@controllers.routes.Assets.versioned("stylesheets/moj-frontend.min.css")' media="all" rel="stylesheet" type="text/css" />
+}
+
+@downloadYourClientList = {
+    @paragraph("agent.clientListSearch.details.1.p1")
+    @link("agent.clientListSearch.details.1.link", appConfig.commercialSoftwareSuppliersUrl)
+}
+
+@filingOnlyService = {
+    @paragraph("agent.clientListSearch.details.2.p1")
+    @paragraph("agent.clientListSearch.details.2.p2")
+    @link("agent.clientListSearch.details.2.link", appConfig.commercialSoftwareSuppliersUrl)
+}
+
+@layout(pageTitle = title(form, messages("agent.clientListSearch.title")),
+additionalScripts = Some(scripts),
+additionalCss = Some(css)) {
+
+    @formHelper(action = controllers.agent.routes.ClientListSearchController.onSubmit()) {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        @h1(messages("agent.clientListSearch.heading"))
+
+        @govukSelect(
+            SelectViewModel(
+                field = form("searchBy"),
+                items = Seq(SelectItem(value = Some(""), text = "")) ++
+                    searchByOptions.map(searchOption =>
+                        SelectItem(
+                            value = Some(searchOption.value),
+                            text = searchOption.label
+                        )
+                    ),
+                label = LabelViewModel(messages("agent.clientListSearch.searchBy.label")).withCssClass("govuk-label--m")
+            )
+            .withCssClass("govuk-input")
+            .withFormGroupClasses("govuk-!-width-two-thirds")
+            .withAttribute("aria-label" -> "searchBy")
+            .asAccessibleAutocomplete(Some(AccessibleAutocomplete(defaultValue = Some(""), showAllValues = true, autoSelect = true)))
+        )
+
+        @govukInput(
+            InputViewModel(
+                field = form("searchFilter"),
+                label = LabelViewModel(messages("agent.clientListSearch.searchFilter.label"))
+            )
+            .withHint(Hint(content = messages("agent.clientListSearch.searchFilter.label.hint")))
+            .withWidth(TwoThirds)
+        )
+
+        <div class="govuk-button-group">
+            @govukButton(
+                ButtonViewModel(messages("site.search"))
+            )
+            @link(
+                "agent.clientListSearch.clearSearch",
+                controllers.agent.routes.ClientListSearchController.clearFilter().url,
+                extraClasses = "govuk-radios--inline"
+            )
+        </div>
+
+        @if(clientList.isEmpty) {
+            <table id="agent-client-no-list" class="govuk-table">
+                <caption class="govuk-table__caption govuk-table__caption--m govuk-visually-hidden">@messages("agent.clientListSearch.heading")</caption>
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">@messages("agent.clientListSearch.noResults")</td>
+                </tr>
+            </table>
+        } else {
+            <table id="agent-client-list" class="govuk-table" data-module="moj-sortable-table">
+                <caption class="govuk-table__caption govuk-table__caption--m govuk-visually-hidden">@messages("agent.clientListSearch.heading")</caption>
+                <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th class="govuk-table__header" scope="col" aria-sort="ascending">@messages("agent.clientListSearch.th.clientName")</th>
+                    <th class="govuk-table__header" scope="col" aria-sort="none">@messages("agent.clientListSearch.th.employerReference")</th>
+                    <th class="govuk-table__header" scope="col" aria-sort="none">@messages("agent.clientListSearch.th.clientReference")</th>
+                    <th class="govuk-table__header" scope="col">@messages("agent.clientListSearch.th.action")</th>
+                </tr>
+                </thead>
+                @clientList.map { agentClient =>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">
+                            @agentClient.clientLink.map { link =>
+                                <a href="@link.href" class="govuk-link">@agentClient.clientName</a>
+                            }
+                        </td>
+                        <td class="govuk-table__cell">@agentClient.employerReference</td>
+                        <td class="govuk-table__cell">@agentClient.clientReference</td>
+                        <td class="govuk-table__cell">
+                            @agentClient.removeLink.map { link =>
+                                <a href="@link.href" class="govuk-link">@link.text</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </table>
+        }
+
+        @govukDetails(
+            Details(
+                summary = Text(messages("agent.clientListSearch.details.1.summary")),
+                content = HtmlContent(downloadYourClientList)
+            )
+        )
+
+        @govukDetails(
+            Details(
+                summary = Text(messages("agent.clientListSearch.details.2.summary")),
+                content = HtmlContent(filingOnlyService)
+            )
+        )
+
+    }
+}

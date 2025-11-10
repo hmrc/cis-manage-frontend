@@ -6,6 +6,7 @@ site.change = Change
 site.no = No
 site.yes = Yes
 site.continue = Continue
+site.search = Search
 site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
@@ -83,3 +84,44 @@ agent.noAuthorisedClients.listItem2.link = form 64-8
 agent.noAuthorisedClients.listItem2.afterLinkText = to authorise you by post
 agent.noAuthorisedClients.p4 = It can take up to 5 working days for new authorisations to appear in your account.
 agent.noAuthorisedClients.returnToHome.link = Return to home
+
+
+
+agent.clientListSearch.title = Select a client to file CIS returns
+agent.clientListSearch.heading = File monthly CIS returns
+
+agent.clientListSearch.searchBy.label = What do you want to search by?
+agent.clientListSearch.searchBy.error.required = Select a search option
+
+agent.clientListSearch.searchFilter.label = Enter your search
+agent.clientListSearch.searchFilter.label.hint = This is the client name (ABC Construction), employer reference (123/AB45678), or client reference (ABC-001)
+agent.clientListSearch.searchFilter.error.required = Enter either a Client name, Employers Reference or your Client reference
+agent.clientListSearch.searchFilter.error.length = Search value must be 35 characters or less
+agent.clientListSearch.searchFilter.error.format = Search value must only include letters, numbers, hyphens, spaces, commas, full stops, exclamation marks, ampersands, underscores, parentheses and apostrophes
+
+agent.clientListSearch.th.clientName = Client name
+agent.clientListSearch.th.employerReference = Employer reference
+agent.clientListSearch.th.clientReference = Client reference
+agent.clientListSearch.th.action = Action
+agent.clientListSearch.td.action.remove = Remove
+
+agent.clientListSearch.clearSearch = Clear search
+agent.clientListSearch.noResults = No search results found
+
+
+
+
+
+agent.clientListSearch.details.1.summary = Download your client list
+agent.clientListSearch.details.1.p1 = You can download a list of all your clients as a CSV file. This may take some time if you have many clients.
+agent.clientListSearch.details.1.link = Download client list (CSV)
+
+agent.clientListSearch.details.2.summary = Filing only service
+agent.clientListSearch.details.2.p1 = You can send CIS monthly returns on behalf of a client without completing an authorisation online or form 64-8.
+agent.clientListSearch.details.2.p2 = This service is only available using commercial software.
+agent.clientListSearch.details.2.link = Find commercial software for CIS returns (opens in new tab)
+
+agent.clientListSearch.error.required = Enter a search value
+
+agent.clientListSearch.select.error.xss = The search by option you enter must not include the following characters <, >, " or &
+agent.clientListSearch.select.error.length = The search by option cannot be more than 35 characters

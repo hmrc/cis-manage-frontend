@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-package viewmodels
+package viewmodels.agent
 
-package object govuk {
+import enumeratum.{EnumEntry, PlayEnum}
 
-  object all
-      extends ImplicitConversions
-      with BackLinkFluency
-      with ButtonFluency
-      with CheckboxFluency
-      with DateFluency
-      with ErrorSummaryFluency
-      with FieldsetFluency
-      with HintFluency
-      with InputFluency
-      with InsetTextFluency
-      with LabelFluency
-      with RadiosFluency
-      with SummaryListFluency
-      with TagFluency
-      with SelectFluency
+sealed abstract class ClientStatus(override val entryName: String) extends EnumEntry
+
+object ClientStatus extends PlayEnum[ClientStatus] {
+
+  override val values: IndexedSeq[ClientStatus] = findValues
+
+  case object Active extends ClientStatus("ACTIVE")
+  case object InActive extends ClientStatus("INACTIVE")
+  
 }
