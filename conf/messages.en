@@ -89,7 +89,7 @@ agent.clientListSearch.title = Select a client to file CIS returns
 agent.clientListSearch.heading = File monthly CIS returns
 
 agent.clientListSearch.searchBy.label = What do you want to search by?
-agent.clientListSearch.searchBy.error.required = Select a search option
+agent.clientListSearch.searchBy.error.required = Enter client name, employer reference or client reference from the dropdown list
 
 agent.clientListSearch.searchFilter.label = Enter your search
 agent.clientListSearch.searchFilter.label.hint = This is the client name (ABC Construction), employer reference (123/AB45678), or client reference (ABC-001)
@@ -97,6 +97,7 @@ agent.clientListSearch.searchFilter.error.required = Enter either a Client name,
 agent.clientListSearch.searchFilter.error.length = Search value must be 35 characters or less
 agent.clientListSearch.searchFilter.error.format = Search value must only include letters, numbers, hyphens, spaces, commas, full stops, exclamation marks, ampersands, underscores, parentheses and apostrophes
 
+agent.clientListSearch.table.caption = Your clients
 agent.clientListSearch.th.clientName = Client name
 agent.clientListSearch.th.employerReference = Employer reference
 agent.clientListSearch.th.clientReference = Client reference

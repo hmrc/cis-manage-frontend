@@ -73,6 +73,9 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
 
       val hint: Element = getElementByClass(doc, "govuk-hint")
       hint.text() mustBe messages("agent.clientListSearch.searchFilter.label.hint")
+
+      doc.getElementById("table-heading").text mustBe messages("agent.clientListSearch.table.caption")
+
     }
 
     "must show error summary and messages when form has errors" in new Setup {

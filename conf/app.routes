@@ -29,6 +29,6 @@ GET         /sign-into-cis                                          controllers.
 
 GET         /org/manage-cis-returns                                 controllers.contractor.ContractorLandingController.onPageLoad()
 
-GET         /agent/agent-client-list-search                         controllers.agent.ClientListSearchController.onPageLoad()
-POST        /agent/agent-client-list-search                         controllers.agent.ClientListSearchController.onSubmit()
-GET         /agent/agent-client-list-search/clear                   controllers.agent.ClientListSearchController.clearFilter()
+GET         /agent/file-monthly-cis-returns                         controllers.agent.ClientListSearchController.onPageLoad()
+POST        /agent/file-monthly-cis-returns                         controllers.agent.ClientListSearchController.onSubmit()
+GET         /agent/file-monthly-cis-returns/clear                   controllers.agent.ClientListSearchController.clearFilter()
