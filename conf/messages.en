@@ -85,8 +85,6 @@ agent.noAuthorisedClients.listItem2.afterLinkText = to authorise you by post
 agent.noAuthorisedClients.p4 = It can take up to 5 working days for new authorisations to appear in your account.
 agent.noAuthorisedClients.returnToHome.link = Return to home
 
-
-
 agent.clientListSearch.title = Select a client to file CIS returns
 agent.clientListSearch.heading = File monthly CIS returns
 
@@ -107,21 +105,93 @@ agent.clientListSearch.td.action.remove = Remove
 
 agent.clientListSearch.clearSearch = Clear search
 agent.clientListSearch.noResults = No search results found
-
-
-
-
-
 agent.clientListSearch.details.1.summary = Download your client list
 agent.clientListSearch.details.1.p1 = You can download a list of all your clients as a CSV file. This may take some time if you have many clients.
 agent.clientListSearch.details.1.link = Download client list (CSV)
-
 agent.clientListSearch.details.2.summary = Filing only service
 agent.clientListSearch.details.2.p1 = You can send CIS monthly returns on behalf of a client without completing an authorisation online or form 64-8.
 agent.clientListSearch.details.2.p2 = This service is only available using commercial software.
 agent.clientListSearch.details.2.link = Find commercial software for CIS returns (opens in new tab)
 
-agent.clientListSearch.error.required = Enter a search value
+contractorLanding.title = Manage CIS return
+contractorLanding.heading = Manage CIS return
+contractorLanding.paragraph = You can manage ABC Construction Ltd’s monthly CIS returns – including dates and statements.
+contractorLanding.label.employerReference = Employer reference
+contractorLanding.label.utr = Unique Taxpayer Reference (UTR)
+contractorLanding.subheading.actionRequired = Action required
+contractorLanding.link.returnDue = Return due
+contractorLanding.label.dueBy = Due by {0}
+contractorLanding.link.newNotices = New notices
+contractorLanding.label.newNotices = Notices to view
+contractorLanding.subheading.manage = Manage your CIS
+contractorLanding.link.subcontractors = Subcontractors
+contractorLanding.label.subcontractors = View, verify or manage your subcontractors.
+contractorLanding.link.history = Return history
+contractorLanding.label.history = View your previously submitted CIS returns.
+contractorLanding.link.notices = Notices and statements
+contractorLanding.label.notices = View HMRC notices, penalty warnings and confirmation statements.
+contractorLanding.link.amend = Amend a return
+contractorLanding.label.amend = Make changes to a return you’ve already submitted.
+contractorLanding.subheading.activity = Recent activity
+contractorLanding.paragraph.activity = Last return submitted: {0} for tax month {1}
+contractorLanding.sidebar.title = Help and guidance
+contractorLanding.sidebar.nav.whatIs.text = What is the Construction Industry Scheme
+contractorLanding.sidebar.nav.guidance.text = CIS monthly returns guidance
+contractorLanding.sidebar.nav.penalties.text = CIS 340: Penalties for late returns
 
-agent.clientListSearch.select.error.xss = The search by option you enter must not include the following characters <, >, " or &
-agent.clientListSearch.select.error.length = The search by option cannot be more than 35 characters
+agent.landing.title = Construction Industry Scheme for {0}
+agent.landing.h1 = Manage CIS return
+agent.landing.intro = You can manage {0}&#8217;s monthly CIS returns – including dates and statements.
+agent.landing.employerRef.key = Employer reference
+agent.landing.utr.key = Unique Taxpayer Reference (UTR)
+agent.landing.h2.actionRequired = Action required
+agent.landing.h2.manageClient = Manage this client
+agent.landing.h2.recentActivity = Recent activity
+agent.landing.h2.help = Help and guidance
+agent.landing.card.returnDue.title = Return due
+agent.landing.card.returnDue.dueBy = Due by {0}
+agent.landing.card.notices.title = New notices
+agent.landing.card.notices.subtitle = Notices to view
+agent.landing.manage.subcontractors = Subcontractors
+agent.landing.manage.subcontractors.blurb = View, verify or manage subcontractors for this client.
+agent.landing.manage.returnHistory = Return history
+agent.landing.manage.returnHistory.blurb = View previously submitted CIS returns for this client.
+agent.landing.manage.notices = Notices and statements
+agent.landing.manage.notices.blurb = View HMRC notices, penalty warnings and confirmation statements.
+agent.landing.manage.amend = Amend a return
+agent.landing.manage.amend.blurb = Make changes to a return you&#8217;ve already submitted.
+agent.landing.manage.clientDetails = Client details
+agent.landing.manage.clientDetails.blurb = Update client information and authorisation settings.
+agent.landing.recentActivity.line = Last return submitted: {0} for tax month {1} {2}
+agent.landing.help.link1 = What is the Construction Industry Scheme
+agent.landing.help.link2 = CIS monthly returns guidance
+agent.landing.help.link3 = CIS 340: Penalties for late returns
+agent.landing.back = Back to clients
+
+introduction.title = Construction Industry Scheme (CIS)
+introduction.heading = Construction Industry Scheme (CIS)
+introduction.p1 = Use this service to:
+introduction.listItem1 = file monthly CIS returns
+introduction.listItem2 = file nil returns (when you have made no payments)
+introduction.listItem3 = view and manage subcontractors
+introduction.listItem4 = amend returns you have already submitted
+introduction.listItem5 = view notices and statements
+introduction.listItem6 = appeal against late-filing penalties
+introduction.listItem7 = save incomplete returns
+introduction.inset = You must file CIS returns for each tax month, by the 19th of the following month.
+introduction.h2 = Before you start
+introduction.p2 = To use this service, you need:
+introduction.listItem8 = to be authorised to act for your clients
+introduction.listItem9 = a tax office reference or Unique Taxpayer Reference (UTR)
+introduction.listItem10 = details of payments made to subcontractors during the tax month
+introduction.details.summary = Other ways to file CIS returns
+introduction.details.h3 = Filing only service
+introduction.details.p1 = You can send CIS monthly returns without completing an authorisation online or form FBI-2.
+introduction.details.p2 = This service is only available using commercial software.
+introduction.details.link = Find commercial software for CIS returns
+introduction.button.continue = Continue
+introduction.sidebar.h2 = Related content
+introduction.sidebar.link1 = What is the Construction Industry Scheme
+introduction.sidebar.link2 = CIS monthly returns guidance
+introduction.sidebar.link3 = CIS 340: Penalties for late returns
+introduction.sidebar.link4 = Client authorisation guidance

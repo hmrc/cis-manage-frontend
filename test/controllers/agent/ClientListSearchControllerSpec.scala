@@ -37,8 +37,7 @@ import scala.concurrent.Future
 
 class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
-
-  val formProvider = new ClientListFormProvider()
+  val formProvider                   = new ClientListFormProvider()
   val form: Form[ClientListFormData] = formProvider()
 
   lazy val clientListSearchRoute: String = controllers.agent.routes.ClientListSearchController.onPageLoad().url
@@ -58,9 +57,11 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[ClientListSearchView]
 
-
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, SearchByList.searchByOptions, filteredClients)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, SearchByList.searchByOptions, filteredClients)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -68,7 +69,8 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
       val filteredClients = ClientListViewModel.filterByField("CN", "ABC")
 
-      val userAnswers = UserAnswers(userAnswersId).set(ClientListSearchPage, ClientListFormData("CN", "ABC")).success.value
+      val userAnswers =
+        UserAnswers(userAnswersId).set(ClientListSearchPage, ClientListFormData("CN", "ABC")).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -81,7 +83,10 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(form.fill(ClientListFormData("CN", "ABC")), SearchByList.searchByOptions, filteredClients)(request, messages(application)).toString
+          view(form.fill(ClientListFormData("CN", "ABC")), SearchByList.searchByOptions, filteredClients)(
+            request,
+            messages(application)
+          ).toString
       }
     }
 
@@ -126,7 +131,10 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, SearchByList.searchByOptions, filteredClients)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, SearchByList.searchByOptions, filteredClients)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 

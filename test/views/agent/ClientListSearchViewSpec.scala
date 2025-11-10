@@ -53,21 +53,21 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
   "ClientListSearchView" - {
 
     "must render the page with heading, paragraph, input and button" in new Setup {
-      val html: HtmlFormat.Appendable  = view(form = form, searchByOptions = searchOptions, clientList = clientList)
-      val doc: Document = Jsoup.parse(html.body)
-      doc.title must include(messages("agent.clientListSearch.title"))
+      val html: HtmlFormat.Appendable = view(form = form, searchByOptions = searchOptions, clientList = clientList)
+      val doc: Document               = Jsoup.parse(html.body)
+      doc.title                must include(messages("agent.clientListSearch.title"))
       doc.select("h1").text mustBe messages("agent.clientListSearch.heading")
       doc.select("label").text must include(messages("agent.clientListSearch.searchBy.label"))
 
       def validateSelectValues(document: Document, searchByOptions: Seq[SearchByList], numberOfSets: Int = 1): Unit = {
         val elements: List[Element] = getElementsBySelector(document, "option")
-        elements.size shouldBe searchByOptions.size + 1
+        elements.size                     shouldBe searchByOptions.size + 1
         elements.map(_.attr("value")).toSet should contain allElementsOf searchByOptions.map(_.value)
       }
 
       validateSelectValues(doc, searchOptions, 3)
 
-      doc.select("label").text must include(messages("agent.clientListSearch.searchFilter.label"))
+      doc.select("label").text                  must include(messages("agent.clientListSearch.searchFilter.label"))
       doc.select("button[type=submit]").text mustBe messages("site.search")
       doc.getElementsByClass("govuk-link").text must include(messages("agent.clientListSearch.clearSearch"))
 
@@ -77,8 +77,9 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
 
     "must show error summary and messages when form has errors" in new Setup {
       val boundWithError: Form[ClientListFormData] = form.bind(Map("searchBy" -> "", "searchFilter" -> ""))
-      val html: HtmlFormat.Appendable = view(form = boundWithError, searchByOptions = searchOptions, clientList = clientList)
-      val doc: Document = Jsoup.parse(html.body)
+      val html: HtmlFormat.Appendable              =
+        view(form = boundWithError, searchByOptions = searchOptions, clientList = clientList)
+      val doc: Document                            = Jsoup.parse(html.body)
 
       doc.title must startWith(messages("error.title.prefix"))
       doc.select(".govuk-error-summary").size() mustBe 1
@@ -88,12 +89,12 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
   }
 
   trait Setup {
-    val app: Application = applicationBuilder().build()
-    val view: ClientListSearchView = app.injector.instanceOf[ClientListSearchView]
-    val formProvider: ClientListFormProvider = app.injector.instanceOf[ClientListFormProvider]
-    val form: Form[ClientListFormData] = formProvider()
-    val searchOptions: Seq[SearchByList] = SearchByList.searchByOptions
-    val clientList: Seq[ClientListViewModel] = ClientListViewModel.allAgentClients
+    val app: Application                          = applicationBuilder().build()
+    val view: ClientListSearchView                = app.injector.instanceOf[ClientListSearchView]
+    val formProvider: ClientListFormProvider      = app.injector.instanceOf[ClientListFormProvider]
+    val form: Form[ClientListFormData]            = formProvider()
+    val searchOptions: Seq[SearchByList]          = SearchByList.searchByOptions
+    val clientList: Seq[ClientListViewModel]      = ClientListViewModel.allAgentClients
     implicit val request: play.api.mvc.Request[_] = FakeRequest()
     implicit val messages: Messages               = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,

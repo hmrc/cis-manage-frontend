@@ -23,12 +23,12 @@ import play.api.data.FormError
 import viewmodels.agent.SearchByList
 
 class ClientListFormProviderSpec extends StringFieldBehaviours {
-  
+
   val form = new ClientListFormProvider()()
 
   ".searchBy" - {
 
-    val fieldName = "searchBy"
+    val fieldName   = "searchBy"
     val requiredKey = "agent.clientListSearch.searchBy.error.required"
 
     behave like fieldThatBindsValidData(
@@ -55,10 +55,10 @@ class ClientListFormProviderSpec extends StringFieldBehaviours {
   ".searchFilter" - {
 
     val requiredKey = "agent.clientListSearch.searchFilter.error.required"
-    val lengthKey = "agent.clientListSearch.searchFilter.error.length"
-    val invalidKey = "agent.clientListSearch.searchFilter.error.format"
-    val maxLength = 35
-    val fieldName = "searchFilter"
+    val lengthKey   = "agent.clientListSearch.searchFilter.error.length"
+    val invalidKey  = "agent.clientListSearch.searchFilter.error.format"
+    val maxLength   = 35
+    val fieldName   = "searchFilter"
 
     behave like fieldThatBindsValidData(
       form,
@@ -81,6 +81,5 @@ class ClientListFormProviderSpec extends StringFieldBehaviours {
     )
 
   }
-
 
 }

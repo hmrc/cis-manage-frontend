@@ -31,64 +31,66 @@ import views.html.agent.ClientListSearchView
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ClientListSearchController @Inject()(
-                                            override val messagesApi: MessagesApi,
-                                            sessionRepository: SessionRepository,
-                                            identify: IdentifierAction,
-                                            getData: DataRetrievalAction,
-                                            requireData: DataRequiredAction,
-                                            formProvider: ClientListFormProvider,
-                                            val controllerComponents: MessagesControllerComponents,
-                                            view: ClientListSearchView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class ClientListSearchController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: ClientListFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: ClientListSearchView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   val form: Form[ClientListFormData] = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-      implicit request =>
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
 
-      val preparedForm = request.userAnswers.get(ClientListSearchPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
+    val preparedForm = request.userAnswers.get(ClientListSearchPage) match {
+      case None        => form
+      case Some(value) => form.fill(value)
+    }
 
-      val activeSearchBy = preparedForm.value match {
-        case None => ""
-        case Some(clientListFormData: ClientListFormData) => clientListFormData.searchBy
-      }
+    val activeSearchBy = preparedForm.value match {
+      case None                                         => ""
+      case Some(clientListFormData: ClientListFormData) => clientListFormData.searchBy
+    }
 
-      val activeSearchFilter = preparedForm.value match {
-        case None => ""
-        case Some(clientListFormData: ClientListFormData) => clientListFormData.searchFilter
-      }
+    val activeSearchFilter = preparedForm.value match {
+      case None                                         => ""
+      case Some(clientListFormData: ClientListFormData) => clientListFormData.searchFilter
+    }
 
-      val filteredClients = ClientListViewModel.filterByField(activeSearchBy, activeSearchFilter)
+    val filteredClients = ClientListViewModel.filterByField(activeSearchBy, activeSearchFilter)
 
-      for {
-        updatedAnswers <- Future.fromTry(request.userAnswers.set(ClientListSearchPage, ClientListFormData(activeSearchBy, activeSearchFilter)))
-        _              <- sessionRepository.set(updatedAnswers)
-      } yield Ok(view(preparedForm, SearchByList.searchByOptions, filteredClients))
+    for {
+      updatedAnswers <-
+        Future.fromTry(
+          request.userAnswers.set(ClientListSearchPage, ClientListFormData(activeSearchBy, activeSearchFilter))
+        )
+      _              <- sessionRepository.set(updatedAnswers)
+    } yield Ok(view(preparedForm, SearchByList.searchByOptions, filteredClients))
 
   }
 
-  def clearFilter(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      for {
-        updatedAnswers <- Future.fromTry(request.userAnswers.remove(ClientListSearchPage))
-        _              <- sessionRepository.set(updatedAnswers)
-      } yield Ok(view(form, SearchByList.searchByOptions, ClientListViewModel.allAgentClients))
+  def clearFilter(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+    for {
+      updatedAnswers <- Future.fromTry(request.userAnswers.remove(ClientListSearchPage))
+      _              <- sessionRepository.set(updatedAnswers)
+    } yield Ok(view(form, SearchByList.searchByOptions, ClientListViewModel.allAgentClients))
   }
 
+  def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
 
-  def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+    val filteredClients = ClientListViewModel.filterByField("", "")
 
-      val filteredClients = ClientListViewModel.filterByField("", "")
-
-      form.bindFromRequest().fold(
+    form
+      .bindFromRequest()
+      .fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, SearchByList.searchByOptions, filteredClients))),
-
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ClientListSearchPage, value))

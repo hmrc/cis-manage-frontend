@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package viewmodels.agent
+package viewmodels.contractor
 
-import enumeratum.{EnumEntry, PlayEnum}
-
-sealed abstract class ClientStatus(override val entryName: String) extends EnumEntry
-
-object ClientStatus extends PlayEnum[ClientStatus] {
-
-  override val values: IndexedSeq[ClientStatus] = findValues
-
-  case object Active extends ClientStatus("ACTIVE")
-  case object InActive extends ClientStatus("INACTIVE")
-
-}
+case class ContractorLandingViewModel(
+  employerReference: String,
+  utr: String,
+  returnCount: Int,
+  returnDueDate: String,
+  noticeCount: Int,
+  lastSubmittedDate: String,
+  lastSubmittedTaxMonthYear: String,
+  whatIsUrl: String,
+  guidanceUrl: String,
+  penaltiesUrl: String
+)

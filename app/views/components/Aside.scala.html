@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,19 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package viewmodels.agent
+@import utils.Utils.emptyString
 
-import enumeratum.{EnumEntry, PlayEnum}
+@this()
 
-sealed abstract class ClientStatus(override val entryName: String) extends EnumEntry
+@(titleKey: String, content: Html)(implicit messages: Messages)
 
-object ClientStatus extends PlayEnum[ClientStatus] {
-
-  override val values: IndexedSeq[ClientStatus] = findValues
-
-  case object Active extends ClientStatus("ACTIVE")
-  case object InActive extends ClientStatus("INACTIVE")
-
-}
+<aside class="app-related-items" role="complementary">
+    <h2 class="govuk-heading-m" id="subsection-title">
+        @messages(titleKey)
+    </h2>
+    @content
+</aside>

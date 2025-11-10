@@ -40,8 +40,7 @@ trait ViewSpecGetters {
   def getElementHref(element: Element): String =
     element.attr("href")
 
-  def getElementsBySelector(doc: Document, selector: String): List[Element] = {
+  def getElementsBySelector(doc: Document, selector: String): List[Element] =
     doc.select(s"$selector").asScala.toList
-  }
-  
+
 }

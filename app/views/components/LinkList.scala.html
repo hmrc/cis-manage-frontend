@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,19 +12,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package viewmodels.agent
+@this()
 
-import enumeratum.{EnumEntry, PlayEnum}
+@(items: Seq[(String, String)],
+  listClasses: String = "govuk-list govuk-!-font-size-16",
+  linkClasses: String = "govuk-link",
+  openInNewTab: Boolean = false
+)(implicit messages: Messages)
 
-sealed abstract class ClientStatus(override val entryName: String) extends EnumEntry
-
-object ClientStatus extends PlayEnum[ClientStatus] {
-
-  override val values: IndexedSeq[ClientStatus] = findValues
-
-  case object Active extends ClientStatus("ACTIVE")
-  case object InActive extends ClientStatus("INACTIVE")
-
-}
+<ul class="@listClasses">
+    @for((textKey, href) <- items) {
+        <li>
+            <a href="@href"
+               class="@linkClasses"
+               @if(openInNewTab){rel="noreferrer noopener" target="_blank"}>
+                @messages(textKey)
+            </a>
+        </li>
+    }
+</ul>

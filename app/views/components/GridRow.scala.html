@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,19 +12,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package viewmodels.agent
+@import uk.gov.hmrc.hmrcfrontend.views.Utils.{toClasses, toAttributes}
 
-import enumeratum.{EnumEntry, PlayEnum}
+@this()
 
-sealed abstract class ClientStatus(override val entryName: String) extends EnumEntry
+@(classes: String = "", attributes: Map[String, String] = Map.empty)(content: Html)
 
-object ClientStatus extends PlayEnum[ClientStatus] {
-
-  override val values: IndexedSeq[ClientStatus] = findValues
-
-  case object Active extends ClientStatus("ACTIVE")
-  case object InActive extends ClientStatus("INACTIVE")
-
-}
+<div class='@toClasses("govuk-grid-row", classes)' @toAttributes(attributes)>
+  @content
+</div>

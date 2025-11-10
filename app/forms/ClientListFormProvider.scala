@@ -29,18 +29,21 @@ class ClientListFormProvider @Inject() extends Mappings {
   private val searchFilterMaxLength = 35
 
   def apply(): Form[ClientListFormData] = Form(
-      mapping(
-        "searchBy" -> text("agent.clientListSearch.searchBy.error.required")
-          .verifying("agent.clientListSearch.searchBy.error.required", value => SearchByList.searchByOptions.exists(_.value == value)),
-        "searchFilter" -> text("agent.clientListSearch.searchFilter.error.required")
-          .verifying(
-            firstError(
-              maxLength(searchFilterMaxLength, "agent.clientListSearch.searchFilter.error.length"),
-              nonEmptyString("searchFilter", "agent.clientListSearch.searchFilter.error.required"),
-              regexp(Validation.textInputPattern.toString, "agent.clientListSearch.searchFilter.error.format")
-            )
+    mapping(
+      "searchBy"     -> text("agent.clientListSearch.searchBy.error.required")
+        .verifying(
+          "agent.clientListSearch.searchBy.error.required",
+          value => SearchByList.searchByOptions.exists(_.value == value)
+        ),
+      "searchFilter" -> text("agent.clientListSearch.searchFilter.error.required")
+        .verifying(
+          firstError(
+            maxLength(searchFilterMaxLength, "agent.clientListSearch.searchFilter.error.length"),
+            nonEmptyString("searchFilter", "agent.clientListSearch.searchFilter.error.required"),
+            regexp(Validation.textInputPattern.toString, "agent.clientListSearch.searchFilter.error.format")
           )
-      )(ClientListFormData.apply)(x => Some(x.searchBy, x.searchFilter))
-    )
+        )
+    )(ClientListFormData.apply)(x => Some(x.searchBy, x.searchFilter))
+  )
 
 }
