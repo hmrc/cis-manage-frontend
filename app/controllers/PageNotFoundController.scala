@@ -24,7 +24,7 @@ import views.html.PageNotFoundView
 
 import javax.inject.Inject
 
-class PageNotFoundController @Inject()(
+class PageNotFoundController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: PageNotFoundView
 )(implicit appConfig: FrontendAppConfig)

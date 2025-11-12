@@ -24,7 +24,7 @@ import views.html.AccessDeniedView
 
 import javax.inject.Inject
 
-class AccessDeniedController @Inject()(
+class AccessDeniedController @Inject() (
   override val messagesApi: MessagesApi,
   val controllerComponents: MessagesControllerComponents,
   view: AccessDeniedView

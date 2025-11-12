@@ -59,9 +59,9 @@ class ContractorLandingControllerSpec extends SpecBase {
         implicit val appConfig: FrontendAppConfig =
           application.injector.instanceOf[FrontendAppConfig]
 
-        val request = FakeRequest(GET, routes.ContractorLandingController.onPageLoad().url)
-        val result = route(application, request).value
-        val view = application.injector.instanceOf[ContractorLandingView]
+        val request  = FakeRequest(GET, routes.ContractorLandingController.onPageLoad().url)
+        val result   = route(application, request).value
+        val view     = application.injector.instanceOf[ContractorLandingView]
         val expected = view(viewModel(appConfig))(request, messages(application))
 
         status(result)          shouldBe OK
@@ -107,7 +107,6 @@ class ContractorLandingControllerSpec extends SpecBase {
         redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
       }
     }
-
 
   }
 }

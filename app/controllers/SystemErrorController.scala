@@ -26,7 +26,7 @@ import views.html.SystemErrorView
 
 import javax.inject.Inject
 
-class SystemErrorController @Inject()(
+class SystemErrorController @Inject() (
   override val messagesApi: MessagesApi,
   val controllerComponents: MessagesControllerComponents,
   view: SystemErrorView,

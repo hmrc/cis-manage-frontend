@@ -28,7 +28,7 @@ import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AuditService @Inject(
+class AuditService @Inject (
   auditConnector: AuditConnector
 )(implicit ec: ExecutionContext) {
 

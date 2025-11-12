@@ -32,15 +32,15 @@ class UnauthorisedViewSpec extends SpecBase with Matchers {
 
     "must render the page with the correct heading and paragraph" in new Setup {
       val html: HtmlFormat.Appendable = view()
-      val doc: Document = Jsoup.parse(html.body)
+      val doc: Document               = Jsoup.parse(html.body)
 
-      doc.title must include(messages("unauthorised.title"))
-      doc.select("h1").text must include(messages("unauthorised.heading"))
-      doc.select("p").text must include(messages("unauthorised.guidance.org.p1.prefix"))
-      doc.select("p").text must include(messages("unauthorised.guidance.org.p1.suffix"))
+      doc.title                                 must include(messages("unauthorised.title"))
+      doc.select("h1").text                     must include(messages("unauthorised.heading"))
+      doc.select("p").text                      must include(messages("unauthorised.guidance.org.p1.prefix"))
+      doc.select("p").text                      must include(messages("unauthorised.guidance.org.p1.suffix"))
       doc.getElementsByClass("govuk-link").text must include(messages("unauthorised.guidance.org.p1.link"))
-      doc.select("p").text must include(messages("unauthorised.guidance.agent.p2.prefix"))
-      doc.select("p").text must include(messages("unauthorised.guidance.agent.p2.suffix"))
+      doc.select("p").text                      must include(messages("unauthorised.guidance.agent.p2.prefix"))
+      doc.select("p").text                      must include(messages("unauthorised.guidance.agent.p2.suffix"))
       doc.getElementsByClass("govuk-link").text must include(messages("unauthorised.guidance.agent.p2.link"))
     }
   }
