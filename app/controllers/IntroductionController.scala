@@ -32,6 +32,7 @@ class IntroductionController @Inject() (
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
-    Ok(view())
+    val retrievingClientUrl = agent.routes.RetrievingClientController.onPageLoad().url
+    Ok(view(retrievingClientUrl))
   }
 }

@@ -32,7 +32,7 @@
     bulletList: BulletList,
 )
 
-@()(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
+@(retrievingClientUrl: String)(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
 @detailsHtmlContent = {
     @h3(messages("introduction.details.h3"))
@@ -87,5 +87,5 @@
         )
     )
 
-    @buttonWithLink("introduction.button.continue", "#")
+    @buttonWithLink("introduction.button.continue", retrievingClientUrl)
 }

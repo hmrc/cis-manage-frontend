@@ -30,7 +30,7 @@ class IntroductionViewSpec extends SpecBase {
   "IntroductionViewSpec" - {
 
     "must render the page with the correct main content" in new Setup {
-      val html: HtmlFormat.Appendable = view()
+      val html: HtmlFormat.Appendable = view("someurl.com")
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.title             must include(messages("introduction.title"))
@@ -59,11 +59,12 @@ class IntroductionViewSpec extends SpecBase {
       doc.select("p").text                      must include(messages("introduction.details.p2"))
       doc.getElementsByClass("govuk-link").text must include(messages("introduction.details.link"))
 
-      doc.getElementsByClass("govuk-button").text must include(messages("introduction.button.continue"))
+      doc.select("a.govuk-button").text         must include(messages("introduction.button.continue"))
+      doc.select("a.govuk-button").attr("href") must be("someurl.com")
     }
 
     "must render the page with the correct sidebar links and header" in new Setup {
-      val html: HtmlFormat.Appendable = view()
+      val html: HtmlFormat.Appendable = view("someurl.com")
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.select("h2").text                     must include(messages("introduction.sidebar.h2"))
