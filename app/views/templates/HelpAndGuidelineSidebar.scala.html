@@ -1,0 +1,31 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import views.html.components._
+
+@this(h2: H2, linkList: LinkList)
+
+@(implicit messages: play.api.i18n.Messages, appConfig: config.FrontendAppConfig)
+
+<aside class="app-related-items" role="complementary" aria-labelledby="subsection-title">
+  @h2(messages("agent.landing.h2.help"), "govuk-heading-s", Some("subsection-title"))
+
+  @linkList(Seq(
+    "agent.landing.help.link1" -> appConfig.cisHelpWhatIsUrl,
+    "agent.landing.help.link2" -> appConfig.cisHelpMonthlyUrl,
+    "agent.landing.help.link3" -> appConfig.cisHelp340Url
+  ))
+</aside>

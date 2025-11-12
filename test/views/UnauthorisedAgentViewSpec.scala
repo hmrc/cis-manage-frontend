@@ -32,7 +32,7 @@ class UnauthorisedAgentViewSpec extends SpecBase with Matchers {
 
     "must render the page with the correct heading and paragraph" in new Setup {
       val html: HtmlFormat.Appendable = view()
-      val doc: Document = Jsoup.parse(html.body)
+      val doc: Document               = Jsoup.parse(html.body)
 
       doc.title             must include(messages("unauthorised.agent.title"))
       doc.select("h1").text must include(messages("unauthorised.agent.heading"))
@@ -41,8 +41,8 @@ class UnauthorisedAgentViewSpec extends SpecBase with Matchers {
   }
 
   trait Setup {
-    val app: Application = applicationBuilder().build()
-    val view: UnauthorisedAgentView = app.injector.instanceOf[UnauthorisedAgentView]
+    val app: Application                          = applicationBuilder().build()
+    val view: UnauthorisedAgentView               = app.injector.instanceOf[UnauthorisedAgentView]
     implicit val request: play.api.mvc.Request[_] = FakeRequest()
     implicit val messages: Messages               = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,

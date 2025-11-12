@@ -75,7 +75,7 @@ class ContractorIdentifierAction @Inject() (
         case Some(internalId) ~ Enrolments(enrolments) ~ Some(Agent) ~ _                 =>
           logger.warn("ContractorIdentifierAction - Agent login attempt")
           Future.successful(
-            Redirect(controllers.routes.UnauthorisedAgentAffinityController.onPageLoad())
+            Redirect(controllers.routes.UnauthorisedController.onPageLoad())
           )
         case _                                                                           =>
           logger.warn("ContractorIdentifierAction - Unable to retrieve internal id or affinity group")

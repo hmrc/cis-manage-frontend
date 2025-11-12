@@ -38,4 +38,3 @@ class CisIdRequiredActionImpl @Inject() (implicit val executionContext: Executio
         )
     }
 }
-

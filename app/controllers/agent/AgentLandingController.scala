@@ -1,0 +1,53 @@
+/*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers.agent
+
+import controllers.actions.*
+import config.FrontendAppConfig
+
+import javax.inject.{Inject, Named}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import views.html.agent.AgentLandingView
+
+class AgentLandingController @Inject() (
+  override val messagesApi: MessagesApi,
+  @Named("AgentIdentifier") identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: AgentLandingView,
+  appConfig: FrontendAppConfig
+) extends FrontendBaseController
+    with I18nSupport {
+  def onPageLoad: Action[AnyContent] = (identify andThen getData) { implicit request =>
+    implicit val config: FrontendAppConfig = appConfig
+
+    Ok(
+      view(
+        clientName = "ABC Construction Ltd",
+        employerRef = "123/AB45678",
+        utr = "1234567890",
+        returnsDueCount = 1,
+        returnsDueBy = java.time.LocalDate.of(2025, 10, 19),
+        newNoticesCount = 2,
+        lastSubmittedDate = java.time.LocalDate.of(2025, 9, 19),
+        lastSubmittedTaxMonth = java.time.YearMonth.of(2025, 8)
+      )
+    )
+  }
+}

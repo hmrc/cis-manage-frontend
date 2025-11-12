@@ -23,12 +23,12 @@ class EmployerReferenceSpec extends SpecBase {
   "EmployerReference" - {
     "serialize to JSON correctly" in {
       val employerRef = EmployerReference("123", "AB456")
-      val json = Json.toJson(employerRef)
+      val json        = Json.toJson(employerRef)
       (json \ "taxOfficeNumber").as[String] mustBe "123"
       (json \ "taxOfficeReference").as[String] mustBe "AB456"
     }
     "deserialize from JSON correctly" in {
-      val json = Json.parse(
+      val json   = Json.parse(
         """
           |{
           |  "taxOfficeNumber": "987",
@@ -42,8 +42,8 @@ class EmployerReferenceSpec extends SpecBase {
     }
     "round-trip serialize and deserialize correctly" in {
       val employerRef = EmployerReference("321", "XY123")
-      val json = Json.toJson(employerRef)
-      val result = json.as[EmployerReference]
+      val json        = Json.toJson(employerRef)
+      val result      = json.as[EmployerReference]
       result mustBe employerRef
     }
   }

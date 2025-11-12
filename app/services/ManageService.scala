@@ -18,7 +18,6 @@ package services
 
 import connectors.ConstructionIndustrySchemeConnector
 import models.UserAnswers
-//import models.*
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
@@ -29,7 +28,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ManageService @Inject()(
+class ManageService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector,
   sessionRepository: SessionRepository
 )(implicit ec: ExecutionContext)
@@ -55,5 +54,5 @@ class ManageService @Inject()(
           }
         }
     }
-  
+
 }

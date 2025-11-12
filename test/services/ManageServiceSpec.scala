@@ -19,7 +19,7 @@ package services
 import connectors.ConstructionIndustrySchemeConnector
 import models.{CisTaxpayer, UserAnswers}
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
@@ -42,7 +42,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
     val service     = new ManageService(connector, sessionRepo)
     (service, connector, sessionRepo)
   }
-  
+
   private def createTaxpayer(
     id: String = "CIS-123",
     ton: String = "111",
@@ -149,5 +149,5 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       verifyNoMoreInteractions(connector)
     }
   }
-  
+
 }

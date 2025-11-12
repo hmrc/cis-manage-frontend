@@ -17,73 +17,24 @@
 package controllers
 
 import base.SpecBase
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import play.api.inject.bind
-import repositories.SessionRepository
-
-import scala.concurrent.Future
 
 class IndexControllerSpec extends SpecBase {
 
   "Index Controller" - {
 
-    "for a contractor" - {
+    "must redirect to the introduction page for a GET" in {
 
-      "must redirect to the contractor landing page" in {
+      val application = applicationBuilder(userAnswers = None).build()
 
-        val mockSessionRepository = mock[SessionRepository]
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-        val application = applicationBuilder(userAnswers = None)
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-        running(application) {
-          val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-
-          redirectLocation(result).value mustEqual controllers.agent.routes.NoAuthorisedClientsController
-            .onPageLoad()
-            .url
-        }
+      running(application) {
+        val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+        val result  = route(application, request).value
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.IntroductionController.onPageLoad().url
       }
-
     }
-
-    "for an agent" - {
-
-      "must redirect to the agent landing page" in {
-
-        val mockSessionRepository = mock[SessionRepository]
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-        val application = applicationBuilder(userAnswers = None, isAgent = true)
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-        running(application) {
-          val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-
-          redirectLocation(result).value mustEqual controllers.agent.routes.RetrievingClientController.onPageLoad().url
-        }
-      }
-
-    }
-
   }
+
 }

@@ -32,19 +32,20 @@ class UnauthorisedOrgViewSpec extends SpecBase with Matchers {
 
     "must render the page with correct heading, paragraphs, and link" in new Setup {
       val html: HtmlFormat.Appendable = view()
-      val doc: Document = Jsoup.parse(html.body)
+      val doc: Document               = Jsoup.parse(html.body)
 
       doc.title                                 must include(messages("unauthorised.org.title"))
       doc.select("h1").text                     must include(messages("unauthorised.org.heading"))
-      doc.select("p").text                      must include(messages("unauthorised.org.guidance.p1"))
-      doc.select("p").text                      must include(messages("unauthorised.org.guidance.p2"))
-      doc.getElementsByClass("govuk-link").text must include(messages("unauthorised.org.guidance.link"))
+      doc.select("p").text                      must include(messages("unauthorised.org.p1"))
+      doc.select("p").text                      must include(messages("unauthorised.org.guidance.p2.prefix"))
+      doc.select("p").text                      must include(messages("unauthorised.org.guidance.p2.suffix"))
+      doc.getElementsByClass("govuk-link").text must include(messages("unauthorised.org.guidance.p2.link"))
     }
   }
 
   trait Setup {
-    val app: Application = applicationBuilder().build()
-    val view: UnauthorisedOrgView = app.injector.instanceOf[UnauthorisedOrgView]
+    val app: Application                          = applicationBuilder().build()
+    val view: UnauthorisedOrgView                 = app.injector.instanceOf[UnauthorisedOrgView]
     implicit val request: play.api.mvc.Request[_] = FakeRequest()
     implicit val messages: Messages               = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,

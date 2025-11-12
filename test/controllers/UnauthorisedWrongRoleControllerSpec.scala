@@ -23,6 +23,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import services.AuditService
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import views.html.UnauthorisedOrgStandardView
 
@@ -30,19 +31,19 @@ import scala.concurrent.Future
 
 class UnauthorisedWrongRoleControllerSpec extends SpecBase {
 
-//  private val mockAuditService: AuditService = MockitoSugar.mock[AuditService]
+  private val mockAuditService: AuditService = MockitoSugar.mock[AuditService]
 
   "UnauthorisedWrongRole Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = None)
-//        .overrides(
-//          bind[AuditService].toInstance(mockAuditService)
-//        )
+        .overrides(
+          bind[AuditService].toInstance(mockAuditService)
+        )
         .build()
 
-//      when(mockAuditService.sendEvent(any())(any(), any(), any())).thenReturn(Future.successful(AuditResult.Success))
+      when(mockAuditService.sendEvent(any())(any(), any(), any())).thenReturn(Future.successful(AuditResult.Success))
 
       running(application) {
         val request =

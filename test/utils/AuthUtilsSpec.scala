@@ -24,9 +24,9 @@ import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.auth.core.EnrolmentIdentifier
 
 class AuthUtilsSpec extends SpecBase {
-  
+
   class AuthUtilsSpec extends AnyWordSpec with Matchers {
-    "AuthUtils.hasCisOrgEnrolment" should {
+    "AuthUtils.hasCisOrgEnrolment"   should {
       "return EmployerReference when valid HMRC-CIS-ORG enrolment is found and activated" in {
         val enrolment = Enrolment(
           key = "HMRC-CIS-ORG",
@@ -36,7 +36,7 @@ class AuthUtilsSpec extends SpecBase {
           ),
           state = "Activated"
         )
-        val result = AuthUtils.hasCisOrgEnrolment(Set(enrolment))
+        val result    = AuthUtils.hasCisOrgEnrolment(Set(enrolment))
         result shouldBe Some(EmployerReference("123", "AB12345"))
       }
       "return None when HMRC-CIS-ORG enrolment is not activated" in {
@@ -48,7 +48,7 @@ class AuthUtilsSpec extends SpecBase {
           ),
           state = "NotYetActivated"
         )
-        val result = AuthUtils.hasCisOrgEnrolment(Set(enrolment))
+        val result    = AuthUtils.hasCisOrgEnrolment(Set(enrolment))
         result shouldBe None
       }
       "return None when TaxOfficeNumber is invalid" in {
@@ -60,7 +60,7 @@ class AuthUtilsSpec extends SpecBase {
           ),
           state = "Activated"
         )
-        val result = AuthUtils.hasCisOrgEnrolment(Set(enrolment))
+        val result    = AuthUtils.hasCisOrgEnrolment(Set(enrolment))
         result shouldBe None
       }
       "return None when enrolment key does not match" in {
@@ -72,7 +72,7 @@ class AuthUtilsSpec extends SpecBase {
           ),
           state = "Activated"
         )
-        val result = AuthUtils.hasCisOrgEnrolment(Set(enrolment))
+        val result    = AuthUtils.hasCisOrgEnrolment(Set(enrolment))
         result shouldBe None
       }
     }
@@ -85,7 +85,7 @@ class AuthUtilsSpec extends SpecBase {
           ),
           state = "Activated"
         )
-        val result = AuthUtils.hasCisAgentEnrolment(Set(enrolment))
+        val result    = AuthUtils.hasCisAgentEnrolment(Set(enrolment))
         result shouldBe Some("ABC123")
       }
       "return None when agent reference is invalid" in {
@@ -96,7 +96,7 @@ class AuthUtilsSpec extends SpecBase {
           ),
           state = "Activated"
         )
-        val result = AuthUtils.hasCisAgentEnrolment(Set(enrolment))
+        val result    = AuthUtils.hasCisAgentEnrolment(Set(enrolment))
         result shouldBe None
       }
       "return None when enrolment is not activated" in {
@@ -107,7 +107,7 @@ class AuthUtilsSpec extends SpecBase {
           ),
           state = "NotYetActivated"
         )
-        val result = AuthUtils.hasCisAgentEnrolment(Set(enrolment))
+        val result    = AuthUtils.hasCisAgentEnrolment(Set(enrolment))
         result shouldBe None
       }
       "return None when enrolment key does not match" in {
@@ -118,22 +118,22 @@ class AuthUtilsSpec extends SpecBase {
           ),
           state = "Activated"
         )
-        val result = AuthUtils.hasCisAgentEnrolment(Set(enrolment))
+        val result    = AuthUtils.hasCisAgentEnrolment(Set(enrolment))
         result shouldBe None
       }
     }
-    "AuthUtils validation helpers" should {
+    "AuthUtils validation helpers"   should {
       "validate tax office number correctly" in {
         AuthUtils.isValidTaxOfficeNumber("123") shouldBe true
         AuthUtils.isValidTaxOfficeNumber("12A") shouldBe false
-        AuthUtils.isValidTaxOfficeNumber("") shouldBe false
+        AuthUtils.isValidTaxOfficeNumber("")    shouldBe false
       }
       "validate agent reference correctly" in {
         AuthUtils.isValidAgentReference("ABC123") shouldBe true
-        AuthUtils.isValidAgentReference("123!") shouldBe false
-        AuthUtils.isValidAgentReference("") shouldBe false
+        AuthUtils.isValidAgentReference("123!")   shouldBe false
+        AuthUtils.isValidAgentReference("")       shouldBe false
       }
     }
   }
-  
+
 }

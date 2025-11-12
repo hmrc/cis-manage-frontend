@@ -57,7 +57,7 @@ class AgentIdentifierAction @Inject() (
         case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ Some(User) =>
           logger.info("AgentIdentifierAction - Organisation login attempt")
           Future.successful(
-            Redirect(controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad())
+            Redirect(controllers.routes.UnauthorisedController.onPageLoad())
           )
         case Some(_) ~ _ ~ Some(Organisation) ~ Some(Assistant)                          =>
           logger.info("AgentIdentifierAction - Organisation: Assistant login attempt")

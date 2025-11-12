@@ -32,7 +32,7 @@ class UnauthorisedOrgStandardViewSpec extends SpecBase with Matchers {
 
     "must render the page with the correct heading and paragraph with link" in new Setup {
       val html: HtmlFormat.Appendable = view()
-      val doc: Document = Jsoup.parse(html.body)
+      val doc: Document               = Jsoup.parse(html.body)
 
       doc.title                                 must include(messages("unauthorised.org.standard.title"))
       doc.select("h1").text                     must include(messages("unauthorised.org.standard.heading"))
@@ -44,8 +44,8 @@ class UnauthorisedOrgStandardViewSpec extends SpecBase with Matchers {
   }
 
   trait Setup {
-    val app: Application = applicationBuilder().build()
-    val view: UnauthorisedOrgStandardView = app.injector.instanceOf[UnauthorisedOrgStandardView]
+    val app: Application                          = applicationBuilder().build()
+    val view: UnauthorisedOrgStandardView         = app.injector.instanceOf[UnauthorisedOrgStandardView]
     implicit val request: play.api.mvc.Request[_] = FakeRequest()
     implicit val messages: Messages               = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,

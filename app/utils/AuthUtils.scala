@@ -25,32 +25,32 @@ object AuthUtils extends Logging {
   def hasCisOrgEnrolment[A](enrolments: Set[Enrolment]): Option[EmployerReference] =
     enrolments.find(_.key == "HMRC-CIS-ORG") match {
       case Some(enrolment) =>
-        val taxOfficeNumber = enrolment.identifiers.find(id => id.key == "TaxOfficeNumber").map(_.value)
+        val taxOfficeNumber    = enrolment.identifiers.find(id => id.key == "TaxOfficeNumber").map(_.value)
         val taxOfficeReference = enrolment.identifiers.find(id => id.key == "TaxOfficeReference").map(_.value)
-        val isActivated = enrolment.isActivated
+        val isActivated        = enrolment.isActivated
         (taxOfficeNumber, taxOfficeReference, isActivated) match {
           case (Some(number), Some(reference), true) if isValidTaxOfficeNumber(number) =>
             Some(EmployerReference(number, reference))
-          case _ =>
+          case _                                                                       =>
             logger.warn("EnrolmentAuthIdentifierAction - Unable to retrieve activated cis enrolments")
             None
         }
-      case _ => None
+      case _               => None
     }
 
   def hasCisAgentEnrolment[A](enrolments: Set[Enrolment]): Option[String] =
     enrolments.find(_.key == "IR-PAYE-AGENT") match {
       case Some(enrolment) =>
         val irAgentReference = enrolment.identifiers.find(id => id.key == "IRAgentReference").map(_.value)
-        val isActivated = enrolment.isActivated
+        val isActivated      = enrolment.isActivated
         (irAgentReference, isActivated) match {
           case (Some(reference), true) if isValidAgentReference(reference) =>
             Some(reference)
-          case _ =>
+          case _                                                           =>
             logger.warn("EnrolmentAuthIdentifierAction - Unable to retrieve activated agent reference")
             None
         }
-      case _ => None
+      case _               => None
     }
 
   def isValidTaxOfficeNumber(taxOfficeNumber: String): Boolean =

@@ -18,18 +18,16 @@ package connectors
 
 import models.CisTaxpayer
 import play.api.Logging
-import play.api.libs.json.Json
-import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, HttpResponse, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, StringContextOps}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ConstructionIndustrySchemeConnector @Inject()(config: ServicesConfig, http: HttpClientV2)(implicit
-                                                                                                ec: ExecutionContext
+class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, http: HttpClientV2)(implicit
+  ec: ExecutionContext
 ) extends HttpReadsInstances
     with Logging {
 
@@ -39,5 +37,5 @@ class ConstructionIndustrySchemeConnector @Inject()(config: ServicesConfig, http
     http
       .get(url"$cisBaseUrl/taxpayer")
       .execute[CisTaxpayer]
-  
+
 }

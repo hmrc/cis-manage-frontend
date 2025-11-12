@@ -174,7 +174,7 @@ class ContractorIdentificationActionSpec extends SpecBase {
     }
 
     "the user is logged in as an agent" - {
-      "fail and redirect to unauthorised agent affinity screen" in {
+      "fail and redirect to unauthorised screen" in {
         when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(id) ~ emptyEnrolments ~ Some(Agent) ~ None))
         running(application) {
@@ -183,7 +183,7 @@ class ContractorIdentificationActionSpec extends SpecBase {
           val result     = controller.onPageLoad()(FakeRequest())
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe controllers.routes.UnauthorisedAgentAffinityController
+          redirectLocation(result).value mustBe controllers.routes.UnauthorisedController
             .onPageLoad()
             .url
         }

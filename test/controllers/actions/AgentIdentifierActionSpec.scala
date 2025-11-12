@@ -52,7 +52,7 @@ class AgentIdentifierActionSpec extends SpecBase {
     def onPageLoad(): Action[AnyContent] = authAction(_ => Results.Ok)
   }
 
-  "Auth Action" - {
+  "Agent Identifier Action" - {
 
     "when the user hasn't logged in" - {
       "must redirect the user to log in " in {
@@ -293,7 +293,7 @@ class AgentIdentifierActionSpec extends SpecBase {
     }
 
     "the user is logged in as an organisation User" - {
-      "must redirect to unauthorised organisation affinity screen" in {
+      "must redirect to unauthorised screen" in {
         when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
           .thenReturn(
             Future.successful(Some(id) ~ emptyEnrolments ~ Some(Organisation) ~ Some(User))
@@ -305,7 +305,7 @@ class AgentIdentifierActionSpec extends SpecBase {
           status(result) mustBe SEE_OTHER
           redirectLocation(
             result
-          ).value mustBe controllers.routes.UnauthorisedOrganisationAffinityController
+          ).value mustBe controllers.routes.UnauthorisedController
             .onPageLoad()
             .url
         }

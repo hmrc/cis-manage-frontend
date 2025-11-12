@@ -23,26 +23,27 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-//import uk.gov.hmrc.play.audit.http.connector.AuditResult
+import services.AuditService
+import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import views.html.UnauthorisedIndividualView
 
 import scala.concurrent.Future
 
 class UnauthorisedIndividualAffinityControllerSpec extends SpecBase {
 
-//  private val mockAuditService: AuditService = MockitoSugar.mock[AuditService]
+  private val mockAuditService: AuditService = MockitoSugar.mock[AuditService]
 
   "UnauthorisedIndividualAffinity Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = None)
-//        .overrides(
-//          bind[AuditService].toInstance(mockAuditService)
-//        )
+        .overrides(
+          bind[AuditService].toInstance(mockAuditService)
+        )
         .build()
 
-//      when(mockAuditService.sendEvent(any())(any(), any(), any())).thenReturn(Future.successful(AuditResult.Success))
+      when(mockAuditService.sendEvent(any())(any(), any(), any())).thenReturn(Future.successful(AuditResult.Success))
 
       running(application) {
         val request =
