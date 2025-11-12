@@ -17,28 +17,95 @@
 package controllers.agent
 
 import base.SpecBase
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import services.ConstructionIndustrySchemeService
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.agent.RetrievingClientView
 
-class RetrievingClientControllerSpec extends SpecBase {
+import scala.concurrent.Future
 
+class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
+
+  lazy val view: RetrievingClientView = app.injector.instanceOf[RetrievingClientView]
   "RetrievingClient Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must redirect to the correct page for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), isAgent = true).build()
+      val mockCisService: ConstructionIndustrySchemeService = mock[ConstructionIndustrySchemeService]
+      val application                                       = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        additionalBindings = Seq(
+          bind[ConstructionIndustrySchemeService].to(mockCisService)
+        ),
+        isAgent = true
+      ).build()
 
       running(application) {
+
+        when(mockCisService.getClientListStatus(using any[HeaderCarrier])).thenReturn(Future.successful("succeeded"))
         val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.onPageLoad().url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[RetrievingClientView]
+        application.injector.instanceOf[RetrievingClientView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, applicationConfig, messages(application)).toString
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustBe "/success"
       }
     }
+
+    "must redirect to the correct page for a GET when Failed occurs" in {
+
+      val mockCisService: ConstructionIndustrySchemeService = mock[ConstructionIndustrySchemeService]
+      val application                                       = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        additionalBindings = Seq(
+          bind[ConstructionIndustrySchemeService].to(mockCisService)
+        )
+      ).build()
+
+      running(application) {
+
+        when(mockCisService.getClientListStatus(using any[HeaderCarrier])).thenReturn(Future.successful("failed"))
+        val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        application.injector.instanceOf[RetrievingClientView]
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustBe routes.FailedToRetrieveClientController.onPageLoad().url
+      }
+    }
+
+    "must redirect to the correct page for a GET when InProgress occurs" in {
+
+      val mockCisService: ConstructionIndustrySchemeService = mock[ConstructionIndustrySchemeService]
+      val application                                       = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        additionalBindings = Seq(
+          bind[ConstructionIndustrySchemeService].to(mockCisService)
+        )
+      ).build()
+
+      running(application) {
+
+        when(mockCisService.getClientListStatus(using any[HeaderCarrier])).thenReturn(Future.successful("in-progress"))
+        val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        application.injector.instanceOf[RetrievingClientView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustBe view()(request, applicationConfig, messages(application)).toString
+      }
+    }
+
   }
 }

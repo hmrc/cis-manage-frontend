@@ -89,4 +89,95 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
     }
   }
 
+  "getClientListStatus" should {
+
+    "return GetClientListStatusResponse with 'succeeded' when BE returns 200 with succeeded status" in {
+      stubFor(
+        post(urlPathEqualTo("/cis/agent/client-list/retrieval/start"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody("""{ "result": "succeeded" }""")
+          )
+      )
+
+      val result = connector.getClientListStatus(using hc).futureValue
+      result.result mustBe "succeeded"
+    }
+
+    "return GetClientListStatusResponse with 'in-progress' when BE returns 200 with in-progress status" in {
+      stubFor(
+        post(urlPathEqualTo("/cis/agent/client-list/retrieval/start"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody("""{ "result": "in-progress" }""")
+          )
+      )
+
+      val result = connector.getClientListStatus(using hc).futureValue
+      result.result mustBe "in-progress"
+    }
+
+    "return GetClientListStatusResponse with 'failed' when BE returns 200 with failed status" in {
+      stubFor(
+        post(urlPathEqualTo("/cis/agent/client-list/retrieval/start"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody("""{ "result": "failed" }""")
+          )
+      )
+
+      val result = connector.getClientListStatus(using hc).futureValue
+      result.result mustBe "failed"
+    }
+
+    "return GetClientListStatusResponse with 'initiate-download' when BE returns 200 with initiate-download status" in {
+      stubFor(
+        post(urlPathEqualTo("/cis/agent/client-list/retrieval/start"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody("""{ "result": "initiate-download" }""")
+          )
+      )
+
+      val result = connector.getClientListStatus(using hc).futureValue
+      result.result mustBe "initiate-download"
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      stubFor(
+        post(urlPathEqualTo("/cis/agent/client-list/retrieval/start"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody("""{ "result": "system-error" }""")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.getClientListStatus(using hc).futureValue
+      }
+      ex.getMessage must include("returned 500")
+    }
+
+    "fail when BE returns 200 with invalid JSON" in {
+      stubFor(
+        post(urlPathEqualTo("/cis/agent/client-list/retrieval/start"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody("""{ "unexpectedField": true }""")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.getClientListStatus(using hc).futureValue
+      }
+      ex.getMessage.toLowerCase must include("result")
+    }
+  }
+
 }
