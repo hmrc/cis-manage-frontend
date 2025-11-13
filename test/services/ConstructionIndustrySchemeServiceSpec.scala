@@ -19,10 +19,10 @@ package services
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
 import models.GetClientListStatusResponse
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
 import org.scalatest.TryValues
 import uk.gov.hmrc.http.HeaderCarrier
-import org.mockito.Mockito.*
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -35,14 +35,40 @@ class ConstructionIndustrySchemeServiceSpec extends SpecBase with TryValues {
   val service = new ConstructionIndustrySchemeService(connector)
 
   "getClientListStatus" - {
-    "should get the status from the connector response" in {
+    "should get the success status from the connector response" in {
       when(connector.getClientListStatus(using any[HeaderCarrier]))
-        .thenReturn(Future.successful(GetClientListStatusResponse("success")))
+        .thenReturn(Future.successful(GetClientListStatusResponse("Success")))
 
       val status = service.getClientListStatus.futureValue
 
-      status mustBe "succsss"
+      status mustBe "Success"
+    }
+
+    "should get the failed status from the connector response" in {
+      when(connector.getClientListStatus(using any[HeaderCarrier]))
+        .thenReturn(Future.successful(GetClientListStatusResponse("Failed")))
+
+      val status = service.getClientListStatus.futureValue
+
+      status mustBe "Failed"
+    }
+
+    "should get the initiate download status from the connector response" in {
+      when(connector.getClientListStatus(using any[HeaderCarrier]))
+        .thenReturn(Future.successful(GetClientListStatusResponse("InitiateDownload")))
+
+      val status = service.getClientListStatus.futureValue
+
+      status mustBe "InitiateDownload"
+    }
+
+    "should get the in progress status from the connector response" in {
+      when(connector.getClientListStatus(using any[HeaderCarrier]))
+        .thenReturn(Future.successful(GetClientListStatusResponse("InProgress")))
+
+      val status = service.getClientListStatus.futureValue
+
+      status mustBe "InProgress"
     }
   }
-
 }
