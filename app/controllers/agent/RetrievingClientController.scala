@@ -19,19 +19,27 @@ package controllers.agent
 import config.FrontendAppConfig
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.ConstructionIndustrySchemeService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.agent.RetrievingClientView
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class RetrievingClientController @Inject() (
   override val messagesApi: MessagesApi,
   val controllerComponents: MessagesControllerComponents,
+  cisService: ConstructionIndustrySchemeService,
   view: RetrievingClientView
-)(implicit appConfig: FrontendAppConfig)
+)(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = Action { implicit request =>
-    Ok(view())
+  def onPageLoad: Action[AnyContent] = Action.async { implicit request =>
+    cisService.getClientListStatus.map {
+      case "Success"          => Redirect("/success")
+      case "Failed"           => Redirect(routes.FailedToRetrieveClientController.onPageLoad())
+      case "InProgress"       => Ok(view())
+      case "InitiateDownload" => Ok(view())
+    }
   }
 }
