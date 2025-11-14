@@ -19,25 +19,49 @@ package controllers.contractor
 import ContractorLandingController.viewModel
 import config.FrontendAppConfig
 import controllers.actions.*
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.ManageService
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.contractor.ContractorLandingViewModel
 import views.html.contractor.ContractorLandingView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
+import scala.concurrent.ExecutionContext
 
 class ContractorLandingController @Inject() (
   override val messagesApi: MessagesApi,
-  identify: IdentifierAction,
+  @Named("ContractorIdentifier") identify: IdentifierAction,
   val controllerComponents: MessagesControllerComponents,
   view: ContractorLandingView,
-  appConfig: FrontendAppConfig
-) extends FrontendBaseController
-    with I18nSupport {
+  appConfig: FrontendAppConfig,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  manageService: ManageService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
-  def onPageLoad: Action[AnyContent] = identify { implicit request =>
-    Ok(view(viewModel(appConfig)))
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+    manageService
+      .resolveAndStoreCisId(request.userAnswers)
+      .map { _ =>
+        Ok(view(viewModel(appConfig)))
+      }
+      .recover {
+        case e: UpstreamErrorResponse if e.statusCode == NOT_FOUND =>
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        case exception                                             =>
+          logger.error(
+            s"[ContractorLandingController] Failed to retrieve cisId: ${exception.getMessage}",
+            exception
+          )
+          Redirect(controllers.routes.SystemErrorController.onPageLoad())
+      }
+
   }
 }
 

@@ -18,7 +18,8 @@ package controllers.agent
 
 import controllers.actions.*
 import config.FrontendAppConfig
-import javax.inject.Inject
+
+import javax.inject.{Inject, Named}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -26,7 +27,7 @@ import views.html.agent.AgentLandingView
 
 class AgentLandingController @Inject() (
   override val messagesApi: MessagesApi,
-  identify: IdentifierAction,
+  @Named("AgentIdentifier") identify: IdentifierAction,
   getData: DataRetrievalAction,
   val controllerComponents: MessagesControllerComponents,
   view: AgentLandingView,

@@ -29,8 +29,7 @@ class ClientListFormDataSpec extends SpecBase {
   }
 
   "ClientListFormData should deserialize from JSON" in {
-    val json = Json.parse(
-      """
+    val json = Json.parse("""
         |{
         |  "searchBy": "ER",
         |  "searchFilter": "1234567890"
@@ -43,8 +42,8 @@ class ClientListFormDataSpec extends SpecBase {
 
   "ClientListFormData should serialize and deserialize consistently" in {
     val original = ClientListFormData("CR", "ABC/123456")
-    val json = Json.toJson(original)
-    val parsed = json.as[ClientListFormData]
+    val json     = Json.toJson(original)
+    val parsed   = json.as[ClientListFormData]
     assert(parsed === original)
   }
 }

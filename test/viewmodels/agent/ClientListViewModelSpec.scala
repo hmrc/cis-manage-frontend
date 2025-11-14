@@ -20,7 +20,6 @@ import base.SpecBase
 import org.scalatest.matchers.should.Matchers.*
 import play.api.i18n.Messages
 import viewmodels.agent.ClientStatus.{Active, InActive}
-import viewmodels.agent.{ClientListViewModel, SearchBy, SearchByList}
 
 class ClientListViewModelSpec extends SpecBase {
 
@@ -31,7 +30,7 @@ class ClientListViewModelSpec extends SpecBase {
 
   "ClientListViewModel.removeLink" - {
     "return a remove link when status is Active" in {
-      val model = ClientListViewModel(
+      val model  = ClientListViewModel(
         clientName = "Test",
         employerReference = "123/AA12345",
         clientReference = "TEST-001",
@@ -39,8 +38,8 @@ class ClientListViewModelSpec extends SpecBase {
       )
       val result = model.removeLink
       result.isDefined shouldBe true
-      result.get.text shouldBe "Remove"
-      result.get.href shouldBe "#"
+      result.get.text  shouldBe "Remove"
+      result.get.href  shouldBe "#"
     }
 
     "return None when status is NOT Active" in {
@@ -56,7 +55,7 @@ class ClientListViewModelSpec extends SpecBase {
 
   "ClientListViewModel.clientLink" - {
     "always return a link" in {
-      val model = ClientListViewModel(
+      val model  = ClientListViewModel(
         clientName = "Test",
         employerReference = "123/AA12345",
         clientReference = "TEST-003",
@@ -64,8 +63,8 @@ class ClientListViewModelSpec extends SpecBase {
       )
       val result = model.clientLink
       result.isDefined shouldBe true
-      result.get.text shouldBe ""
-      result.get.href shouldBe ""
+      result.get.text  shouldBe ""
+      result.get.href  shouldBe ""
     }
   }
 

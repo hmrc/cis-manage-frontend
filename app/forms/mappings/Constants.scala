@@ -17,6 +17,6 @@
 package forms.mappings
 
 object Constants {
-  final val SearchBy:              String = "searchBy"
-  final val SearchFilter:          String = "searchFilter"
+  final val SearchBy: String     = "searchBy"
+  final val SearchFilter: String = "searchFilter"
 }

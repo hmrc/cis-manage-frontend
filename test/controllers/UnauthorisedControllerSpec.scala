@@ -17,17 +17,33 @@
 package controllers
 
 import base.SpecBase
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import services.AuditService
+import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import views.html.UnauthorisedView
 
+import scala.concurrent.Future
+
 class UnauthorisedControllerSpec extends SpecBase {
+
+  private val mockAuditService: AuditService = MockitoSugar.mock[AuditService]
 
   "Unauthorised Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(
+          bind[AuditService].toInstance(mockAuditService)
+        )
+        .build()
+
+      when(mockAuditService.sendEvent(any())(any(), any(), any())).thenReturn(Future.successful(AuditResult.Success))
 
       running(application) {
         val request = FakeRequest(GET, routes.UnauthorisedController.onPageLoad().url)
@@ -37,7 +53,7 @@ class UnauthorisedControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[UnauthorisedView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view()(request, applicationConfig, messages(application)).toString
       }
     }
   }

@@ -17,21 +17,41 @@
 package controllers
 
 import config.FrontendAppConfig
+import controllers.actions.IdentifierAction
+import models.UserAnswers
+
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IntroductionView
+
+import scala.concurrent.ExecutionContext
 
 class IntroductionController @Inject() (
   override val messagesApi: MessagesApi,
   val controllerComponents: MessagesControllerComponents,
+  identify: IdentifierAction,
+  sessionRepository: SessionRepository,
   view: IntroductionView
-)(implicit appConfig: FrontendAppConfig)
+)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
     Ok(view())
   }
+
+  def affinityGroupRouting: Action[AnyContent] = identify.async { implicit request =>
+    val userAnswers = UserAnswers(request.userId)
+    sessionRepository.set(userAnswers).map { _ =>
+      if (request.isAgent) {
+        Redirect(controllers.agent.routes.RetrievingClientController.onPageLoad())
+      } else {
+        Redirect(controllers.contractor.routes.ContractorLandingController.onPageLoad())
+      }
+    }
+  }
+
 }

@@ -31,7 +31,18 @@ class DataRequiredActionImpl @Inject() (implicit val executionContext: Execution
       case None       =>
         Future.successful(Left(Redirect(routes.JourneyRecoveryController.onPageLoad())))
       case Some(data) =>
-        Future.successful(Right(DataRequest(request.request, request.userId, data)))
+        Future.successful(
+          Right(
+            DataRequest(
+              request.request,
+              request.userId,
+              data,
+              request.employerReference,
+              request.agentReference,
+              request.isAgent
+            )
+          )
+        )
     }
 }
 

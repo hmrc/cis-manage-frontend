@@ -21,7 +21,6 @@ import org.scalatest.matchers.should.Matchers.*
 import play.api.i18n.Messages
 import viewmodels.agent.ClientStatus.*
 
-
 class ClientStatusSpec extends SpecBase {
 
   implicit val messages: Messages = play.api.i18n.MessagesImpl(
@@ -37,15 +36,15 @@ class ClientStatusSpec extends SpecBase {
       )
     }
     "expose correct entry names" in {
-      ClientStatus.Active.entryName shouldBe "ACTIVE"
+      ClientStatus.Active.entryName   shouldBe "ACTIVE"
       ClientStatus.InActive.entryName shouldBe "INACTIVE"
     }
     "resolve enum values using withName" in {
-      ClientStatus.withName("ACTIVE") shouldBe ClientStatus.Active
+      ClientStatus.withName("ACTIVE")   shouldBe ClientStatus.Active
       ClientStatus.withName("INACTIVE") shouldBe ClientStatus.InActive
     }
     "resolve enum values using withNameInsensitive" in {
-      ClientStatus.withNameInsensitive("active") shouldBe ClientStatus.Active
+      ClientStatus.withNameInsensitive("active")   shouldBe ClientStatus.Active
       ClientStatus.withNameInsensitive("inactive") shouldBe ClientStatus.InActive
     }
     "throw when name is invalid" in {

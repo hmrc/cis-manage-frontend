@@ -29,6 +29,9 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.libs.json.{JsObject, Json}
+import play.api.mvc.PlayBodyParsers
+import play.api.test.Helpers.stubControllerComponents
 
 trait SpecBase
     extends AnyFreeSpec
@@ -41,17 +44,26 @@ trait SpecBase
 
   implicit lazy val applicationConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
 
-  val userAnswersId: String = "id"
+  val userAnswersId: String    = "id"
+  val parsers: PlayBodyParsers = stubControllerComponents().parsers
+  val cisIdData: JsObject      = Json.obj("cisId" -> "1")
 
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 
+  def userAnswersWithCisId: UserAnswers = UserAnswers(userAnswersId, cisIdData)
+
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
-  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None): GuiceApplicationBuilder =
+  protected def applicationBuilder(
+    userAnswers: Option[UserAnswers] = None,
+    isAgent: Boolean = false
+  ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
         bind[DataRequiredAction].to[DataRequiredActionImpl],
-        bind[IdentifierAction].to[FakeIdentifierAction],
+        bind[IdentifierAction].to(new FakeIdentifierAction(isAgent)(parsers)),
+        bind[IdentifierAction].qualifiedWith("AgentIdentifier").to(new FakeIdentifierAction(true)(parsers)),
+        bind[IdentifierAction].qualifiedWith("ContractorIdentifier").to(new FakeIdentifierAction(false)(parsers)),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
       )
 }

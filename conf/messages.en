@@ -35,19 +35,72 @@ index.guidance = Welcome to cis-manage-frontend. Please see the README file for 
 checkYourAnswers.title = Check your answers
 checkYourAnswers.heading = Check your answers
 
-journeyRecovery.continue.title = Sorry, there is a problem with the service
-journeyRecovery.continue.heading = Sorry, there is a problem with the service
-journeyRecovery.continue.guidance = [Add content to explain how to proceed.]
-journeyRecovery.startAgain.title = Sorry, there is a problem with the service
-journeyRecovery.startAgain.heading = Sorry, there is a problem with the service
-journeyRecovery.startAgain.guidance = [Add content to explain why the user needs to start again.]
+journeyRecovery.continue.title = Sorry, there is a problem with this service
+journeyRecovery.continue.heading = Sorry, there is a problem with this service
+journeyRecovery.continue.guidance.p1 = There is problem with this service. You can return to
+journeyRecovery.continue.guidance.link = Construction Industry Scheme
+journeyRecovery.continue.guidance.p2 = or try again later.
+
+journeyRecovery.startAgain.title = Sorry, there is a problem with this service
+journeyRecovery.startAgain.heading = Sorry, there is a problem with this service
+journeyRecovery.startAgain.guidance.p1 = There is problem with this service. You can return to
+journeyRecovery.startAgain.guidance.link = Construction Industry Scheme
+journeyRecovery.startAgain.guidance.p2 = or try again later.
 
 signedOut.title = For your security, we signed you out
 signedOut.heading = For your security, we signed you out
 signedOut.guidance = We did not save your answers.
 
+pageNotFound.title      = Page not found
+pageNotFound.heading    = Page not found
+pageNotFound.p1         = If you typed the web address, check it is correct.
+pageNotFound.p2         = If you pasted the web address, check you copied the entire address.
+pageNotFound.p3         = If the web address is correct or you selected a link or button, contact the
+pageNotFound.link       = HMRC Online Services Helpdesk
+pageNotFound.p4         = if you need to speak to someone.
+
+systemError.title       = Sorry, there is a problem with this service
+systemError.heading     = Sorry, there is a problem with this service
+systemError.p1          = Try again later.
+systemError.p2          = Contact the
+systemError.link        = HMRC Online Services Helpdesk
+systemError.p3          = if you need to speak to someone about Construction Industry Scheme and quote the reference number:
+
+accessDenied.title      = Sorry, there is a problem with the service
+accessDenied.heading    = Sorry, there is a problem with the service
+accessDenied.link       = Return to the Construction Industry Scheme start page.
+
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
+unauthorised.guidance.org.p1.prefix = If you are a contractor or subcontractor, you will need to register with
+unauthorised.guidance.org.p1.link = Construction Industry Scheme
+unauthorised.guidance.org.p1.suffix = to access this service.
+unauthorised.guidance.agent.p2.prefix = If you are an agent, you will need to request access to
+unauthorised.guidance.agent.p2.link = PAYE for Agents
+unauthorised.guidance.agent.p2.suffix = to use this service.
+
+unauthorised.org.title = You need to register to use this service
+unauthorised.org.heading = You need to register to use this service
+unauthorised.org.p1 = You are signed in with an organisation account.
+unauthorised.org.guidance.p2.prefix = Register with the
+unauthorised.org.guidance.p2.link = Construction Industry Scheme
+unauthorised.org.guidance.p2.suffix = to access this service.
+
+unauthorised.org.standard.title = Sorry, you are unable to use this service
+unauthorised.org.standard.heading = Sorry, you are unable to use this service
+unauthorised.org.standard.paragraph = Return to
+unauthorised.org.standard.guidance.link = Construction Industry Scheme
+
+unauthorised.individual.title = Sorry, you are unable to use this service
+unauthorised.individual.heading = Sorry, you are unable to use this service
+unauthorised.individual.p1 = You are signed in with an individual account. Only users with an organisation or agent services accounts can use this service.
+
+unauthorised.agent.title = Sorry, you are unable to use this service
+unauthorised.agent.heading = Sorry, you are unable to use this service
+unauthorised.agent.p1 = You are signed in with an agent account.
+unauthorised.agent.p2.prefix = You need to request access to
+unauthorised.agent.p2.link = PAYE for Agents
+unauthorised.agent.p2.suffix = to use this service.
 
 agent.retrievingClient.title = Retrieving your client list
 agent.retrievingClient.h1 = Retrieving your client list
@@ -203,7 +256,6 @@ introduction.details.h3 = Filing only service
 introduction.details.p1 = You can send CIS monthly returns without completing an authorisation online or form FBI-2.
 introduction.details.p2 = This service is only available using commercial software.
 introduction.details.link = Find commercial software for CIS returns
-introduction.button.continue = Continue
 introduction.sidebar.h2 = Related content
 introduction.sidebar.link1 = What is the Construction Industry Scheme
 introduction.sidebar.link2 = CIS monthly returns guidance

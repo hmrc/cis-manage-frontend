@@ -22,6 +22,7 @@
     sidebarLinks: templates.SidebarLinks,
     govukInsetText: GovukInsetText,
     govukDetails: GovukDetails,
+    govukButton: GovukButton,
     linkList: LinkList,
     h1: H1,
     h2: H2,
@@ -29,7 +30,7 @@
     buttonWithLink: ButtonWithLink,
     link: Link,
     paragraph: Paragraph,
-    bulletList: BulletList,
+    bulletList: BulletList
 )
 
 @()(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
@@ -87,5 +88,10 @@
         )
     )
 
-    @buttonWithLink("introduction.button.continue", "#")
+    <div>
+    @govukButton(
+        ButtonViewModel(messages("site.continue")).asLink(controllers.routes.IntroductionController.affinityGroupRouting().url)
+    )
+    </div>
+
 }
