@@ -18,7 +18,7 @@ package controllers.agent
 
 import base.SpecBase
 import controllers.routes
-import forms.ClientListFormProvider
+import forms.ClientListSearchFormProvider
 import models.agent.ClientListFormData
 import models.UserAnswers
 import org.mockito.ArgumentMatchers.any
@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider                   = new ClientListFormProvider()
+  val formProvider                   = new ClientListSearchFormProvider()
   val form: Form[ClientListFormData] = formProvider()
 
   lazy val clientListSearchRoute: String = controllers.agent.routes.ClientListSearchController.onPageLoad().url

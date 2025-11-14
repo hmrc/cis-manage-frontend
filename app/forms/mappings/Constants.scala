@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-package models.agent
+package forms.mappings
 
-import play.api.libs.json._
-import play.api.libs.json.Reads._
-
-case class ClientListFormData(searchBy: String, searchFilter: String)
-
-object ClientListFormData {
-  implicit val format: Format[ClientListFormData] = Json.format[ClientListFormData]
+object Constants {
+  final val SearchBy:              String = "searchBy"
+  final val SearchFilter:          String = "searchFilter"
 }

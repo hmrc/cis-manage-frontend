@@ -1,4 +1,3 @@
-@import "autocomplete";
 
 /*
     Styling in this and other .scss files will be compiled by the sbt-sass-compiler plugin: https://github.com/hmrc/sbt-sass-compiler
@@ -23,4 +22,12 @@
 
 .govuk-section-break--l {
   margin-top: 0px;
+}
+
+.autocomplete__wrapper {
+    max-width: 11.5em;
+}
+.autocomplete__dropdown-arrow-down {
+    z-index: 0;
+    pointer-events: none;
 }

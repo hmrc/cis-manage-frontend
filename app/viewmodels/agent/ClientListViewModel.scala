@@ -16,10 +16,11 @@
 
 package viewmodels.agent
 
-import controllers.routes
 import ClientStatus.Active
+import models.{Enumerable, WithName}
 import play.api.i18n.Messages
 import viewmodels.Link
+import viewmodels.agent.SearchBy.*
 
 case class ClientListViewModel(
   clientName: String,
@@ -32,12 +33,12 @@ case class ClientListViewModel(
     clientStatus match {
       case Active =>
         Some(
-          Link(messages("agent.clientListSearch.td.action.remove"), routes.JourneyRecoveryController.onPageLoad().url)
+          Link(messages("agent.clientListSearch.td.actions.remove"), "#")
         )
       case _      => None
     }
   def clientLink(implicit messages: Messages): Option[Link] =
-    Some(Link("", routes.JourneyRecoveryController.onPageLoad().url))
+    Some(Link("", ""))
 }
 
 object ClientListViewModel {
@@ -62,14 +63,32 @@ object ClientListViewModel {
 
 }
 
+sealed trait SearchBy
+
+object SearchBy extends Enumerable.Implicits {
+  case object CN extends WithName("CN") with SearchBy
+  case object CR extends WithName("CR") with SearchBy
+  case object ER extends WithName("ER") with SearchBy
+
+  val values: Seq[SearchBy] = Seq(
+    CN,
+    CR,
+    ER
+  )
+
+  implicit val enumerable: Enumerable[SearchBy] =
+    Enumerable(values.map(v => v.toString -> v): _*)
+
+}
+
 case class SearchByList(value: String, label: String)
 
 object SearchByList {
 
   val searchByOptions: Seq[SearchByList] = Seq(
-    SearchByList("CN", "Client name"),
-    SearchByList("CR", "Client reference"),
-    SearchByList("ER", "Employer reference")
+    SearchByList(CN.toString, "Client name"),
+    SearchByList(CR.toString, "Client reference"),
+    SearchByList(ER.toString, "Employer reference")
   )
 
 }

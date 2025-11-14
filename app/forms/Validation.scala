@@ -20,6 +20,11 @@ import scala.util.matching.Regex
 
 object Validation {
 
-  val textInputPattern: Regex = """[0-9A-Za-zÀ-ÅÇ-ÖØ-Ýà-åç-öø-ýÿĀ-ľŁ-ňŊ-őŔ-ſ'’ \-.,_&!)(]+""".r.anchored
+  val clientNameInputPattern: Regex        = """[a-zA-Z0-9 .()/\-',&]+""".r.anchored
+  val clientReferenceInputPattern: Regex   = """[a-zA-Z0-9 .()/\-',&]+""".r.anchored
+  val employerReferenceInputPattern: Regex = """[a-zA-Z0-9/]+""".r.anchored
+  val clientNameInputMaxLength: Int        = 56
+  val clientReferenceInputMaxLength: Int   = 20
+  val employerReferenceInputMaxLength: Int = 14
 
 }

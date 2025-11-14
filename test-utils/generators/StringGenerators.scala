@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package models.agent
+package generators
 
-import play.api.libs.json._
-import play.api.libs.json.Reads._
+trait StringGenerators {
+  def randomStringGenerator(n: Int): String =
+    n match {
+      case 1 => util.Random.nextPrintableChar.toString
+      case _ => util.Random.nextPrintableChar.toString ++ randomStringGenerator(n - 1)
+    }
 
-case class ClientListFormData(searchBy: String, searchFilter: String)
+  def randomAlphaNumericStringGenerator(n: Int): String = {
+    val alphanumericChars = ('a' to 'z') ++ ('A' to 'Z') ++ ('0' to '9')
+    val r                 = new scala.util.Random
 
-object ClientListFormData {
-  implicit val format: Format[ClientListFormData] = Json.format[ClientListFormData]
+    Vector.fill(n)(alphanumericChars(r.nextInt(alphanumericChars.length))).mkString
+  }
 }

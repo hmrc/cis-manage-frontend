@@ -33,7 +33,7 @@ package views.agent
  */
 
 import base.SpecBase
-import forms.ClientListFormProvider
+import forms.ClientListSearchFormProvider
 import models.agent.ClientListFormData
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
@@ -92,14 +92,14 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
   }
 
   trait Setup {
-    val app: Application                          = applicationBuilder().build()
-    val view: ClientListSearchView                = app.injector.instanceOf[ClientListSearchView]
-    val formProvider: ClientListFormProvider      = app.injector.instanceOf[ClientListFormProvider]
-    val form: Form[ClientListFormData]            = formProvider()
-    val searchOptions: Seq[SearchByList]          = SearchByList.searchByOptions
-    val clientList: Seq[ClientListViewModel]      = ClientListViewModel.allAgentClients
-    implicit val request: play.api.mvc.Request[_] = FakeRequest()
-    implicit val messages: Messages               = play.api.i18n.MessagesImpl(
+    val app: Application                           = applicationBuilder().build()
+    val view: ClientListSearchView                 = app.injector.instanceOf[ClientListSearchView]
+    val formProvider: ClientListSearchFormProvider = app.injector.instanceOf[ClientListSearchFormProvider]
+    val form: Form[ClientListFormData]             = formProvider()
+    val searchOptions: Seq[SearchByList]           = SearchByList.searchByOptions
+    val clientList: Seq[ClientListViewModel]       = ClientListViewModel.allAgentClients
+    implicit val request: play.api.mvc.Request[_]  = FakeRequest()
+    implicit val messages: Messages                = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,
       app.injector.instanceOf[play.api.i18n.MessagesApi]
     )

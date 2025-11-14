@@ -21,6 +21,7 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accessibleautocomplete.AccessibleAutocomplete
 @import config.FrontendAppConfig
+@import forms.mappings.Constants
 
 @this(
     layout: templates.Layout,
@@ -71,10 +72,12 @@ additionalCss = Some(css)) {
 
         @h1(messages("agent.clientListSearch.heading"))
 
+        @paragraph(messages("agent.clientListSearch.p1"))
+
         @govukSelect(
             SelectViewModel(
-                field = form("searchBy"),
-                items = Seq(SelectItem(value = Some(""), text = "")) ++
+                field = form(Constants.SearchBy),
+                items = Seq(SelectItem(value = Some(""), text = "Select an option")) ++
                     searchByOptions.map(searchOption =>
                         SelectItem(
                             value = Some(searchOption.value),
@@ -85,13 +88,13 @@ additionalCss = Some(css)) {
             )
             .withCssClass("govuk-input")
             .withFormGroupClasses("govuk-!-width-two-thirds")
-            .withAttribute("aria-label" -> "searchBy")
-            .asAccessibleAutocomplete(Some(AccessibleAutocomplete(defaultValue = Some(""), showAllValues = true, autoSelect = true)))
+            .withAttribute("aria-label" -> Constants.SearchBy)
+            .asAccessibleAutocomplete(Some(AccessibleAutocomplete(defaultValue = Some(""), showAllValues = true)))
         )
 
         @govukInput(
             InputViewModel(
-                field = form("searchFilter"),
+                field = form(Constants.SearchFilter),
                 label = LabelViewModel(messages("agent.clientListSearch.searchFilter.label"))
             )
             .withHint(Hint(content = messages("agent.clientListSearch.searchFilter.label.hint")))
@@ -130,7 +133,7 @@ additionalCss = Some(css)) {
                 <th class="govuk-table__header" scope="col" aria-sort="ascending">@messages("agent.clientListSearch.th.clientName")</th>
                 <th class="govuk-table__header" scope="col" aria-sort="none">@messages("agent.clientListSearch.th.employerReference")</th>
                 <th class="govuk-table__header" scope="col" aria-sort="none">@messages("agent.clientListSearch.th.clientReference")</th>
-                <th class="govuk-table__header" scope="col">@messages("agent.clientListSearch.th.action")</th>
+                <th class="govuk-table__header" scope="col">@messages("agent.clientListSearch.th.actions")</th>
             </tr>
             </thead>
             @clientList.map { agentClient =>

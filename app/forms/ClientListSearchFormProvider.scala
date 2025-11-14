@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package models.agent
+package forms
 
-import play.api.libs.json._
-import play.api.libs.json.Reads._
+import forms.mappings.Mappings
+import models.agent.ClientListFormData
+import play.api.data.*
 
-case class ClientListFormData(searchBy: String, searchFilter: String)
+import javax.inject.Inject
 
-object ClientListFormData {
-  implicit val format: Format[ClientListFormData] = Json.format[ClientListFormData]
+class ClientListSearchFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[ClientListFormData] =
+    Form(
+      "value" -> clientListSearchMapping(key => s"agent.clientListSearch.$key.error.required")
+    )
+
 }

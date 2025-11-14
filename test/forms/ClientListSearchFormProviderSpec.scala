@@ -22,9 +22,9 @@ import org.scalacheck.Gen
 import play.api.data.FormError
 import viewmodels.agent.SearchByList
 
-class ClientListFormProviderSpec extends StringFieldBehaviours {
+class ClientListSearchFormProviderSpec extends StringFieldBehaviours {
 
-  val form = new ClientListFormProvider()()
+  val form = new ClientListSearchFormProvider()()
 
   ".searchBy" - {
 
@@ -54,30 +54,13 @@ class ClientListFormProviderSpec extends StringFieldBehaviours {
 
   ".searchFilter" - {
 
-    val requiredKey = "agent.clientListSearch.searchFilter.error.required"
-    val lengthKey   = "agent.clientListSearch.searchFilter.error.length"
-    val invalidKey  = "agent.clientListSearch.searchFilter.error.format"
-    val maxLength   = 35
-    val fieldName   = "searchFilter"
+    val maxLength = 35
+    val fieldName = "searchFilter"
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
       stringsWithMaxLength(maxLength)
-    )
-
-    behave like checkForMaxLengthAndInvalid(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength)),
-      invalidError = FormError(fieldName, invalidKey, Seq(maxLength))
-    )
-
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
     )
 
   }

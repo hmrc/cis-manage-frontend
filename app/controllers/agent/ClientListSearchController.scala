@@ -17,7 +17,7 @@
 package controllers.agent
 
 import controllers.actions.*
-import forms.ClientListFormProvider
+import forms.ClientListSearchFormProvider
 import models.agent.ClientListFormData
 import pages.ClientListSearchPage
 import play.api.data.Form
@@ -37,7 +37,7 @@ class ClientListSearchController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: ClientListFormProvider,
+  formProvider: ClientListSearchFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: ClientListSearchView
 )(implicit ec: ExecutionContext)
