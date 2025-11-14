@@ -18,6 +18,7 @@ package services
 
 import com.google.inject.{Inject, Singleton}
 import connectors.ConstructionIndustrySchemeConnector
+import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -25,8 +26,9 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ConstructionIndustrySchemeService @Inject() (cisConnector: ConstructionIndustrySchemeConnector)(using
   ExecutionContext
-) {
+) extends Logging {
 
   def getClientListStatus(using HeaderCarrier): Future[String] =
-    cisConnector.getClientListStatus.map(_.status)
+    cisConnector.getClientListStatus
+      .map(_.result)
 }

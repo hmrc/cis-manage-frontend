@@ -17,7 +17,6 @@
 package controllers.agent
 
 import base.SpecBase
-import controllers.routes
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.agent.NoAuthorisedClientsView

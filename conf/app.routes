@@ -28,3 +28,5 @@ GET         /agent/authorised-client-manage-CIS-returns             controllers.
 GET         /sign-into-cis                                          controllers.IntroductionController.onPageLoad()
 
 GET         /org/manage-cis-returns                                 controllers.contractor.ContractorLandingController.onPageLoad()
+
+GET         /system-error/there-is-a-problem                        controllers.SystemErrorController.onPageLoad()

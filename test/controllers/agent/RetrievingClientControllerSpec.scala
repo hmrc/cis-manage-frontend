@@ -46,7 +46,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
 
-        when(mockCisService.getClientListStatus(using any[HeaderCarrier])).thenReturn(Future.successful("Success"))
+        when(mockCisService.getClientListStatus(using any[HeaderCarrier])).thenReturn(Future.successful("succeeded"))
         val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.onPageLoad().url)
 
         val result = route(application, request).value
@@ -70,7 +70,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
 
-        when(mockCisService.getClientListStatus(using any[HeaderCarrier])).thenReturn(Future.successful("Failed"))
+        when(mockCisService.getClientListStatus(using any[HeaderCarrier])).thenReturn(Future.successful("failed"))
         val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.onPageLoad().url)
 
         val result = route(application, request).value
@@ -85,17 +85,16 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the correct page for a GET when InProgress occurs" in {
 
       val mockCisService: ConstructionIndustrySchemeService = mock[ConstructionIndustrySchemeService]
-      val application = applicationBuilder(
+      val application                                       = applicationBuilder(
         userAnswers = Some(emptyUserAnswers),
         additionalBindings = Seq(
           bind[ConstructionIndustrySchemeService].to(mockCisService)
         )
       ).build()
 
-
       running(application) {
 
-        when(mockCisService.getClientListStatus(using any[HeaderCarrier])).thenReturn(Future.successful("InProgress"))
+        when(mockCisService.getClientListStatus(using any[HeaderCarrier])).thenReturn(Future.successful("in-progress"))
         val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.onPageLoad().url)
 
         val result = route(application, request).value
@@ -107,28 +106,5 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the correct page for a GET when InitiateDownload occurs" in {
-
-      val mockCisService: ConstructionIndustrySchemeService = mock[ConstructionIndustrySchemeService]
-      val application = applicationBuilder(
-        userAnswers = Some(emptyUserAnswers),
-        additionalBindings = Seq(
-          bind[ConstructionIndustrySchemeService].to(mockCisService)
-        )
-      ).build()
-
-      running(application) {
-
-        when(mockCisService.getClientListStatus(using any[HeaderCarrier])).thenReturn(Future.successful("InitiateDownload"))
-        val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.onPageLoad().url)
-
-        val result = route(application, request).value
-
-        application.injector.instanceOf[RetrievingClientView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustBe view()(request, applicationConfig, messages(application)).toString
-      }
-    }
   }
 }

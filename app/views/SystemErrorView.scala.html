@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,14 +12,26 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package models
+@import views.html.components._
+@import config.FrontendAppConfig
 
-import play.api.libs.json.{Json, OFormat}
+@this(
+    layout: templates.Layout,
+    heading: H1,
+    paragraph: Paragraph,
+    texWithLinkAndReference: TextWithLinkAndReference
+)
 
-case class GetClientListStatusResponse(result: String)
+@(incidentReferenceNumber: String)(implicit request: RequestHeader, appConfig: FrontendAppConfig, messages: Messages)
 
-object GetClientListStatusResponse {
-  implicit val format: OFormat[GetClientListStatusResponse] = Json.format[GetClientListStatusResponse]
+@layout(
+    pageTitle = titleNoForm(messages("systemError.title")),
+    showBackLink = false,
+    showSignOut = false
+) {
+
+    @heading(messages("systemError.heading"), classes = "govuk-heading-xl")
+    @paragraph(messages("systemError.p1"))
 }

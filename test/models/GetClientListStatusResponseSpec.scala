@@ -26,13 +26,13 @@ class GetClientListStatusResponseSpec extends AnyFreeSpec with Matchers {
 
     "must serialize to JSON correctly" in {
       val model        = GetClientListStatusResponse("complete")
-      val expectedJson = Json.obj("status" -> "complete")
+      val expectedJson = Json.obj("result" -> "complete")
 
       Json.toJson(model) mustEqual expectedJson
     }
 
     "must deserialize from JSON correctly" in {
-      val json          = Json.obj("status" -> "processing")
+      val json          = Json.obj("result" -> "processing")
       val expectedModel = GetClientListStatusResponse("processing")
 
       json.as[GetClientListStatusResponse] mustEqual expectedModel
@@ -54,7 +54,7 @@ class GetClientListStatusResponseSpec extends AnyFreeSpec with Matchers {
         val json   = Json.toJson(model)
         val result = json.as[GetClientListStatusResponse]
 
-        result.status mustEqual status
+        result.result mustEqual status
       }
     }
 

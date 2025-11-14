@@ -14,33 +14,27 @@
  * limitations under the License.
  */
 
-package controllers.agent
+package controllers
 
 import config.FrontendAppConfig
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.ConstructionIndustrySchemeService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.agent.RetrievingClientView
-import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import views.html.SystemErrorView
 
-class RetrievingClientController @Inject() (
+import javax.inject.Inject
+
+class SystemErrorController @Inject() (
   override val messagesApi: MessagesApi,
   val controllerComponents: MessagesControllerComponents,
-  cisService: ConstructionIndustrySchemeService,
-  view: RetrievingClientView
-)(implicit appConfig: config.FrontendAppConfig, ec: ExecutionContext)
+  view: SystemErrorView
+)(implicit appConfig: FrontendAppConfig)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
-  def onPageLoad: Action[AnyContent] = Action.async { implicit request =>
-    cisService.getClientListStatus.map {
-      case "succeeded"    => Redirect("/success")
-      case "failed"       => Redirect(routes.FailedToRetrieveClientController.onPageLoad())
-      case "system-error" => Redirect(controllers.routes.SystemErrorController.onPageLoad())
-      case "in-progress"  => Ok(view())
-      case _              => Ok(view())
-    }
+  def onPageLoad: Action[AnyContent] = Action { implicit request =>
+    Ok(view("1234567890"))
   }
 }
