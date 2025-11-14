@@ -107,6 +107,14 @@ trait Constraints {
         Invalid(errorKey)
     }
 
+  protected def nonEmptyString(value: String, errorKey: String): Constraint[String] =
+    Constraint {
+      case str if str.trim.nonEmpty =>
+        Valid
+      case _                        =>
+        Invalid(errorKey, value)
+    }
+
   protected def minimumCurrency(minimum: BigDecimal, errorKey: String)(implicit
     ev: Ordering[BigDecimal]
   ): Constraint[BigDecimal] =

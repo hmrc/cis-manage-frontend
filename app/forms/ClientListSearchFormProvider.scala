@@ -14,24 +14,19 @@
  * limitations under the License.
  */
 
-package viewmodels
+package forms
 
-package object govuk {
+import forms.mappings.Mappings
+import models.agent.ClientListFormData
+import play.api.data.*
 
-  object all
-      extends ImplicitConversions
-      with BackLinkFluency
-      with ButtonFluency
-      with CheckboxFluency
-      with DateFluency
-      with ErrorSummaryFluency
-      with FieldsetFluency
-      with HintFluency
-      with InputFluency
-      with InsetTextFluency
-      with LabelFluency
-      with RadiosFluency
-      with SummaryListFluency
-      with TagFluency
-      with SelectFluency
+import javax.inject.Inject
+
+class ClientListSearchFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[ClientListFormData] =
+    Form(
+      "value" -> clientListSearchMapping(key => s"agent.clientListSearch.$key.error.required")
+    )
+
 }

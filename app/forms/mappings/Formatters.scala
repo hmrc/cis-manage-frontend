@@ -16,9 +16,14 @@
 
 package forms.mappings
 
+import forms.Validation
+import forms.Validation.{clientNameInputMaxLength, clientReferenceInputMaxLength, employerReferenceInputMaxLength}
 import play.api.data.FormError
 import play.api.data.format.Formatter
 import models.Enumerable
+import models.agent.ClientListFormData
+import viewmodels.agent.SearchBy
+import viewmodels.agent.SearchBy.*
 
 import scala.util.control.Exception.nonFatalCatch
 
@@ -138,4 +143,80 @@ trait Formatters {
       override def unbind(key: String, value: BigDecimal): Map[String, String] =
         baseFormatter.unbind(key, value.toString)
     }
+
+  private[mappings] def searchFilterFormatter(
+    searchBy: SearchBy,
+    args: Seq[String] = Seq.empty
+  ): Formatter[String] =
+    new Formatter[String] {
+
+      val errorKey                        = s"agent.clientListSearch.searchFilter.${searchBy.toString.toLowerCase()}.error.required"
+      val clientNameFormatErrorKey        = "agent.clientListSearch.searchFilter.cn.error.format"
+      val clientNameLengthErrorKey        = "agent.clientListSearch.searchFilter.cn.error.length"
+      val clientReferenceFormatErrorKey   = "agent.clientListSearch.searchFilter.cr.error.format"
+      val clientReferenceLengthErrorKey   = "agent.clientListSearch.searchFilter.cr.error.length"
+      val employerReferenceFormatErrorKey = "agent.clientListSearch.searchFilter.er.error.format"
+      val employerReferenceLengthErrorKey = "agent.clientListSearch.searchFilter.er.error.length"
+
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] =
+        data.get(key) match {
+          case None                                                                                                  => Left(Seq(FormError(key, errorKey, args)))
+          case Some(s) if s.trim.isEmpty                                                                             => Left(Seq(FormError(key, errorKey, args)))
+          case Some(s) if (searchBy == SearchBy.CN) && !s.matches(Validation.clientNameInputPattern.toString())      =>
+            Left(Seq(FormError(key, clientNameFormatErrorKey, args)))
+          case Some(s) if (searchBy == SearchBy.CN) && (s.length > clientNameInputMaxLength)                         =>
+            Left(Seq(FormError(key, clientNameLengthErrorKey, args)))
+          case Some(s) if (searchBy == SearchBy.CR) && !s.matches(Validation.clientReferenceInputPattern.toString()) =>
+            Left(Seq(FormError(key, clientReferenceFormatErrorKey, args)))
+          case Some(s) if (searchBy == SearchBy.CR) && (s.length > clientReferenceInputMaxLength)                    =>
+            Left(Seq(FormError(key, clientReferenceLengthErrorKey, args)))
+          case Some(s)
+              if (searchBy == SearchBy.ER) && !s.matches(Validation.employerReferenceInputPattern.toString()) =>
+            Left(Seq(FormError(key, employerReferenceFormatErrorKey, args)))
+          case Some(s) if (searchBy == SearchBy.ER) && (s.length > employerReferenceInputMaxLength)                  =>
+            Left(Seq(FormError(key, employerReferenceLengthErrorKey, args)))
+          case Some(s)                                                                                               => Right(s)
+        }
+
+      override def unbind(key: String, value: String): Map[String, String] =
+        Map(key -> value)
+    }
+
+  private[mappings] def clientListSearchFormatter(
+    requiredKey: String => String,
+    args: Seq[String]
+  ): Formatter[ClientListFormData] =
+    new Formatter[ClientListFormData] {
+
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], ClientListFormData] = {
+        def bindSearchBy(key: String): Either[Seq[FormError], String]                         =
+          stringFormatter(requiredKey(key), args).bind(key, data)
+        def bindSearchFilter(key: String, searchBy: SearchBy): Either[Seq[FormError], String] =
+          searchFilterFormatter(searchBy, args).bind(key, data)
+        bindSearchBy(Constants.SearchBy) match {
+          case Right(searchBy)     =>
+            def validateSearchFilter(searchByVal: SearchBy) =
+              bindSearchFilter(Constants.SearchFilter, searchByVal) match {
+                case Right(searchFilter)     => Right(ClientListFormData(searchBy, searchFilter))
+                case Left(searchFilterError) => Left(searchFilterError)
+              }
+            searchBy match {
+              case CN.toString => validateSearchFilter(CN)
+              case CR.toString => validateSearchFilter(CR)
+              case ER.toString => validateSearchFilter(ER)
+              case _           => Left(Seq(FormError(Constants.SearchBy, "agent.clientListSearch.searchBy.error.required", args)))
+            }
+          case Left(searchByError) =>
+            Left(searchByError)
+        }
+
+      }
+
+      override def unbind(key: String, value: ClientListFormData): Map[String, String] =
+        Map(
+          Constants.SearchBy     -> value.searchBy,
+          Constants.SearchFilter -> value.searchFilter
+        )
+    }
+
 }

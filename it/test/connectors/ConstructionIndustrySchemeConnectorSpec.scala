@@ -18,12 +18,11 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import itutil.ApplicationWithWiremock
-import org.scalatest.OptionValues.convertOptionToValuable
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
-import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import uk.gov.hmrc.http.HeaderCarrier
 
 class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
   with Matchers
@@ -34,8 +33,6 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   val connector: ConstructionIndustrySchemeConnector = app.injector.instanceOf[ConstructionIndustrySchemeConnector]
-
-  private val cisId = "123"
 
   "getCisTaxpayer" should {
 

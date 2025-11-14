@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-package viewmodels
+package forms
 
-package object govuk {
+import scala.util.matching.Regex
 
-  object all
-      extends ImplicitConversions
-      with BackLinkFluency
-      with ButtonFluency
-      with CheckboxFluency
-      with DateFluency
-      with ErrorSummaryFluency
-      with FieldsetFluency
-      with HintFluency
-      with InputFluency
-      with InsetTextFluency
-      with LabelFluency
-      with RadiosFluency
-      with SummaryListFluency
-      with TagFluency
-      with SelectFluency
+object Validation {
+
+  val clientNameInputPattern: Regex        = """[a-zA-Z0-9 .()/\-',&]+""".r.anchored
+  val clientReferenceInputPattern: Regex   = """[a-zA-Z0-9 .()/\-',&]+""".r.anchored
+  val employerReferenceInputPattern: Regex = """[a-zA-Z0-9/]+""".r.anchored
+  val clientNameInputMaxLength: Int        = 56
+  val clientReferenceInputMaxLength: Int   = 20
+  val employerReferenceInputMaxLength: Int = 14
+
 }
