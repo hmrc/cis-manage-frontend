@@ -97,7 +97,7 @@ unauthorised.individual.p1 = You are signed in with an individual account. Only 
 unauthorised.agent.title = Sorry, you are unable to use this service
 unauthorised.agent.heading = Sorry, you are unable to use this service
 unauthorised.agent.p1 = You are signed in with an agent account.
-unauthorised.agent.p2.prefix = You need request access to
+unauthorised.agent.p2.prefix = You need to request access to
 unauthorised.agent.p2.link = PAYE for Agents
 unauthorised.agent.p2.suffix = to use this service.
 

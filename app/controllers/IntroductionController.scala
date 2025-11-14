@@ -49,7 +49,6 @@ class IntroductionController @Inject() (
       if (request.isAgent) {
         Redirect(controllers.agent.routes.RetrievingClientController.onPageLoad())
       } else {
-        // TODO clear cisId from session
         Redirect(controllers.contractor.routes.ContractorLandingController.onPageLoad())
       }
     }

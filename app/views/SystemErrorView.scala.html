@@ -21,7 +21,7 @@
     layout: templates.Layout,
     heading: H1,
     paragraph: Paragraph,
-    texWithLinkAndReference: TextWithLinkAndReference
+    textWithLinkAndReference: TextWithLinkAndReference
 )
 
 @(incidentReferenceNumber: String)(implicit request: RequestHeader, appConfig: FrontendAppConfig, messages: Messages)
@@ -35,7 +35,7 @@
     @heading(messages("systemError.heading"), classes = "govuk-heading-xl")
     @paragraph(messages("systemError.p1"))
 
-    @texWithLinkAndReference(
+    @textWithLinkAndReference(
         "systemError.link",
         appConfig.hmrcOnlineServiceDeskUrl,
         prefixTextKey = "systemError.p2",
