@@ -17,21 +17,54 @@
 package controllers.agent
 
 import config.FrontendAppConfig
+import controllers.actions.IdentifierAction
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, RequestHeader}
+import services.{ClientListResult, ClientListService}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.agent.RetrievingClientView
+
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class RetrievingClientController @Inject() (
   override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
   val controllerComponents: MessagesControllerComponents,
-  view: RetrievingClientView
-)(implicit appConfig: FrontendAppConfig)
+  view: RetrievingClientView,
+  clientListService: ClientListService
+)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
-  def onPageLoad: Action[AnyContent] = Action { implicit request =>
-    Ok(view())
+  private inline def hcFrom(rh: RequestHeader): HeaderCarrier =
+    HeaderCarrierConverter.fromRequestAndSession(rh, rh.session)
+
+  def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
+    implicit val hc: HeaderCarrier = hcFrom(request)
+
+    clientListService
+      .start()
+      .map {
+        case ClientListResult.Success =>
+          Redirect(controllers.agent.routes.AgentLandingController.onPageLoad())
+
+        case ClientListResult.Failed =>
+          Redirect(controllers.agent.routes.FailedToRetrieveClientController.onPageLoad())
+
+        case ClientListResult.SystemError =>
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+        case ClientListResult.InProgress =>
+          Ok(view()).withHeaders("Refresh" -> "8")
+      }
+      .recover { e =>
+        logger.error("[RetrievingClientController] Unexpected error calling BE", e)
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
   }
 }
