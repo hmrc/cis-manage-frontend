@@ -87,8 +87,8 @@ object SearchByList {
 
   val searchByOptions: Seq[SearchByList] = Seq(
     SearchByList(CN.toString, "Client name"),
-    SearchByList(CR.toString, "Client reference"),
-    SearchByList(ER.toString, "Employer reference")
+    SearchByList(ER.toString, "Employer reference"),
+    SearchByList(CR.toString, "Client reference")
   )
 
 }

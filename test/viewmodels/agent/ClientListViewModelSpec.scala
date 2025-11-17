@@ -114,8 +114,8 @@ class ClientListViewModelSpec extends SpecBase {
         SearchByList("ER", "Employer reference")
       )
     }
-    "preserve ordering CN → CR → ER" in {
-      SearchByList.searchByOptions.map(_.value) shouldBe Seq("CN", "CR", "ER")
+    "preserve ordering CN → ER → CR" in {
+      SearchByList.searchByOptions.map(_.value) shouldBe Seq("CN", "ER", "CR")
     }
   }
 
