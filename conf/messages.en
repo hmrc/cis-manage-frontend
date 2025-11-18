@@ -156,9 +156,9 @@ agent.clientListSearch.searchFilter.cn.error.required = Enter the client name in
 agent.clientListSearch.searchFilter.er.error.required = Enter the employer reference in the correct format, like 123/AB45678 (three numbers, '/', then seven alphanumeric characters)
 agent.clientListSearch.searchFilter.cr.error.required = Enter the client reference in the correct format, like ABC-001
 
-agent.clientListSearch.searchFilter.cn.error.format = The Client name you have entered is in the wrong format. Please check
-agent.clientListSearch.searchFilter.er.error.format = The Employers Reference you have entered is in the wrong format. Please check
-agent.clientListSearch.searchFilter.cr.error.format = The Client reference you have entered is in the wrong format. Please check
+agent.clientListSearch.searchFilter.cn.error.format = Enter the client name in the correct format, like ABC Construction
+agent.clientListSearch.searchFilter.er.error.format = Enter the employer reference in the correct format, like 123/AB45678 (three numbers, '/', then seven alphanumeric characters)
+agent.clientListSearch.searchFilter.cr.error.format = Enter the client reference in the correct format, like ABC-001
 
 agent.clientListSearch.searchFilter.cn.error.length = Client name length must be 56 characters or less
 agent.clientListSearch.searchFilter.er.error.length = Employers Reference length must be 14 characters or less
