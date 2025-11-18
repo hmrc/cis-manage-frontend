@@ -19,18 +19,14 @@
 @this()
 
 @(
-    message: String,
-    bold: Boolean = false,
-    baseClass: String = "govuk-body",
-    extraClasses: String = emptyString,
-    args: Seq[Any] = Nil,
-    boldSuffix: String = emptyString
+  message: String,
+  bold: Boolean = false,
+  baseClass: String = "govuk-body",
+  extraClasses: String = emptyString,
 )(implicit messages: Messages)
 
-<p class="@baseClass @extraClasses @if(bold){govuk-!-font-weight-bold}">
-    @{Html(messages(message, args*))}
-
-    @if(boldSuffix.nonEmpty) {
-        <strong>@{Html(messages(boldSuffix))}</strong>
-    }
+<p class="@baseClass @extraClasses">
+    <button class="govuk-button @if(bold){govuk-!-font-weight-bold}" type="submit" data-module="govuk-button">
+        @{Html(message)}
+    </button>
 </p>

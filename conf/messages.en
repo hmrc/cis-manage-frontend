@@ -218,3 +218,9 @@ introduction.sidebar.link1 = What is the Construction Industry Scheme
 introduction.sidebar.link2 = CIS monthly returns guidance
 introduction.sidebar.link3 = CIS 340: Penalties for late returns
 introduction.sidebar.link4 = Client authorisation guidance
+
+unsuccessfulAutomaticSubcontractorUpdate.title = Unsuccessful automatic subcontractor update
+unsuccessfulAutomaticSubcontractorUpdate.heading = Unsuccessful automatic subcontractor update
+unsuccessfulAutomaticSubcontractorUpdate.p1 = The subcontractor automatic check was unsuccessful. CIS Online will perform this update again the next time you enter the application,
+unsuccessfulAutomaticSubcontractorUpdate.p2 = unless you choose to add subcontractor details yourself.
+unsuccessfulAutomaticSubcontractorUpdate.p3 = Before adding a subcontrator, you will need to add their details.
