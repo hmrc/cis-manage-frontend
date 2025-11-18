@@ -223,4 +223,4 @@ unsuccessfulAutomaticSubcontractorUpdate.title = Unsuccessful automatic subcontr
 unsuccessfulAutomaticSubcontractorUpdate.heading = Unsuccessful automatic subcontractor update
 unsuccessfulAutomaticSubcontractorUpdate.p1 = The subcontractor automatic check was unsuccessful. CIS Online will perform this update again the next time you enter the application,
 unsuccessfulAutomaticSubcontractorUpdate.p2 = unless you choose to add subcontractor details yourself.
-unsuccessfulAutomaticSubcontractorUpdate.p3 = Before adding a subcontrator, you will need to add their details.
+unsuccessfulAutomaticSubcontractorUpdate.p3 = Before adding a subcontractor, you will need to add their details.
