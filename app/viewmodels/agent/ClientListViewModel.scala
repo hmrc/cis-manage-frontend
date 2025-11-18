@@ -43,7 +43,11 @@ case class ClientListViewModel(
 
 object ClientListViewModel {
 
-  def filterByField(field: String, query: String): Seq[ClientListViewModel] = {
+  def filterByField(
+    field: String,
+    query: String,
+    allAgentClients: Seq[ClientListViewModel]
+  ): Seq[ClientListViewModel] = {
     val trimmed = query.trim.toLowerCase
     if (trimmed.isEmpty) { allAgentClients }
     else {

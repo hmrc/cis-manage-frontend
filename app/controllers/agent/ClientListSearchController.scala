@@ -20,6 +20,7 @@ import controllers.actions.*
 import forms.ClientListSearchFormProvider
 import models.agent.ClientListFormData
 import pages.ClientListSearchPage
+import services.ClientListService
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -39,6 +40,7 @@ class ClientListSearchController @Inject() (
   requireData: DataRequiredAction,
   formProvider: ClientListSearchFormProvider,
   val controllerComponents: MessagesControllerComponents,
+  clientListService: ClientListService,
   view: ClientListSearchView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -63,39 +65,42 @@ class ClientListSearchController @Inject() (
       case Some(clientListFormData: ClientListFormData) => clientListFormData.searchFilter
     }
 
-    val filteredClients = ClientListViewModel.filterByField(activeSearchBy, activeSearchFilter)
-
-    for {
-      updatedAnswers <-
-        Future.fromTry(
-          request.userAnswers.set(ClientListSearchPage, ClientListFormData(activeSearchBy, activeSearchFilter))
-        )
-      _              <- sessionRepository.set(updatedAnswers)
-    } yield Ok(view(preparedForm, SearchByList.searchByOptions, filteredClients))
-
+    clientListService
+      .filteredClients(request.userAnswers, activeSearchBy, activeSearchFilter)
+      .flatMap { filteredClients =>
+        for {
+          updatedAnswers <-
+            Future.fromTry(
+              request.userAnswers.set(ClientListSearchPage, ClientListFormData(activeSearchBy, activeSearchFilter))
+            )
+          _              <- sessionRepository.set(updatedAnswers)
+        } yield Ok(view(preparedForm, SearchByList.searchByOptions, filteredClients))
+      }
   }
 
   def clearFilter(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     for {
       updatedAnswers <- Future.fromTry(request.userAnswers.remove(ClientListSearchPage))
       _              <- sessionRepository.set(updatedAnswers)
+      allClients     <- clientListService.allClients(request.userAnswers)
     } yield Ok(view(form, SearchByList.searchByOptions, ClientListViewModel.allAgentClients))
   }
 
   def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-
-    val filteredClients = ClientListViewModel.filterByField("", "")
-
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, SearchByList.searchByOptions, filteredClients))),
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(ClientListSearchPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(controllers.agent.routes.ClientListSearchController.onPageLoad())
-      )
+    clientListService
+      .allClients(request.userAnswers)
+      .flatMap { allClients =>
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, SearchByList.searchByOptions, allClients))),
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(ClientListSearchPage, value))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(controllers.agent.routes.ClientListSearchController.onPageLoad())
+          )
+      }
   }
 }
