@@ -23,13 +23,14 @@ import views.html.UnsuccessfulAutomaticSubcontractorUpdateView
 
 import javax.inject.Inject
 
-class UnsuccessfulAutomaticSubcontractorUpdateController @Inject()(
+class UnsuccessfulAutomaticSubcontractorUpdateController @Inject() (
   override val messagesApi: MessagesApi,
   val controllerComponents: MessagesControllerComponents,
   view: UnsuccessfulAutomaticSubcontractorUpdateView
-) extends FrontendBaseController with I18nSupport {
+) extends FrontendBaseController
+    with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
-      Ok(view())
+    Ok(view())
   }
 }
