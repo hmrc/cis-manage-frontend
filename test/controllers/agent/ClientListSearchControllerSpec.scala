@@ -40,7 +40,9 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
   val formProvider                   = new ClientListSearchFormProvider()
   val form: Form[ClientListFormData] = formProvider()
 
-  lazy val clientListSearchRoute: String = controllers.agent.routes.ClientListSearchController.onPageLoad().url
+  lazy val clientListSearchRoute: String   = controllers.agent.routes.ClientListSearchController.onPageLoad().url
+  lazy val clientListDownloadRoute: String =
+    controllers.agent.routes.ClientListSearchController.downloadClientList().url
 
   "ClientListSearch Controller" - {
 
@@ -197,6 +199,36 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
           status(result) mustEqual OK
           contentAsString(result) mustEqual
             view(form, SearchByList.searchByOptions, filteredClients)(request, messages(application)).toString
+        }
+      }
+    }
+
+    ".downloadClientList" - {
+
+      "must return a CSV file with all mock clients" in {
+
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, clientListDownloadRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual OK
+
+          contentType(result) mustBe Some("text/csv")
+          header("Content-Disposition", result) mustBe Some("attachment; filename=CISAgentClientList.csv")
+
+          val body = contentAsString(result)
+
+          val expectedLines = Seq(
+            "Client name,Employers reference,Client reference",
+            "\"ABC Construction Ltd\",\"123/AB45678\",\"ABC-001\"",
+            "\"ABC Property Services\",\"789/EF23456\",\"ABC-002\"",
+            "\"Capital Construction Group\",\"345/IJ67890\",\"CAP-001\""
+          )
+
+          body mustEqual expectedLines.mkString("\n")
         }
       }
     }

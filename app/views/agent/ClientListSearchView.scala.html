@@ -55,7 +55,7 @@
 
 @downloadYourClientList = {
     @paragraph("agent.clientListSearch.details.1.p1")
-    @link("agent.clientListSearch.details.1.link", appConfig.commercialSoftwareSuppliersUrl)
+    @link("agent.clientListSearch.details.1.link", controllers.agent.routes.ClientListSearchController.downloadClientList().url)
 }
 
 @filingOnlyService = {
