@@ -38,5 +38,7 @@
     )
 
     @paragraph(messages("unsuccessfulAutomaticSubcontractorUpdate.p3"))
-    @paragraphWithButton(messages("site.continue"))
+    @govukButton(
+        ButtonViewModel(messages("site.continue"))
+    )
 }
