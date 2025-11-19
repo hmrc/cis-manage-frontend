@@ -263,6 +263,11 @@ introduction.sidebar.link2 = CIS monthly returns guidance
 introduction.sidebar.link3 = CIS 340: Penalties for late returns
 introduction.sidebar.link4 = Client authorisation guidance
 
+checkSubcontractorRecords.title = Check subcontractor records
+checkSubcontractorRecords.heading = Check subcontractor records
+checkSubcontractorRecords.p1 = We will now check if there are any subcontractor records you have recently paid/verified.
+checkSubcontractorRecords.p2 = Any record we find will be automatically added to your subcontractor list, which will be available to view.
+
 unsuccessfulAutomaticSubcontractorUpdate.title = Unsuccessful automatic subcontractor update
 unsuccessfulAutomaticSubcontractorUpdate.heading = Unsuccessful automatic subcontractor update
 unsuccessfulAutomaticSubcontractorUpdate.p1 = The subcontractor automatic check was unsuccessful. CIS Online will perform this update again the next time you enter the application,
