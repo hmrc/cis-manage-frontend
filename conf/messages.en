@@ -268,3 +268,14 @@ retrievingSubcontractors.heading = Retrieving your subcontractors
 retrievingSubcontractors.p1 = Please wait while we retrieve your subcontractor records.
 retrievingSubcontractors.p2 = This should only take a few moments.
 retrievingSubcontractors.p3.bold = Do not refresh this page or use the back button.
+
+checkSubcontractorRecords.title = Check subcontractor records
+checkSubcontractorRecords.heading = Check subcontractor records
+checkSubcontractorRecords.p1 = We will now check if there are any subcontractor records you have recently paid/verified.
+checkSubcontractorRecords.p2 = Any record we find will be automatically added to your subcontractor list, which will be available to view.
+
+unsuccessfulAutomaticSubcontractorUpdate.title = Unsuccessful automatic subcontractor update
+unsuccessfulAutomaticSubcontractorUpdate.heading = Unsuccessful automatic subcontractor update
+unsuccessfulAutomaticSubcontractorUpdate.p1 = The subcontractor automatic check was unsuccessful. CIS Online will perform this update again the next time you enter the application,
+unsuccessfulAutomaticSubcontractorUpdate.p2 = unless you choose to add subcontractor details yourself.
+unsuccessfulAutomaticSubcontractorUpdate.p3 = Before adding a subcontractor, you will need to add their details.
