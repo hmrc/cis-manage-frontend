@@ -21,7 +21,7 @@ import forms.ClientListSearchFormProvider
 import models.agent.ClientListFormData
 import pages.ClientListSearchPage
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -98,4 +98,33 @@ class ClientListSearchController @Inject() (
           } yield Redirect(controllers.agent.routes.ClientListSearchController.onPageLoad())
       )
   }
+
+  def downloadClientList(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      val msgs: Messages    = messagesApi.preferred(request)
+      val clientsToDownload = ClientListViewModel.allAgentClients
+      val header            = Seq(
+        msgs("agent.clientListSearch.th.clientName"),
+        msgs("agent.clientListSearch.th.employersReference"),
+        msgs("agent.clientListSearch.th.clientReference")
+      ).mkString(",")
+
+      def csvEscape(s: String): String =
+        "\"" + s.replace("\"", "\"\"") + "\""
+
+      val rows: Seq[String] = clientsToDownload.map { c =>
+        val name        = csvEscape(c.clientName)
+        val employerRef = csvEscape(c.employerReference)
+        val clientRef   = csvEscape(c.clientReference)
+        s"$name,$employerRef,$clientRef"
+      }
+
+      val csvContent = (header +: rows).mkString("\n")
+
+      Future.successful(
+        Ok(csvContent)
+          .as("text/csv")
+          .withHeaders("Content-Disposition" -> "attachment; filename=CISAgentClientList.csv")
+      )
+    }
 }

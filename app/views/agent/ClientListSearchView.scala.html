@@ -55,7 +55,7 @@
 
 @downloadYourClientList = {
     @paragraph("agent.clientListSearch.details.1.p1")
-    @link("agent.clientListSearch.details.1.link", appConfig.commercialSoftwareSuppliersUrl)
+    @link("agent.clientListSearch.details.1.link", controllers.agent.routes.ClientListSearchController.downloadClientList().url)
 }
 
 @filingOnlyService = {
@@ -135,7 +135,7 @@ additionalCss = Some(css)) {
             <thead class="govuk-table__head">
             <tr class="govuk-table__row">
                 <th class="govuk-table__header" scope="col" aria-sort="ascending">@messages("agent.clientListSearch.th.clientName")</th>
-                <th class="govuk-table__header" scope="col" aria-sort="none">@messages("agent.clientListSearch.th.employerReference")</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none">@messages("agent.clientListSearch.th.employersReference")</th>
                 <th class="govuk-table__header" scope="col" aria-sort="none">@messages("agent.clientListSearch.th.clientReference")</th>
                 <th class="govuk-table__header" scope="col">@messages("agent.clientListSearch.th.actions")</th>
             </tr>
