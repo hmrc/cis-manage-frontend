@@ -43,3 +43,4 @@ GET         /access-denied                                          controllers.
 GET         /system-error/there-is-a-problem                        controllers.SystemErrorController.onPageLoad()
 
 GET        /check-subcontractor-records                             controllers.CheckSubcontractorRecordsController.onPageLoad()
+GET        /automatic-subcontractor-update-unsuccessful             controllers.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad()
