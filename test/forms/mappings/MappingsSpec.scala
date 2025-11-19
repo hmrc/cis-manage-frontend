@@ -16,11 +16,16 @@
 
 package forms.mappings
 
+import forms.Validation.{clientNameInputMaxLength, clientReferenceInputMaxLength, employerReferenceInputMaxLength}
+import generators.StringGenerators
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import play.api.data.*
+import play.api.data.Forms.*
 import play.api.data.{Form, FormError}
 import models.Enumerable
+import models.agent.ClientListFormData
 
 object MappingsSpec {
 
@@ -37,7 +42,7 @@ object MappingsSpec {
   }
 }
 
-class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mappings {
+class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mappings with StringGenerators {
 
   import MappingsSpec._
 
@@ -230,4 +235,91 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
       result.apply("value").value.value mustEqual "1"
     }
   }
+
+  "clientListSearchMapping" - {
+
+    def requiredKey(key: String): String = s"agent.clientListSearch.$key.error.required"
+
+    val testForm: Form[ClientListFormData] =
+      Form(
+        "value" -> clientListSearchMapping(requiredKey)
+      )
+
+    "must bind a valid searchBy and searchFilter" in {
+      val result = testForm.bind(Map("searchBy" -> "CN", "searchFilter" -> "ABC"))
+      result.get mustEqual ClientListFormData("CN", "ABC")
+    }
+
+    "must not bind an empty searchBy" in {
+      val result = testForm.bind(Map("searchBy" -> ""))
+      result.errors must contain(FormError("searchBy", "agent.clientListSearch.searchBy.error.required"))
+    }
+
+    "must not bind an invalid searchBy" in {
+      val result = testForm.bind(Map("searchBy" -> "XX"))
+      result.errors must contain(FormError("searchBy", "agent.clientListSearch.searchBy.error.required"))
+    }
+
+    "searchFilter for client name" - {
+      "must bind a valid client name searchFilter" in {
+        val result = testForm.bind(Map("searchBy" -> "CN", "searchFilter" -> "ABC"))
+        result.get mustEqual ClientListFormData("CN", "ABC")
+      }
+      "must not bind an invalid client name searchFilter" in {
+        val result = testForm.bind(Map("searchBy" -> "CN", "searchFilter" -> "$"))
+        result.errors must contain(FormError("searchFilter", "agent.clientListSearch.searchFilter.cn.error.format"))
+      }
+      "must not bind an empty client name searchFilter" in {
+        val result = testForm.bind(Map("searchBy" -> "CN", "searchFilter" -> ""))
+        result.errors must contain(FormError("searchFilter", "agent.clientListSearch.searchFilter.cn.error.required"))
+      }
+      s"must not bind a client name searchFilter that exceeds $clientNameInputMaxLength" in {
+        val stringInput = randomAlphaNumericStringGenerator(clientNameInputMaxLength + 1)
+        val result      = testForm.bind(Map("searchBy" -> "CN", "searchFilter" -> stringInput))
+        result.errors must contain(FormError("searchFilter", "agent.clientListSearch.searchFilter.cn.error.length"))
+      }
+    }
+
+    "searchFilter for client reference" - {
+      "must bind a valid client reference searchFilter" in {
+        val result = testForm.bind(Map("searchBy" -> "CR", "searchFilter" -> "ABC"))
+        result.get mustEqual ClientListFormData("CR", "ABC")
+      }
+      "must not bind an invalid client reference searchFilter" in {
+        val result = testForm.bind(Map("searchBy" -> "CR", "searchFilter" -> "$"))
+        result.errors must contain(FormError("searchFilter", "agent.clientListSearch.searchFilter.cr.error.format"))
+      }
+      "must not bind an empty client reference searchFilter" in {
+        val result = testForm.bind(Map("searchBy" -> "CR", "searchFilter" -> ""))
+        result.errors must contain(FormError("searchFilter", "agent.clientListSearch.searchFilter.cr.error.required"))
+      }
+      s"must not bind a client reference searchFilter that exceeds $clientReferenceInputMaxLength" in {
+        val stringInput = randomAlphaNumericStringGenerator(clientReferenceInputMaxLength + 1)
+        val result      = testForm.bind(Map("searchBy" -> "CR", "searchFilter" -> stringInput))
+        result.errors must contain(FormError("searchFilter", "agent.clientListSearch.searchFilter.cr.error.length"))
+      }
+    }
+
+    "searchFilter for employer reference" - {
+      "must bind a valid employer reference searchFilter" in {
+        val result = testForm.bind(Map("searchBy" -> "ER", "searchFilter" -> "ABC"))
+        result.get mustEqual ClientListFormData("ER", "ABC")
+      }
+      "must not bind an invalid employer reference searchFilter" in {
+        val result = testForm.bind(Map("searchBy" -> "ER", "searchFilter" -> "$"))
+        result.errors must contain(FormError("searchFilter", "agent.clientListSearch.searchFilter.er.error.format"))
+      }
+      "must not bind an empty employer reference searchFilter" in {
+        val result = testForm.bind(Map("searchBy" -> "ER", "searchFilter" -> ""))
+        result.errors must contain(FormError("searchFilter", "agent.clientListSearch.searchFilter.er.error.required"))
+      }
+      s"must not bind a employer reference searchFilter that exceeds $employerReferenceInputMaxLength" in {
+        val stringInput = randomAlphaNumericStringGenerator(employerReferenceInputMaxLength + 1)
+        val result      = testForm.bind(Map("searchBy" -> "ER", "searchFilter" -> stringInput))
+        result.errors must contain(FormError("searchFilter", "agent.clientListSearch.searchFilter.er.error.length"))
+      }
+    }
+
+  }
+
 }
