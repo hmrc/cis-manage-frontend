@@ -39,11 +39,12 @@ class RetrievingClientController @Inject() (
 
   def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
     cisService.getClientListStatus.map {
-      case "succeeded"    => Redirect("/success")
-      case "failed"       => Redirect(routes.FailedToRetrieveClientController.onPageLoad())
-      case "system-error" => Redirect(controllers.routes.SystemErrorController.onPageLoad())
-      case "in-progress"  => Ok(view())
-      case _              => Ok(view())
+      case "succeeded"         => Redirect("/success")
+      case "failed"            => Redirect(routes.FailedToRetrieveClientController.onPageLoad())
+      case "system-error"      => Redirect(controllers.routes.SystemErrorController.onPageLoad())
+      case "initiate-download" => Redirect(controllers.routes.SystemErrorController.onPageLoad())
+      case "in-progress"       => Ok(view())
+      case _                   => Ok(view())
     }
   }
 }

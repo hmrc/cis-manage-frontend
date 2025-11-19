@@ -59,7 +59,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the correct page for a GET when Failed occurs" in {
+    "must redirect to the correct page for a GET when 'failed' is returned" in {
 
       val mockCisService: ConstructionIndustrySchemeService = mock[ConstructionIndustrySchemeService]
       val application                                       = applicationBuilder(
@@ -83,7 +83,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the correct page for a GET when InProgress occurs" in {
+    "must redirect to the correct page for a GET when in-progress is returned" in {
 
       val mockCisService: ConstructionIndustrySchemeService = mock[ConstructionIndustrySchemeService]
       val application                                       = applicationBuilder(
@@ -104,6 +104,56 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustBe view()(request, applicationConfig, messages(application)).toString
+      }
+    }
+
+    "must redirect to the correct page for a GET when system-error is returned" in {
+
+      val mockCisService: ConstructionIndustrySchemeService = mock[ConstructionIndustrySchemeService]
+      val application                                       = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        additionalBindings = Seq(
+          bind[ConstructionIndustrySchemeService].to(mockCisService)
+        )
+      ).build()
+
+      running(application) {
+
+        when(mockCisService.getClientListStatus(using any[HeaderCarrier]))
+          .thenReturn(Future.successful("system-error"))
+        val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        application.injector.instanceOf[RetrievingClientView]
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustBe controllers.routes.SystemErrorController.onPageLoad().url
+      }
+    }
+
+    "must redirect to the correct page for a GET when initiate-download is returned" in {
+
+      val mockCisService: ConstructionIndustrySchemeService = mock[ConstructionIndustrySchemeService]
+      val application                                       = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        additionalBindings = Seq(
+          bind[ConstructionIndustrySchemeService].to(mockCisService)
+        )
+      ).build()
+
+      running(application) {
+
+        when(mockCisService.getClientListStatus(using any[HeaderCarrier]))
+          .thenReturn(Future.successful("initiate-download"))
+        val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        application.injector.instanceOf[RetrievingClientView]
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustBe controllers.routes.SystemErrorController.onPageLoad().url
       }
     }
 
