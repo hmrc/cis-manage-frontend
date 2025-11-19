@@ -23,9 +23,14 @@
     bold: Boolean = false,
     baseClass: String = "govuk-body",
     extraClasses: String = emptyString,
-    args: Seq[Any] = Nil
+    args: Seq[Any] = Nil,
+    boldSuffix: String = emptyString
 )(implicit messages: Messages)
 
 <p class="@baseClass @extraClasses @if(bold){govuk-!-font-weight-bold}">
     @{Html(messages(message, args*))}
+
+    @if(boldSuffix.nonEmpty) {
+        <strong>@{Html(messages(boldSuffix))}</strong>
+    }
 </p>
