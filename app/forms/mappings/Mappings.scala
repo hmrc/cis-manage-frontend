@@ -17,6 +17,7 @@
 package forms.mappings
 
 import models.Enumerable
+import models.agent.ClientListFormData
 import play.api.data.FieldMapping
 import play.api.data.Forms.of
 import play.api.i18n.Messages
@@ -66,4 +67,11 @@ trait Mappings extends Formatters with Constraints {
     args: Seq[String] = Seq.empty
   ): FieldMapping[BigDecimal] =
     of(currencyFormatter(requiredKey, invalidNumeric, nonNumericKey, args))
+
+  protected def clientListSearchMapping(
+    requiredKey: String => String,
+    args: Seq[String] = Seq.empty
+  ): FieldMapping[ClientListFormData] =
+    of(clientListSearchFormatter(requiredKey, args))
+
 }

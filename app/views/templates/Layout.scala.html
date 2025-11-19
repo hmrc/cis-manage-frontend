@@ -20,6 +20,8 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcAccessibleAutocompleteCss
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcAccessibleAutocompleteJavascript
 @import views.html.helper.CSPNonce
 
 @this(
@@ -28,10 +30,12 @@
     hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
     alphaBanner: StandardAlphaBanner,
     hmrcStandardPage: HmrcStandardPage,
-    twoThirdsOneThirdMainContent: TwoThirdsOneThirdMainContent
+    twoThirdsOneThirdMainContent: TwoThirdsOneThirdMainContent,
+    autocompleteCss: HmrcAccessibleAutocompleteCss,
+    autocompleteJavascript: HmrcAccessibleAutocompleteJavascript
 )
 
-@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false, sidebar: Option[Html] = None)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
+@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false, sidebar: Option[Html] = None, additionalScripts: Option[Html] = None, additionalCss: Option[Html] = None)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
 
 @head = {
 
@@ -49,12 +53,14 @@
         ))
     }
 
+    @autocompleteCss()
+    @additionalCss
+
     <link href="@routes.Assets.versioned("stylesheets/application.css")"
         media="all"
         rel="stylesheet"
         type="text/css"
         @CSPNonce.attr />
-
 }
 
 @content = {
@@ -62,10 +68,16 @@
     <div class="govuk-!-margin-top-4">@hmrcReportTechnicalIssueHelper()</div>
 }
 
+@scripts = {
+    @autocompleteJavascript()
+    @additionalScripts
+}
+
 @hmrcStandardPage(HmrcStandardPageParams(
     pageTitle = Some(pageTitle),
     templateOverrides = TemplateOverrides(
         additionalHeadBlock = Some(head),
+        additionalScriptsBlock = Some(scripts),
         mainContentLayout = sidebar.map(twoThirdsOneThirdMainContent(_))
     ),
     serviceURLs = ServiceURLs(
