@@ -183,7 +183,7 @@ agent.clientListSearch.details.2.link = Find commercial software for CIS returns
 
 contractorLanding.title = Manage CIS return
 contractorLanding.heading = Manage CIS return
-contractorLanding.paragraph = You can manage ABC Construction Ltd’s monthly CIS returns – including dates and statements.
+contractorLanding.paragraph = You can manage {0}&#8217;s monthly CIS returns – including dates and statements.
 contractorLanding.label.employerReference = Employer reference
 contractorLanding.label.utr = Unique Taxpayer Reference (UTR)
 contractorLanding.subheading.actionRequired = Action required
