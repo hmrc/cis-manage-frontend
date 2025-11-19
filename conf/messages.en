@@ -263,6 +263,12 @@ introduction.sidebar.link2 = CIS monthly returns guidance
 introduction.sidebar.link3 = CIS 340: Penalties for late returns
 introduction.sidebar.link4 = Client authorisation guidance
 
+retrievingSubcontractors.title = Retrieving your subcontractors
+retrievingSubcontractors.heading = Retrieving your subcontractors
+retrievingSubcontractors.p1 = Please wait while we retrieve your subcontractor records.
+retrievingSubcontractors.p2 = This should only take a few moments.
+retrievingSubcontractors.p3.bold = Do not refresh this page or use the back button.
+
 checkSubcontractorRecords.title = Check subcontractor records
 checkSubcontractorRecords.heading = Check subcontractor records
 checkSubcontractorRecords.p1 = We will now check if there are any subcontractor records you have recently paid/verified.

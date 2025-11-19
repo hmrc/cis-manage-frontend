@@ -42,5 +42,6 @@ GET         /page-not-found                                         controllers.
 GET         /access-denied                                          controllers.AccessDeniedController.onPageLoad()
 GET         /system-error/there-is-a-problem                        controllers.SystemErrorController.onPageLoad()
 
+GET        /retrieving-subcontractors                               controllers.RetrievingSubcontractorsController.onPageLoad()
 GET        /check-subcontractor-records                             controllers.CheckSubcontractorRecordsController.onPageLoad()
 GET        /automatic-subcontractor-update-unsuccessful             controllers.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad()
