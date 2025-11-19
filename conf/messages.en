@@ -181,6 +181,10 @@ agent.clientListSearch.details.2.p1 = You can send CIS monthly returns on behalf
 agent.clientListSearch.details.2.p2 = This service is only available using commercial software.
 agent.clientListSearch.details.2.link = Find commercial software for CIS returns (opens in new tab)
 
+agent.clientListSearch.th.clientName = Client name 
+agent.clientListSearch.th.employerReference = Employers reference 
+agent.clientListSearch.th.clientReference = Client reference
+
 contractorLanding.title = Manage CIS return
 contractorLanding.heading = Manage CIS return
 contractorLanding.paragraph = You can manage ABC Construction Ltd’s monthly CIS returns – including dates and statements.
