@@ -105,7 +105,7 @@ class ClientListSearchController @Inject() (
       val clientsToDownload = ClientListViewModel.allAgentClients
       val header            = Seq(
         msgs("agent.clientListSearch.th.clientName"),
-        msgs("agent.clientListSearch.th.employerReference"),
+        msgs("agent.clientListSearch.th.employersReference"),
         msgs("agent.clientListSearch.th.clientReference")
       ).mkString(",")
 
