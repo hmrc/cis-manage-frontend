@@ -166,7 +166,6 @@ agent.clientListSearch.searchFilter.cr.error.length = Client reference length mu
 
 agent.clientListSearch.table.caption = Your clients
 agent.clientListSearch.th.clientName = Client name
-agent.clientListSearch.th.employerReference = Employer reference
 agent.clientListSearch.th.employersReference = Employers reference
 agent.clientListSearch.th.clientReference = Client reference
 agent.clientListSearch.th.actions = Actions
