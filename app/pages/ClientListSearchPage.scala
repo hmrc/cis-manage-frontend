@@ -14,24 +14,14 @@
  * limitations under the License.
  */
 
-package viewmodels
+package pages
 
-package object govuk {
+import models.agent.ClientListFormData
+import play.api.libs.json.JsPath
 
-  object all
-      extends ImplicitConversions
-      with BackLinkFluency
-      with ButtonFluency
-      with CheckboxFluency
-      with DateFluency
-      with ErrorSummaryFluency
-      with FieldsetFluency
-      with HintFluency
-      with InputFluency
-      with InsetTextFluency
-      with LabelFluency
-      with RadiosFluency
-      with SummaryListFluency
-      with TagFluency
-      with SelectFluency
+case object ClientListSearchPage extends QuestionPage[ClientListFormData] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "clientListSearch"
 }
