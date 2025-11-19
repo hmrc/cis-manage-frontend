@@ -279,3 +279,9 @@ unsuccessfulAutomaticSubcontractorUpdate.heading = Unsuccessful automatic subcon
 unsuccessfulAutomaticSubcontractorUpdate.p1 = The subcontractor automatic check was unsuccessful. CIS Online will perform this update again the next time you enter the application,
 unsuccessfulAutomaticSubcontractorUpdate.p2 = unless you choose to add subcontractor details yourself.
 unsuccessfulAutomaticSubcontractorUpdate.p3 = Before adding a subcontractor, you will need to add their details.
+
+successfulNoRecordsFound.title = Successful automatic subcontractor update
+successfulNoRecordsFound.heading = Successful automatic subcontractor update
+successfulNoRecordsFound.p1 = No subcontractor records were found.
+successfulNoRecordsFound.p2 = You can
+successfulNoRecordsFound.p2.link = add a subcontractor
