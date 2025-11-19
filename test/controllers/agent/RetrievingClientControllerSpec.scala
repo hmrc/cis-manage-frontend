@@ -55,7 +55,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
         application.injector.instanceOf[RetrievingClientView]
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustBe "/success"
+        redirectLocation(result).value mustBe routes.ClientListSearchController.onPageLoad().url
       }
     }
 
