@@ -1,0 +1,44 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import views.html.components._
+
+@this(
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    h1: H1,
+    paragraph: Paragraph
+)
+
+@()(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("successfulAutomaticSubcontractorUpdate.title"))) {
+
+    @h1(messages("successfulAutomaticSubcontractorUpdate.heading"))
+    @paragraph(messages("successfulAutomaticSubcontractorUpdate.p1"))
+
+    <table id="agent-client-list" class="govuk-table" data-module="moj-sortable-table">
+        <caption class="govuk-table__caption govuk-table__caption--m govuk-visually-hidden">@messages("agent.clientListSearch.table.caption")</caption>
+        <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th class="govuk-table__header" scope="col" aria-sort="ascending">@messages("successfulAutomaticSubcontractorUpdate.th.name")</th>
+            <th class="govuk-table__header" scope="col" aria-sort="none">@messages("successfulAutomaticSubcontractorUpdate.th.uniqueTaxReference")</th>
+            <th class="govuk-table__header" scope="col" aria-sort="none">@messages("successfulAutomaticSubcontractorUpdate.th.verificationNumber")</th>
+            <th class="govuk-table__header" scope="col">@messages("successfulAutomaticSubcontractorUpdate.th.dateAdded")</th>
+        </tr>
+        </thead>
+    </table>
+}
