@@ -23,7 +23,7 @@ import views.html.RetrievingSubcontractorsView
 
 import javax.inject.Inject
 
-class RetrievingSubcontractorsController @Inject()(
+class RetrievingSubcontractorsController @Inject() (
   override val messagesApi: MessagesApi,
   val controllerComponents: MessagesControllerComponents,
   view: RetrievingSubcontractorsView
@@ -31,6 +31,6 @@ class RetrievingSubcontractorsController @Inject()(
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
-      Ok(view())
+    Ok(view())
   }
 }

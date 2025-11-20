@@ -15,6 +15,7 @@
  *@
 
 @import views.html.components._
+@import viewmodels.SuccessfulAutomaticSubcontractorUpdateViewModel
 
 @this(
     layout: templates.Layout,
@@ -23,15 +24,17 @@
     paragraph: Paragraph
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(subcontractorsList: Seq[SuccessfulAutomaticSubcontractorUpdateViewModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("successfulAutomaticSubcontractorUpdate.title"))) {
+@layout(
+    pageTitle = titleNoForm(messages("successfulAutomaticSubcontractorUpdate.title")),
+    showSignOut = false
+) {
 
     @h1(messages("successfulAutomaticSubcontractorUpdate.heading"))
     @paragraph(messages("successfulAutomaticSubcontractorUpdate.p1"))
 
     <table id="agent-client-list" class="govuk-table" data-module="moj-sortable-table">
-        <caption class="govuk-table__caption govuk-table__caption--m govuk-visually-hidden">@messages("agent.clientListSearch.table.caption")</caption>
         <thead class="govuk-table__head">
         <tr class="govuk-table__row">
             <th class="govuk-table__header" scope="col" aria-sort="ascending">@messages("successfulAutomaticSubcontractorUpdate.th.name")</th>
@@ -40,5 +43,19 @@
             <th class="govuk-table__header" scope="col">@messages("successfulAutomaticSubcontractorUpdate.th.dateAdded")</th>
         </tr>
         </thead>
+        <tbody class="govuk-table__body">
+        @subcontractorsList.map { subcontractor =>
+        <tr class="govuk-table__row">
+            <td class="govuk-table__cell">@subcontractor.name</td>
+            <td class="govuk-table__cell">@subcontractor.uniqueReferenceNumber</td>
+            <td class="govuk-table__cell">@subcontractor.verificationNumber</td>
+            <td class="govuk-table__cell">@subcontractor.dateAdded</td>
+        </tr>
+        }
+        </tbody>
     </table>
+
+    @govukButton(
+        ButtonViewModel(messages("site.continue"))
+    )
 }
