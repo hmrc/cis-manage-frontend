@@ -46,3 +46,4 @@ GET         /system-error/there-is-a-problem                        controllers.
 GET        /your-subcontractors                                     controllers.RetrievingSubcontractorsController.onPageLoad()
 GET        /check-subcontractor-records                             controllers.CheckSubcontractorRecordsController.onPageLoad()
 GET        /automatic-subcontractor-update-unsuccessful             controllers.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad()
+GET        /automatic-subcontractor-update-successful-no-records    controllers.SuccessfulNoRecordsFoundController.onPageLoad()
