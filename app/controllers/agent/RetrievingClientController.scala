@@ -19,13 +19,14 @@ package controllers.agent
 import config.FrontendAppConfig
 import controllers.actions.IdentifierAction
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import services.ConstructionIndustrySchemeService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.agent.RetrievingClientView
-import scala.concurrent.ExecutionContext
 
+import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.{Inject, Named}
+import scala.util.Try
 
 class RetrievingClientController @Inject() (
   override val messagesApi: MessagesApi,
@@ -33,18 +34,53 @@ class RetrievingClientController @Inject() (
   @Named("AgentIdentifier") identify: IdentifierAction,
   cisService: ConstructionIndustrySchemeService,
   view: RetrievingClientView
-)(implicit appConfig: config.FrontendAppConfig, ec: ExecutionContext)
+)(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
+  private val RetryCountParam          = "RetryCount"
+  private val MaxRetries               = 8
+  private val RefreshIntervalInSeconds = 15
+
   def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
-    cisService.getClientListStatus.map {
-      case "succeeded"         => Redirect(routes.ClientListSearchController.onPageLoad())
-      case "failed"            => Redirect(routes.FailedToRetrieveClientController.onPageLoad())
-      case "system-error"      => Redirect(controllers.routes.SystemErrorController.onPageLoad())
-      case "initiate-download" => Redirect(controllers.routes.SystemErrorController.onPageLoad())
-      case "in-progress"       => Ok(view())
-      case _                   => Ok(view())
+    val currentRetry =
+      request.getQueryString(RetryCountParam).flatMap(s => Try(s.toInt).toOption).getOrElse(0)
+    val nextRetry    = currentRetry + 1
+
+    if (nextRetry > MaxRetries) {
+      Future.successful(
+        Redirect(routes.FailedToRetrieveClientController.onPageLoad())
+      )
+    } else {
+      cisService.getClientListStatus
+        .map {
+          case "succeeded"   => Redirect(routes.ClientListSearchController.onPageLoad())
+          case "failed"      => Redirect(routes.FailedToRetrieveClientController.onPageLoad())
+          case "in-progress" => refreshResult(nextRetry)
+          case _             => Redirect(controllers.routes.SystemErrorController.onPageLoad())
+        }
+        .recover { case _ =>
+          Redirect(controllers.routes.SystemErrorController.onPageLoad())
+        }
     }
+  }
+
+  private def refreshResult(nextRetry: Int)(implicit request: Request[_]): Result = {
+    val baseUrl     = routes.RetrievingClientController.onPageLoad().url
+    val queryString = request.rawQueryString
+
+    val newQuery =
+      if (queryString.isEmpty) {
+        s"$RetryCountParam=$nextRetry"
+      } else if (queryString.contains(s"$RetryCountParam=")) {
+        queryString.replaceAll(s"$RetryCountParam=\\d+", s"$RetryCountParam=$nextRetry")
+      } else {
+        s"$queryString&$RetryCountParam=$nextRetry"
+      }
+
+    val refreshUrl = s"$baseUrl?$newQuery"
+
+    Ok(view())
+      .withHeaders("Refresh" -> s"$RefreshIntervalInSeconds; url=$refreshUrl")
   }
 }

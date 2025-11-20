@@ -34,6 +34,45 @@ class ConstructionIndustrySchemeServiceSpec extends SpecBase with TryValues {
 
   val service = new ConstructionIndustrySchemeService(connector)
 
+  "startClientListRetrieval" - {
+
+    "should get the success status from the connector response" in {
+      when(connector.startClientList(using any[HeaderCarrier]))
+        .thenReturn(Future.successful(GetClientListStatusResponse("succeeded")))
+
+      val status = service.startClientListRetrieval.futureValue
+
+      status mustBe "succeeded"
+    }
+
+    "should get the failed status from the connector response" in {
+      when(connector.startClientList(using any[HeaderCarrier]))
+        .thenReturn(Future.successful(GetClientListStatusResponse("failed")))
+
+      val status = service.startClientListRetrieval.futureValue
+
+      status mustBe "failed"
+    }
+
+    "should get the initiate-download status from the connector response" in {
+      when(connector.startClientList(using any[HeaderCarrier]))
+        .thenReturn(Future.successful(GetClientListStatusResponse("initiate-download")))
+
+      val status = service.startClientListRetrieval.futureValue
+
+      status mustBe "initiate-download"
+    }
+
+    "should get the in-progress status from the connector response" in {
+      when(connector.startClientList(using any[HeaderCarrier]))
+        .thenReturn(Future.successful(GetClientListStatusResponse("in-progress")))
+
+      val status = service.startClientListRetrieval.futureValue
+
+      status mustBe "in-progress"
+    }
+  }
+
   "getClientListStatus" - {
     "should get the success status from the connector response" in {
       when(connector.getClientListStatus(using any[HeaderCarrier]))
