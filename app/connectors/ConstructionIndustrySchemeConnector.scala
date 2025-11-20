@@ -16,6 +16,7 @@
 
 package connectors
 
+import models.GetClientListStatusResponse
 import models.CisTaxpayer
 import play.api.Logging
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -32,6 +33,11 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
     with Logging {
 
   private val cisBaseUrl: String = config.baseUrl("construction-industry-scheme") + "/cis"
+
+  def getClientListStatus(using HeaderCarrier): Future[GetClientListStatusResponse] =
+    http
+      .post(url"$cisBaseUrl/agent/client-list/retrieval/start")
+      .execute[GetClientListStatusResponse]
 
   def getCisTaxpayer()(implicit hc: HeaderCarrier): Future[CisTaxpayer] =
     http
