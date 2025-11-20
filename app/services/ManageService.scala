@@ -17,10 +17,13 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
-import models.UserAnswers
+import models.requests.DataRequest
+import models.{CisTaxpayerSearchResult, UserAnswers}
+import org.apache.pekko.actor.typed.delivery.internal.ProducerControllerImpl.Request
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
+import play.api.mvc.AnyContent
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -55,4 +58,19 @@ class ManageService @Inject() (
         }
     }
 
+  def resolveAndStoreAgentClients(
+    userAnswers: UserAnswers
+  )(using HeaderCarrier): Future[(List[CisTaxpayerSearchResult], UserAnswers)] =
+    userAnswers.get(AgentClientsPage) match {
+      case Some(clientList) => Future.successful((clientList, userAnswers))
+      case None             =>
+        logger.info("[resolveAndStoreAgentClients] cache-miss: fetching agent clients from backend")
+        cisConnector.getAllClients
+          .flatMap { clients =>
+            for {
+              updatedAnswers <- Future.fromTry(userAnswers.set(AgentClientsPage, clients))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield (clients, updatedAnswers)
+          }
+    }
 }

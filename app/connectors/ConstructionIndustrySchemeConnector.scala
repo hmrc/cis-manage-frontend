@@ -16,14 +16,16 @@
 
 package connectors
 
-import models.CisTaxpayer
+import models.{CisTaxpayer, CisTaxpayerSearchResult}
 import play.api.Logging
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, StringContextOps}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.reflect.runtime.universe.Try
 
 @Singleton
 class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, http: HttpClientV2)(implicit
@@ -37,5 +39,15 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
     http
       .get(url"$cisBaseUrl/taxpayer")
       .execute[CisTaxpayer]
+
+  def getAllClients(implicit hc: HeaderCarrier): Future[List[CisTaxpayerSearchResult]] =
+    http
+      .get(url"$cisBaseUrl/agent/client-list")
+      .execute[JsObject]
+      .map { x =>
+        val result = Json.fromJson[List[CisTaxpayerSearchResult]](x("clients"))
+
+        result.get
+      }
 
 }
