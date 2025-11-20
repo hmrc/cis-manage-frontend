@@ -73,8 +73,7 @@ class IntroductionControllerSpec extends SpecBase {
           .build()
 
         running(application) {
-          val request = FakeRequest(GET, routes.IntroductionController.affinityGroupRouting().url)
-
+          val request = FakeRequest(POST, routes.IntroductionController.affinityGroupRouting().url)
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
