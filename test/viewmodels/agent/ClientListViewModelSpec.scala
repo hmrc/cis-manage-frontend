@@ -36,24 +36,15 @@ class ClientListViewModelSpec extends SpecBase {
   )
 
   private def cisClient(
-   schemeName: Option[String] = Some("Some Scheme"),
-   ton: String = "123",
-   tor: String = "AB45678",
-   agentOwnRef: Option[String] = Some("AOR-001")
+    schemeName: Option[String] = Some("Some Scheme"),
+    ton: String = "123",
+    tor: String = "AB45678",
+    agentOwnRef: Option[String] = Some("AOR-001")
   ): CisTaxpayerSearchResult =
     CisTaxpayerSearchResult(
       uniqueId = "UID-1",
       taxOfficeNumber = ton,
       taxOfficeRef = tor,
-      aoDistrict = None,
-      aoPayType = None,
-      aoCheckCode = None,
-      aoReference = None,
-      validBusinessAddr = None,
-      correlation = None,
-      ggAgentId = None,
-      employerName1 = None,
-      employerName2 = None,
       agentOwnRef = agentOwnRef,
       schemeName = schemeName
     )
@@ -170,7 +161,7 @@ class ClientListViewModelSpec extends SpecBase {
 
       val result = ClientListViewModel.fromCisClients(cisClients)
 
-      result.head.clientName shouldBe ""
+      result.head.clientName      shouldBe ""
       result.head.clientReference shouldBe ""
     }
   }

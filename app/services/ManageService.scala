@@ -17,13 +17,10 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
-import models.requests.DataRequest
 import models.{CisTaxpayerSearchResult, UserAnswers}
-import org.apache.pekko.actor.typed.delivery.internal.ProducerControllerImpl.Request
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
-import play.api.mvc.AnyContent
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 

@@ -38,28 +38,28 @@ import viewmodels.agent.{ClientListViewModel, SearchByList}
 import scala.concurrent.Future
 
 class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
-  implicit val hc: HeaderCarrier = HeaderCarrier()
-  val formProvider = new ClientListSearchFormProvider()
+  implicit val hc: HeaderCarrier     = HeaderCarrier()
+  val formProvider                   = new ClientListSearchFormProvider()
   val form: Form[ClientListFormData] = formProvider()
 
-  private val onPageLoadRoute = controllers.agent.routes.ClientListSearchController.onPageLoad().url
+  private val onPageLoadRoute  = controllers.agent.routes.ClientListSearchController.onPageLoad().url
   private val clearFilterRoute = controllers.agent.routes.ClientListSearchController.clearFilter().url
-  private val downloadRoute = controllers.agent.routes.ClientListSearchController.downloadClientList().url
+  private val downloadRoute    = controllers.agent.routes.ClientListSearchController.downloadClientList().url
 
   private val cisClients: List[CisTaxpayerSearchResult] = List(
     CisTaxpayerSearchResult(
-      uniqueId = "UID-001", taxOfficeNumber = "123", taxOfficeRef = "AB45678",
-      aoDistrict = None, aoPayType = None, aoCheckCode = None, aoReference = None,
-      validBusinessAddr = None, correlation = None, ggAgentId = None,
-      employerName1 = None, employerName2 = None,
-      agentOwnRef = Some("ABC-001"), schemeName = Some("ABC Construction Ltd")
+      uniqueId = "UID-001",
+      taxOfficeNumber = "123",
+      taxOfficeRef = "AB45678",
+      agentOwnRef = Some("ABC-001"),
+      schemeName = Some("ABC Construction Ltd")
     ),
     CisTaxpayerSearchResult(
-      uniqueId = "UID-002", taxOfficeNumber = "789", taxOfficeRef = "EF23456",
-      aoDistrict = None, aoPayType = None, aoCheckCode = None, aoReference = None,
-      validBusinessAddr = None, correlation = None, ggAgentId = None,
-      employerName1 = None, employerName2 = None,
-      agentOwnRef = Some("ABC-002"), schemeName = Some("ABC Property Services")
+      uniqueId = "UID-002",
+      taxOfficeNumber = "789",
+      taxOfficeRef = "EF23456",
+      agentOwnRef = Some("ABC-002"),
+      schemeName = Some("ABC Property Services")
     )
   )
 
@@ -67,11 +67,11 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
     ClientListViewModel.fromCisClients(cisClients)
 
   private def appWith(
-                       ua: Option[UserAnswers] = Some(emptyUserAnswers),
-                       returnedUa: UserAnswers = emptyUserAnswers
-                     ) = {
+    ua: Option[UserAnswers] = Some(emptyUserAnswers),
+    returnedUa: UserAnswers = emptyUserAnswers
+  ) = {
     val manageService = mock[ManageService]
-    val sessionRepo = mock[SessionRepository]
+    val sessionRepo   = mock[SessionRepository]
 
     when(sessionRepo.set(any())) thenReturn Future.successful(true)
     when(manageService.resolveAndStoreAgentClients(any[UserAnswers])(using any[HeaderCarrier]))
@@ -85,15 +85,14 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
       .build()
   }
 
-
   "ClientListSearch Controller" - {
 
     "must return OK and the correct view for a GET" in {
       val app = appWith()
       running(app) {
-        val req = FakeRequest(GET, "/agent/file-monthly-cis-returns")
+        val req    = FakeRequest(GET, "/agent/file-monthly-cis-returns")
         val result = route(app, req).value
-        val view = app.injector.instanceOf[ClientListSearchView]
+        val view   = app.injector.instanceOf[ClientListSearchView]
 
         val filtered = ClientListViewModel.filterByField("", "", allVm)
 
@@ -109,9 +108,9 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
       val app = appWith(returnedUa = uaWithSearch)
       running(app) {
-        val req = FakeRequest(GET, onPageLoadRoute)
+        val req    = FakeRequest(GET, onPageLoadRoute)
         val result = route(app, req).value
-        val view = app.injector.instanceOf[ClientListSearchView]
+        val view   = app.injector.instanceOf[ClientListSearchView]
 
         val prepared = form.fill(ClientListFormData("CN", "ABC"))
         val filtered = ClientListViewModel.filterByField("CN", "ABC", allVm)
@@ -143,8 +142,8 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
           FakeRequest(POST, onPageLoadRoute)
             .withFormUrlEncodedBody("value" -> "")
 
-        val result = route(app, req).value
-        val view = app.injector.instanceOf[ClientListSearchView]
+        val result    = route(app, req).value
+        val view      = app.injector.instanceOf[ClientListSearchView]
         val boundForm = form.bind(Map("value" -> ""))
 
         val filtered = ClientListViewModel.filterByField("", "", allVm)
@@ -189,9 +188,9 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
       "must remove form data from user answers and display the client list search page" in {
         val app = appWith()
         running(app) {
-          val req = FakeRequest(GET, clearFilterRoute)
+          val req    = FakeRequest(GET, clearFilterRoute)
           val result = route(app, req).value
-          val view = app.injector.instanceOf[ClientListSearchView]
+          val view   = app.injector.instanceOf[ClientListSearchView]
 
           status(result) mustBe OK
           contentAsString(result) mustBe
@@ -205,14 +204,14 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
       "must return a CSV file with all mock clients" in {
         val app = appWith()
         running(app) {
-          val req = FakeRequest(GET, downloadRoute)
+          val req    = FakeRequest(GET, downloadRoute)
           val result = route(app, req).value
 
           status(result) mustBe OK
           contentType(result) mustBe Some("text/csv")
           header("Content-Disposition", result).value mustBe "attachment; filename=CISAgentClientList.csv"
 
-          val msgs = messages(app)
+          val msgs           = messages(app)
           val expectedHeader = Seq(
             msgs("agent.clientListSearch.th.clientName"),
             msgs("agent.clientListSearch.th.employerReference"),
@@ -232,7 +231,7 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
       "journey recovery when no userAnswers" in {
         val app = appWith(ua = None)
         running(app) {
-          val req = FakeRequest(GET, onPageLoadRoute)
+          val req    = FakeRequest(GET, onPageLoadRoute)
           val result = route(app, req).value
 
           status(result) mustBe SEE_OTHER
