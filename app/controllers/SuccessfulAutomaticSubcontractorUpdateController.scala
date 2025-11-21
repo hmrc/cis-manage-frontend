@@ -32,7 +32,13 @@ class SuccessfulAutomaticSubcontractorUpdateController @Inject() (
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
-    val subcontractorsList: Seq[SuccessfulAutomaticSubcontractorUpdateViewModel] = Seq(
+    val subcontractorsList: Seq[SuccessfulAutomaticSubcontractorUpdateViewModel] = getSubcontractorsList
+
+    Ok(view(subcontractorsList))
+  }
+
+  private def getSubcontractorsList: Seq[SuccessfulAutomaticSubcontractorUpdateViewModel] =
+    Seq(
       SuccessfulAutomaticSubcontractorUpdateViewModel("Alice, A", "1111111111", " ", "01 Jan 2014"),
       SuccessfulAutomaticSubcontractorUpdateViewModel("Bob, B", "2222222222", " ", "01 Jan 2014"),
       SuccessfulAutomaticSubcontractorUpdateViewModel("Dave, D", "4444444444", "V1000000009", "07 May 2015"),
@@ -40,7 +46,4 @@ class SuccessfulAutomaticSubcontractorUpdateController @Inject() (
       SuccessfulAutomaticSubcontractorUpdateViewModel("Elise, E", "5555555555", "V1000000009", "07 May 2015"),
       SuccessfulAutomaticSubcontractorUpdateViewModel("Frank, F", "6666666666", "V1000000009", "07 Jan 2018")
     )
-
-    Ok(view(subcontractorsList))
-  }
 }
