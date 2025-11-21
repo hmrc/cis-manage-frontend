@@ -24,27 +24,28 @@ import play.api.Application
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import views.html.RetrievingSubcontractorsView
+import views.html.SuccessfulNoRecordsFoundView
 
-class RetrievingSubcontractorsViewSpec extends SpecBase {
+class SuccessfulNoRecordsFoundViewSpec extends SpecBase {
 
-  "RetrievingSubcontractorsView" - {
+  "SuccessfulNoRecordsFoundView" - {
+    "must render the page with the correct heading, paragraphs, link and button" in new Setup {
+      val html: HtmlFormat.Appendable = view()
+      val doc: Document               = Jsoup.parse(html.body)
 
-    "must render the header and paragraphs on the page" in new Setup {
-      val html = view()
-      val doc  = Jsoup.parse(html.body)
-
-      doc.title             must include(messages("retrievingSubcontractors.title"))
-      doc.select("h1").text must include(messages("retrievingSubcontractors.heading"))
-      doc.select("p").text  must include(messages("retrievingSubcontractors.p1"))
-      doc.select("p").text  must include(messages("retrievingSubcontractors.p2"))
-      doc.select("p").text  must include(messages("retrievingSubcontractors.p3.bold"))
+      doc.title                                   must include(messages("successfulNoRecordsFound.title"))
+      doc.select("h1").text                       must include(messages("successfulNoRecordsFound.heading"))
+      doc.select("p").text                        must include(messages("successfulNoRecordsFound.p1"))
+      doc.select("p").text                        must include(messages("successfulNoRecordsFound.p2"))
+      doc.getElementsByClass("govuk-link").text   must (include(messages("successfulNoRecordsFound.p2.link")))
+      doc.getElementsByClass("govuk-button").text must include(messages("site.continue"))
     }
   }
 
   trait Setup {
     val app: Application                          = applicationBuilder().build()
-    val view: RetrievingSubcontractorsView        = app.injector.instanceOf[RetrievingSubcontractorsView]
+    val view: SuccessfulNoRecordsFoundView        =
+      app.injector.instanceOf[SuccessfulNoRecordsFoundView]
     implicit val request: play.api.mvc.Request[_] = FakeRequest()
     implicit val messages: Messages               = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,

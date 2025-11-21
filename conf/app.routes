@@ -32,6 +32,7 @@ GET         /agent/authorised-client-manage-CIS-returns             controllers.
 GET         /agent/file-monthly-cis-returns                         controllers.agent.ClientListSearchController.onPageLoad()
 POST        /agent/file-monthly-cis-returns                         controllers.agent.ClientListSearchController.onSubmit()
 GET         /agent/file-monthly-cis-returns/clear                   controllers.agent.ClientListSearchController.clearFilter()
+GET         /agent/file-monthly-cis-returns/download                controllers.agent.ClientListSearchController.downloadClientList()
 
 GET         /org/manage-cis-returns                                 controllers.contractor.ContractorLandingController.onPageLoad()
 
@@ -42,7 +43,8 @@ GET         /page-not-found                                         controllers.
 GET         /access-denied                                          controllers.AccessDeniedController.onPageLoad()
 GET         /system-error/there-is-a-problem                        controllers.SystemErrorController.onPageLoad()
 
-GET        /retrieving-subcontractors                               controllers.RetrievingSubcontractorsController.onPageLoad()
+GET        /your-subcontractors                                     controllers.RetrievingSubcontractorsController.onPageLoad()
 GET        /check-subcontractor-records                             controllers.CheckSubcontractorRecordsController.onPageLoad()
 GET        /automatic-subcontractor-update-unsuccessful             controllers.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad()
 GET        /automatic-subcontractor-update-successful               controllers.SuccessfulAutomaticSubcontractorUpdateController.onPageLoad()
+GET        /automatic-subcontractor-update-successful-no-records    controllers.SuccessfulNoRecordsFoundController.onPageLoad()

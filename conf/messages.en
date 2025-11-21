@@ -166,7 +166,7 @@ agent.clientListSearch.searchFilter.cr.error.length = Client reference length mu
 
 agent.clientListSearch.table.caption = Your clients
 agent.clientListSearch.th.clientName = Client name
-agent.clientListSearch.th.employerReference = Employer reference
+agent.clientListSearch.th.employersReference = Employers reference
 agent.clientListSearch.th.clientReference = Client reference
 agent.clientListSearch.th.actions = Actions
 agent.clientListSearch.td.actions.remove = Remove
@@ -263,9 +263,9 @@ introduction.sidebar.link2 = CIS monthly returns guidance
 introduction.sidebar.link3 = CIS 340: Penalties for late returns
 introduction.sidebar.link4 = Client authorisation guidance
 
-retrievingSubcontractors.title = Retrieving your subcontractors
-retrievingSubcontractors.heading = Retrieving your subcontractors
-retrievingSubcontractors.p1 = Please wait while we retrieve your subcontractor records.
+retrievingSubcontractors.title = Your subcontractors
+retrievingSubcontractors.heading = Your subcontractors
+retrievingSubcontractors.p1 = We are locating your subcontractor records.
 retrievingSubcontractors.p2 = This should only take a few moments.
 retrievingSubcontractors.p3.bold = Do not refresh this page or use the back button.
 
@@ -287,3 +287,9 @@ successfulAutomaticSubcontractorUpdate.th.name = Name
 successfulAutomaticSubcontractorUpdate.th.uniqueTaxReference = Unique Tax Reference
 successfulAutomaticSubcontractorUpdate.th.verificationNumber = Verification number
 successfulAutomaticSubcontractorUpdate.th.dateAdded = Date added
+
+successfulNoRecordsFound.title = Successful automatic subcontractor update
+successfulNoRecordsFound.heading = Successful automatic subcontractor update
+successfulNoRecordsFound.p1 = No subcontractor records were found.
+successfulNoRecordsFound.p2 = You can
+successfulNoRecordsFound.p2.link = add a subcontractor
