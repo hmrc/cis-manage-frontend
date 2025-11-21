@@ -14,23 +14,24 @@
  * limitations under the License.
  *@
 
-@import utils.Utils.emptyString
+@import views.html.components._
+@this(
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    h1: H1,
+    paragraph: Paragraph
+)
 
-@this()
+@()(implicit request: Request[_], messages: Messages)
 
-@(
-    message: String,
-    bold: Boolean = false,
-    baseClass: String = "govuk-body",
-    extraClasses: String = emptyString,
-    args: Seq[Any] = Nil,
-    boldSuffix: String = emptyString
-)(implicit messages: Messages)
+@layout(
+    pageTitle = titleNoForm(messages("retrievingSubcontractors.title")),
+    showBackLink = false,
+    showSignOut = false
+) {
 
-<p class="@baseClass @extraClasses @if(bold){govuk-!-font-weight-bold}">
-    @{Html(messages(message, args*))}
-
-    @if(boldSuffix.nonEmpty) {
-        <strong>@{Html(messages(boldSuffix))}</strong>
-    }
-</p>
+    @h1(messages("retrievingSubcontractors.heading"))
+    @paragraph(messages("retrievingSubcontractors.p1"))
+    @paragraph(messages("retrievingSubcontractors.p2"))
+    @paragraph(messages("retrievingSubcontractors.p3.bold"), bold = true)
+}

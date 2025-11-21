@@ -89,6 +89,116 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
     }
   }
 
+  "getAllClients" should {
+
+    "return a list of CisTaxpayerSearchResult when BE returns 200 with valid JSON" in {
+      stubFor(
+        get(urlPathEqualTo("/cis/agent/client-list"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                """{
+                  |  "clients": [
+                  |    {
+                  |      "uniqueId": "123",
+                  |      "taxOfficeNumber": "111",
+                  |      "taxOfficeRef": "test111",
+                  |      "agentOwnRef": "abc123",
+                  |      "schemeName": "TEST LTD"
+                  |    },
+                  |    {
+                  |      "uniqueId": "456",
+                  |      "taxOfficeNumber": "222",
+                  |      "taxOfficeRef": "test222",
+                  |      "agentOwnRef": "abc456",
+                  |      "schemeName": "ANOTHER LTD"
+                  |    }
+                  |  ]
+                  |}""".stripMargin
+              )
+          )
+      )
+
+      val result = connector.getAllClients.futureValue
+      result.length mustBe 2
+      result.head.uniqueId mustBe "123"
+      result.head.taxOfficeNumber mustBe "111"
+      result.head.taxOfficeRef mustBe "test111"
+      result.head.agentOwnRef mustBe Some("abc123")
+      result.head.schemeName mustBe Some("TEST LTD")
+      result(1).uniqueId mustBe "456"
+      result(1).taxOfficeNumber mustBe "222"
+      result(1).taxOfficeRef mustBe "test222"
+      result(1).agentOwnRef mustBe Some("abc456")
+      result(1).schemeName mustBe Some("ANOTHER LTD")
+    }
+
+    "return an empty list when BE returns 200 with empty clients array" in {
+      stubFor(
+        get(urlPathEqualTo("/cis/agent/client-list"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody("""{ "clients": [] }""")
+          )
+      )
+
+      val result = connector.getAllClients.futureValue
+      result mustBe empty
+    }
+
+    "fail when BE returns 200 with invalid JSON structure" in {
+      stubFor(
+        get(urlPathEqualTo("/cis/agent/client-list"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody("""{ "unexpectedField": true }""")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.getAllClients.futureValue
+      }
+      ex.getMessage must (include("clients") or include("NoSuchElementException"))
+    }
+
+    "fail when BE returns 200 with invalid client JSON" in {
+      stubFor(
+        get(urlPathEqualTo("/cis/agent/client-list"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                """{
+                  |  "clients": [
+                  |    { "invalidField": "invalid" }
+                  |  ]
+                  |}""".stripMargin
+              )
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.getAllClients.futureValue
+      }
+      ex.getMessage.toLowerCase must include("nosuchelementexception")
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      stubFor(
+        get(urlPathEqualTo("/cis/agent/client-list"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = intercept[Exception] {
+        connector.getAllClients.futureValue
+      }
+      ex.getMessage must include("returned 500")
+    }
+  }
+
   "startClientList" should {
 
     "return GetClientListStatusResponse with 'succeeded' when BE returns succeeded" in {

@@ -166,7 +166,7 @@ agent.clientListSearch.searchFilter.cr.error.length = Client reference length mu
 
 agent.clientListSearch.table.caption = Your clients
 agent.clientListSearch.th.clientName = Client name
-agent.clientListSearch.th.employerReference = Employer reference
+agent.clientListSearch.th.employersReference = Employers reference
 agent.clientListSearch.th.clientReference = Client reference
 agent.clientListSearch.th.actions = Actions
 agent.clientListSearch.td.actions.remove = Remove
@@ -180,7 +180,6 @@ agent.clientListSearch.details.2.summary = Filing only service
 agent.clientListSearch.details.2.p1 = You can send CIS monthly returns on behalf of a client without completing an authorisation online or form 64-8.
 agent.clientListSearch.details.2.p2 = This service is only available using commercial software.
 agent.clientListSearch.details.2.link = Find commercial software for CIS returns (opens in new tab)
-
 contractorLanding.title = Manage CIS return
 contractorLanding.heading = Manage CIS return
 contractorLanding.paragraph = You can manage ABC Construction Ltd’s monthly CIS returns – including dates and statements.
@@ -262,3 +261,26 @@ introduction.sidebar.link1 = What is the Construction Industry Scheme
 introduction.sidebar.link2 = CIS monthly returns guidance
 introduction.sidebar.link3 = CIS 340: Penalties for late returns
 introduction.sidebar.link4 = Client authorisation guidance
+
+retrievingSubcontractors.title = Your subcontractors
+retrievingSubcontractors.heading = Your subcontractors
+retrievingSubcontractors.p1 = We are locating your subcontractor records.
+retrievingSubcontractors.p2 = This should only take a few moments.
+retrievingSubcontractors.p3.bold = Do not refresh this page or use the back button.
+
+checkSubcontractorRecords.title = Check subcontractor records
+checkSubcontractorRecords.heading = Check subcontractor records
+checkSubcontractorRecords.p1 = We will now check if there are any subcontractor records you have recently paid/verified.
+checkSubcontractorRecords.p2 = Any record we find will be automatically added to your subcontractor list, which will be available to view.
+
+unsuccessfulAutomaticSubcontractorUpdate.title = Unsuccessful automatic subcontractor update
+unsuccessfulAutomaticSubcontractorUpdate.heading = Unsuccessful automatic subcontractor update
+unsuccessfulAutomaticSubcontractorUpdate.p1 = The subcontractor automatic check was unsuccessful. CIS Online will perform this update again the next time you enter the application,
+unsuccessfulAutomaticSubcontractorUpdate.p2 = unless you choose to add subcontractor details yourself.
+unsuccessfulAutomaticSubcontractorUpdate.p3 = Before adding a subcontractor, you will need to add their details.
+
+successfulNoRecordsFound.title = Successful automatic subcontractor update
+successfulNoRecordsFound.heading = Successful automatic subcontractor update
+successfulNoRecordsFound.p1 = No subcontractor records were found.
+successfulNoRecordsFound.p2 = You can
+successfulNoRecordsFound.p2.link = add a subcontractor

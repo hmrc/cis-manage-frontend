@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,25 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import utils.Utils.emptyString
+package pages
 
-@this()
+import models.CisTaxpayerSearchResult
+import play.api.libs.json.JsPath
 
-@(
-    message: String,
-    bold: Boolean = false,
-    baseClass: String = "govuk-body",
-    extraClasses: String = emptyString,
-    args: Seq[Any] = Nil,
-    boldSuffix: String = emptyString
-)(implicit messages: Messages)
+case object AgentClientsPage extends QuestionPage[List[CisTaxpayerSearchResult]] {
 
-<p class="@baseClass @extraClasses @if(bold){govuk-!-font-weight-bold}">
-    @{Html(messages(message, args*))}
-
-    @if(boldSuffix.nonEmpty) {
-        <strong>@{Html(messages(boldSuffix))}</strong>
-    }
-</p>
+  override def path: JsPath     = JsPath \ toString
+  override def toString: String = "agentClients"
+}
