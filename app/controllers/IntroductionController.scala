@@ -22,20 +22,18 @@ import models.UserAnswers
 
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.ConstructionIndustrySchemeService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IntroductionView
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class IntroductionController @Inject() (
   override val messagesApi: MessagesApi,
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
   sessionRepository: SessionRepository,
-  cisService: ConstructionIndustrySchemeService,
   view: IntroductionView
 )(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
@@ -47,30 +45,13 @@ class IntroductionController @Inject() (
 
   def affinityGroupRouting: Action[AnyContent] = identify.async { implicit request =>
     val userAnswers = UserAnswers(request.userId)
-
-    sessionRepository.set(userAnswers).flatMap { _ =>
+    sessionRepository.set(userAnswers).map { _ =>
       if (request.isAgent) {
-        cisService.startClientListRetrieval
-          .map(redirectForStatus)
-          .recover { case _ =>
-            Redirect(controllers.routes.SystemErrorController.onPageLoad())
-          }
+        Redirect(controllers.agent.routes.RetrievingClientController.start())
       } else {
-        Future.successful(
-          Redirect(controllers.contractor.routes.ContractorLandingController.onPageLoad())
-        )
+        Redirect(controllers.contractor.routes.ContractorLandingController.onPageLoad())
       }
     }
   }
-
-  private def redirectForStatus(status: String): Result =
-    status match {
-      case "succeeded"                          => Redirect(controllers.agent.routes.ClientListSearchController.onPageLoad())
-      case "failed"                             => Redirect(controllers.agent.routes.FailedToRetrieveClientController.onPageLoad())
-      case "system-error" | "initiate-download" => Redirect(controllers.routes.SystemErrorController.onPageLoad())
-      case "in-progress"                        =>
-        Redirect(controllers.agent.routes.RetrievingClientController.onPageLoad().url + "?RetryCount=1")
-      case _                                    => Redirect(controllers.routes.SystemErrorController.onPageLoad())
-    }
 
 }

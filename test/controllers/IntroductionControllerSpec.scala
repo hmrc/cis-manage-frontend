@@ -20,19 +20,15 @@ import base.SpecBase
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import play.api.inject.bind
 import repositories.SessionRepository
-import services.ConstructionIndustrySchemeService
-import uk.gov.hmrc.http.HeaderCarrier
 import views.html.IntroductionView
 
 import scala.concurrent.Future
 
 class IntroductionControllerSpec extends SpecBase {
-
-  private val routeRouting = routes.IntroductionController.affinityGroupRouting().url
 
   "IntroductionController.onPageLoad" - {
     "must return OK and the correct view for a GET" in {
@@ -73,7 +69,8 @@ class IntroductionControllerSpec extends SpecBase {
           .build()
 
         running(application) {
-          val request = FakeRequest(POST, routes.IntroductionController.affinityGroupRouting().url)
+          val request = FakeRequest(GET, routes.IntroductionController.affinityGroupRouting().url)
+
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
@@ -88,140 +85,31 @@ class IntroductionControllerSpec extends SpecBase {
 
     "for an agent" - {
 
-      "must redirect to client list search page when status is succeeded" in {
+      "must redirect to the agent landing page" in {
 
         val mockSessionRepository = mock[SessionRepository]
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-        val mockCisService = mock[ConstructionIndustrySchemeService]
-        when(mockCisService.startClientListRetrieval(using any[HeaderCarrier]))
-          .thenReturn(Future.successful("succeeded"))
-
         val application = applicationBuilder(userAnswers = None, isAgent = true)
           .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[ConstructionIndustrySchemeService].toInstance(mockCisService)
+            bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
         running(application) {
-          val controller = application.injector.instanceOf[IntroductionController]
-          val request    = FakeRequest(POST, routeRouting)
-          val result     = controller.affinityGroupRouting()(request)
+          val request = FakeRequest(GET, routes.IntroductionController.affinityGroupRouting().url)
+
+          val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual
-            controllers.agent.routes.ClientListSearchController.onPageLoad().url
+
+          redirectLocation(result).value mustEqual controllers.agent.routes.RetrievingClientController
+            .start()
+            .url
         }
       }
 
-      "must redirect to failed-to-retrieve page when status is failed" in {
-
-        val mockSessionRepository = mock[SessionRepository]
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-        val mockCisService = mock[ConstructionIndustrySchemeService]
-        when(mockCisService.startClientListRetrieval(using any[HeaderCarrier]))
-          .thenReturn(Future.successful("failed"))
-
-        val application = applicationBuilder(userAnswers = None, isAgent = true)
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[ConstructionIndustrySchemeService].toInstance(mockCisService)
-          )
-          .build()
-
-        running(application) {
-          val controller = application.injector.instanceOf[IntroductionController]
-          val request    = FakeRequest(POST, routeRouting)
-          val result     = controller.affinityGroupRouting()(request)
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual
-            controllers.agent.routes.FailedToRetrieveClientController.onPageLoad().url
-        }
-      }
-
-      "must redirect to retrieving page with RetryCount=1 when status is in-progress" in {
-
-        val mockSessionRepository = mock[SessionRepository]
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-        val mockCisService = mock[ConstructionIndustrySchemeService]
-        when(mockCisService.startClientListRetrieval(using any[HeaderCarrier]))
-          .thenReturn(Future.successful("in-progress"))
-
-        val application = applicationBuilder(userAnswers = None, isAgent = true)
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[ConstructionIndustrySchemeService].toInstance(mockCisService)
-          )
-          .build()
-
-        running(application) {
-          val controller = application.injector.instanceOf[IntroductionController]
-          val request    = FakeRequest(POST, routeRouting)
-          val result     = controller.affinityGroupRouting()(request)
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual
-            controllers.agent.routes.RetrievingClientController.onPageLoad().url + "?RetryCount=1"
-        }
-      }
-
-      "must redirect to system error page when status is initiate-download" in {
-
-        val mockSessionRepository = mock[SessionRepository]
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-        val mockCisService = mock[ConstructionIndustrySchemeService]
-        when(mockCisService.startClientListRetrieval(using any[HeaderCarrier]))
-          .thenReturn(Future.successful("initiate-download"))
-
-        val application = applicationBuilder(userAnswers = None, isAgent = true)
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[ConstructionIndustrySchemeService].toInstance(mockCisService)
-          )
-          .build()
-
-        running(application) {
-          val controller = application.injector.instanceOf[IntroductionController]
-          val request    = FakeRequest(POST, routeRouting)
-          val result     = controller.affinityGroupRouting()(request)
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual
-            controllers.routes.SystemErrorController.onPageLoad().url
-        }
-      }
-
-      "must redirect to system error page when service call fails" in {
-
-        val mockSessionRepository = mock[SessionRepository]
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-        val mockCisService = mock[ConstructionIndustrySchemeService]
-        when(mockCisService.startClientListRetrieval(using any[HeaderCarrier]))
-          .thenReturn(Future.failed(new RuntimeException("boom")))
-
-        val application = applicationBuilder(userAnswers = None, isAgent = true)
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[ConstructionIndustrySchemeService].toInstance(mockCisService)
-          )
-          .build()
-
-        running(application) {
-          val controller = application.injector.instanceOf[IntroductionController]
-          val request    = FakeRequest(POST, routeRouting)
-          val result     = controller.affinityGroupRouting()(request)
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual
-            controllers.routes.SystemErrorController.onPageLoad().url
-        }
-      }
     }
+
   }
 }

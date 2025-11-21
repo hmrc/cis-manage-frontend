@@ -42,6 +42,20 @@ class RetrievingClientController @Inject() (
   private val MaxRetries               = 8
   private val RefreshIntervalInSeconds = 15
 
+  def start: Action[AnyContent] = identify.async { implicit request =>
+    cisService.startClientListRetrieval
+      .map {
+        case "succeeded"   => Redirect(controllers.agent.routes.ClientListSearchController.onPageLoad())
+        case "failed"      => Redirect(controllers.agent.routes.FailedToRetrieveClientController.onPageLoad())
+        case "in-progress" =>
+          Redirect(controllers.agent.routes.RetrievingClientController.onPageLoad().url + "?RetryCount=1")
+        case _             => Redirect(controllers.routes.SystemErrorController.onPageLoad())
+      }
+      .recover { case _ =>
+        Redirect(controllers.routes.SystemErrorController.onPageLoad())
+      }
+  }
+
   def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
     val currentRetry =
       request.getQueryString(RetryCountParam).flatMap(s => Try(s.toInt).toOption).getOrElse(0)

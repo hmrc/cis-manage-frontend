@@ -20,7 +20,6 @@
 @this(
     layout: templates.LayoutWithSidebar,
     sidebarLinks: templates.SidebarLinks,
-    formHelper: FormWithCSRF,
     govukInsetText: GovukInsetText,
     govukDetails: GovukDetails,
     govukButton: GovukButton,
@@ -89,9 +88,9 @@
         )
     )
 
-    @formHelper(action = controllers.routes.IntroductionController.affinityGroupRouting()) {
+    <div>
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+        ButtonViewModel(messages("site.continue")).asLink(controllers.routes.IntroductionController.affinityGroupRouting().url)
         )
-    }
+    </div>
 }

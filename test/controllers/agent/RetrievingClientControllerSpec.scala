@@ -48,6 +48,24 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
     (application, mockCisService)
   }
 
+  private def buildAppWithStartStatus(startStatusF: Future[String]) = {
+    val mockCisService = mock[ConstructionIndustrySchemeService]
+    when(mockCisService.startClientListRetrieval(using any[HeaderCarrier]))
+      .thenReturn(startStatusF)
+
+    when(mockCisService.getClientListStatus(using any[HeaderCarrier]))
+      .thenReturn(Future.successful("in-progress"))
+
+    val application =
+      applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        additionalBindings = Seq(bind[ConstructionIndustrySchemeService].toInstance(mockCisService)),
+        isAgent = true
+      ).build()
+
+    (application, mockCisService)
+  }
+
   "RetrievingClientController.onPageLoad" - {
 
     "must redirect to client list search when status is succeeded" in {
@@ -146,6 +164,74 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.SystemErrorController.onPageLoad().url
+      }
+    }
+  }
+
+  "RetrievingClientController.start" - {
+
+    "must redirect to client list search when start status is succeeded" in {
+      val (application, _) = buildAppWithStartStatus(Future.successful("succeeded"))
+
+      running(application) {
+        val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.start().url)
+        val result  = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.agent.routes.ClientListSearchController.onPageLoad().url
+      }
+    }
+
+    "must redirect to failed-to-retrieve when start status is failed" in {
+      val (application, _) = buildAppWithStartStatus(Future.successful("failed"))
+
+      running(application) {
+        val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.start().url)
+        val result  = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.agent.routes.FailedToRetrieveClientController.onPageLoad().url
+      }
+    }
+
+    "must redirect to polling page with RetryCount=1 when start status is in-progress" in {
+      val (application, _) = buildAppWithStartStatus(Future.successful("in-progress"))
+
+      running(application) {
+        val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.start().url)
+        val result  = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.agent.routes.RetrievingClientController.onPageLoad().url + "?RetryCount=1"
+      }
+    }
+
+    "must redirect to system error for any other start status" in {
+      val (application, _) = buildAppWithStartStatus(Future.successful("weird-status"))
+
+      running(application) {
+        val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.start().url)
+        val result  = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.SystemErrorController.onPageLoad().url
+      }
+    }
+
+    "must redirect to system error if the start call fails" in {
+      val (application, _) = buildAppWithStartStatus(Future.failed(new RuntimeException("boom")))
+
+      running(application) {
+        val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.start().url)
+        val result  = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
           controllers.routes.SystemErrorController.onPageLoad().url
       }

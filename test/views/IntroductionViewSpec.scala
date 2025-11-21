@@ -59,7 +59,7 @@ class IntroductionViewSpec extends SpecBase {
       doc.select("p").text                      must include(messages("introduction.details.p2"))
       doc.getElementsByClass("govuk-link").text must include(messages("introduction.details.link"))
 
-      doc.select("button.govuk-button").text must include(messages("site.continue"))
+      doc.select("a.govuk-button").text must include(messages("site.continue"))
     }
 
     "must render the page with the correct sidebar links and header" in new Setup {
