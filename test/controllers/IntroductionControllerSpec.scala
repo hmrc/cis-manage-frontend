@@ -20,17 +20,15 @@ import base.SpecBase
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import play.api.inject.bind
 import repositories.SessionRepository
 import views.html.IntroductionView
 
 import scala.concurrent.Future
 
 class IntroductionControllerSpec extends SpecBase {
-
-  private val redirectUrl = agent.routes.RetrievingClientController.onPageLoad().url
 
   "IntroductionController.onPageLoad" - {
     "must return OK and the correct view for a GET" in {
@@ -106,7 +104,7 @@ class IntroductionControllerSpec extends SpecBase {
           status(result) mustEqual SEE_OTHER
 
           redirectLocation(result).value mustEqual controllers.agent.routes.RetrievingClientController
-            .onPageLoad()
+            .start()
             .url
         }
       }

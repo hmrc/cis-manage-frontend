@@ -28,6 +28,10 @@ class ConstructionIndustrySchemeService @Inject() (cisConnector: ConstructionInd
   ExecutionContext
 ) extends Logging {
 
+  def startClientListRetrieval(using HeaderCarrier): Future[String] =
+    cisConnector.startClientList
+      .map(_.result)
+
   def getClientListStatus(using HeaderCarrier): Future[String] =
     cisConnector.getClientListStatus
       .map(_.result)
