@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import forms.ClientListSearchFormProvider
 import models.agent.ClientListFormData
-import models.UserAnswers
+import models.{CisTaxpayerSearchResult, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -31,6 +31,8 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.agent.ClientListSearchView
 import pages.ClientListSearchPage
+import play.api.Application
+import services.ManageService
 import viewmodels.agent.{ClientListViewModel, SearchByList}
 
 import scala.concurrent.Future
@@ -43,6 +45,31 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
   lazy val clientListSearchRoute: String   = controllers.agent.routes.ClientListSearchController.onPageLoad().url
   lazy val clientListDownloadRoute: String =
     controllers.agent.routes.ClientListSearchController.downloadClientList().url
+  val clients                              = List(
+    CisTaxpayerSearchResult(
+      uniqueId = "123",
+      taxOfficeNumber = "123",
+      taxOfficeRef = "AB456",
+      agentOwnRef = Some("someRef"),
+      schemeName = Some("Scheme 123")
+    )
+  )
+
+  def buildApp(userAnswers: UserAnswers = emptyUserAnswers): (ManageService, SessionRepository, Application) = buildApp(
+    Some(userAnswers)
+  )
+  def buildApp(userAnswers: Option[UserAnswers]): (ManageService, SessionRepository, Application)            = {
+    val manageService     = mock[ManageService]
+    val sessionRepository = mock[SessionRepository]
+    val app               = applicationBuilder(userAnswers = userAnswers)
+      .overrides(
+        bind[ManageService].toInstance(manageService),
+        bind[SessionRepository].toInstance(sessionRepository)
+      )
+      .build()
+
+    (manageService, sessionRepository, app)
+  }
 
   "ClientListSearch Controller" - {
 
@@ -50,7 +77,11 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val (manageService, mockSessionRepository, application) = buildApp(emptyUserAnswers)
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(manageService.resolveAndStoreAgentClients(any[UserAnswers])(using any))
+        .thenReturn(Future.successful((clients, emptyUserAnswers)))
 
       running(application) {
         val request = FakeRequest(GET, clientListSearchRoute)
@@ -74,7 +105,11 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
       val userAnswers =
         UserAnswers(userAnswersId).set(ClientListSearchPage, ClientListFormData("CN", "ABC")).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val (manageService, mockSessionRepository, application) = buildApp(userAnswers)
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(manageService.resolveAndStoreAgentClients(any[UserAnswers])(using any))
+        .thenReturn(Future.successful((clients, userAnswers)))
 
       running(application) {
         val request = FakeRequest(GET, clientListSearchRoute)
@@ -94,16 +129,11 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the client list search page when valid data is submitted" in {
 
-      val mockSessionRepository = mock[SessionRepository]
+      val (manageService, mockSessionRepository, application) = buildApp(emptyUserAnswers)
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
+      when(manageService.resolveAndStoreAgentClients(any[UserAnswers])(using any))
+        .thenReturn(Future.successful((clients, emptyUserAnswers)))
 
       running(application) {
         val request =
@@ -119,7 +149,10 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val (manageService, _, application) = buildApp(emptyUserAnswers)
+
+      when(manageService.resolveAndStoreAgentClients(any[UserAnswers])(using any))
+        .thenReturn(Future.successful((clients, emptyUserAnswers)))
 
       running(application) {
         val request =
@@ -142,7 +175,7 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val (_, _, application) = buildApp(None)
 
       running(application) {
         val request = FakeRequest(GET, clientListSearchRoute)
@@ -156,7 +189,7 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val (_, _, application) = buildApp(None)
 
       running(application) {
         val request =
@@ -173,20 +206,13 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
     ".clearFilter" - {
       "must remove form data from user answers and display the client list search page" in {
 
+        val (_, mockSessionRepository, application) = buildApp(emptyUserAnswers)
+
         val filteredClients = ClientListViewModel.allAgentClients
 
         lazy val clearFilterRoute: String = controllers.agent.routes.ClientListSearchController.clearFilter().url
 
-        val mockSessionRepository = mock[SessionRepository]
-
         when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-        val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(
-              bind[SessionRepository].toInstance(mockSessionRepository)
-            )
-            .build()
 
         running(application) {
           val view = application.injector.instanceOf[ClientListSearchView]
@@ -207,7 +233,7 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
       "must return a CSV file with all mock clients" in {
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        val (_, _, application) = buildApp(emptyUserAnswers)
 
         running(application) {
           val request = FakeRequest(GET, clientListDownloadRoute)

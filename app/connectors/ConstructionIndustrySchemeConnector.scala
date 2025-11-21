@@ -26,7 +26,6 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.reflect.runtime.universe.Try
 
 @Singleton
 class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, http: HttpClientV2)(implicit
@@ -51,9 +50,9 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .get(url"$cisBaseUrl/agent/client-list")
       .execute[JsObject]
       .map { x =>
-        val result = Json.fromJson[List[CisTaxpayerSearchResult]](x("clients"))
+        val clientListJson = Json.fromJson[List[CisTaxpayerSearchResult]](x("clients"))
 
-        result.get
+        clientListJson.get
       }
 
 }

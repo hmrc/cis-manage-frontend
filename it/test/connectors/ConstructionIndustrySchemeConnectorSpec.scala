@@ -104,13 +104,15 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
                   |      "uniqueId": "123",
                   |      "taxOfficeNumber": "111",
                   |      "taxOfficeRef": "test111",
-                  |      "employerName1": "TEST LTD"
+                  |      "agentOwnRef": "abc123",
+                  |      "schemeName": "TEST LTD"
                   |    },
                   |    {
                   |      "uniqueId": "456",
                   |      "taxOfficeNumber": "222",
                   |      "taxOfficeRef": "test222",
-                  |      "employerName1": "ANOTHER LTD"
+                  |      "agentOwnRef": "abc456",
+                  |      "schemeName": "ANOTHER LTD"
                   |    }
                   |  ]
                   |}""".stripMargin
@@ -123,11 +125,13 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
       result.head.uniqueId mustBe "123"
       result.head.taxOfficeNumber mustBe "111"
       result.head.taxOfficeRef mustBe "test111"
-      result.head.employerName1 mustBe Some("TEST LTD")
+      result.head.agentOwnRef mustBe Some("abc123")
+      result.head.schemeName mustBe Some("TEST LTD")
       result(1).uniqueId mustBe "456"
       result(1).taxOfficeNumber mustBe "222"
       result(1).taxOfficeRef mustBe "test222"
-      result(1).employerName1 mustBe Some("ANOTHER LTD")
+      result(1).agentOwnRef mustBe Some("abc456")
+      result(1).schemeName mustBe Some("ANOTHER LTD")
     }
 
     "return an empty list when BE returns 200 with empty clients array" in {
