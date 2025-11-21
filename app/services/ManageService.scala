@@ -65,12 +65,10 @@ class ManageService @Inject() (
       case Some(clientList) => Future.successful((clientList, userAnswers))
       case None             =>
         logger.info("[resolveAndStoreAgentClients] cache-miss: fetching agent clients from backend")
-        cisConnector.getAllClients
-          .flatMap { clients =>
-            for {
-              updatedAnswers <- Future.fromTry(userAnswers.set(AgentClientsPage, clients))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield (clients, updatedAnswers)
-          }
+        for {
+          clients        <- cisConnector.getAllClients
+          updatedAnswers <- Future.fromTry(userAnswers.set(AgentClientsPage, clients))
+          _              <- sessionRepository.set(updatedAnswers)
+        } yield (clients, updatedAnswers)
     }
 }

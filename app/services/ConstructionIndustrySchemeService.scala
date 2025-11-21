@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package pages
+package services
 
-import models.CisTaxpayerSearchResult
-import play.api.libs.json.JsPath
+import com.google.inject.{Inject, Singleton}
+import connectors.ConstructionIndustrySchemeConnector
+import play.api.Logging
+import uk.gov.hmrc.http.HeaderCarrier
 
-case object AgentClientsPage extends QuestionPage[List[CisTaxpayerSearchResult]] {
+import scala.concurrent.{ExecutionContext, Future}
 
-  override def path: JsPath     = JsPath \ toString
-  override def toString: String = "agentClients"
+@Singleton
+class ConstructionIndustrySchemeService @Inject() (cisConnector: ConstructionIndustrySchemeConnector)(using
+  ExecutionContext
+) extends Logging {
+
+  def getClientListStatus(using HeaderCarrier): Future[String] =
+    cisConnector.getClientListStatus
+      .map(_.result)
 }

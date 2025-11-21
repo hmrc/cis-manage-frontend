@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package pages
+package models
 
-import models.CisTaxpayerSearchResult
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Json, OFormat}
 
-case object AgentClientsPage extends QuestionPage[List[CisTaxpayerSearchResult]] {
+case class GetClientListStatusResponse(result: String)
 
-  override def path: JsPath     = JsPath \ toString
-  override def toString: String = "agentClients"
+object GetClientListStatusResponse {
+  implicit val format: OFormat[GetClientListStatusResponse] = Json.format[GetClientListStatusResponse]
 }

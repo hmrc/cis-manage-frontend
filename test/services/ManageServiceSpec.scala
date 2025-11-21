@@ -160,16 +160,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       uniqueId = id,
       taxOfficeNumber = ton,
       taxOfficeRef = tor,
-      aoDistrict = None,
-      aoPayType = None,
-      aoCheckCode = None,
-      aoReference = None,
-      validBusinessAddr = None,
-      correlation = None,
-      ggAgentId = None,
-      employerName1 = name1,
-      employerName2 = None,
-      agentOwnRef = None,
+      agentOwnRef = Some("abc123"),
       schemeName = None
     )
 

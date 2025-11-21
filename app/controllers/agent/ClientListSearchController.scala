@@ -44,8 +44,8 @@ class ClientListSearchController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: ClientListSearchFormProvider,
-  val controllerComponents: MessagesControllerComponents,
   manageService: ManageService,
+  val controllerComponents: MessagesControllerComponents,
   view: ClientListSearchView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController

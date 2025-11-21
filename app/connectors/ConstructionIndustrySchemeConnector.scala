@@ -16,6 +16,7 @@
 
 package connectors
 
+import models.GetClientListStatusResponse
 import models.{CisTaxpayer, CisTaxpayerSearchResult}
 import play.api.Logging
 import play.api.libs.json.{JsObject, Json}
@@ -35,6 +36,11 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
 
   private val cisBaseUrl: String = config.baseUrl("construction-industry-scheme") + "/cis"
 
+  def getClientListStatus(using HeaderCarrier): Future[GetClientListStatusResponse] =
+    http
+      .post(url"$cisBaseUrl/agent/client-list/retrieval/start")
+      .execute[GetClientListStatusResponse]
+
   def getCisTaxpayer()(implicit hc: HeaderCarrier): Future[CisTaxpayer] =
     http
       .get(url"$cisBaseUrl/taxpayer")
@@ -45,9 +51,9 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .get(url"$cisBaseUrl/agent/client-list")
       .execute[JsObject]
       .map { x =>
-        val result = Json.fromJson[List[CisTaxpayerSearchResult]](x("clients"))
+        val clientListJson = Json.fromJson[List[CisTaxpayerSearchResult]](x("clients"))
 
-        result.get
+        clientListJson.get
       }
 
 }
