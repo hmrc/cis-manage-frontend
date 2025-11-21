@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import forms.ClientListSearchFormProvider
 import models.agent.ClientListFormData
-import models.UserAnswers
+import models.{CisTaxpayerSearchResult, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -31,112 +31,127 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.agent.ClientListSearchView
 import pages.ClientListSearchPage
+import services.ManageService
+import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.agent.{ClientListViewModel, SearchByList}
 
 import scala.concurrent.Future
 
 class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
-
-  val formProvider                   = new ClientListSearchFormProvider()
+  implicit val hc: HeaderCarrier = HeaderCarrier()
+  val formProvider = new ClientListSearchFormProvider()
   val form: Form[ClientListFormData] = formProvider()
 
-  lazy val clientListSearchRoute: String   = controllers.agent.routes.ClientListSearchController.onPageLoad().url
-  lazy val clientListDownloadRoute: String =
-    controllers.agent.routes.ClientListSearchController.downloadClientList().url
+  private val onPageLoadRoute = controllers.agent.routes.ClientListSearchController.onPageLoad().url
+  private val clearFilterRoute = controllers.agent.routes.ClientListSearchController.clearFilter().url
+  private val downloadRoute = controllers.agent.routes.ClientListSearchController.downloadClientList().url
+
+  private val cisClients: List[CisTaxpayerSearchResult] = List(
+    CisTaxpayerSearchResult(
+      uniqueId = "UID-001", taxOfficeNumber = "123", taxOfficeRef = "AB45678",
+      aoDistrict = None, aoPayType = None, aoCheckCode = None, aoReference = None,
+      validBusinessAddr = None, correlation = None, ggAgentId = None,
+      employerName1 = None, employerName2 = None,
+      agentOwnRef = Some("ABC-001"), schemeName = Some("ABC Construction Ltd")
+    ),
+    CisTaxpayerSearchResult(
+      uniqueId = "UID-002", taxOfficeNumber = "789", taxOfficeRef = "EF23456",
+      aoDistrict = None, aoPayType = None, aoCheckCode = None, aoReference = None,
+      validBusinessAddr = None, correlation = None, ggAgentId = None,
+      employerName1 = None, employerName2 = None,
+      agentOwnRef = Some("ABC-002"), schemeName = Some("ABC Property Services")
+    )
+  )
+
+  private def allVm: Seq[ClientListViewModel] =
+    ClientListViewModel.fromCisClients(cisClients)
+
+  private def appWith(
+                       ua: Option[UserAnswers] = Some(emptyUserAnswers),
+                       returnedUa: UserAnswers = emptyUserAnswers
+                     ) = {
+    val manageService = mock[ManageService]
+    val sessionRepo = mock[SessionRepository]
+
+    when(sessionRepo.set(any())) thenReturn Future.successful(true)
+    when(manageService.resolveAndStoreAgentClients(any[UserAnswers])(using any[HeaderCarrier]))
+      .thenReturn(Future.successful((cisClients, returnedUa)))
+
+    applicationBuilder(userAnswers = ua, isAgent = true)
+      .overrides(
+        bind[ManageService].toInstance(manageService),
+        bind[SessionRepository].toInstance(sessionRepo)
+      )
+      .build()
+  }
+
 
   "ClientListSearch Controller" - {
 
-    val filteredClients = ClientListViewModel.filterByField("", "")
-
     "must return OK and the correct view for a GET" in {
+      val app = appWith()
+      running(app) {
+        val req = FakeRequest(GET, "/agent/file-monthly-cis-returns")
+        val result = route(app, req).value
+        val view = app.injector.instanceOf[ClientListSearchView]
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        val filtered = ClientListViewModel.filterByField("", "", allVm)
 
-      running(application) {
-        val request = FakeRequest(GET, clientListSearchRoute)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[ClientListSearchView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, SearchByList.searchByOptions, filteredClients)(
-          request,
-          messages(application)
-        ).toString
+        status(result) mustBe OK
+        contentAsString(result) mustBe
+          view(form, SearchByList.searchByOptions, filtered)(req, messages(app)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
+      val uaWithSearch =
+        emptyUserAnswers.set(ClientListSearchPage, ClientListFormData("CN", "ABC")).success.value
 
-      val filteredClients = ClientListViewModel.filterByField("CN", "ABC")
+      val app = appWith(returnedUa = uaWithSearch)
+      running(app) {
+        val req = FakeRequest(GET, onPageLoadRoute)
+        val result = route(app, req).value
+        val view = app.injector.instanceOf[ClientListSearchView]
 
-      val userAnswers =
-        UserAnswers(userAnswersId).set(ClientListSearchPage, ClientListFormData("CN", "ABC")).success.value
+        val prepared = form.fill(ClientListFormData("CN", "ABC"))
+        val filtered = ClientListViewModel.filterByField("CN", "ABC", allVm)
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, clientListSearchRoute)
-
-        val view = application.injector.instanceOf[ClientListSearchView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual
-          view(form.fill(ClientListFormData("CN", "ABC")), SearchByList.searchByOptions, filteredClients)(
-            request,
-            messages(application)
-          ).toString
+        status(result) mustBe OK
+        contentAsString(result) mustBe
+          view(prepared, SearchByList.searchByOptions, filtered)(req, messages(app)).toString
       }
     }
 
     "must redirect to the client list search page when valid data is submitted" in {
+      val app = appWith()
+      running(app) {
+        val req =
+          FakeRequest(POST, onPageLoadRoute)
+            .withFormUrlEncodedBody("searchBy" -> "CN", "searchFilter" -> "ABC")
 
-      val mockSessionRepository = mock[SessionRepository]
+        val result = route(app, req).value
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, clientListSearchRoute)
-            .withFormUrlEncodedBody(("searchBy", "CN"), ("searchFilter", "ABC"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.agent.routes.ClientListSearchController.onPageLoad().url
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe onPageLoadRoute
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
+      val app = appWith()
+      running(app) {
+        val req =
+          FakeRequest(POST, onPageLoadRoute)
+            .withFormUrlEncodedBody("value" -> "")
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, clientListSearchRoute)
-            .withFormUrlEncodedBody(("value", ""))
-
+        val result = route(app, req).value
+        val view = app.injector.instanceOf[ClientListSearchView]
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[ClientListSearchView]
+        val filtered = ClientListViewModel.filterByField("", "", allVm)
 
-        val result = route(application, request).value
-
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, SearchByList.searchByOptions, filteredClients)(
-          request,
-          messages(application)
-        ).toString
+        status(result) mustBe BAD_REQUEST
+        contentAsString(result) mustBe
+          view(boundForm, SearchByList.searchByOptions, filtered)(req, messages(app)).toString
       }
     }
 
@@ -145,7 +160,7 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, clientListSearchRoute)
+        val request = FakeRequest(GET, onPageLoadRoute)
 
         val result = route(application, request).value
 
@@ -160,7 +175,7 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, clientListSearchRoute)
+          FakeRequest(POST, onPageLoadRoute)
             .withFormUrlEncodedBody(("value", "answer"))
 
         val result = route(application, request).value
@@ -172,33 +187,15 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
     ".clearFilter" - {
       "must remove form data from user answers and display the client list search page" in {
+        val app = appWith()
+        running(app) {
+          val req = FakeRequest(GET, clearFilterRoute)
+          val result = route(app, req).value
+          val view = app.injector.instanceOf[ClientListSearchView]
 
-        val filteredClients = ClientListViewModel.allAgentClients
-
-        lazy val clearFilterRoute: String = controllers.agent.routes.ClientListSearchController.clearFilter().url
-
-        val mockSessionRepository = mock[SessionRepository]
-
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-        val application =
-          applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(
-              bind[SessionRepository].toInstance(mockSessionRepository)
-            )
-            .build()
-
-        running(application) {
-          val view = application.injector.instanceOf[ClientListSearchView]
-
-          val request =
-            FakeRequest(GET, clearFilterRoute)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual
-            view(form, SearchByList.searchByOptions, filteredClients)(request, messages(application)).toString
+          status(result) mustBe OK
+          contentAsString(result) mustBe
+            view(form, SearchByList.searchByOptions, allVm)(req, messages(app)).toString
         }
       }
     }
@@ -206,32 +203,42 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
     ".downloadClientList" - {
 
       "must return a CSV file with all mock clients" in {
+        val app = appWith()
+        running(app) {
+          val req = FakeRequest(GET, downloadRoute)
+          val result = route(app, req).value
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-        running(application) {
-          val request = FakeRequest(GET, clientListDownloadRoute)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual OK
-
+          status(result) mustBe OK
           contentType(result) mustBe Some("text/csv")
-          header("Content-Disposition", result) mustBe Some("attachment; filename=CISAgentClientList.csv")
+          header("Content-Disposition", result).value mustBe "attachment; filename=CISAgentClientList.csv"
 
-          val body = contentAsString(result)
+          val msgs = messages(app)
+          val expectedHeader = Seq(
+            msgs("agent.clientListSearch.th.clientName"),
+            msgs("agent.clientListSearch.th.employerReference"),
+            msgs("agent.clientListSearch.th.clientReference")
+          ).mkString(",")
 
-          val expectedLines = Seq(
-            "Client name,Employers reference,Client reference",
+          val expectedBody = Seq(
+            expectedHeader,
             "\"ABC Construction Ltd\",\"123/AB45678\",\"ABC-001\"",
-            "\"ABC Property Services\",\"789/EF23456\",\"ABC-002\"",
-            "\"Capital Construction Group\",\"345/IJ67890\",\"CAP-001\""
-          )
+            "\"ABC Property Services\",\"789/EF23456\",\"ABC-002\""
+          ).mkString("\n")
 
-          body mustEqual expectedLines.mkString("\n")
+          contentAsString(result) mustBe expectedBody
+        }
+      }
+
+      "journey recovery when no userAnswers" in {
+        val app = appWith(ua = None)
+        running(app) {
+          val req = FakeRequest(GET, onPageLoadRoute)
+          val result = route(app, req).value
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
         }
       }
     }
-
   }
 }

@@ -44,6 +44,7 @@ import play.api.data.Form
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
+import viewmodels.agent.ClientStatus.Active
 import viewmodels.agent.{ClientListViewModel, SearchByList}
 import views.ViewSpecGetters
 import views.html.agent.ClientListSearchView
@@ -97,7 +98,11 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
     val formProvider: ClientListSearchFormProvider = app.injector.instanceOf[ClientListSearchFormProvider]
     val form: Form[ClientListFormData]             = formProvider()
     val searchOptions: Seq[SearchByList]           = SearchByList.searchByOptions
-    val clientList: Seq[ClientListViewModel]       = ClientListViewModel.allAgentClients
+    val clientList: Seq[ClientListViewModel] = Seq(
+      ClientListViewModel("ABC Construction Ltd", "123/AB45678", "AOR-001", Active),
+      ClientListViewModel("ABC Property Services", "789/EF23456", "AOR-002", Active),
+      ClientListViewModel("Capital Construction Group", "345/IJ67890", "AOR-003", Active)
+    )
     implicit val request: play.api.mvc.Request[_]  = FakeRequest()
     implicit val messages: Messages                = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,
