@@ -26,7 +26,6 @@ import views.html.agent.RetrievingClientView
 
 import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.{Inject, Named}
-import scala.util.Try
 
 class RetrievingClientController @Inject() (
   override val messagesApi: MessagesApi,
@@ -38,7 +37,6 @@ class RetrievingClientController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  private val RetryCountParam          = "RetryCount"
   private val MaxRetries               = 8
   private val RefreshIntervalInSeconds = 15
 
@@ -47,8 +45,7 @@ class RetrievingClientController @Inject() (
       .map {
         case "succeeded"   => Redirect(controllers.agent.routes.ClientListSearchController.onPageLoad())
         case "failed"      => Redirect(controllers.agent.routes.FailedToRetrieveClientController.onPageLoad())
-        case "in-progress" =>
-          Redirect(controllers.agent.routes.RetrievingClientController.onPageLoad().url + "?RetryCount=1")
+        case "in-progress" => Redirect(controllers.agent.routes.RetrievingClientController.onPageLoad(retryCount = 1))
         case _             => Redirect(controllers.routes.SystemErrorController.onPageLoad())
       }
       .recover { case _ =>
@@ -56,10 +53,8 @@ class RetrievingClientController @Inject() (
       }
   }
 
-  def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
-    val currentRetry =
-      request.getQueryString(RetryCountParam).flatMap(s => Try(s.toInt).toOption).getOrElse(0)
-    val nextRetry    = currentRetry + 1
+  def onPageLoad(retryCount: Int = 0): Action[AnyContent] = identify.async { implicit request =>
+    val nextRetry = retryCount + 1
 
     if (nextRetry > MaxRetries) {
       Future.successful(
@@ -80,19 +75,7 @@ class RetrievingClientController @Inject() (
   }
 
   private def refreshResult(nextRetry: Int)(implicit request: Request[_]): Result = {
-    val baseUrl     = routes.RetrievingClientController.onPageLoad().url
-    val queryString = request.rawQueryString
-
-    val newQuery =
-      if (queryString.isEmpty) {
-        s"$RetryCountParam=$nextRetry"
-      } else if (queryString.contains(s"$RetryCountParam=")) {
-        queryString.replaceAll(s"$RetryCountParam=\\d+", s"$RetryCountParam=$nextRetry")
-      } else {
-        s"$queryString&$RetryCountParam=$nextRetry"
-      }
-
-    val refreshUrl = s"$baseUrl?$newQuery"
+    val refreshUrl = routes.RetrievingClientController.onPageLoad(retryCount = nextRetry).url
 
     Ok(view())
       .withHeaders("Refresh" -> s"$RefreshIntervalInSeconds; url=$refreshUrl")

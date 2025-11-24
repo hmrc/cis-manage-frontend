@@ -98,14 +98,15 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
       val (application, _) = buildAppWithStatus(Future.successful("in-progress"))
 
       running(application) {
-        val baseUrl = controllers.agent.routes.RetrievingClientController.onPageLoad().url
-        val request = FakeRequest(GET, baseUrl)
-        val result  = route(application, request).value
+        val baseUrl     = controllers.agent.routes.RetrievingClientController.onPageLoad().url
+        val expectedUrl = controllers.agent.routes.RetrievingClientController.onPageLoad(retryCount = 1).url
+        val request     = FakeRequest(GET, baseUrl)
+        val result      = route(application, request).value
 
         status(result) mustEqual OK
         contentAsString(result) mustBe view()(request, applicationConfig, messages(application)).toString
 
-        headers(result).get("Refresh") mustBe Some(s"15; url=$baseUrl?RetryCount=1")
+        headers(result).get("Refresh") mustBe Some(s"15; url=$expectedUrl")
       }
     }
 
@@ -113,12 +114,16 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
       val (application, _) = buildAppWithStatus(Future.successful("in-progress"))
 
       running(application) {
-        val baseUrl = controllers.agent.routes.RetrievingClientController.onPageLoad().url
-        val request = FakeRequest(GET, s"$baseUrl?RetryCount=3")
-        val result  = route(application, request).value
+        val request            = FakeRequest(
+          GET,
+          controllers.agent.routes.RetrievingClientController.onPageLoad(retryCount = 3).url
+        )
+        val result             = route(application, request).value
+        val expectedRefreshUrl =
+          controllers.agent.routes.RetrievingClientController.onPageLoad(retryCount = 4).url
 
         status(result) mustEqual OK
-        headers(result).get("Refresh") mustBe Some(s"15; url=$baseUrl?RetryCount=4")
+        headers(result).get("Refresh") mustBe Some(s"15; url=$expectedRefreshUrl")
       }
     }
 
@@ -127,8 +132,10 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
         buildAppWithStatus(Future.successful("in-progress"))
 
       running(application) {
-        val baseUrl = controllers.agent.routes.RetrievingClientController.onPageLoad().url
-        val request = FakeRequest(GET, s"$baseUrl?RetryCount=8")
+        val request = FakeRequest(
+          GET,
+          controllers.agent.routes.RetrievingClientController.onPageLoad(retryCount = 8).url
+        )
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -157,7 +164,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to system error if the service call fails" in {
       val (application, _) =
-        buildAppWithStatus(Future.failed(new RuntimeException("boom"))) // NEW
+        buildAppWithStatus(Future.failed(new RuntimeException("boom")))
 
       running(application) {
         val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.onPageLoad().url)
@@ -207,7 +214,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          controllers.agent.routes.RetrievingClientController.onPageLoad().url + "?RetryCount=1"
+          controllers.agent.routes.RetrievingClientController.onPageLoad(retryCount = 1).url
       }
     }
 
