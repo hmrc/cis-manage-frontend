@@ -149,9 +149,6 @@ class ClientListSearchController @Inject() (
             msgs("agent.clientListSearch.th.clientReference")
           ).mkString(",")
 
-          def csvEscape(s: String): String =
-            "\"" + s.replace("\"", "\"\"") + "\""
-
           val rows: Seq[String] = clientsToDownload.map { c =>
             val name        = csvEscape(c.clientName)
             val employerRef = csvEscape(c.employerReference)
@@ -192,4 +189,11 @@ class ClientListSearchController @Inject() (
       updatedAnswers <- Future.fromTry(ua.set(ClientListSearchPage, ClientListFormData(searchBy, searchFilter)))
       _              <- sessionRepository.set(updatedAnswers)
     } yield Ok(view(preparedForm, SearchByList.searchByOptions, filteredClients))
+
+  private def csvEscape(raw: String): String = {
+    val trimmed     = raw.dropWhile(_.isWhitespace)
+    val dangerous   = trimmed.nonEmpty && "=+-@\t\r\n".contains(trimmed.head)
+    val neutralised = if (dangerous) "'" + raw else raw
+    "\"" + neutralised.replace("\"", "\"\"") + "\""
+  }
 }

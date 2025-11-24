@@ -238,6 +238,80 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
           redirectLocation(result).value mustBe routes.JourneyRecoveryController.onPageLoad().url
         }
       }
+
+      "must neutralise CSV injection for dangerous leading characters" in {
+        val dangerousClients = List(
+          CisTaxpayerSearchResult(
+            uniqueId = "UID-003",
+            taxOfficeNumber = "123",
+            taxOfficeRef = "AB45678",
+            agentOwnRef = Some("=ABC"),
+            schemeName = Some("""=Company("x")""")
+          ),
+          CisTaxpayerSearchResult(
+            uniqueId = "UID-004",
+            taxOfficeNumber = "124",
+            taxOfficeRef = "AB45679",
+            agentOwnRef = Some("\t=ABC"),
+            schemeName = Some("\t=Company(\"x\")")
+          ),
+          CisTaxpayerSearchResult(
+            uniqueId = "UID-005",
+            taxOfficeNumber = "125",
+            taxOfficeRef = "AB45680",
+            agentOwnRef = Some("\r=ABC"),
+            schemeName = Some("\r=Company(\"x\")")
+          ),
+          CisTaxpayerSearchResult(
+            uniqueId = "UID-006",
+            taxOfficeNumber = "126",
+            taxOfficeRef = "AB45681",
+            agentOwnRef = Some("\n=ABC"),
+            schemeName = Some("\n=Company(\"x\")")
+          )
+        )
+
+        val returnedUa = emptyUserAnswers
+        val app        = {
+          val manageService = mock[ManageService]
+          val sessionRepo   = mock[SessionRepository]
+
+          when(sessionRepo.set(any())) thenReturn Future.successful(true)
+          when(manageService.resolveAndStoreAgentClients(any[UserAnswers])(using any[HeaderCarrier]))
+            .thenReturn(Future.successful((dangerousClients, returnedUa)))
+
+          applicationBuilder(userAnswers = Some(emptyUserAnswers), isAgent = true)
+            .overrides(
+              bind[ManageService].toInstance(manageService),
+              bind[SessionRepository].toInstance(sessionRepo)
+            )
+            .build()
+        }
+
+        running(app) {
+          val request = FakeRequest(GET, downloadRoute)
+          val result  = route(app, request).value
+
+          status(result) mustBe OK
+
+          val msgs           = messages(app)
+          val expectedHeader = Seq(
+            msgs("agent.clientListSearch.th.clientName"),
+            msgs("agent.clientListSearch.th.employerReference"),
+            msgs("agent.clientListSearch.th.clientReference")
+          ).mkString(",")
+
+          val expectedBody = Seq(
+            expectedHeader,
+            "\"'=Company(\"\"x\"\")\",\"123/AB45678\",\"'=ABC\"",
+            "\"'\t=Company(\"\"x\"\")\",\"124/AB45679\",\"'\t=ABC\"",
+            "\"'\r=Company(\"\"x\"\")\",\"125/AB45680\",\"'\r=ABC\"",
+            "\"'\n=Company(\"\"x\"\")\",\"126/AB45681\",\"'\n=ABC\""
+          ).mkString("\n")
+
+          contentAsString(result) mustBe expectedBody
+        }
+      }
     }
   }
 }
