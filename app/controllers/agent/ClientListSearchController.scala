@@ -62,14 +62,20 @@ class ClientListSearchController @Inject() (
 
       manageService
         .resolveAndStoreAgentClients(request.userAnswers)
-        .flatMap { case (cisClients, uaWithClients) =>
-          val preparedForm             = prepareForm(uaWithClients)
-          val (searchBy, searchFilter) = currentSearch(preparedForm)
+        .flatMap {
+          case (Nil, _) =>
+            Future.successful(
+              Redirect(controllers.agent.routes.NoAuthorisedClientsController.onPageLoad())
+            )
 
-          val allClientsVm      = ClientListViewModel.fromCisClients(cisClients)
-          val filteredClientsVm = ClientListViewModel.filterByField(searchBy, searchFilter, allClientsVm)
+          case (cisClients, uaWithClients) =>
+            val preparedForm             = prepareForm(uaWithClients)
+            val (searchBy, searchFilter) = currentSearch(preparedForm)
 
-          saveSearchAndRender(uaWithClients, preparedForm, searchBy, searchFilter, filteredClientsVm)
+            val allClientsVm      = ClientListViewModel.fromCisClients(cisClients)
+            val filteredClientsVm = ClientListViewModel.filterByField(searchBy, searchFilter, allClientsVm)
+
+            saveSearchAndRender(uaWithClients, preparedForm, searchBy, searchFilter, filteredClientsVm)
         }
         .recover { case e =>
           logger.error(s"[ClientListSearchController][onPageLoad] failed: ${e.getMessage}", e)
