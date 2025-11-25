@@ -16,8 +16,10 @@
 
 package connectors
 
-import models.CisTaxpayer
+import models.GetClientListStatusResponse
+import models.{CisTaxpayer, CisTaxpayerSearchResult}
 import play.api.Logging
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, StringContextOps}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -33,9 +35,24 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
 
   private val cisBaseUrl: String = config.baseUrl("construction-industry-scheme") + "/cis"
 
+  def getClientListStatus(using HeaderCarrier): Future[GetClientListStatusResponse] =
+    http
+      .post(url"$cisBaseUrl/agent/client-list/retrieval/start")
+      .execute[GetClientListStatusResponse]
+
   def getCisTaxpayer()(implicit hc: HeaderCarrier): Future[CisTaxpayer] =
     http
       .get(url"$cisBaseUrl/taxpayer")
       .execute[CisTaxpayer]
+
+  def getAllClients(implicit hc: HeaderCarrier): Future[List[CisTaxpayerSearchResult]] =
+    http
+      .get(url"$cisBaseUrl/agent/client-list")
+      .execute[JsObject]
+      .map { x =>
+        val clientListJson = Json.fromJson[List[CisTaxpayerSearchResult]](x("clients"))
+
+        clientListJson.get
+      }
 
 }

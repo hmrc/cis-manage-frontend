@@ -17,7 +17,7 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
-import models.UserAnswers
+import models.{CisTaxpayerSearchResult, UserAnswers}
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
@@ -59,4 +59,17 @@ class ManageService @Inject() (
         }
     }
 
+  def resolveAndStoreAgentClients(
+    userAnswers: UserAnswers
+  )(using HeaderCarrier): Future[(List[CisTaxpayerSearchResult], UserAnswers)] =
+    userAnswers.get(AgentClientsPage) match {
+      case Some(clientList) => Future.successful((clientList, userAnswers))
+      case None             =>
+        logger.info("[resolveAndStoreAgentClients] cache-miss: fetching agent clients from backend")
+        for {
+          clients        <- cisConnector.getAllClients
+          updatedAnswers <- Future.fromTry(userAnswers.set(AgentClientsPage, clients))
+          _              <- sessionRepository.set(updatedAnswers)
+        } yield (clients, updatedAnswers)
+    }
 }

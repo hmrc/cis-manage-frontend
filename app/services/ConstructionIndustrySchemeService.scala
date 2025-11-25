@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,25 +12,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import utils.Utils.emptyString
+package services
 
-@this()
+import com.google.inject.{Inject, Singleton}
+import connectors.ConstructionIndustrySchemeConnector
+import play.api.Logging
+import uk.gov.hmrc.http.HeaderCarrier
 
-@(
-    message: String,
-    bold: Boolean = false,
-    baseClass: String = "govuk-body",
-    extraClasses: String = emptyString,
-    args: Seq[Any] = Nil,
-    boldSuffix: String = emptyString
-)(implicit messages: Messages)
+import scala.concurrent.{ExecutionContext, Future}
 
-<p class="@baseClass @extraClasses @if(bold){govuk-!-font-weight-bold}">
-    @{Html(messages(message, args*))}
+@Singleton
+class ConstructionIndustrySchemeService @Inject() (cisConnector: ConstructionIndustrySchemeConnector)(using
+  ExecutionContext
+) extends Logging {
 
-    @if(boldSuffix.nonEmpty) {
-        <strong>@{Html(messages(boldSuffix))}</strong>
-    }
-</p>
+  def getClientListStatus(using HeaderCarrier): Future[String] =
+    cisConnector.getClientListStatus
+      .map(_.result)
+}

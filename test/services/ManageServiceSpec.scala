@@ -17,7 +17,7 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
-import models.{CisTaxpayer, UserAnswers}
+import models.{CisTaxpayer, CisTaxpayerSearchResult, UserAnswers}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
@@ -157,6 +157,119 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       verifyNoInteractions(sessionRepo)
       verify(connector).getCisTaxpayer()(any[HeaderCarrier])
       verifyNoMoreInteractions(connector)
+    }
+  }
+
+  private def createClient(
+    id: String = "CLIENT-123",
+    ton: String = "111",
+    tor: String = "test111",
+    name1: Option[String] = Some("TEST LTD")
+  ): CisTaxpayerSearchResult =
+    CisTaxpayerSearchResult(
+      uniqueId = id,
+      taxOfficeNumber = ton,
+      taxOfficeRef = tor,
+      agentOwnRef = Some("abc123"),
+      schemeName = None
+    )
+
+  "resolveAndStoreAgentClients" should {
+
+    "return existing clients from UserAnswers without calling BE" in {
+      val (service, connector, sessionRepo) = newService()
+
+      val existingClients = List(createClient("CLIENT-001"), createClient("CLIENT-002"))
+      val emptyUa         = UserAnswers("test-user")
+      val uaWithClients   = emptyUa.set(AgentClientsPage, existingClients).get
+
+      val (clients, savedUa) = service.resolveAndStoreAgentClients(uaWithClients)(using hc).futureValue
+      clients mustBe existingClients
+      savedUa mustBe uaWithClients
+
+      verifyNoInteractions(connector)
+      verifyNoInteractions(sessionRepo)
+    }
+
+    "fetch clients when missing, store in session, and return updated UA" in {
+      val (service, connector, sessionRepo) = newService()
+
+      val emptyUa       = UserAnswers("test-user")
+      val clientsFromBe = List(createClient("CLIENT-001"), createClient("CLIENT-002"))
+
+      when(connector.getAllClients(any[HeaderCarrier]))
+        .thenReturn(Future.successful(clientsFromBe))
+      when(sessionRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val (clients, savedUa) = service.resolveAndStoreAgentClients(emptyUa)(using hc).futureValue
+
+      clients mustBe clientsFromBe
+      savedUa.get(AgentClientsPage) mustBe Some(clientsFromBe)
+
+      val uaCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+      verify(sessionRepo).set(uaCaptor.capture())
+      uaCaptor.getValue.get(AgentClientsPage) mustBe Some(clientsFromBe)
+
+      verify(connector).getAllClients(any[HeaderCarrier])
+      verifyNoMoreInteractions(connector)
+    }
+
+    "return empty list when BE returns no clients" in {
+      val (service, connector, sessionRepo) = newService()
+
+      val emptyUa      = UserAnswers("test-user")
+      val emptyClients = List.empty[CisTaxpayerSearchResult]
+
+      when(connector.getAllClients(any[HeaderCarrier]))
+        .thenReturn(Future.successful(emptyClients))
+      when(sessionRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val (clients, savedUa) = service.resolveAndStoreAgentClients(emptyUa)(using hc).futureValue
+
+      clients mustBe empty
+      savedUa.get(AgentClientsPage) mustBe Some(emptyClients)
+
+      verify(connector).getAllClients(any[HeaderCarrier])
+      verify(sessionRepo).set(any[UserAnswers])
+    }
+
+    "fail when BE call fails" in {
+      val (service, connector, sessionRepo) = newService()
+
+      val emptyUa = UserAnswers("test-user")
+
+      when(connector.getAllClients(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("Backend error")))
+
+      val ex = intercept[RuntimeException] {
+        service.resolveAndStoreAgentClients(emptyUa)(using hc).futureValue
+      }
+      ex.getMessage must include("Backend error")
+
+      verify(connector).getAllClients(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+
+    "fail when session repository fails to save" in {
+      val (service, connector, sessionRepo) = newService()
+
+      val emptyUa       = UserAnswers("test-user")
+      val clientsFromBe = List(createClient())
+
+      when(connector.getAllClients(any[HeaderCarrier]))
+        .thenReturn(Future.successful(clientsFromBe))
+      when(sessionRepo.set(any[UserAnswers]))
+        .thenReturn(Future.failed(new RuntimeException("Session save failed")))
+
+      val ex = intercept[RuntimeException] {
+        service.resolveAndStoreAgentClients(emptyUa)(using hc).futureValue
+      }
+      ex.getMessage must include("Session save failed")
+
+      verify(connector).getAllClients(any[HeaderCarrier])
+      verify(sessionRepo).set(any[UserAnswers])
     }
   }
 

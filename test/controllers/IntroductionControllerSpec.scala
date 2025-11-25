@@ -30,6 +30,8 @@ import scala.concurrent.Future
 
 class IntroductionControllerSpec extends SpecBase {
 
+  private val redirectUrl = agent.routes.RetrievingClientController.onPageLoad().url
+
   "IntroductionController.onPageLoad" - {
     "must return OK and the correct view for a GET" in {
 
@@ -43,7 +45,12 @@ class IntroductionControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[IntroductionView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, applicationConfig, messages(application)).toString
+        contentAsString(result) mustEqual view()(
+          request,
+          applicationConfig,
+          messages(application)
+        ).toString
+
       }
     }
   }
