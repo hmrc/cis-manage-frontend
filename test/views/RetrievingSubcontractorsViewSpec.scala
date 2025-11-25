@@ -18,12 +18,9 @@ package views
 
 import base.SpecBase
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.scalatest.matchers.must.Matchers
 import play.api.Application
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
-import play.twirl.api.HtmlFormat
 import views.html.RetrievingSubcontractorsView
 
 class RetrievingSubcontractorsViewSpec extends SpecBase {
