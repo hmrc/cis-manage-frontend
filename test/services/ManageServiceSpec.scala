@@ -163,8 +163,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
   private def createClient(
     id: String = "CLIENT-123",
     ton: String = "111",
-    tor: String = "test111",
-    name1: Option[String] = Some("TEST LTD")
+    tor: String = "test111"
   ): CisTaxpayerSearchResult =
     CisTaxpayerSearchResult(
       uniqueId = id,

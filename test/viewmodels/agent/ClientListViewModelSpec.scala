@@ -17,6 +17,7 @@
 package viewmodels.agent
 
 import base.SpecBase
+import models.CisTaxpayerSearchResult
 import org.scalatest.matchers.should.Matchers.*
 import play.api.i18n.Messages
 import viewmodels.agent.ClientStatus.{Active, InActive}
@@ -28,6 +29,26 @@ class ClientListViewModelSpec extends SpecBase {
     app.injector.instanceOf[play.api.i18n.MessagesApi]
   )
 
+  private val sampleClients: Seq[ClientListViewModel] = Seq(
+    ClientListViewModel("ABC Construction Ltd", "123/AB45678", "ABC-001", Active),
+    ClientListViewModel("ABC Property Services", "789/EF23456", "ABC-002", Active),
+    ClientListViewModel("Capital Construction Group", "345/IJ67890", "CAP-001", Active)
+  )
+
+  private def cisClient(
+    schemeName: Option[String] = Some("Some Scheme"),
+    ton: String = "123",
+    tor: String = "AB45678",
+    agentOwnRef: Option[String] = Some("AOR-001")
+  ): CisTaxpayerSearchResult =
+    CisTaxpayerSearchResult(
+      uniqueId = "UID-1",
+      taxOfficeNumber = ton,
+      taxOfficeRef = tor,
+      agentOwnRef = agentOwnRef,
+      schemeName = schemeName
+    )
+
   "ClientListViewModel.removeLink" - {
     "return a remove link when status is Active" in {
       val model  = ClientListViewModel(
@@ -38,7 +59,7 @@ class ClientListViewModelSpec extends SpecBase {
       )
       val result = model.removeLink
       result.isDefined shouldBe true
-      result.get.text  shouldBe "Remove"
+      result.get.text  shouldBe messages("agent.clientListSearch.td.actions.remove")
       result.get.href  shouldBe "#"
     }
 
@@ -70,27 +91,78 @@ class ClientListViewModelSpec extends SpecBase {
 
   "ClientListViewModel.filterByField" - {
     "return all clients when query is empty" in {
-      val result = ClientListViewModel.filterByField("CR", "")
-      result shouldBe ClientListViewModel.allAgentClients
+      val result = ClientListViewModel.filterByField("CR", "", sampleClients)
+      result shouldBe sampleClients
     }
     "filter by client reference when field = CR" in {
-      val result = ClientListViewModel.filterByField("CR", "abc-002")
+      val result = ClientListViewModel.filterByField("CR", "abc-002", sampleClients)
       result.map(_.clientReference) shouldBe Seq("ABC-002")
     }
     "filter by employer reference when field = ER" in {
-      val result = ClientListViewModel.filterByField("ER", "345/ij")
+      val result = ClientListViewModel.filterByField("ER", "345/ij", sampleClients)
       result.map(_.employerReference) shouldBe Seq("345/IJ67890")
     }
     "filter by client name when field is anything else" in {
-      val result = ClientListViewModel.filterByField("NAME", "construction")
+      val result = ClientListViewModel.filterByField("NAME", "construction", sampleClients)
       result.map(_.clientName) should contain theSameElementsAs Seq(
         "ABC Construction Ltd",
         "Capital Construction Group"
       )
     }
     "trim and lowercase the query before searching" in {
-      val result = ClientListViewModel.filterByField("CR", "   AbC-001  ")
+      val result = ClientListViewModel.filterByField("CR", "   AbC-001  ", sampleClients)
       result.map(_.clientReference) shouldBe Seq("ABC-001")
+    }
+  }
+
+  "ClientListViewModel.fromCisClients" - {
+
+    "map cis clients into view models using schemeName / ton/tor / agentOwnRef" in {
+      val cisClients = List(
+        cisClient(
+          schemeName = Some("ABC Construction Ltd"),
+          ton = "111",
+          tor = "AA12345",
+          agentOwnRef = Some("AOR-999")
+        ),
+        cisClient(
+          schemeName = Some("Capital Construction Group"),
+          ton = "222",
+          tor = "BB67890",
+          agentOwnRef = Some("AOR-888")
+        )
+      )
+
+      val result = ClientListViewModel.fromCisClients(cisClients)
+
+      result shouldBe Seq(
+        ClientListViewModel(
+          clientName = "ABC Construction Ltd",
+          employerReference = "111/AA12345",
+          clientReference = "AOR-999",
+          clientStatus = Active
+        ),
+        ClientListViewModel(
+          clientName = "Capital Construction Group",
+          employerReference = "222/BB67890",
+          clientReference = "AOR-888",
+          clientStatus = Active
+        )
+      )
+    }
+
+    "use empty strings when schemeName or agentOwnRef are missing" in {
+      val cisClients = List(
+        cisClient(
+          schemeName = None,
+          agentOwnRef = None
+        )
+      )
+
+      val result = ClientListViewModel.fromCisClients(cisClients)
+
+      result.head.clientName      shouldBe ""
+      result.head.clientReference shouldBe ""
     }
   }
 
