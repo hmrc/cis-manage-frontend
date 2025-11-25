@@ -16,20 +16,35 @@
 
 package controllers
 
+import config.FrontendAppConfig
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import pages.ContractorNamePage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.SubcontractorsLandingPageView
+
 import javax.inject.Inject
 
-class SubcontractorsLandingPageController @Inject()(
+class SubcontractorsLandingPageController @Inject() (
   override val messagesApi: MessagesApi,
   val controllerComponents: MessagesControllerComponents,
-  view: SubcontractorsLandingPageView
-) extends FrontendBaseController
-    with I18nSupport {
+  view: SubcontractorsLandingPageView,
+  getData: DataRetrievalAction,
+  identify: IdentifierAction,
+  requireData: DataRequiredAction
+)(implicit appConfig: FrontendAppConfig)
+    extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
-  def onPageLoad: Action[AnyContent] = Action { implicit request =>
-      Ok(view())
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    val contractorName = request.userAnswers.get(ContractorNamePage).getOrElse {
+      logger.error("[SubmissionSuccess] contractorName missing from userAnswers")
+      throw new IllegalStateException("contractorName missing from userAnswers")
+    }
+
+    Ok(view(contractorName))
   }
 }

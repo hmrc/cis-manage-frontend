@@ -287,16 +287,14 @@ successfulNoRecordsFound.p2.link = add a subcontractor
 
 subcontractorsLandingPage.title = Manage your CIS return subcontractor
 subcontractorsLandingPage.heading = Manage your CIS return subcontractor
-subcontractorsLandingPage.user = ABC Construction Ltd
 subcontractorsLandingPage.p1 = You can use this service to manage your subcontractors list.
 subcontractorsLandingPage.hint = You will need HMRC free software to access the links below.
-subcontractorsLandingPage.addSubcontractors = Add Subcontractor
-subcontractorsLandingPage.addSubcontractors.p1 = Add Subcontractors to your list
-subcontractorsLandingPage.verifySubcontractors = Verify Subcontractor
-subcontractorsLandingPage.verifySubcontractors.p1 = View, verify or manage Subcontractors
+subcontractorsLandingPage.addSubcontractors = Add subcontractor
+subcontractorsLandingPage.addSubcontractors.p1 = Add subcontractors to your list
+subcontractorsLandingPage.verifySubcontractors = Verify subcontractor
+subcontractorsLandingPage.verifySubcontractors.p1 = View, verify or manage subcontractors
 subcontractorsLandingPage.subcontractorList = Subcontractor list
-subcontractorsLandingPage.subcontractorList.p1 = View Subcontractor list
-
+subcontractorsLandingPage.subcontractorList.p1 = View subcontractor list
 subcontractorsLandingPage.h2 = What you need to know
 subcontractorsLandingPage.p2 = You should include subcontractors that have gross payment status on your list, and include them on your monthly return if you pay them in the month.
 subcontractorsLandingPage.p3 = Subcontractors must be verified before submitting a return.

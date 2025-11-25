@@ -15,14 +15,17 @@
  *@
 
 @import views.html.components._
+@import config.FrontendAppConfig
 
 @this(
     layout: templates.Layout,
     govukButton: GovukButton,
+    govukInsetText: GovukInsetText,
     h1: H1,
     h2: H2,
     paragraph: Paragraph,
-    govukInsetText: GovukInsetText,
+    aside: Aside,
+    nav: Nav,
     twoColumnGrid: TwoColumnGrid,
     oneColumnGrid: OneColumnGrid,
     headingLink: HeadingLink,
@@ -30,14 +33,23 @@
     caption: Caption,
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(contractorName: String)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
+
+@sidebar = {
+    @aside("contractorLanding.sidebar.title", nav(Seq(
+        "subcontractorsLandingPage.aside.link1" -> config.govUkCISGuidanceUrl,
+        "subcontractorsLandingPage.aside.link2" -> config.cisMonthlyReturnsGuidanceUrl,
+        "subcontractorsLandingPage.aside.link3" -> config.cis340PenaltiesForLateReturnsUrl,
+    )))
+}
 
 @layout(
     pageTitle = titleNoForm(messages("subcontractorsLandingPage.title")),
-    showSignOut = false
+    showSignOut = false,
+    sidebar = Some(sidebar)
 ) {
 
-    @caption(messages("subcontractorsLandingPage.user"))
+    @caption(messages(contractorName))
     @h1(messages("subcontractorsLandingPage.heading"))
     @paragraph(messages("subcontractorsLandingPage.p1"))
 
