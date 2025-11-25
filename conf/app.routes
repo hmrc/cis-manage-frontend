@@ -33,7 +33,7 @@ GET         /agent/file-monthly-cis-returns                         controllers.
 POST        /agent/file-monthly-cis-returns                         controllers.agent.ClientListSearchController.onSubmit()
 GET         /agent/file-monthly-cis-returns/clear                   controllers.agent.ClientListSearchController.clearFilter()
 
-GET         /org/manage-cis-returns                                 controllers.contractor.ContractorLandingController.onPageLoad()
+GET         /org/cis-return-dashboard                               controllers.contractor.ContractorLandingController.onPageLoad()
 
 GET         /sign-into-cis                                          controllers.IntroductionController.onPageLoad()
 GET         /sign-into-cis-routing                                  controllers.IntroductionController.affinityGroupRouting()
