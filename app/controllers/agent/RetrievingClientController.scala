@@ -37,7 +37,11 @@ class RetrievingClientController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
+  def onPageLoad: Action[AnyContent] = identify { implicit request =>
+    Ok(view()).withHeaders("Refresh" -> s"0, url=${routes.RetrievingClientController.start().url}")
+  }
+
+  def start: Action[AnyContent] = identify.async { implicit request =>
     cisService.getClientListStatus.map {
       case "succeeded"         => Redirect(routes.ClientListSearchController.onPageLoad())
       case "failed"            => Redirect(routes.FailedToRetrieveClientController.onPageLoad())
