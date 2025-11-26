@@ -28,6 +28,7 @@
 @this(
   layout: templates.LayoutWithSidebar,
   helpAndGuidelineSidebar: templates.HelpAndGuidelineSidebar,
+  backNavigation: BackNavigation,
   h1: H1,
   h2: H2,
   h3: H3,
@@ -60,13 +61,9 @@
   pageTitle     = titleNoForm(messages("agent.landing.title", clientName)),
   showBackLink  = false,
   beforeContent = Some(
-    Html(
-      s"""
-          |<a href="${controllers.agent.routes.ClientListSearchController.onPageLoad().url}"
-          |   class="govuk-back-link">
-          |  ${messages("agent.landing.back")}
-          |</a>
-          |""".stripMargin
+    backNavigation(
+      controllers.agent.routes.ClientListSearchController.onPageLoad().url,
+      "agent.landing.back"
     )
   ),
   sidebar = Some(helpAndGuidelineSidebar())

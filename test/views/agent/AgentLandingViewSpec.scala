@@ -44,7 +44,8 @@ class AgentLandingViewSpec extends SpecBase {
     "render the page with expected header, caption and title" in {
       val (doc, appConfig) = render()
 
-      doc.title() shouldBe s"${messages(app)("agent.landing.title", clientName)} - Construction Industry Scheme - GOV.UK"
+      doc
+        .title() shouldBe s"${messages(app)("agent.landing.title", clientName)} - Construction Industry Scheme - GOV.UK"
 
       val back = doc.select("a.govuk-back-link")
       back.size() shouldBe 1
