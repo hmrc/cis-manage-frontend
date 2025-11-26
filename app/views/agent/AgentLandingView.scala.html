@@ -57,7 +57,7 @@
 )
 
 @layout(
-  pageTitle     = s"${messages("agent.landing.title", clientName)} - GOV.UK",
+  pageTitle     = titleNoForm(messages("agent.landing.title")),
   showBackLink  = false,
   beforeContent = Some(
     Html(
