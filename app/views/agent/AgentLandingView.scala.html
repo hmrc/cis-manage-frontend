@@ -61,10 +61,15 @@
   showBackLink  = false,
   beforeContent = Some(
     Html(
-      s"""<a href="#" class="govuk-back-link" aria-disabled="true" onclick="return false;" tabindex="-1">${messages("agent.landing.back")}</a>"""
-      )
-    ),
-    sidebar = Some(helpAndGuidelineSidebar())
+      s"""
+          |<a href="${controllers.agent.routes.ClientListSearchController.onPageLoad().url}"
+          |   class="govuk-back-link">
+          |  ${messages("agent.landing.back")}
+          |</a>
+          |""".stripMargin
+    )
+  ),
+  sidebar = Some(helpAndGuidelineSidebar())
 ) {
 
   @caption(clientName)

@@ -46,10 +46,8 @@ class AgentLandingViewSpec extends SpecBase {
 
       doc.title() shouldBe s"${messages(app)("agent.landing.title")} - Construction Industry Scheme - GOV.UK"
 
-      val back = doc.selectFirst("a.govuk-back-link")
-      back                         should not be null
-      back.attr("aria-disabled") shouldBe "true"
-      back.hasAttr("onclick")    shouldBe true
+      val back = doc.select("a.govuk-back-link")
+      back.size() shouldBe 1
 
       val caption = doc.selectFirst("span.govuk-caption-l")
       caption.text() shouldBe clientName
