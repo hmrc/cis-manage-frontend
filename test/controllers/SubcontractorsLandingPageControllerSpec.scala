@@ -1,8 +1,10 @@
 package controllers
 
 import base.SpecBase
+import models.UserAnswers
+import pages.ContractorNamePage
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import views.html.SubcontractorsLandingPageView
 
 class SubcontractorsLandingPageControllerSpec extends SpecBase {
@@ -10,8 +12,14 @@ class SubcontractorsLandingPageControllerSpec extends SpecBase {
   "SubcontractorsLandingPage Controller" - {
 
     "must return OK and the correct view for a GET" in {
+      val contractorName: String        = "ABC Construction Ltd"
+      lazy val userAnswers: UserAnswers =
+        userAnswersWithCisId
+          .set(ContractorNamePage, contractorName)
+          .success
+          .value
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.SubcontractorsLandingPageController.onPageLoad().url)
@@ -21,7 +29,11 @@ class SubcontractorsLandingPageControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[SubcontractorsLandingPageView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(contractorName)(
+          request,
+          applicationConfig,
+          messages(application)
+        ).toString
       }
     }
   }
