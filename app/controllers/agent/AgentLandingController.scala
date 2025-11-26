@@ -22,32 +22,51 @@ import config.FrontendAppConfig
 import javax.inject.{Inject, Named}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.ManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.agent.AgentLandingView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class AgentLandingController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("AgentIdentifier") identify: IdentifierAction,
   getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: AgentLandingView,
-  appConfig: FrontendAppConfig
-) extends FrontendBaseController
+  appConfig: FrontendAppConfig,
+  service: ManageService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
-  def onPageLoad: Action[AnyContent] = (identify andThen getData) { implicit request =>
-    implicit val config: FrontendAppConfig = appConfig
 
-    Ok(
-      view(
-        clientName = "ABC Construction Ltd",
-        employerRef = "123/AB45678",
-        utr = "1234567890",
-        returnsDueCount = 1,
-        returnsDueBy = java.time.LocalDate.of(2025, 10, 19),
-        newNoticesCount = 2,
-        lastSubmittedDate = java.time.LocalDate.of(2025, 9, 19),
-        lastSubmittedTaxMonth = java.time.YearMonth.of(2025, 8)
-      )
-    )
+  private val failedToRetrieveClientRedirect =
+    Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad().url))
+
+  def onPageLoad(clientUniqueId: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+      implicit val config: FrontendAppConfig = appConfig
+
+      service.resolveAndStoreAgentClients(request.userAnswers).flatMap { (allClients, _) =>
+        val clientEither      = allClients.find(_.uniqueId == clientUniqueId).toRight(failedToRetrieveClientRedirect)
+        val cisTaxpayerFuture = clientEither.map(c => service.getClientDetails(c.taxOfficeNumber, c.taxOfficeRef))
+        cisTaxpayerFuture
+          .map(_.map { cisTaxpayer =>
+            Ok(
+              view(
+                clientName = cisTaxpayer.schemeName.getOrElse(""),
+                employerRef = s"${cisTaxpayer.taxOfficeNumber}/${cisTaxpayer.taxOfficeRef}",
+                utr = cisTaxpayer.utr.getOrElse(""),
+                returnsDueCount = 1,
+                returnsDueBy = java.time.LocalDate.of(2025, 10, 19),
+                newNoticesCount = 2,
+                lastSubmittedDate = java.time.LocalDate.of(2025, 9, 19),
+                lastSubmittedTaxMonth = java.time.YearMonth.of(2025, 8)
+              )
+            )
+          })
+          .merge
+      }
   }
 }

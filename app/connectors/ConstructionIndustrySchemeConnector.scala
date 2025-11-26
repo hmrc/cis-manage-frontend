@@ -45,6 +45,14 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .get(url"$cisBaseUrl/taxpayer")
       .execute[CisTaxpayer]
 
+  def getClientCisTaxpayer(
+    taxOfficeNumber: String,
+    taxOfficeReference: String
+  )(implicit hc: HeaderCarrier): Future[CisTaxpayer] =
+    http
+      .get(url"$cisBaseUrl/agent/client-taxpayer/$taxOfficeNumber/$taxOfficeReference")
+      .execute[CisTaxpayer]
+
   def getAllClients(implicit hc: HeaderCarrier): Future[List[CisTaxpayerSearchResult]] =
     http
       .get(url"$cisBaseUrl/agent/client-list")

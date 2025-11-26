@@ -17,7 +17,7 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
-import models.{CisTaxpayerSearchResult, UserAnswers}
+import models.{CisTaxpayer, CisTaxpayerSearchResult, UserAnswers}
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
@@ -33,6 +33,9 @@ class ManageService @Inject() (
   sessionRepository: SessionRepository
 )(implicit ec: ExecutionContext)
     extends Logging {
+
+  def getClientDetails(taxOfficeNumber: String, taxOfficeReference: String)(using HeaderCarrier): Future[CisTaxpayer] =
+    cisConnector.getClientCisTaxpayer(taxOfficeNumber, taxOfficeReference)
 
   def resolveAndStoreCisId(ua: UserAnswers)(implicit hc: HeaderCarrier): Future[(String, UserAnswers)] =
     ua.get(CisIdPage) match {

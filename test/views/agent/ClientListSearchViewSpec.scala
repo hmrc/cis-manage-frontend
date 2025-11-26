@@ -99,9 +99,9 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
     val form: Form[ClientListFormData]             = formProvider()
     val searchOptions: Seq[SearchByList]           = SearchByList.searchByOptions
     val clientList: Seq[ClientListViewModel]       = Seq(
-      ClientListViewModel("ABC Construction Ltd", "123/AB45678", "AOR-001", Active),
-      ClientListViewModel("ABC Property Services", "789/EF23456", "AOR-002", Active),
-      ClientListViewModel("Capital Construction Group", "345/IJ67890", "AOR-003", Active)
+      ClientListViewModel("ABC Construction Ltd", "123/AB45678", "AOR-001", Active, "unique-id-1"),
+      ClientListViewModel("ABC Property Services", "789/EF23456", "AOR-002", Active, "unique-id-2"),
+      ClientListViewModel("Capital Construction Group", "345/IJ67890", "AOR-003", Active, "unique-id-3")
     )
     implicit val request: play.api.mvc.Request[_]  = FakeRequest()
     implicit val messages: Messages                = play.api.i18n.MessagesImpl(

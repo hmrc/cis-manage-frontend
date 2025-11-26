@@ -26,7 +26,8 @@ case class ClientListViewModel(
   clientName: String,
   employerReference: String,
   clientReference: String,
-  clientStatus: ClientStatus
+  clientStatus: ClientStatus,
+  uniqueId: String
 ) {
 
   def removeLink(implicit messages: Messages): Option[Link] =
@@ -38,7 +39,7 @@ case class ClientListViewModel(
       case _      => None
     }
   def clientLink(implicit messages: Messages): Option[Link] =
-    Some(Link("", ""))
+    Some(Link(clientName, controllers.agent.routes.AgentLandingController.onPageLoad(uniqueId).url))
 }
 
 object ClientListViewModel {
@@ -61,7 +62,8 @@ object ClientListViewModel {
         clientName = client.schemeName.getOrElse(""),
         employerReference = s"${client.taxOfficeNumber}/${client.taxOfficeRef}",
         clientReference = client.agentOwnRef.getOrElse(""),
-        clientStatus = Active
+        clientStatus = Active,
+        uniqueId = client.uniqueId
       )
     }
 

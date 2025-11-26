@@ -2,49 +2,49 @@
 
 ->          /hmrc-frontend                                          hmrcfrontend.Routes
 
-GET         /                                                       controllers.IndexController.onPageLoad()
+GET         /                                                               controllers.IndexController.onPageLoad()
 
-GET         /assets/*file                                           controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                                                   controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /language/:lang                                         controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET         /language/:lang                                                 controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /refresh-session                                        controllers.KeepAliveController.keepAlive()
+GET         /refresh-session                                                controllers.KeepAliveController.keepAlive()
 
-GET         /there-is-a-problem                                     controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+GET         /there-is-a-problem                                             controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /check-your-answers                                     controllers.CheckYourAnswersController.onPageLoad()
+GET         /check-your-answers                                             controllers.CheckYourAnswersController.onPageLoad()
 
-GET         /account/sign-out-survey                                controllers.auth.AuthController.signOut()
-GET         /account/sign-out                                       controllers.auth.AuthController.signOutNoSurvey()
-GET         /account/signed-out                                     controllers.auth.SignedOutController.onPageLoad()
+GET         /account/sign-out-survey                                        controllers.auth.AuthController.signOut()
+GET         /account/sign-out                                               controllers.auth.AuthController.signOutNoSurvey()
+GET         /account/signed-out                                             controllers.auth.SignedOutController.onPageLoad()
 
-GET         /unauthorised                                           controllers.UnauthorisedController.onPageLoad()
-GET         /unauthorised/standard-user                             controllers.UnauthorisedWrongRoleController.onPageLoad()
-GET         /unauthorised/organisation                              controllers.UnauthorisedOrganisationAffinityController.onPageLoad()
-GET         /unauthorised/individual                                controllers.UnauthorisedIndividualAffinityController.onPageLoad()
-GET         /unauthorised/agent                                     controllers.UnauthorisedAgentAffinityController.onPageLoad()
+GET         /unauthorised                                                   controllers.UnauthorisedController.onPageLoad()
+GET         /unauthorised/standard-user                                     controllers.UnauthorisedWrongRoleController.onPageLoad()
+GET         /unauthorised/organisation                                      controllers.UnauthorisedOrganisationAffinityController.onPageLoad()
+GET         /unauthorised/individual                                        controllers.UnauthorisedIndividualAffinityController.onPageLoad()
+GET         /unauthorised/agent                                             controllers.UnauthorisedAgentAffinityController.onPageLoad()
 
-GET         /agent/retrieve-client-list                             controllers.agent.RetrievingClientController.onPageLoad()
-GET         /agent/no-client-list                                   controllers.agent.FailedToRetrieveClientController.onPageLoad()
-GET         /agent/no-authorised-clients                            controllers.agent.NoAuthorisedClientsController.onPageLoad()
-GET         /agent/authorised-client-manage-CIS-returns             controllers.agent.AgentLandingController.onPageLoad()
+GET         /agent/retrieve-client-list                                     controllers.agent.RetrievingClientController.onPageLoad()
+GET         /agent/no-client-list                                           controllers.agent.FailedToRetrieveClientController.onPageLoad()
+GET         /agent/no-authorised-clients                                    controllers.agent.NoAuthorisedClientsController.onPageLoad()
+GET         /agent/authorised-client/:clientUniqueId/manage-cis-returns     controllers.agent.AgentLandingController.onPageLoad(clientUniqueId: String)
 
-GET         /agent/file-monthly-cis-returns                         controllers.agent.ClientListSearchController.onPageLoad()
-POST        /agent/file-monthly-cis-returns                         controllers.agent.ClientListSearchController.onSubmit()
-GET         /agent/file-monthly-cis-returns/clear                   controllers.agent.ClientListSearchController.clearFilter()
-GET         /agent/file-monthly-cis-returns/download                controllers.agent.ClientListSearchController.downloadClientList()
+GET         /agent/file-monthly-cis-returns                                 controllers.agent.ClientListSearchController.onPageLoad()
+POST        /agent/file-monthly-cis-returns                                 controllers.agent.ClientListSearchController.onSubmit()
+GET         /agent/file-monthly-cis-returns/clear                           controllers.agent.ClientListSearchController.clearFilter()
+GET         /agent/file-monthly-cis-returns/download                        controllers.agent.ClientListSearchController.downloadClientList()
 
-GET         /org/manage-cis-returns                                 controllers.contractor.ContractorLandingController.onPageLoad()
+GET         /org/manage-cis-returns                                         controllers.contractor.ContractorLandingController.onPageLoad()
 
-GET         /sign-into-cis                                          controllers.IntroductionController.onPageLoad()
-GET         /sign-into-cis-routing                                  controllers.IntroductionController.affinityGroupRouting()
+GET         /sign-into-cis                                                  controllers.IntroductionController.onPageLoad()
+GET         /sign-into-cis-routing                                          controllers.IntroductionController.affinityGroupRouting()
 
-GET         /page-not-found                                         controllers.PageNotFoundController.onPageLoad()
-GET         /access-denied                                          controllers.AccessDeniedController.onPageLoad()
-GET         /system-error/there-is-a-problem                        controllers.SystemErrorController.onPageLoad()
+GET         /page-not-found                                                 controllers.PageNotFoundController.onPageLoad()
+GET         /access-denied                                                  controllers.AccessDeniedController.onPageLoad()
+GET         /system-error/there-is-a-problem                                controllers.SystemErrorController.onPageLoad()
 
-GET        /your-subcontractors                                     controllers.RetrievingSubcontractorsController.onPageLoad()
-GET        /check-subcontractor-records                             controllers.CheckSubcontractorRecordsController.onPageLoad()
-GET        /automatic-subcontractor-update-unsuccessful             controllers.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad()
-GET        /automatic-subcontractor-update-successful               controllers.SuccessfulAutomaticSubcontractorUpdateController.onPageLoad()
-GET        /automatic-subcontractor-update-successful-no-records    controllers.SuccessfulNoRecordsFoundController.onPageLoad()
+GET        /your-subcontractors                                             controllers.RetrievingSubcontractorsController.onPageLoad()
+GET        /check-subcontractor-records                                     controllers.CheckSubcontractorRecordsController.onPageLoad()
+GET        /automatic-subcontractor-update-unsuccessful                     controllers.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad()
+GET        /automatic-subcontractor-update-successful                       controllers.SuccessfulAutomaticSubcontractorUpdateController.onPageLoad()
+GET        /automatic-subcontractor-update-successful-no-records            controllers.SuccessfulNoRecordsFoundController.onPageLoad()

@@ -30,9 +30,9 @@ class ClientListViewModelSpec extends SpecBase {
   )
 
   private val sampleClients: Seq[ClientListViewModel] = Seq(
-    ClientListViewModel("ABC Construction Ltd", "123/AB45678", "ABC-001", Active),
-    ClientListViewModel("ABC Property Services", "789/EF23456", "ABC-002", Active),
-    ClientListViewModel("Capital Construction Group", "345/IJ67890", "CAP-001", Active)
+    ClientListViewModel("ABC Construction Ltd", "123/AB45678", "ABC-001", Active, "uid-1"),
+    ClientListViewModel("ABC Property Services", "789/EF23456", "ABC-002", Active, "uid-2"),
+    ClientListViewModel("Capital Construction Group", "345/IJ67890", "CAP-001", Active, "uid-3")
   )
 
   private def cisClient(
@@ -55,7 +55,8 @@ class ClientListViewModelSpec extends SpecBase {
         clientName = "Test",
         employerReference = "123/AA12345",
         clientReference = "TEST-001",
-        clientStatus = Active
+        clientStatus = Active,
+        uniqueId = "uid-test-1"
       )
       val result = model.removeLink
       result.isDefined shouldBe true
@@ -68,24 +69,26 @@ class ClientListViewModelSpec extends SpecBase {
         clientName = "Test",
         employerReference = "123/AA12345",
         clientReference = "TEST-002",
-        clientStatus = InActive
+        clientStatus = InActive,
+        uniqueId = "uid-test-2"
       )
       model.removeLink shouldBe None
     }
   }
 
   "ClientListViewModel.clientLink" - {
-    "always return a link" in {
+    "always return a link with the client name as text and route to agent landing" in {
       val model  = ClientListViewModel(
         clientName = "Test",
         employerReference = "123/AA12345",
         clientReference = "TEST-003",
-        clientStatus = Active
+        clientStatus = Active,
+        uniqueId = "uid-test-3"
       )
       val result = model.clientLink
       result.isDefined shouldBe true
-      result.get.text  shouldBe ""
-      result.get.href  shouldBe ""
+      result.get.text  shouldBe "Test"
+      result.get.href  shouldBe controllers.agent.routes.AgentLandingController.onPageLoad("uid-test-3").url
     }
   }
 
@@ -140,13 +143,15 @@ class ClientListViewModelSpec extends SpecBase {
           clientName = "ABC Construction Ltd",
           employerReference = "111/AA12345",
           clientReference = "AOR-999",
-          clientStatus = Active
+          clientStatus = Active,
+          uniqueId = "UID-1"
         ),
         ClientListViewModel(
           clientName = "Capital Construction Group",
           employerReference = "222/BB67890",
           clientReference = "AOR-888",
-          clientStatus = Active
+          clientStatus = Active,
+          uniqueId = "UID-1"
         )
       )
     }

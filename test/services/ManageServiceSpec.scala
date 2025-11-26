@@ -19,7 +19,7 @@ package services
 import connectors.ConstructionIndustrySchemeConnector
 import models.{CisTaxpayer, CisTaxpayerSearchResult, UserAnswers}
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.*
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
@@ -259,6 +259,42 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       verify(connector).getAllClients(any[HeaderCarrier])
       verify(sessionRepo).set(any[UserAnswers])
+    }
+  }
+
+  "getClientDetails" should {
+
+    "fetch and return client taxpayer details from the connector" in {
+      val (service, connector, _) = newService()
+
+      val taxpayer = createTaxpayer(
+        id = "CLIENT-123",
+        ton = "456",
+        tor = "CD98765",
+        name1 = Some("XYZ Construction Ltd")
+      )
+
+      when(connector.getClientCisTaxpayer(eqTo("456"), eqTo("CD98765"))(any))
+        .thenReturn(Future.successful(taxpayer))
+
+      val result = service.getClientDetails("456", "CD98765")(using hc).futureValue
+
+      result mustBe taxpayer
+      verify(connector).getClientCisTaxpayer(eqTo("456"), eqTo("CD98765"))(any[HeaderCarrier])
+    }
+
+    "fail when connector fails to fetch client taxpayer" in {
+      val (service, connector, _) = newService()
+
+      when(connector.getClientCisTaxpayer(eqTo("456"), eqTo("CD98765"))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("Connector error")))
+
+      val ex = intercept[RuntimeException] {
+        service.getClientDetails("456", "CD98765")(using hc).futureValue
+      }
+      ex.getMessage must include("Connector error")
+
+      verify(connector).getClientCisTaxpayer(eqTo("456"), eqTo("CD98765"))(any[HeaderCarrier])
     }
   }
 
