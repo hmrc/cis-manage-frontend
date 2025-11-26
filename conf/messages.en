@@ -207,7 +207,7 @@ contractorLanding.sidebar.nav.whatIs.text = What is the Construction Industry Sc
 contractorLanding.sidebar.nav.guidance.text = CIS monthly returns guidance
 contractorLanding.sidebar.nav.penalties.text = CIS 340: Penalties for late returns
 
-agent.landing.title = CIS return dashboard
+agent.landing.title = CIS return dashboard for {0}
 agent.landing.h1 = CIS return dashboard
 agent.landing.intro = You can manage {0}&#8217;s monthly CIS returns – including dates and statements.
 agent.landing.employerRef.key = Employer reference

@@ -57,7 +57,7 @@
 )
 
 @layout(
-  pageTitle     = titleNoForm(messages("agent.landing.title")),
+  pageTitle     = titleNoForm(messages("agent.landing.title", clientName)),
   showBackLink  = false,
   beforeContent = Some(
     Html(
