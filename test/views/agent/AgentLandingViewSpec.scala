@@ -20,9 +20,9 @@ import base.SpecBase
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.parser.Parser
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.*
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import views.html.agent.AgentLandingView
 import config.FrontendAppConfig
 import java.time.{LocalDate, YearMonth}
@@ -44,7 +44,7 @@ class AgentLandingViewSpec extends SpecBase {
     "render the page with expected header, caption and title" in {
       val (doc, appConfig) = render()
 
-      doc.title() shouldBe s"${messages(app).apply("agent.landing.title", clientName)} - GOV.UK"
+      doc.title() shouldBe s"${messages(app)("agent.landing.title")} - Construction Industry Scheme - GOV.UK"
 
       val back = doc.selectFirst("a.govuk-back-link")
       back                         should not be null
