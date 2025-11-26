@@ -2,7 +2,7 @@ package controllers
 
 import base.SpecBase
 import models.UserAnswers
-import pages.ContractorNamePage
+import pages.{CisIdPage, ContractorNamePage}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.SubcontractorsLandingPageView
@@ -34,6 +34,26 @@ class SubcontractorsLandingPageControllerSpec extends SpecBase {
           applicationConfig,
           messages(application)
         ).toString
+      }
+    }
+
+    "must throw IllegalStateException when ContractorNamePage is missing" in {
+      lazy val userAnswers: UserAnswers =
+        userAnswersWithCisId
+          .set(CisIdPage, "some value")
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.SubcontractorsLandingPageController.onPageLoad().url)
+
+        val exception = intercept[IllegalStateException] {
+          contentAsString(route(application, request).value)
+        }
+
+        exception.getMessage mustEqual "contractorName missing from userAnswers"
       }
     }
   }

@@ -15,7 +15,7 @@ class OneColumnGridSpec extends SpecBase {
       val html = oneColumnGrid(
         content = Html("""<p class="govuk-body">Hello</p>""")
       )
-      val doc = Jsoup.parse(html.body)
+      val doc  = Jsoup.parse(html.body)
 
       val rows = doc.getElementsByClass("govuk-grid-row")
       rows.size mustBe 1
@@ -25,7 +25,7 @@ class OneColumnGridSpec extends SpecBase {
       innerDiv.size() shouldBe 1
 
       val paragraph = innerDiv.select("p.govuk-body")
-      paragraph.text() shouldBe("Hello")
+      paragraph.text() shouldBe "Hello"
     }
   }
 }

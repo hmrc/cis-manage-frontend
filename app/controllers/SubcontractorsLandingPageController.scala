@@ -41,7 +41,7 @@ class SubcontractorsLandingPageController @Inject() (
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     val contractorName = request.userAnswers.get(ContractorNamePage).getOrElse {
-      logger.error("[SubmissionSuccess] contractorName missing from userAnswers")
+      logger.error("[SubcontractorsLandingPageController] contractorName missing from userAnswers")
       throw new IllegalStateException("contractorName missing from userAnswers")
     }
 
