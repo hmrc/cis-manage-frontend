@@ -299,14 +299,14 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       val (service, connector, sessionRepo) = newService()
       val uniqueId                          = "CLIENT-123"
       val baseClient                        =
-        createClient(id = uniqueId, ton = "111", tor = "test111", utr = None)
+        createClient(id = uniqueId, utr = None)
           .copy(schemeName = Some("ABC Construction Ltd"))
       val otherClient                       = createClient(id = "CLIENT-999")
 
       val clients  = List(baseClient, otherClient)
       val ua       = UserAnswers("test-user").set(AgentClientsPage, clients).get
       val taxpayer =
-        createTaxpayer(id = uniqueId, ton = "111", tor = "test111", name1 = Some("ABC Construction Ltd"))
+        createTaxpayer(id = uniqueId, name1 = Some("ABC Construction Ltd"))
           .copy(utr = Some("5555555555"))
 
       when(connector.getAgentClientTaxpayer(any[String])(any[HeaderCarrier]))
