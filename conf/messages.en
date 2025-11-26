@@ -293,3 +293,6 @@ successfulNoRecordsFound.heading = Successful automatic subcontractor update
 successfulNoRecordsFound.p1 = No subcontractor records were found.
 successfulNoRecordsFound.p2 = You can
 successfulNoRecordsFound.p2.link = add a subcontractor
+
+returnsLanding.title =  Manage your CIS return
+returnsLanding.heading =  Manage your CIS return
