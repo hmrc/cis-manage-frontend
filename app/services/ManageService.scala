@@ -84,7 +84,7 @@ class ManageService @Inject() (
             Future.failed(new RuntimeException(s"Client with uniqueId=$uniqueId not found in AgentClientsPage"))
 
           case Some(client) =>
-            cisConnector.getAgentClientTaxpayer(uniqueId).flatMap { taxpayer =>
+            cisConnector.getAgentClientTaxpayer(client.taxOfficeNumber, client.taxOfficeRef).flatMap { taxpayer =>
               val utrOpt        = taxpayer.utr
               val updatedClient = client.copy(utr = utrOpt)
               val updatedList   =

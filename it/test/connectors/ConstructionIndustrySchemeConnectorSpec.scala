@@ -293,10 +293,11 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
   "getAgentClientTaxpayer" should {
 
     "return CisTaxpayer when BE returns 200 with valid JSON" in {
-      val uniqueId = "123"
+      val taxOfficeNumber = "111"
+      val taxOfficeRef = "test111"
 
       stubFor(
-        get(urlPathEqualTo(s"/cis/agent/client/$uniqueId/taxpayer"))
+        get(urlPathEqualTo(s"/cis/agent/client-taxpayer/$taxOfficeNumber/$taxOfficeRef"))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -311,7 +312,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
           )
       )
 
-      val result = connector.getAgentClientTaxpayer(uniqueId).futureValue
+      val result = connector.getAgentClientTaxpayer(taxOfficeNumber,taxOfficeRef).futureValue
 
       result.uniqueId mustBe "123"
       result.taxOfficeNumber mustBe "111"
@@ -320,10 +321,11 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
     }
 
     "fail when BE returns 200 with invalid JSON" in {
-      val uniqueId = "ABC-INVALID"
+      val taxOfficeNumber = "111"
+      val taxOfficeRef = "test111"
 
       stubFor(
-        get(urlPathEqualTo(s"/cis/agent/client/$uniqueId/taxpayer"))
+        get(urlPathEqualTo(s"/cis/agent/client-taxpayer/$taxOfficeNumber/$taxOfficeRef"))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -332,17 +334,18 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
       )
 
       val ex = intercept[Exception] {
-        connector.getAgentClientTaxpayer(uniqueId).futureValue
+        connector.getAgentClientTaxpayer(taxOfficeNumber,taxOfficeRef).futureValue
       }
 
       ex.getMessage.toLowerCase must include("uniqueid")
     }
 
     "propagate an upstream error when BE returns 500" in {
-      val uniqueId = "500"
+      val taxOfficeNumber = "111"
+      val taxOfficeRef = "test111"
 
       stubFor(
-        get(urlPathEqualTo(s"/cis/agent/client/$uniqueId/taxpayer"))
+        get(urlPathEqualTo(s"/cis/agent/client-taxpayer/$taxOfficeNumber/$taxOfficeRef"))
           .willReturn(
             aResponse()
               .withStatus(INTERNAL_SERVER_ERROR)
@@ -351,7 +354,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
       )
 
       val ex = intercept[Exception] {
-        connector.getAgentClientTaxpayer(uniqueId).futureValue
+        connector.getAgentClientTaxpayer(taxOfficeNumber,taxOfficeRef).futureValue
       }
 
       ex.getMessage must include("returned 500")

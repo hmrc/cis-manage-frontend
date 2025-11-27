@@ -89,7 +89,7 @@ class ClientListViewModelSpec extends SpecBase {
       )
       val result = model.clientLink
       result.isDefined shouldBe true
-      result.get.text  shouldBe ""
+      result.get.text  shouldBe "Test"
       result.get.href  shouldBe controllers.agent.routes.AgentLandingController.onPageLoad("123").url
     }
   }

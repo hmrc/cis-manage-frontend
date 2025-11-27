@@ -41,7 +41,7 @@ case class ClientListViewModel(
   def clientLink(implicit messages: Messages): Option[Link] =
     Some(
       Link(
-        "",
+        clientName,
         controllers.agent.routes.AgentLandingController.onPageLoad(uniqueId).url
       )
     )

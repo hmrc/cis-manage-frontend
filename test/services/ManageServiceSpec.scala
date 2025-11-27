@@ -298,9 +298,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
     "fetch taxpayer, update client UTR in session, and return AgentLandingViewModel" in {
       val (service, connector, sessionRepo) = newService()
       val uniqueId                          = "CLIENT-123"
-      val baseClient                        =
-        createClient(id = uniqueId, utr = None)
-          .copy(schemeName = Some("ABC Construction Ltd"))
+      val baseClient                        = createClient(id = uniqueId, utr = None)
+        .copy(schemeName = Some("ABC Construction Ltd"))
       val otherClient                       = createClient(id = "CLIENT-999")
 
       val clients  = List(baseClient, otherClient)
@@ -309,7 +308,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         createTaxpayer(id = uniqueId, name1 = Some("ABC Construction Ltd"))
           .copy(utr = Some("5555555555"))
 
-      when(connector.getAgentClientTaxpayer(any[String])(any[HeaderCarrier]))
+      when(connector.getAgentClientTaxpayer(any[String], any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(taxpayer))
 
       when(sessionRepo.set(any[UserAnswers]))
@@ -336,7 +335,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       val updatedClientOpt = storedClients.find(_.uniqueId == uniqueId)
       updatedClientOpt.flatMap(_.utr) mustBe Some("5555555555")
 
-      verify(connector).getAgentClientTaxpayer(uniqueId)(hc)
+      verify(connector).getAgentClientTaxpayer("111", "test111")(hc)
       verifyNoMoreInteractions(connector)
     }
   }
