@@ -23,6 +23,7 @@
     govukInsetText: GovukInsetText,
     h1: H1,
     h2: H2,
+    link: Link,
     paragraph: Paragraph,
     aside: Aside,
     nav: Nav,
@@ -78,6 +79,11 @@
     @sectionBreak()
 
     @h2(messages("subcontractorsLandingPage.h2"))
-    @paragraph(messages("subcontractorsLandingPage.p2"))
+    @link(
+        linkTextKey = "subcontractorsLandingPage.p2.link",
+        linkUrl = config.cisSubcontractorGrossPaymentStatusUrl,
+        hasFullStop = true,
+        prefixTextKey = "subcontractorsLandingPage.p2"
+    )
     @paragraph(messages("subcontractorsLandingPage.p3"))
 }

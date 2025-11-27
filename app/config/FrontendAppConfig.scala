@@ -52,6 +52,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val payeCisForAgentsOnlineService: String              = configuration.get[String]("urls.payeCisForAgentsOnlineService")
   lazy val cisMonthlyReturnsGuidanceUrl: String               = configuration.get[String]("urls.cisMonthlyReturnsGuidance")
   lazy val cis340PenaltiesForLateReturnsUrl: String           = configuration.get[String]("urls.cis340PenaltiesForLateReturns")
+  lazy val cisSubcontractorGrossPaymentStatusUrl: String      =
+    configuration.get[String]("urls.cisSubcontractorGrossPaymentStatus")
 
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   lazy val exitSurveyUrl: String        = s"$exitSurveyBaseUrl/feedback/cis-manage-frontend"

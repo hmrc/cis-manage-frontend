@@ -30,6 +30,7 @@ class SubcontractorsLandingPageViewSpec extends SpecBase {
       doc.select("p").text                      must include(messages("subcontractorsLandingPage.subcontractorList.p1"))
       doc.select("h2").text                     must include(messages("subcontractorsLandingPage.h2"))
       doc.select("p").text                      must include(messages("subcontractorsLandingPage.p2"))
+      doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.p2.link"))
       doc.select("p").text                      must include(messages("subcontractorsLandingPage.p3"))
 
       doc.select("h2").text                     must include(messages("subcontractorsLandingPage.aside.h2"))

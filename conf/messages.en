@@ -305,8 +305,10 @@ subcontractorsLandingPage.verifySubcontractors.p1 = View, verify or manage subco
 subcontractorsLandingPage.subcontractorList = Subcontractor list
 subcontractorsLandingPage.subcontractorList.p1 = View subcontractor list
 subcontractorsLandingPage.h2 = What you need to know
-subcontractorsLandingPage.p2 = You should include subcontractors that have gross payment status on your list, and include them on your monthly return if you pay them in the month.
-subcontractorsLandingPage.p3 = Subcontractors must be verified before submitting a return.
+subcontractorsLandingPage.p2 = You should include subcontractors – with or without gross payment status – on your subcontractor list. For more information
+subcontractorsLandingPage.p2.link = on gross payment status
+subcontractorsLandingPage.p3 = Subcontractors from your list must be included in your monthly return if you pay them during the month. To submit a return, your selected subcontractors must be verified.
+
 subcontractorsLandingPage.aside.h2 = Help and guidance
 subcontractorsLandingPage.aside.link1 = What is the Construction Industry Scheme
 subcontractorsLandingPage.aside.link2 = CIS monthly returns guidance
