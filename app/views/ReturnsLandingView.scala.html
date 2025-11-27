@@ -14,14 +14,38 @@
  * limitations under the License.
  *@
 
+@import views.html.components._
+
 @this(
-        layout: templates.Layout,
-        govukButton: GovukButton
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    h1: H1,
+    h2: H2,
+    paragraph: Paragraph,
+    paragraphWithLinks: ParagraphWithLinks,
+    notificationBannerCard: NotificationBannerCard
 )
 
 @()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("returnsLanding.title"))) {
+@layout(
+    pageTitle = titleNoForm(messages("returnsLanding.title")),
+    showSignOut = false
+) {
 
+    @notificationBannerCard(
+        bannerTitle = "Important",
+        content = HtmlFormat.fill(Seq(
+            h2("returnsLanding.banner.header"),
+            paragraph(messages("returnsLanding.banner.p1")),
+            paragraphWithLinks(
+                linkTextUrlOne = "returnsLanding.banner.p2.link1",
+                linkUrlOne = "#",
+                suffixTextKey = "returnsLanding.banner.p2.text",
+                linkTextUrlTwo = "returnsLanding.banner.p2.link2",
+                linkUrlTwo = "#"
+            )
+        ))
+    )
     <h1 class="govuk-heading-xl">@messages("returnsLanding.heading")</h1>
 }

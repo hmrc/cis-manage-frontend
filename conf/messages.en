@@ -296,3 +296,9 @@ successfulNoRecordsFound.p2.link = add a subcontractor
 
 returnsLanding.title =  Manage your CIS return
 returnsLanding.heading =  Manage your CIS return
+returnsLanding.banner.header = You need to file a CIS return for the tax month ending 5 October 2025
+returnsLanding.banner.p1 = Your return is due by 19 October 2025.
+returnsLanding.banner.p2.link1 = File standard return
+returnsLanding.banner.p2.text = or
+returnsLanding.banner.p2.link2 = File nil return
+
