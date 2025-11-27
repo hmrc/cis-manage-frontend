@@ -15,22 +15,42 @@
  *@
 
 @import views.html.components._
+@import viewmodels.ReturnLandingViewModel
+@import config.FrontendAppConfig
 
 @this(
     layout: templates.Layout,
     govukButton: GovukButton,
     h1: H1,
     h2: H2,
+    twoColumnGrid: TwoColumnGrid,
+    oneColumnGrid: OneColumnGrid,
+    headingLink: HeadingLink,
     paragraph: Paragraph,
+    sectionBreak: SectionBreak,
+    link: Link,
+    aside: Aside,
+    nav: Nav,
     paragraphWithLinks: ParagraphWithLinks,
-    notificationBannerCard: NotificationBannerCard
+    notificationBannerCard: NotificationBannerCard,
+    caption: Caption
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(contractorName: String, returnsList: Seq[ReturnLandingViewModel])(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
+
+@sidebar = {
+    @aside("returnsLanding.aside.h2", nav(Seq(
+        "returnsLanding.aside.link1" -> "#",
+        "returnsLanding.aside.link2" -> "#",
+        "returnsLanding.aside.link3" -> "#",
+        "returnsLanding.aside.link4" -> "#"
+    )))
+}
 
 @layout(
     pageTitle = titleNoForm(messages("returnsLanding.title")),
-    showSignOut = false
+    showSignOut = false,
+    sidebar = Some(sidebar)
 ) {
 
     @notificationBannerCard(
@@ -47,5 +67,63 @@
             )
         ))
     )
-    <h1 class="govuk-heading-xl">@messages("returnsLanding.heading")</h1>
+
+    @caption("ABC Construction Ltd")
+    @h1(messages("returnsLanding.heading"))
+
+    @twoColumnGrid(
+        HtmlFormat.fill(Seq(
+            headingLink("returnsLanding.fileStandardReturn.h3.link", "#"),
+            paragraph("returnsLanding.fileStandardReturn.p1")
+        )),
+        HtmlFormat.fill(Seq(
+            headingLink("returnsLanding.fileNilReturn.h3.link", "#"),
+            paragraph("returnsLanding.fileNilReturn.p1")
+        ))
+    )
+
+    @twoColumnGrid(
+        HtmlFormat.fill(Seq(
+            headingLink("returnsLanding.amendReturn.h3.link", "#"),
+            paragraph("returnsLanding.amendReturn.p1")
+        )),
+        HtmlFormat.fill(Seq(
+            headingLink("returnsLanding.paymentsAndDeductions.h3.link", "#"),
+            paragraph("returnsLanding.paymentsAndDeductions.p1")
+        ))
+    )
+
+    @oneColumnGrid(
+        HtmlFormat.fill(Seq(
+            headingLink("returnsLanding.noticesAndStatements.h3.link", "#"),
+            paragraph("returnsLanding.noticeAndStatements.p1")
+        ))
+    )
+
+    @sectionBreak()
+
+    @h2(messages("returnsLanding.recentCisReturns.h2"))
+
+    <table id="" class="govuk-table" data-module="moj-sortable-table">
+        <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th class="govuk-table__header" scope="col">@messages("returnsLanding.taxMonth.th")</th>
+            <th class="govuk-table__header" scope="col">@messages("returnsLanding.type.th")</th>
+            <th class="govuk-table__header" scope="col">@messages("returnsLanding.dateSubmitted.th")</th>
+            <th class="govuk-table__header" scope="col">@messages("returnsLanding.status.th")</th>
+        </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+        @returnsList.map { item =>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">@item.taxMonth</th>
+            <td class="govuk-table__cell">@item.returnType</td>
+            <td class="govuk-table__cell">@item.dateSubmitted</td>
+            <td class="govuk-table__cell"> <strong class="govuk-tag govuk-tag--green">@item.status</strong></td>
+        </tr>
+        }
+        </tbody>
+    </table>
+
+    @link(linkTextKey = "returnsLanding.viewReturnsHistory.link", linkUrl = "#")
 }

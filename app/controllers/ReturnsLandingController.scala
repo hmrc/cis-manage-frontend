@@ -16,11 +16,16 @@
 
 package controllers
 
-import controllers.actions._
+import config.FrontendAppConfig
+import controllers.actions.*
+import pages.ContractorNamePage
+import play.api.Logging
+
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.ReturnLandingViewModel
 import views.html.ReturnsLandingView
 
 class ReturnsLandingController @Inject() (
@@ -30,10 +35,23 @@ class ReturnsLandingController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: ReturnsLandingView
-) extends FrontendBaseController
-    with I18nSupport {
+)(implicit appConfig: FrontendAppConfig)
+    extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    Ok(view())
+    val contractorName = request.userAnswers.get(ContractorNamePage).getOrElse {
+      logger.error("[ReturnsLandingController] contractorName missing from userAnswers")
+      throw new IllegalStateException("contractorName missing from userAnswers")
+    }
+
+    val returnsList = Seq(
+      ReturnLandingViewModel("August 2025", "Standard", "19 September 2025", "Accepted"),
+      ReturnLandingViewModel("July 2025", "Nil", "19 August 2025", "Accepted"),
+      ReturnLandingViewModel("June 2025", "Standard", "18 July 2025", "Accepted")
+    )
+
+    Ok(view(contractorName, returnsList))
   }
 }
