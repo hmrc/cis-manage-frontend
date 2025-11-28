@@ -1,0 +1,89 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import views.html.components._
+@import config.FrontendAppConfig
+
+@this(
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    govukInsetText: GovukInsetText,
+    h1: H1,
+    h2: H2,
+    link: Link,
+    paragraph: Paragraph,
+    aside: Aside,
+    nav: Nav,
+    twoColumnGrid: TwoColumnGrid,
+    oneColumnGrid: OneColumnGrid,
+    headingLink: HeadingLink,
+    sectionBreak: SectionBreak,
+    caption: Caption,
+)
+
+@(contractorName: String)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
+
+@sidebar = {
+    @aside("contractorLanding.sidebar.title", nav(Seq(
+        "subcontractorsLandingPage.aside.link1" -> config.govUkCISGuidanceUrl,
+        "subcontractorsLandingPage.aside.link2" -> config.cisMonthlyReturnsGuidanceUrl,
+        "subcontractorsLandingPage.aside.link3" -> config.cis340PenaltiesForLateReturnsUrl,
+    )))
+}
+
+@layout(
+    pageTitle = titleNoForm(messages("subcontractorsLandingPage.title")),
+    showSignOut = false,
+    sidebar = Some(sidebar)
+) {
+
+    @caption(messages(contractorName))
+    @h1(messages("subcontractorsLandingPage.heading"))
+    @paragraph(messages("subcontractorsLandingPage.p1"))
+
+    @govukInsetText(
+        InsetTextViewModel(content = HtmlContent(paragraph("subcontractorsLandingPage.hint")))
+    )
+
+    @twoColumnGrid(
+        HtmlFormat.fill(Seq(
+            headingLink("subcontractorsLandingPage.addSubcontractors", "#"),
+            paragraph("subcontractorsLandingPage.addSubcontractors.p1")
+        )),
+        HtmlFormat.fill(Seq(
+            headingLink("subcontractorsLandingPage.verifySubcontractors", "#"),
+            paragraph("subcontractorsLandingPage.verifySubcontractors.p1")
+        ))
+    )
+
+    @oneColumnGrid(
+        HtmlFormat.fill(Seq(
+            headingLink("subcontractorsLandingPage.subcontractorList", "#"),
+            paragraph("subcontractorsLandingPage.subcontractorList.p1")
+        )),
+    )
+
+    @sectionBreak()
+
+    @h2(messages("subcontractorsLandingPage.h2"))
+    @link(
+        linkTextKey = "subcontractorsLandingPage.p2.link",
+        linkUrl = config.cisSubcontractorGrossPaymentStatusUrl,
+        hasFullStop = true,
+        prefixTextKey = "subcontractorsLandingPage.p2"
+    )
+    @paragraph(messages("subcontractorsLandingPage.p3"))
+}

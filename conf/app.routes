@@ -49,3 +49,5 @@ GET        /check-subcontractor-records                             controllers.
 GET        /automatic-subcontractor-update-unsuccessful             controllers.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad()
 GET        /automatic-subcontractor-update-successful               controllers.SuccessfulAutomaticSubcontractorUpdateController.onPageLoad()
 GET        /automatic-subcontractor-update-successful-no-records    controllers.SuccessfulNoRecordsFoundController.onPageLoad()
+
+GET        /manage-subcontractors                                   controllers.SubcontractorsLandingPageController.onPageLoad()
