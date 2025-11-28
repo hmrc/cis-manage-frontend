@@ -29,6 +29,7 @@ import views.html.contractor.ContractorLandingView
 
 class ContractorLandingViewSpec extends SpecBase {
 
+  private val contractorName            = "ABC Construction Ltd"
   private val employerReference         = "123/AB45678"
   private val utr                       = "1234567890"
   private val returnCount               = 1
@@ -38,6 +39,7 @@ class ContractorLandingViewSpec extends SpecBase {
   private val lastSubmittedTaxMonthYear = "August 2025"
 
   private val viewModel = ContractorLandingViewModel(
+    contractorName = contractorName,
     employerReference = employerReference,
     utr = utr,
     returnCount = returnCount,
@@ -64,7 +66,10 @@ class ContractorLandingViewSpec extends SpecBase {
     "show introductory paragraph" in {
       val doc = render()
 
-      doc.text() should include(messages(app)("contractorLanding.paragraph"))
+      val introParagraph = doc.select("p.govuk-body").first().text()
+      val expectedIntro  = Jsoup.parseBodyFragment(messages(app)("contractorLanding.paragraph", contractorName)).text()
+
+      introParagraph shouldBe expectedIntro
     }
 
     "show employerReference and UTR in a summary list" in {

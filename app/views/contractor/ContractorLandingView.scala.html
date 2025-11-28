@@ -48,7 +48,7 @@
 @layout(pageTitle = titleNoForm(messages("contractorLanding.title")), sidebar = Some(sidebar)) {
 
     @h1("contractorLanding.heading")
-    @p("contractorLanding.paragraph")
+    @p("contractorLanding.paragraph", args = Seq(vm.contractorName))
     @govukSummaryList(
         SummaryListViewModel(rows = Seq(
             SummaryListRowViewModel(Key("contractorLanding.label.employerReference"), Value(vm.employerReference)),

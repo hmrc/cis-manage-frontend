@@ -24,7 +24,7 @@ import org.mockito.Mockito.*
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import pages.{AgentClientsPage, CisIdPage}
+import pages.*
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -47,7 +47,9 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
     id: String = "CIS-123",
     ton: String = "111",
     tor: String = "test111",
-    name1: Option[String] = Some("TEST LTD")
+    name1: Option[String] = Some("TEST LTD"),
+    schemeName: Option[String] = Some("ABC Construction LTD"),
+    utr: Option[String] = Some("1234567890")
   ): CisTaxpayer =
     CisTaxpayer(
       uniqueId = id,
@@ -63,8 +65,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       employerName1 = name1,
       employerName2 = None,
       agentOwnRef = None,
-      schemeName = None,
-      utr = None,
+      schemeName = schemeName,
+      utr = utr,
       enrolledSig = None
     )
 
@@ -100,10 +102,18 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       cisId mustBe "CIS-123"
       savedUa.get(CisIdPage) mustBe Some("CIS-123")
+      savedUa.get(ContractorNamePage) mustBe Some("ABC Construction LTD")
+      savedUa.get(EmployerReferencePage) mustBe Some("111/test111")
+      savedUa.get(UniqueTaxReferencePage) mustBe Some("1234567890")
 
       val uaCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
       verify(sessionRepo).set(uaCaptor.capture())
-      uaCaptor.getValue.get(CisIdPage) mustBe Some("CIS-123")
+
+      val persistedUa = uaCaptor.getValue
+      persistedUa.get(CisIdPage) mustBe Some("CIS-123")
+      persistedUa.get(ContractorNamePage) mustBe Some("ABC Construction LTD")
+      persistedUa.get(EmployerReferencePage) mustBe Some("111/test111")
+      persistedUa.get(UniqueTaxReferencePage) mustBe Some("1234567890")
 
       verify(connector).getCisTaxpayer()(any[HeaderCarrier])
       verifyNoMoreInteractions(connector)

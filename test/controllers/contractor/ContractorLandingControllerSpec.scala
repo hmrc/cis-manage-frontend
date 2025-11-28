@@ -18,7 +18,7 @@ package controllers.contractor
 
 import base.SpecBase
 import config.FrontendAppConfig
-import controllers.contractor.ContractorLandingController.viewModel
+import controllers.contractor.ContractorLandingController.fromUserAnswers
 import models.UserAnswers
 import org.mockito.Mockito.when
 import org.mockito.ArgumentMatchers.any
@@ -62,7 +62,8 @@ class ContractorLandingControllerSpec extends SpecBase {
         val request  = FakeRequest(GET, routes.ContractorLandingController.onPageLoad().url)
         val result   = route(application, request).value
         val view     = application.injector.instanceOf[ContractorLandingView]
-        val expected = view(viewModel(appConfig))(request, messages(application))
+        val vm       = fromUserAnswers(emptyUserAnswers, appConfig)
+        val expected = view(vm)(request, messages(application))
 
         status(result)          shouldBe OK
         contentType(result)       should contain(HTML)
