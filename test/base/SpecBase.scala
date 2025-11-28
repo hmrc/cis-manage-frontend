@@ -60,6 +60,7 @@ trait SpecBase
     isAgent: Boolean = false
   ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
+      .configure("play.http.router" -> "app.Routes")
       .overrides(
         Seq(
           bind[DataRequiredAction].to[DataRequiredActionImpl],
