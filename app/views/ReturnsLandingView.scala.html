@@ -40,10 +40,10 @@
 
 @sidebar = {
     @aside("returnsLanding.aside.h2", nav(Seq(
-        "returnsLanding.aside.link1" -> "#",
-        "returnsLanding.aside.link2" -> "#",
-        "returnsLanding.aside.link3" -> "#",
-        "returnsLanding.aside.link4" -> "#"
+        "returnsLanding.aside.link1" -> config.govUkCISGuidanceUrl,
+        "returnsLanding.aside.link2" -> config.cisMonthlyReturnsGuidanceUrl,
+        "returnsLanding.aside.link3" -> config.cis340PenaltiesForLateReturnsUrl,
+        "returnsLanding.aside.link4" -> config.cisLateFilingPenaltyUrl
     )))
 }
 
@@ -58,12 +58,14 @@
         content = HtmlFormat.fill(Seq(
             h2("returnsLanding.banner.header"),
             paragraph(messages("returnsLanding.banner.p1")),
-            paragraphWithLinks(
+
+// TODO: linkTextUrlTwo should go to C1 (JIRA TICKET)
+        paragraphWithLinks(
                 linkTextUrlOne = "returnsLanding.banner.p2.link1",
                 linkUrlOne = "#",
                 suffixTextKey = "returnsLanding.banner.p2.text",
                 linkTextUrlTwo = "returnsLanding.banner.p2.link2",
-                linkUrlTwo = "#"
+                linkUrlTwo = "https://cis-prototype-68106471f73b.herokuapp.com/v1-v4/monthly-nil-return/c1-confirm-nil-return"
             )
         ))
     )
