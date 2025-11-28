@@ -35,15 +35,20 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
 
   private val cisBaseUrl: String = config.baseUrl("construction-industry-scheme") + "/cis"
 
-  def getClientListStatus(using HeaderCarrier): Future[GetClientListStatusResponse] =
-    http
-      .post(url"$cisBaseUrl/agent/client-list/retrieval/start")
-      .execute[GetClientListStatusResponse]
-
   def getCisTaxpayer()(implicit hc: HeaderCarrier): Future[CisTaxpayer] =
     http
       .get(url"$cisBaseUrl/taxpayer")
       .execute[CisTaxpayer]
+
+  def startClientList(using HeaderCarrier): Future[GetClientListStatusResponse] =
+    http
+      .post(url"$cisBaseUrl/agent/client-list/retrieval/start")
+      .execute[GetClientListStatusResponse]
+
+  def getClientListStatus(using HeaderCarrier): Future[GetClientListStatusResponse] =
+    http
+      .post(url"$cisBaseUrl/agent/client-list/retrieval/status")
+      .execute[GetClientListStatusResponse]
 
   def getAllClients(implicit hc: HeaderCarrier): Future[List[CisTaxpayerSearchResult]] =
     http

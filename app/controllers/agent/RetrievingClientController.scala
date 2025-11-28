@@ -19,12 +19,12 @@ package controllers.agent
 import config.FrontendAppConfig
 import controllers.actions.IdentifierAction
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import services.ConstructionIndustrySchemeService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.agent.RetrievingClientView
-import scala.concurrent.ExecutionContext
 
+import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.{Inject, Named}
 
 class RetrievingClientController @Inject() (
@@ -33,22 +33,56 @@ class RetrievingClientController @Inject() (
   @Named("AgentIdentifier") identify: IdentifierAction,
   cisService: ConstructionIndustrySchemeService,
   view: RetrievingClientView
-)(implicit appConfig: config.FrontendAppConfig, ec: ExecutionContext)
+)(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
+  private val MaxRetries               = 8
+  private val RefreshIntervalInSeconds = 15
+
   def onPageLoad: Action[AnyContent] = identify { implicit request =>
-    Ok(view()).withHeaders("Refresh" -> s"0, url=${routes.RetrievingClientController.start().url}")
+    Ok(view())
+      .withHeaders("Refresh" -> s"0; url=${routes.RetrievingClientController.start().url}")
   }
 
   def start: Action[AnyContent] = identify.async { implicit request =>
-    cisService.getClientListStatus.map {
-      case "succeeded"         => Redirect(routes.ClientListSearchController.onPageLoad())
-      case "failed"            => Redirect(routes.FailedToRetrieveClientController.onPageLoad())
-      case "system-error"      => Redirect(controllers.routes.SystemErrorController.onPageLoad())
-      case "initiate-download" => Redirect(controllers.routes.SystemErrorController.onPageLoad())
-      case "in-progress"       => Ok(view())
-      case _                   => Ok(view())
+    cisService.startClientListRetrieval
+      .map {
+        case "succeeded"   => Redirect(controllers.agent.routes.ClientListSearchController.onPageLoad())
+        case "failed"      => Redirect(controllers.agent.routes.FailedToRetrieveClientController.onPageLoad())
+        case "in-progress" => refreshResult(nextRetry = 1)
+        case _             => Redirect(controllers.routes.SystemErrorController.onPageLoad())
+      }
+      .recover { case _ =>
+        Redirect(controllers.routes.SystemErrorController.onPageLoad())
+      }
+  }
+
+  def poll(retryCount: Int = 0): Action[AnyContent] = identify.async { implicit request =>
+    val nextRetry = retryCount + 1
+
+    if (nextRetry > MaxRetries) {
+      Future.successful(
+        Redirect(routes.FailedToRetrieveClientController.onPageLoad())
+      )
+    } else {
+      cisService.getClientListStatus
+        .map {
+          case "succeeded"   => Redirect(routes.ClientListSearchController.onPageLoad())
+          case "failed"      => Redirect(routes.FailedToRetrieveClientController.onPageLoad())
+          case "in-progress" => refreshResult(nextRetry)
+          case _             => Redirect(controllers.routes.SystemErrorController.onPageLoad())
+        }
+        .recover { case _ =>
+          Redirect(controllers.routes.SystemErrorController.onPageLoad())
+        }
     }
+  }
+
+  private def refreshResult(nextRetry: Int)(implicit request: Request[_]): Result = {
+    val refreshUrl = routes.RetrievingClientController.poll(retryCount = nextRetry).url
+
+    Ok(view())
+      .withHeaders("Refresh" -> s"$RefreshIntervalInSeconds; url=$refreshUrl")
   }
 }
