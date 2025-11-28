@@ -40,12 +40,17 @@ class RetrievingClientController @Inject() (
   private val MaxRetries               = 8
   private val RefreshIntervalInSeconds = 15
 
+  def onPageLoad: Action[AnyContent] = identify { implicit request =>
+    Ok(view())
+      .withHeaders("Refresh" -> s"0; url=${routes.RetrievingClientController.start().url}")
+  }
+
   def start: Action[AnyContent] = identify.async { implicit request =>
     cisService.startClientListRetrieval
       .map {
         case "succeeded"   => Redirect(controllers.agent.routes.ClientListSearchController.onPageLoad())
         case "failed"      => Redirect(controllers.agent.routes.FailedToRetrieveClientController.onPageLoad())
-        case "in-progress" => Redirect(controllers.agent.routes.RetrievingClientController.onPageLoad(retryCount = 1))
+        case "in-progress" => refreshResult(nextRetry = 1)
         case _             => Redirect(controllers.routes.SystemErrorController.onPageLoad())
       }
       .recover { case _ =>
@@ -53,7 +58,7 @@ class RetrievingClientController @Inject() (
       }
   }
 
-  def onPageLoad(retryCount: Int = 0): Action[AnyContent] = identify.async { implicit request =>
+  def poll(retryCount: Int = 0): Action[AnyContent] = identify.async { implicit request =>
     val nextRetry = retryCount + 1
 
     if (nextRetry > MaxRetries) {
@@ -75,7 +80,7 @@ class RetrievingClientController @Inject() (
   }
 
   private def refreshResult(nextRetry: Int)(implicit request: Request[_]): Result = {
-    val refreshUrl = routes.RetrievingClientController.onPageLoad(retryCount = nextRetry).url
+    val refreshUrl = routes.RetrievingClientController.poll(retryCount = nextRetry).url
 
     Ok(view())
       .withHeaders("Refresh" -> s"$RefreshIntervalInSeconds; url=$refreshUrl")

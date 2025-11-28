@@ -104,7 +104,7 @@ class IntroductionControllerSpec extends SpecBase {
           status(result) mustEqual SEE_OTHER
 
           redirectLocation(result).value mustEqual controllers.agent.routes.RetrievingClientController
-            .start()
+            .onPageLoad()
             .url
         }
       }

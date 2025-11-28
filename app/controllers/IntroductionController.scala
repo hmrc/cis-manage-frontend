@@ -47,7 +47,7 @@ class IntroductionController @Inject() (
     val userAnswers = UserAnswers(request.userId)
     sessionRepository.set(userAnswers).map { _ =>
       if (request.isAgent) {
-        Redirect(controllers.agent.routes.RetrievingClientController.start())
+        Redirect(controllers.agent.routes.RetrievingClientController.onPageLoad())
       } else {
         Redirect(controllers.contractor.routes.ContractorLandingController.onPageLoad())
       }
