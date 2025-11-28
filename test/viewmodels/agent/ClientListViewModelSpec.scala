@@ -30,28 +30,31 @@ class ClientListViewModelSpec extends SpecBase {
   )
 
   private val sampleClients: Seq[ClientListViewModel] = Seq(
-    ClientListViewModel("ABC Construction Ltd", "123/AB45678", "ABC-001", Active),
-    ClientListViewModel("ABC Property Services", "789/EF23456", "ABC-002", Active),
-    ClientListViewModel("Capital Construction Group", "345/IJ67890", "CAP-001", Active)
+    ClientListViewModel("123", "ABC Construction Ltd", "123/AB45678", "ABC-001", Active),
+    ClientListViewModel("123", "ABC Property Services", "789/EF23456", "ABC-002", Active),
+    ClientListViewModel("123", "Capital Construction Group", "345/IJ67890", "CAP-001", Active)
   )
 
   private def cisClient(
     schemeName: Option[String] = Some("Some Scheme"),
     ton: String = "123",
     tor: String = "AB45678",
-    agentOwnRef: Option[String] = Some("AOR-001")
+    agentOwnRef: Option[String] = Some("AOR-001"),
+    utr: Option[String] = Some("1234567890")
   ): CisTaxpayerSearchResult =
     CisTaxpayerSearchResult(
-      uniqueId = "UID-1",
+      uniqueId = "123",
       taxOfficeNumber = ton,
       taxOfficeRef = tor,
       agentOwnRef = agentOwnRef,
-      schemeName = schemeName
+      schemeName = schemeName,
+      utr = utr
     )
 
   "ClientListViewModel.removeLink" - {
     "return a remove link when status is Active" in {
       val model  = ClientListViewModel(
+        uniqueId = "123",
         clientName = "Test",
         employerReference = "123/AA12345",
         clientReference = "TEST-001",
@@ -65,6 +68,7 @@ class ClientListViewModelSpec extends SpecBase {
 
     "return None when status is NOT Active" in {
       val model = ClientListViewModel(
+        uniqueId = "123",
         clientName = "Test",
         employerReference = "123/AA12345",
         clientReference = "TEST-002",
@@ -77,6 +81,7 @@ class ClientListViewModelSpec extends SpecBase {
   "ClientListViewModel.clientLink" - {
     "always return a link" in {
       val model  = ClientListViewModel(
+        uniqueId = "123",
         clientName = "Test",
         employerReference = "123/AA12345",
         clientReference = "TEST-003",
@@ -84,8 +89,8 @@ class ClientListViewModelSpec extends SpecBase {
       )
       val result = model.clientLink
       result.isDefined shouldBe true
-      result.get.text  shouldBe ""
-      result.get.href  shouldBe ""
+      result.get.text  shouldBe "Test"
+      result.get.href  shouldBe controllers.agent.routes.AgentLandingController.onPageLoad("123").url
     }
   }
 
@@ -137,12 +142,14 @@ class ClientListViewModelSpec extends SpecBase {
 
       result shouldBe Seq(
         ClientListViewModel(
+          uniqueId = "123",
           clientName = "ABC Construction Ltd",
           employerReference = "111/AA12345",
           clientReference = "AOR-999",
           clientStatus = Active
         ),
         ClientListViewModel(
+          uniqueId = "123",
           clientName = "Capital Construction Group",
           employerReference = "222/BB67890",
           clientReference = "AOR-888",

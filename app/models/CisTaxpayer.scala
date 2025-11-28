@@ -46,7 +46,8 @@ case class CisTaxpayerSearchResult(
   taxOfficeNumber: String,
   taxOfficeRef: String,
   agentOwnRef: Option[String],
-  schemeName: Option[String]
+  schemeName: Option[String],
+  utr: Option[String]
 )
 
 object CisTaxpayerSearchResult {
