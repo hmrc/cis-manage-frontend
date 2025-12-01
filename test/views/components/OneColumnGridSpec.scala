@@ -6,6 +6,7 @@ import org.scalatest.matchers.should.Matchers.*
 import play.twirl.api.Html
 
 class OneColumnGridSpec extends SpecBase {
+
   private val oneColumnGrid = app.injector.instanceOf[views.html.components.OneColumnGrid]
 
   "OneColumnGrid" - {
