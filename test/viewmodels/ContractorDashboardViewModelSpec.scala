@@ -26,6 +26,7 @@ class ContractorDashboardViewModelSpec extends SpecBase {
 
     "should create a valid instance with all required fields" in {
       val viewModel = ContractorLandingViewModel(
+        contractorName = "ABC Construction Ltd",
         employerReference = "123/AB45678",
         utr = "1234567890",
         returnCount = 1,
@@ -49,6 +50,7 @@ class ContractorDashboardViewModelSpec extends SpecBase {
 
     "should support case class copy" in {
       val original = ContractorLandingViewModel(
+        contractorName = "ABC Construction Ltd",
         employerReference = "123/AB45678",
         utr = "1234567890",
         returnCount = 1,
@@ -74,6 +76,7 @@ class ContractorDashboardViewModelSpec extends SpecBase {
 
     "should support equality comparison" in {
       val viewModel1 = ContractorLandingViewModel(
+        contractorName = "ABC Construction Ltd",
         employerReference = "123/AB45678",
         utr = "1234567890",
         returnCount = 1,
@@ -87,6 +90,7 @@ class ContractorDashboardViewModelSpec extends SpecBase {
       )
 
       val viewModel2 = ContractorLandingViewModel(
+        contractorName = "ABC Construction Ltd",
         employerReference = "123/AB45678",
         utr = "1234567890",
         returnCount = 1,
@@ -104,6 +108,7 @@ class ContractorDashboardViewModelSpec extends SpecBase {
 
     "should handle different values correctly" in {
       val viewModel1 = ContractorLandingViewModel(
+        contractorName = "ABC Construction Ltd 1",
         employerReference = "123/AB45678",
         utr = "1234567890",
         returnCount = 1,
@@ -117,6 +122,7 @@ class ContractorDashboardViewModelSpec extends SpecBase {
       )
 
       val viewModel2 = ContractorLandingViewModel(
+        contractorName = "ABC Construction Ltd 2",
         employerReference = "456/CD12345",
         utr = "0987654321",
         returnCount = 5,

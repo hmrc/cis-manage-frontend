@@ -46,11 +46,15 @@ class ManageService @Inject() (
             Future.failed(new RuntimeException("Empty cisId (uniqueId) returned from /cis/taxpayer"))
           } else {
             val contractorName = tp.schemeName.getOrElse("")
+            val employerRef    = s"${tp.taxOfficeNumber}/${tp.taxOfficeRef}"
+            val utr            = tp.utr.getOrElse("")
             for {
-              updatedUaWithCisId      <- Future.fromTry(ua.set(CisIdPage, cisId))
-              updatedUaWithContractor <- Future.fromTry(updatedUaWithCisId.set(ContractorNamePage, contractorName))
-              _                       <- sessionRepository.set(updatedUaWithContractor)
-            } yield (cisId, updatedUaWithContractor)
+              ua1 <- Future.fromTry(ua.set(CisIdPage, cisId))
+              ua2 <- Future.fromTry(ua1.set(ContractorNamePage, contractorName))
+              ua3 <- Future.fromTry(ua2.set(EmployerReferencePage, employerRef))
+              ua4 <- Future.fromTry(ua3.set(UniqueTaxReferencePage, utr))
+              _   <- sessionRepository.set(ua4)
+            } yield (cisId, ua4)
           }
         }
     }
