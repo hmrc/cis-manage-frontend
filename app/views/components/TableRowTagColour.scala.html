@@ -18,15 +18,6 @@
 
 @this()
 
-@(bannerTitle: String, content: Html)(implicit messages: Messages)
+@(text: String, colour: String = emptyString)
 
-<div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner" data-govuk-notification-banner-init="">
-    <div class="govuk-notification-banner__header">
-        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
-            @{Html(messages(bannerTitle))}
-        </h2>
-    </div>
-    <div class="govuk-notification-banner__content">
-         @content
-    </div>
-</div>
+<strong class="govuk-tag @if(colour.nonEmpty){@colour}">@text</strong>

@@ -17,10 +17,15 @@
 @import views.html.components._
 @import viewmodels.ReturnLandingViewModel
 @import config.FrontendAppConfig
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
 
 @this(
     layout: templates.Layout,
     govukButton: GovukButton,
+    govukTable: GovukTable,
+    govukNotificationBanner: GovukNotificationBanner,
     h1: H1,
     h2: H2,
     twoColumnGrid: TwoColumnGrid,
@@ -32,8 +37,8 @@
     aside: Aside,
     nav: Nav,
     paragraphWithLinks: ParagraphWithLinks,
-    notificationBannerCard: NotificationBannerCard,
-    caption: Caption
+    caption: Caption,
+    tableRowTagColour: TableRowTagColour
 )
 
 @(contractorName: String, returnsList: Seq[ReturnLandingViewModel])(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
@@ -47,27 +52,28 @@
     )))
 }
 
+@htmlNotificationBanner = {
+    @h2("returnsLanding.banner.header")
+    @paragraph(messages("returnsLanding.banner.p1"))
+    @paragraphWithLinks(
+        linkTextUrlOne = "returnsLanding.banner.p2.link1",
+        linkUrlOne = "#",
+        suffixTextKey = "returnsLanding.banner.p2.text",
+        linkTextUrlTwo = "returnsLanding.banner.p2.link2",
+        linkUrlTwo = config.cisDateConfirmNilPaymentsUrl
+    )
+}
+
 @layout(
     pageTitle = titleNoForm(messages("returnsLanding.title")),
     showSignOut = false,
     sidebar = Some(sidebar)
 ) {
 
-    @notificationBannerCard(
-        bannerTitle = "Important",
-        content = HtmlFormat.fill(Seq(
-            h2("returnsLanding.banner.header"),
-            paragraph(messages("returnsLanding.banner.p1")),
-
-        paragraphWithLinks(
-                linkTextUrlOne = "returnsLanding.banner.p2.link1",
-                linkUrlOne = "#",
-                suffixTextKey = "returnsLanding.banner.p2.text",
-                linkTextUrlTwo = "returnsLanding.banner.p2.link2",
-                linkUrlTwo = config.cisDateConfirmNilPaymentsUrl
-            )
-        ))
-    )
+    @govukNotificationBanner(NotificationBanner(
+        content = HtmlContent(htmlNotificationBanner),
+        bannerType = Some("Important")
+    ))
 
     @caption("ABC Construction Ltd")
     @h1(messages("returnsLanding.heading"))
@@ -105,26 +111,28 @@
 
     @h2(messages("returnsLanding.recentCisReturns.h2"))
 
-    <table id="" class="govuk-table" data-module="moj-sortable-table">
-        <thead class="govuk-table__head">
-        <tr class="govuk-table__row">
-            <th class="govuk-table__header" scope="col">@messages("returnsLanding.taxMonth.th")</th>
-            <th class="govuk-table__header" scope="col">@messages("returnsLanding.type.th")</th>
-            <th class="govuk-table__header" scope="col">@messages("returnsLanding.dateSubmitted.th")</th>
-            <th class="govuk-table__header" scope="col">@messages("returnsLanding.status.th")</th>
-        </tr>
-        </thead>
-        <tbody class="govuk-table__body">
-        @returnsList.map { item =>
-        <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header">@item.taxMonth</th>
-            <td class="govuk-table__cell">@item.returnType</td>
-            <td class="govuk-table__cell">@item.dateSubmitted</td>
-            <td class="govuk-table__cell"> <strong class="govuk-tag govuk-tag--green">@item.status</strong></td>
-        </tr>
-        }
-        </tbody>
-    </table>
+    @govukTable(
+        Table(
+            head = Some(
+                Seq(
+                    "returnsLanding.taxMonth.th",
+                    "returnsLanding.type.th",
+                    "returnsLanding.dateSubmitted.th",
+                    "returnsLanding.status.th"
+                ).map { key =>
+                    HeadCell(content = Text(messages(key)))
+                }
+            ),
+            rows = returnsList.map { item =>
+                Seq(
+                    TableRow(content = Text(item.taxMonth), classes = "govuk-table__header"),
+                    TableRow(content = Text(item.returnType)),
+                    TableRow(content = Text(item.dateSubmitted)),
+                    TableRow(content = HtmlContent(tableRowTagColour(text = item.status, colour = "govuk-tag--green")))
+                )
+            }
+        )
+    )
 
     @link(linkTextKey = "returnsLanding.viewReturnsHistory.link", linkUrl = "#")
 }
