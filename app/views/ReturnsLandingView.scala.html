@@ -57,7 +57,7 @@
     @paragraph(messages("returnsLanding.banner.p1"))
     @paragraphWithLinks(
         linkTextUrlOne = "returnsLanding.banner.p2.link1",
-        linkUrlOne = "#",
+        linkUrlOne = config.fileStandardReturnUrl,
         suffixTextKey = "returnsLanding.banner.p2.text",
         linkTextUrlTwo = "returnsLanding.banner.p2.link2",
         linkUrlTwo = config.cisDateConfirmNilPaymentsUrl
@@ -80,29 +80,29 @@
 
     @twoColumnGrid(
         HtmlFormat.fill(Seq(
-            headingLink("returnsLanding.fileStandardReturn.h3.link", "#"),
+            headingLink("returnsLanding.fileStandardReturn.h3.link", config.fileStandardReturnUrl),
             paragraph("returnsLanding.fileStandardReturn.p1")
         )),
         HtmlFormat.fill(Seq(
-            headingLink("returnsLanding.fileNilReturn.h3.link", "#"),
+            headingLink("returnsLanding.fileNilReturn.h3.link", config.cisDateConfirmNilPaymentsUrl),
             paragraph("returnsLanding.fileNilReturn.p1")
         ))
     )
 
     @twoColumnGrid(
         HtmlFormat.fill(Seq(
-            headingLink("returnsLanding.amendReturn.h3.link", "#"),
+            headingLink("returnsLanding.amendReturn.h3.link", config.amendReturnUrl),
             paragraph("returnsLanding.amendReturn.p1")
         )),
         HtmlFormat.fill(Seq(
-            headingLink("returnsLanding.paymentsAndDeductions.h3.link", "#"),
+            headingLink("returnsLanding.paymentsAndDeductions.h3.link", config.paymentsAndDeductionsUrl),
             paragraph("returnsLanding.paymentsAndDeductions.p1")
         ))
     )
 
     @oneColumnGrid(
         HtmlFormat.fill(Seq(
-            headingLink("returnsLanding.noticesAndStatements.h3.link", "#"),
+            headingLink("returnsLanding.noticesAndStatements.h3.link", config.noticesAndStatementsUrl),
             paragraph("returnsLanding.noticeAndStatements.p1")
         ))
     )
@@ -134,5 +134,5 @@
         )
     )
 
-    @link(linkTextKey = "returnsLanding.viewReturnsHistory.link", linkUrl = "#")
+    @link(linkTextKey = "returnsLanding.viewReturnsHistory.link", linkUrl = config.viewReturnsHistoryUrl)
 }
