@@ -23,6 +23,7 @@ import play.api.Logging
 import play.api.libs.json.Json
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
+import viewmodels.agent.AgentLandingViewModel
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -46,11 +47,15 @@ class ManageService @Inject() (
             Future.failed(new RuntimeException("Empty cisId (uniqueId) returned from /cis/taxpayer"))
           } else {
             val contractorName = tp.schemeName.getOrElse("")
+            val employerRef    = s"${tp.taxOfficeNumber}/${tp.taxOfficeRef}"
+            val utr            = tp.utr.getOrElse("")
             for {
-              updatedUaWithCisId      <- Future.fromTry(ua.set(CisIdPage, cisId))
-              updatedUaWithContractor <- Future.fromTry(updatedUaWithCisId.set(ContractorNamePage, contractorName))
-              _                       <- sessionRepository.set(updatedUaWithContractor)
-            } yield (cisId, updatedUaWithContractor)
+              ua1 <- Future.fromTry(ua.set(CisIdPage, cisId))
+              ua2 <- Future.fromTry(ua1.set(ContractorNamePage, contractorName))
+              ua3 <- Future.fromTry(ua2.set(EmployerReferencePage, employerRef))
+              ua4 <- Future.fromTry(ua3.set(UniqueTaxReferencePage, utr))
+              _   <- sessionRepository.set(ua4)
+            } yield (cisId, ua4)
           }
         }
     }
@@ -67,5 +72,37 @@ class ManageService @Inject() (
           updatedAnswers <- Future.fromTry(userAnswers.set(AgentClientsPage, clients))
           _              <- sessionRepository.set(updatedAnswers)
         } yield (clients, updatedAnswers)
+    }
+
+  def getAgentLandingData(
+    uniqueId: String,
+    ua: UserAnswers
+  )(using HeaderCarrier): Future[AgentLandingViewModel] =
+    ua.get(AgentClientsPage) match {
+      case None =>
+        Future.failed(new RuntimeException("AgentClientsPage missing in UserAnswers"))
+
+      case Some(clients) =>
+        clients.find(_.uniqueId == uniqueId) match {
+          case None =>
+            Future.failed(new RuntimeException(s"Client with uniqueId=$uniqueId not found in AgentClientsPage"))
+
+          case Some(client) =>
+            cisConnector.getAgentClientTaxpayer(client.taxOfficeNumber, client.taxOfficeRef).flatMap { taxpayer =>
+              val utrOpt        = taxpayer.utr
+              val updatedClient = client.copy(utr = utrOpt)
+              val updatedList   =
+                clients.map(c => if (c.uniqueId == client.uniqueId) updatedClient else c)
+
+              for {
+                updatedUa <- Future.fromTry(ua.set(AgentClientsPage, updatedList))
+                _         <- sessionRepository.set(updatedUa)
+              } yield AgentLandingViewModel(
+                clientName = updatedClient.schemeName.getOrElse(""),
+                employerRef = s"${updatedClient.taxOfficeNumber}/${updatedClient.taxOfficeRef}",
+                utr = utrOpt
+              )
+            }
+        }
     }
 }

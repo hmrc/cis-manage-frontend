@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-package viewmodels.contractor
+package viewmodels.agent
 
-case class ContractorLandingViewModel(
-  contractorName: String,
-  employerReference: String,
-  utr: String,
-  returnCount: Int,
-  returnDueDate: String,
-  noticeCount: Int,
-  lastSubmittedDate: String,
-  lastSubmittedTaxMonthYear: String,
-  whatIsUrl: String,
-  guidanceUrl: String,
-  penaltiesUrl: String
+case class AgentLandingViewModel(
+  clientName: String,
+  employerRef: String,
+  utr: Option[String]
 )

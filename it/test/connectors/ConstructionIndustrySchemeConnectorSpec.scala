@@ -357,4 +357,75 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
     }
   }
 
+  "getAgentClientTaxpayer" should {
+
+    "return CisTaxpayer when BE returns 200 with valid JSON" in {
+      val taxOfficeNumber = "111"
+      val taxOfficeRef = "test111"
+
+      stubFor(
+        get(urlPathEqualTo(s"/cis/agent/client-taxpayer/$taxOfficeNumber/$taxOfficeRef"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                """{
+                  |  "uniqueId": "123",
+                  |  "taxOfficeNumber": "111",
+                  |  "taxOfficeRef": "test111",
+                  |  "employerName1": "TEST LTD"
+                  |}""".stripMargin
+              )
+          )
+      )
+
+      val result = connector.getAgentClientTaxpayer(taxOfficeNumber,taxOfficeRef).futureValue
+
+      result.uniqueId mustBe "123"
+      result.taxOfficeNumber mustBe "111"
+      result.taxOfficeRef mustBe "test111"
+      result.employerName1 mustBe Some("TEST LTD")
+    }
+
+    "fail when BE returns 200 with invalid JSON" in {
+      val taxOfficeNumber = "111"
+      val taxOfficeRef = "test111"
+
+      stubFor(
+        get(urlPathEqualTo(s"/cis/agent/client-taxpayer/$taxOfficeNumber/$taxOfficeRef"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody("""{ "unexpectedField": true }""")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.getAgentClientTaxpayer(taxOfficeNumber,taxOfficeRef).futureValue
+      }
+
+      ex.getMessage.toLowerCase must include("uniqueid")
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      val taxOfficeNumber = "111"
+      val taxOfficeRef = "test111"
+
+      stubFor(
+        get(urlPathEqualTo(s"/cis/agent/client-taxpayer/$taxOfficeNumber/$taxOfficeRef"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody("boom")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.getAgentClientTaxpayer(taxOfficeNumber,taxOfficeRef).futureValue
+      }
+
+      ex.getMessage must include("returned 500")
+    }
+  }
+
 }

@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,20 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package viewmodels.contractor
+@this(govukBackLink: GovukBackLink)
 
-case class ContractorLandingViewModel(
-  contractorName: String,
-  employerReference: String,
-  utr: String,
-  returnCount: Int,
-  returnDueDate: String,
-  noticeCount: Int,
-  lastSubmittedDate: String,
-  lastSubmittedTaxMonthYear: String,
-  whatIsUrl: String,
-  guidanceUrl: String,
-  penaltiesUrl: String
+@(href: String, messageKey: String, classes: String = "")(implicit messages: Messages)
+
+@govukBackLink(
+    BackLink(
+        href    = href,
+        content = Text(messages(messageKey)),
+        classes = classes
+    )
 )

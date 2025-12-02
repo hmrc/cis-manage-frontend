@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package viewmodels.contractor
+package viewmodels.agent
 
-case class ContractorLandingViewModel(
-  contractorName: String,
-  employerReference: String,
-  utr: String,
-  returnCount: Int,
-  returnDueDate: String,
-  noticeCount: Int,
-  lastSubmittedDate: String,
-  lastSubmittedTaxMonthYear: String,
-  whatIsUrl: String,
-  guidanceUrl: String,
-  penaltiesUrl: String
-)
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
+
+class AgentLandingViewModelSpec extends AnyFreeSpec with Matchers {
+
+  "AgentLandingViewModel" - {
+
+    "must hold the given values" in {
+      val model = AgentLandingViewModel(
+        clientName = "ABC Construction Ltd",
+        employerRef = "123/AB45678",
+        utr = Some("1234567890")
+      )
+
+      model.clientName mustBe "ABC Construction Ltd"
+      model.employerRef mustBe "123/AB45678"
+      model.utr mustBe Some("1234567890")
+    }
+  }
+}
