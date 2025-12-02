@@ -27,6 +27,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import pages.*
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
+import viewmodels.agent.AgentLandingViewModel
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -163,14 +164,16 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
   private def createClient(
     id: String = "CLIENT-123",
     ton: String = "111",
-    tor: String = "test111"
+    tor: String = "test111",
+    utr: Option[String] = Some("1234567890")
   ): CisTaxpayerSearchResult =
     CisTaxpayerSearchResult(
       uniqueId = id,
       taxOfficeNumber = ton,
       taxOfficeRef = tor,
       agentOwnRef = Some("abc123"),
-      schemeName = None
+      schemeName = None,
+      utr = utr
     )
 
   "resolveAndStoreAgentClients" should {
@@ -269,6 +272,81 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       verify(connector).getAllClients(any[HeaderCarrier])
       verify(sessionRepo).set(any[UserAnswers])
+    }
+  }
+
+  "getAgentLandingData" should {
+
+    "fail when AgentClientsPage is missing from UserAnswers" in {
+      val (service, connector, sessionRepo) = newService()
+      val ua                                = UserAnswers("test-user")
+
+      val ex = intercept[RuntimeException] {
+        service.getAgentLandingData("CLIENT-001", ua).futureValue
+      }
+
+      ex.getMessage must include("AgentClientsPage missing in UserAnswers")
+      verifyNoInteractions(connector)
+      verifyNoInteractions(sessionRepo)
+    }
+
+    "fail when the client with given uniqueId is not present in AgentClientsPage" in {
+      val (service, connector, sessionRepo) = newService()
+
+      val clients      = List(createClient("CLIENT-001"), createClient("CLIENT-002"))
+      val uaWithClient = UserAnswers("test-user").set(AgentClientsPage, clients).get
+
+      val ex = intercept[RuntimeException] {
+        service.getAgentLandingData("OTHER-ID", uaWithClient).futureValue
+      }
+
+      ex.getMessage must include("Client with uniqueId=OTHER-ID not found in AgentClientsPage")
+      verifyNoInteractions(connector)
+      verifyNoInteractions(sessionRepo)
+    }
+
+    "fetch taxpayer, update client UTR in session, and return AgentLandingViewModel" in {
+      val (service, connector, sessionRepo) = newService()
+      val uniqueId                          = "CLIENT-123"
+      val baseClient                        = createClient(id = uniqueId, utr = None)
+        .copy(schemeName = Some("ABC Construction Ltd"))
+      val otherClient                       = createClient(id = "CLIENT-999")
+
+      val clients  = List(baseClient, otherClient)
+      val ua       = UserAnswers("test-user").set(AgentClientsPage, clients).get
+      val taxpayer =
+        createTaxpayer(id = uniqueId, name1 = Some("ABC Construction Ltd"))
+          .copy(utr = Some("5555555555"))
+
+      when(connector.getAgentClientTaxpayer(any[String], any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(taxpayer))
+
+      when(sessionRepo.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val result: AgentLandingViewModel =
+        service.getAgentLandingData(uniqueId, ua).futureValue
+
+      result.clientName mustBe "ABC Construction Ltd"
+      result.employerRef mustBe "111/test111"
+      result.utr mustBe Some("5555555555")
+
+      val uaCaptor: ArgumentCaptor[UserAnswers] =
+        ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      verify(sessionRepo).set(uaCaptor.capture())
+
+      val storedClientsOpt =
+        uaCaptor.getValue.get(AgentClientsPage)
+
+      storedClientsOpt.isDefined mustBe true
+      val storedClients = storedClientsOpt.get
+
+      val updatedClientOpt = storedClients.find(_.uniqueId == uniqueId)
+      updatedClientOpt.flatMap(_.utr) mustBe Some("5555555555")
+
+      verify(connector).getAgentClientTaxpayer("111", "test111")(hc)
+      verifyNoMoreInteractions(connector)
     }
   }
 

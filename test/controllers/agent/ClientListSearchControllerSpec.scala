@@ -52,14 +52,16 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
       taxOfficeNumber = "123",
       taxOfficeRef = "AB45678",
       agentOwnRef = Some("ABC-001"),
-      schemeName = Some("ABC Construction Ltd")
+      schemeName = Some("ABC Construction Ltd"),
+      utr = Some("1234567890")
     ),
     CisTaxpayerSearchResult(
       uniqueId = "UID-002",
       taxOfficeNumber = "789",
       taxOfficeRef = "EF23456",
       agentOwnRef = Some("ABC-002"),
-      schemeName = Some("ABC Property Services")
+      schemeName = Some("ABC Property Services"),
+      utr = Some("1234567890")
     )
   )
 
@@ -246,28 +248,32 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
             taxOfficeNumber = "123",
             taxOfficeRef = "AB45678",
             agentOwnRef = Some("=ABC"),
-            schemeName = Some("""=Company("x")""")
+            schemeName = Some("""=Company("x")"""),
+            utr = Some("1234567890")
           ),
           CisTaxpayerSearchResult(
             uniqueId = "UID-004",
             taxOfficeNumber = "124",
             taxOfficeRef = "AB45679",
             agentOwnRef = Some("\t=ABC"),
-            schemeName = Some("\t=Company(\"x\")")
+            schemeName = Some("\t=Company(\"x\")"),
+            utr = Some("1234567890")
           ),
           CisTaxpayerSearchResult(
             uniqueId = "UID-005",
             taxOfficeNumber = "125",
             taxOfficeRef = "AB45680",
             agentOwnRef = Some("\r=ABC"),
-            schemeName = Some("\r=Company(\"x\")")
+            schemeName = Some("\r=Company(\"x\")"),
+            utr = Some("1234567890")
           ),
           CisTaxpayerSearchResult(
             uniqueId = "UID-006",
             taxOfficeNumber = "126",
             taxOfficeRef = "AB45681",
             agentOwnRef = Some("\n=ABC"),
-            schemeName = Some("\n=Company(\"x\")")
+            schemeName = Some("\n=Company(\"x\")"),
+            utr = Some("1234567890")
           )
         )
 

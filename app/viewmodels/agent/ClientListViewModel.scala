@@ -23,6 +23,7 @@ import viewmodels.Link
 import viewmodels.agent.SearchBy.*
 
 case class ClientListViewModel(
+  uniqueId: String,
   clientName: String,
   employerReference: String,
   clientReference: String,
@@ -38,7 +39,12 @@ case class ClientListViewModel(
       case _      => None
     }
   def clientLink(implicit messages: Messages): Option[Link] =
-    Some(Link("", ""))
+    Some(
+      Link(
+        clientName,
+        controllers.agent.routes.AgentLandingController.onPageLoad(uniqueId).url
+      )
+    )
 }
 
 object ClientListViewModel {
@@ -58,6 +64,7 @@ object ClientListViewModel {
   def fromCisClients(clients: List[CisTaxpayerSearchResult]): Seq[ClientListViewModel] =
     clients.map { client =>
       ClientListViewModel(
+        uniqueId = client.uniqueId,
         clientName = client.schemeName.getOrElse(""),
         employerReference = s"${client.taxOfficeNumber}/${client.taxOfficeRef}",
         clientReference = client.agentOwnRef.getOrElse(""),
