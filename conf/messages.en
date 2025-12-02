@@ -148,7 +148,7 @@ agent.clientListSearch.searchBy.placeholder = Select an option
 
 agent.clientListSearch.searchFilter.label = Enter your search
 agent.clientListSearch.searchFilter.label.hint = This is the client name (ABC Construction), employer reference (123/AB45678), or client reference (ABC-001)
-agent.clientListSearch.searchFilter.error.required = Enter either a Client name, Employers reference or your Client reference
+agent.clientListSearch.searchFilter.error.required = Enter either a Client name, Employer reference or your Client reference
 agent.clientListSearch.searchFilter.error.length = Search value must be 35 characters or less
 agent.clientListSearch.searchFilter.error.format = Search value must only include letters, numbers, hyphens, spaces, commas, full stops, exclamation marks, ampersands, underscores, parentheses and apostrophes
 
@@ -160,13 +160,13 @@ agent.clientListSearch.searchFilter.cn.error.format = Enter the client name in t
 agent.clientListSearch.searchFilter.er.error.format = Enter the employer reference in the correct format, like 123/AB45678 (three numbers, '/', then seven alphanumeric characters)
 agent.clientListSearch.searchFilter.cr.error.format = Enter the client reference in the correct format, like ABC-001
 
-agent.clientListSearch.searchFilter.cn.error.length = Client name length must be 56 characters or less
-agent.clientListSearch.searchFilter.er.error.length = Employers Reference length must be 14 characters or less
-agent.clientListSearch.searchFilter.cr.error.length = Client reference length must be 20 characters or less
+agent.clientListSearch.searchFilter.cn.error.length = Enter a client name shorter than 56 characters
+agent.clientListSearch.searchFilter.er.error.length = Enter an employer reference using up to 14 characters, or fewer
+agent.clientListSearch.searchFilter.cr.error.length = Enter a client reference shorter than 20 characters
 
 agent.clientListSearch.table.caption = Your clients
 agent.clientListSearch.th.clientName = Client name
-agent.clientListSearch.th.employersReference = Employers reference
+agent.clientListSearch.th.employersReference = Employer reference
 agent.clientListSearch.th.clientReference = Client reference
 agent.clientListSearch.th.actions = Actions
 agent.clientListSearch.td.actions.remove = Remove
