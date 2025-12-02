@@ -19,44 +19,95 @@ package controllers.agent
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import org.scalatest.matchers.should.Matchers.*
-import views.html.agent.AgentLandingView
-import config.FrontendAppConfig
-import java.time.{LocalDate, YearMonth}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import models.UserAnswers
+import org.mockito.Mockito.*
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.Application
+import play.api.inject.bind
+import services.ManageService
+import uk.gov.hmrc.http.HeaderCarrier
+import viewmodels.agent.AgentLandingViewModel
 
-class AgentLandingControllerSpec extends SpecBase {
+import scala.concurrent.Future
 
-  "AgentLanding Controller" - {
+class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
 
-    "must return OK and the correct view for a GET" in {
+  private val uniqueId = "some-unique-id"
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+  private val landingViewModel = AgentLandingViewModel(
+    clientName = "Test Client",
+    employerRef = "123/AB456",
+    utr = Some("1234567890")
+  )
 
-      running(application) {
-        implicit val appConfig: FrontendAppConfig =
-          application.injector.instanceOf[FrontendAppConfig]
+  "AgentLandingController.onPageLoad" - {
 
-        val request = FakeRequest(GET, routes.AgentLandingController.onPageLoad().url)
+    "must return OK and render the page when the service succeeds" in {
+      val mockManageService = mock[ManageService]
+
+      when(
+        mockManageService.getAgentLandingData(
+          eqTo(uniqueId),
+          any[UserAnswers]
+        )(using any[HeaderCarrier])
+      ).thenReturn(Future.successful(landingViewModel))
+
+      val application: Application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithCisId),
+          additionalBindings = Seq(
+            bind[ManageService].toInstance(mockManageService)
+          ),
+          isAgent = true
+        ).build()
+
+      try {
+        val request = FakeRequest(GET, controllers.agent.routes.AgentLandingController.onPageLoad(uniqueId).url)
+        val result  = route(application, request).value
+
+        status(result) mustBe OK
+        val body = contentAsString(result)
+
+        body must include("Test Client")
+        body must include("123/AB456")
+        body must include("1234567890")
+
+        verify(mockManageService)
+          .getAgentLandingData(eqTo(uniqueId), any[UserAnswers])(using any[HeaderCarrier])
+      } finally application.stop()
+    }
+
+    "must redirect to JourneyRecoveryController when the service fails" in {
+      val mockManageService = mock[ManageService]
+
+      when(
+        mockManageService.getAgentLandingData(
+          eqTo(uniqueId),
+          any[UserAnswers]
+        )(using any[HeaderCarrier])
+      ).thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val application: Application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithCisId),
+          additionalBindings = Seq(
+            bind[ManageService].toInstance(mockManageService)
+          ),
+          isAgent = true
+        ).build()
+
+      try {
+        val request =
+          FakeRequest(GET, controllers.agent.routes.AgentLandingController.onPageLoad(uniqueId).url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[AgentLandingView]
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
 
-        val expected = view(
-          clientName = "ABC Construction Ltd",
-          employerRef = "123/AB45678",
-          utr = "1234567890",
-          returnsDueCount = 1,
-          returnsDueBy = LocalDate.of(2025, 10, 19),
-          newNoticesCount = 2,
-          lastSubmittedDate = LocalDate.of(2025, 9, 19),
-          lastSubmittedTaxMonth = YearMonth.of(2025, 8)
-        )(request, appConfig, messages(application))
-
-        status(result)          shouldBe OK
-        contentType(result)       should contain(HTML)
-        contentAsString(result) shouldBe expected.toString
-      }
+      } finally application.stop()
     }
   }
 }

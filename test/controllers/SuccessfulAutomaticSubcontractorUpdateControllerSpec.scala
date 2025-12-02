@@ -21,7 +21,6 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import viewmodels.SuccessfulAutomaticSubcontractorUpdateViewModel
 import views.html.SuccessfulAutomaticSubcontractorUpdateView
-import org.mockito.Mockito.*
 
 class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
 
