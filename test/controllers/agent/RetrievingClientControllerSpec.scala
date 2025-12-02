@@ -18,7 +18,7 @@ package controllers.agent
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -32,9 +32,43 @@ import scala.concurrent.Future
 class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val view: RetrievingClientView = app.injector.instanceOf[RetrievingClientView]
-  "RetrievingClient Controller" - {
 
-    "onPageLoad must return the view with Refresh header" in {
+  private def buildAppWithStatus(statusF: Future[String]) = {
+    val mockCisService = mock[ConstructionIndustrySchemeService]
+    when(mockCisService.getClientListStatus(using any[HeaderCarrier]))
+      .thenReturn(statusF)
+
+    val application =
+      applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        additionalBindings = Seq(bind[ConstructionIndustrySchemeService].toInstance(mockCisService)),
+        isAgent = true
+      ).build()
+
+    (application, mockCisService)
+  }
+
+  private def buildAppWithStartStatus(startStatusF: Future[String]) = {
+    val mockCisService = mock[ConstructionIndustrySchemeService]
+    when(mockCisService.startClientListRetrieval(using any[HeaderCarrier]))
+      .thenReturn(startStatusF)
+
+    when(mockCisService.getClientListStatus(using any[HeaderCarrier]))
+      .thenReturn(Future.successful("in-progress"))
+
+    val application =
+      applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        additionalBindings = Seq(bind[ConstructionIndustrySchemeService].toInstance(mockCisService)),
+        isAgent = true
+      ).build()
+
+    (application, mockCisService)
+  }
+
+  "RetrievingClientController.onPageLoad" - {
+
+    "must render retrieving page and immediately refresh to start" in {
       val application = applicationBuilder(
         userAnswers = Some(emptyUserAnswers),
         isAgent = true
@@ -45,123 +79,218 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(application, request).value
 
         status(result) mustEqual OK
-        header("Refresh", result).value mustBe s"0, url=${controllers.agent.routes.RetrievingClientController.start().url}"
-        contentAsString(result) mustBe view()(request, applicationConfig, messages(application)).toString
+        contentAsString(result) mustBe
+          view()(request, applicationConfig, messages(application)).toString
+
+        headers(result).get("Refresh") mustBe
+          Some(s"0; url=${controllers.agent.routes.RetrievingClientController.start().url}")
+      }
+    }
+  }
+
+  "RetrievingClientController.start" - {
+
+    "must redirect to client list search when start status is succeeded" in {
+      val (application, _) = buildAppWithStartStatus(Future.successful("succeeded"))
+
+      running(application) {
+        val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.start().url)
+        val result  = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.agent.routes.ClientListSearchController.onPageLoad().url
       }
     }
 
-    "start must redirect to ClientListSearch when 'succeeded' is returned" in {
-
-      val mockCisService: ConstructionIndustrySchemeService = mock[ConstructionIndustrySchemeService]
-      val application                                       = applicationBuilder(
-        userAnswers = Some(emptyUserAnswers),
-        additionalBindings = Seq(
-          bind[ConstructionIndustrySchemeService].to(mockCisService)
-        ),
-        isAgent = true
-      ).build()
+    "must redirect to failed-to-retrieve when start status is failed" in {
+      val (application, _) = buildAppWithStartStatus(Future.successful("failed"))
 
       running(application) {
-
-        when(mockCisService.getClientListStatus(using any[HeaderCarrier])).thenReturn(Future.successful("succeeded"))
         val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.start().url)
+        val result  = route(application, request).value
 
-        val result = route(application, request).value
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.agent.routes.FailedToRetrieveClientController.onPageLoad().url
+      }
+    }
+
+    "must return OK with Refresh header to poll with RetryCount=1 when start status is in-progress" in {
+      val (application, _) = buildAppWithStartStatus(Future.successful("in-progress"))
+
+      running(application) {
+        val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.start().url)
+        val result  = route(application, request).value
+
+        status(result) mustBe OK
+        contentAsString(result) mustBe
+          view()(request, applicationConfig, messages(application)).toString
+
+        val expectedUrl =
+          controllers.agent.routes.RetrievingClientController.poll(retryCount = 1).url
+
+        headers(result).get("Refresh") mustBe
+          Some(s"15; url=$expectedUrl")
+      }
+    }
+
+    "must redirect to system error for any other start status" in {
+      val (application, _) = buildAppWithStartStatus(Future.successful("weird-status"))
+
+      running(application) {
+        val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.start().url)
+        val result  = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.SystemErrorController.onPageLoad().url
+      }
+    }
+
+    "must redirect to system error if the start call fails" in {
+      val (application, _) = buildAppWithStartStatus(Future.failed(new RuntimeException("boom")))
+
+      running(application) {
+        val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.start().url)
+        val result  = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.SystemErrorController.onPageLoad().url
+      }
+    }
+  }
+
+  "RetrievingClientController.poll" - {
+
+    "must redirect to client list search when status is succeeded" in {
+      val (application, _) = buildAppWithStatus(Future.successful("succeeded"))
+
+      running(application) {
+        val request = FakeRequest(
+          GET,
+          controllers.agent.routes.RetrievingClientController.poll().url
+        )
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustBe routes.ClientListSearchController.onPageLoad().url
+        redirectLocation(result).value mustBe
+          routes.ClientListSearchController.onPageLoad().url
       }
     }
 
-    "start must redirect to FailedToRetrieveClient when 'failed' is returned" in {
-
-      val mockCisService: ConstructionIndustrySchemeService = mock[ConstructionIndustrySchemeService]
-      val application                                       = applicationBuilder(
-        userAnswers = Some(emptyUserAnswers),
-        additionalBindings = Seq(
-          bind[ConstructionIndustrySchemeService].to(mockCisService)
-        )
-      ).build()
+    "must redirect to failed-to-retrieve when status is failed" in {
+      val (application, _) = buildAppWithStatus(Future.successful("failed"))
 
       running(application) {
-
-        when(mockCisService.getClientListStatus(using any[HeaderCarrier])).thenReturn(Future.successful("failed"))
-        val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.start().url)
-
-        val result = route(application, request).value
+        val request = FakeRequest(
+          GET,
+          controllers.agent.routes.RetrievingClientController.poll().url
+        )
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustBe routes.FailedToRetrieveClientController.onPageLoad().url
+        redirectLocation(result).value mustBe
+          routes.FailedToRetrieveClientController.onPageLoad().url
       }
     }
 
-    "start must return the view when 'in-progress' is returned" in {
-
-      val mockCisService: ConstructionIndustrySchemeService = mock[ConstructionIndustrySchemeService]
-      val application                                       = applicationBuilder(
-        userAnswers = Some(emptyUserAnswers),
-        additionalBindings = Seq(
-          bind[ConstructionIndustrySchemeService].to(mockCisService)
-        )
-      ).build()
+    "must return OK with Refresh header when status is in-progress (first retry)" in {
+      val (application, _) = buildAppWithStatus(Future.successful("in-progress"))
 
       running(application) {
+        val request = FakeRequest(
+          GET,
+          controllers.agent.routes.RetrievingClientController.poll().url
+        )
+        val result  = route(application, request).value
 
-        when(mockCisService.getClientListStatus(using any[HeaderCarrier])).thenReturn(Future.successful("in-progress"))
-        val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.start().url)
-
-        val result = route(application, request).value
+        val expectedRefreshUrl =
+          controllers.agent.routes.RetrievingClientController.poll(retryCount = 1).url
 
         status(result) mustEqual OK
-        contentAsString(result) mustBe view()(request, applicationConfig, messages(application)).toString
+        contentAsString(result) mustBe
+          view()(request, applicationConfig, messages(application)).toString
+
+        headers(result).get("Refresh") mustBe
+          Some(s"15; url=$expectedRefreshUrl")
       }
     }
 
-    "start must redirect to SystemError when 'system-error' is returned" in {
-
-      val mockCisService: ConstructionIndustrySchemeService = mock[ConstructionIndustrySchemeService]
-      val application                                       = applicationBuilder(
-        userAnswers = Some(emptyUserAnswers),
-        additionalBindings = Seq(
-          bind[ConstructionIndustrySchemeService].to(mockCisService)
-        )
-      ).build()
+    "must increment RetryCount and refresh again when still in-progress" in {
+      val (application, _) = buildAppWithStatus(Future.successful("in-progress"))
 
       running(application) {
+        val request = FakeRequest(
+          GET,
+          controllers.agent.routes.RetrievingClientController.poll(retryCount = 3).url
+        )
+        val result  = route(application, request).value
 
-        when(mockCisService.getClientListStatus(using any[HeaderCarrier]))
-          .thenReturn(Future.successful("system-error"))
-        val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.start().url)
+        val expectedRefreshUrl =
+          controllers.agent.routes.RetrievingClientController.poll(retryCount = 4).url
 
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustBe controllers.routes.SystemErrorController.onPageLoad().url
+        status(result) mustEqual OK
+        headers(result).get("Refresh") mustBe
+          Some(s"15; url=$expectedRefreshUrl")
       }
     }
 
-    "start must redirect to SystemError when 'initiate-download' is returned" in {
-
-      val mockCisService: ConstructionIndustrySchemeService = mock[ConstructionIndustrySchemeService]
-      val application                                       = applicationBuilder(
-        userAnswers = Some(emptyUserAnswers),
-        additionalBindings = Seq(
-          bind[ConstructionIndustrySchemeService].to(mockCisService)
-        )
-      ).build()
+    "must redirect to failed-to-retrieve when max retries exceeded" in {
+      val (application, mockCisService) =
+        buildAppWithStatus(Future.successful("in-progress"))
 
       running(application) {
-
-        when(mockCisService.getClientListStatus(using any[HeaderCarrier]))
-          .thenReturn(Future.successful("initiate-download"))
-        val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.start().url)
-
-        val result = route(application, request).value
+        val request = FakeRequest(
+          GET,
+          controllers.agent.routes.RetrievingClientController.poll(retryCount = 8).url
+        )
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustBe controllers.routes.SystemErrorController.onPageLoad().url
+        redirectLocation(result).value mustBe
+          routes.FailedToRetrieveClientController.onPageLoad().url
+
+        verifyNoInteractions(mockCisService)
       }
     }
 
+    "must redirect to system error for any other/terminal status" in {
+      val terminalStatuses = Seq("system-error", "initiate-download", "weird-status")
+
+      terminalStatuses.foreach { s =>
+        val (application, _) = buildAppWithStatus(Future.successful(s))
+
+        running(application) {
+          val request = FakeRequest(
+            GET,
+            controllers.agent.routes.RetrievingClientController.poll().url
+          )
+          val result  = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustBe
+            controllers.routes.SystemErrorController.onPageLoad().url
+        }
+      }
+    }
+
+    "must redirect to system error if the service call fails" in {
+      val (application, _) =
+        buildAppWithStatus(Future.failed(new RuntimeException("boom")))
+
+      running(application) {
+        val request = FakeRequest(
+          GET,
+          controllers.agent.routes.RetrievingClientController.poll().url
+        )
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.SystemErrorController.onPageLoad().url
+      }
+    }
   }
 }
