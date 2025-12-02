@@ -30,16 +30,22 @@
     bold: Boolean = false
 )(implicit messages: Messages)
 
+@link(href: String, textKey: String) = {
+    <a href="@href" class="govuk-link @if(bold){govuk-!-font-weight-bold}" @if(isNewTab){rel="noreferrer noopener" target="_blank"}>
+        @{Html(messages(textKey))}
+    </a>
+}
 
 <p class="govuk-body @if(extraClasses.nonEmpty){@extraClasses}">
     @if(prefixTextKey.nonEmpty) {
         @{Html(messages(prefixTextKey))}
     }
-    <a href="@linkUrlOne" class="govuk-link @if(bold){govuk-!-font-weight-bold}" @if(isNewTab){rel="noreferrer noopener" target="_blank"}>@{Html(messages(linkTextUrlOne))}</a>
+
+    @link(linkUrlOne, linkTextUrlOne)
 
     @if(suffixTextKey.nonEmpty) {
         @{Html(messages(suffixTextKey))}
     }
 
-    <a href="@linkUrlTwo" class="govuk-link @if(bold){govuk-!-font-weight-bold}" @if(isNewTab){rel="noreferrer noopener" target="_blank"}>@{Html(messages(linkTextUrlTwo))}</a>
+    @link(linkUrlTwo, linkTextUrlTwo)
 </p>

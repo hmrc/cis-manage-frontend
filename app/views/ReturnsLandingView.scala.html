@@ -53,7 +53,7 @@
 }
 
 @htmlNotificationBanner = {
-    @h2("returnsLanding.banner.header")
+    @paragraph("returnsLanding.banner.header", extraClasses = "govuk-notification-banner__heading")
     @paragraph(messages("returnsLanding.banner.p1"))
     @paragraphWithLinks(
         linkTextUrlOne = "returnsLanding.banner.p2.link1",
@@ -71,11 +71,10 @@
 ) {
 
     @govukNotificationBanner(NotificationBanner(
-        content = HtmlContent(htmlNotificationBanner),
-        bannerType = Some("Important")
+        content = HtmlContent(htmlNotificationBanner)
     ))
 
-    @caption("ABC Construction Ltd")
+    @caption(contractorName)
     @h1(messages("returnsLanding.heading"))
 
     @twoColumnGrid(
