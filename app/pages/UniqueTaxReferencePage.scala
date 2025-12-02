@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package viewmodels.contractor
+package pages
 
-case class ContractorLandingViewModel(
-  contractorName: String,
-  employerReference: String,
-  utr: String,
-  returnCount: Int,
-  returnDueDate: String,
-  noticeCount: Int,
-  lastSubmittedDate: String,
-  lastSubmittedTaxMonthYear: String,
-  whatIsUrl: String,
-  guidanceUrl: String,
-  penaltiesUrl: String
-)
+import play.api.libs.json.JsPath
+
+case object UniqueTaxReferencePage extends QuestionPage[String] {
+  override def path: JsPath     = JsPath \ toString
+  override def toString: String = "utr"
+}

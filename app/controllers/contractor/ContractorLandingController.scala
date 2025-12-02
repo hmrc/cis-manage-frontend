@@ -16,7 +16,9 @@
 
 package controllers.contractor
 
-import ContractorLandingController.viewModel
+import ContractorLandingController.fromUserAnswers
+import models.UserAnswers
+import pages.*
 import config.FrontendAppConfig
 import controllers.actions.*
 import play.api.Logging
@@ -48,8 +50,9 @@ class ContractorLandingController @Inject() (
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     manageService
       .resolveAndStoreCisId(request.userAnswers)
-      .map { _ =>
-        Ok(view(viewModel(appConfig)))
+      .map { case (_, updatedUa) =>
+        val viewModel = fromUserAnswers(updatedUa, appConfig)
+        Ok(view(viewModel))
       }
       .recover {
         case e: UpstreamErrorResponse if e.statusCode == NOT_FOUND =>
@@ -67,16 +70,19 @@ class ContractorLandingController @Inject() (
 
 object ContractorLandingController {
 
-  def viewModel(appConfig: FrontendAppConfig): ContractorLandingViewModel = ContractorLandingViewModel(
-    "123/AB45678",
-    "1234567890",
-    1,
-    "19 October 2025",
-    2,
-    "19 September 2025",
-    "August 2025",
-    appConfig.contractorLandingWhatIsUrl,
-    appConfig.contractorLandingGuidanceUrl,
-    appConfig.contractorLandingPenaltiesUrl
-  )
+  def fromUserAnswers(ua: UserAnswers, appConfig: FrontendAppConfig): ContractorLandingViewModel =
+    ContractorLandingViewModel(
+      contractorName = ua.get(ContractorNamePage).getOrElse(""),
+      employerReference = ua.get(EmployerReferencePage).getOrElse(""),
+      utr = ua.get(UniqueTaxReferencePage).getOrElse(""),
+      // still hard-coded for now
+      returnCount = 1,
+      returnDueDate = "19 October 2025",
+      noticeCount = 2,
+      lastSubmittedDate = "19 September 2025",
+      lastSubmittedTaxMonthYear = "August 2025",
+      whatIsUrl = appConfig.contractorLandingWhatIsUrl,
+      guidanceUrl = appConfig.contractorLandingGuidanceUrl,
+      penaltiesUrl = appConfig.contractorLandingPenaltiesUrl
+    )
 }
