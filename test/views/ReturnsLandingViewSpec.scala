@@ -19,7 +19,7 @@ class ReturnsLandingViewSpec extends SpecBase {
 
       doc.title                                 must include(messages("returnsLanding.title"))
       doc.select("h1").text                     must include(messages("returnsLanding.heading"))
-      doc.select("h2").text                     must include(messages("returnsLanding.banner.header"))
+      doc.select("p").text                      must include(messages("returnsLanding.banner.header"))
       doc.select("p").text                      must include(messages("returnsLanding.banner.p1"))
       doc.getElementsByClass("govuk-link").text must include(messages("returnsLanding.banner.p2.link1"))
       doc.select("p").text                      must include(messages("returnsLanding.banner.p2.text"))
