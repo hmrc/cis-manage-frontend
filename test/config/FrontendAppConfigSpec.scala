@@ -43,15 +43,15 @@ class FrontendAppConfigSpec extends SpecBase {
         "https://www.gov.uk/government/collections/tax-agents-and-advisors-authorisation-forms"
 
       appConfig.cisHelpWhatIsUrl mustBe "https://www.gov.uk/what-is-the-construction-industry-scheme"
-      appConfig.cisHelpMonthlyUrl mustBe "https://www.gov.uk/guidance/cis-monthly-returns"
+      appConfig.cisHelpMonthlyUrl mustBe "https://www.gov.uk/what-you-must-do-as-a-cis-contractor/file-your-monthly-returns#guide-contents"
       appConfig.cisHelp340Url mustBe
         "https://www.gov.uk/what-you-must-do-as-a-cis-contractor/file-your-monthly-returns#penalties-for-late-returns"
 
-      appConfig.returnToHomeUrl mustBe "#"
+      appConfig.returnToHomeUrl mustBe "http://localhost:6996/construction-industry-scheme/management"
 
       appConfig.contractorLandingWhatIsUrl mustBe "https://www.gov.uk/what-is-the-construction-industry-scheme"
-      appConfig.contractorLandingGuidanceUrl mustBe "https://www.gov.uk/guidance/cis-monthly-returns"
-      appConfig.contractorLandingPenaltiesUrl mustBe "https://www.gov.uk/government/publications/cis-340"
+      appConfig.contractorLandingGuidanceUrl mustBe "https://www.gov.uk/what-you-must-do-as-a-cis-contractor/file-your-monthly-returns#guide-contents"
+      appConfig.contractorLandingPenaltiesUrl mustBe "https://www.gov.uk/what-you-must-do-as-a-cis-contractor/file-your-monthly-returns#penalties-for-late-returns"
 
       appConfig.hmrcOnlineServiceDeskUrl mustBe
         "https://www.gov.uk/find-hmrc-contacts/technical-support-with-hmrc-online-services"
