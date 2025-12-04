@@ -1,0 +1,137 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import views.html.components._
+@import viewmodels.ReturnLandingViewModel
+@import config.FrontendAppConfig
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
+
+@this(
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    govukTable: GovukTable,
+    govukNotificationBanner: GovukNotificationBanner,
+    h1: H1,
+    h2: H2,
+    twoColumnGrid: TwoColumnGrid,
+    oneColumnGrid: OneColumnGrid,
+    headingLink: HeadingLink,
+    paragraph: Paragraph,
+    sectionBreak: SectionBreak,
+    link: Link,
+    aside: Aside,
+    nav: Nav,
+    paragraphWithLinks: ParagraphWithLinks,
+    caption: Caption,
+    tableRowTagColour: TableRowTagColour
+)
+
+@(contractorName: String, returnsList: Seq[ReturnLandingViewModel])(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
+
+@sidebar = {
+    @aside("returnsLanding.aside.h2", nav(Seq(
+        "returnsLanding.aside.link1" -> config.govUkCISGuidanceUrl,
+        "returnsLanding.aside.link2" -> config.cisMonthlyReturnsGuidanceUrl,
+        "returnsLanding.aside.link3" -> config.cis340PenaltiesForLateReturnsUrl,
+        "returnsLanding.aside.link4" -> config.cisLateFilingPenaltyUrl
+    )))
+}
+
+@htmlNotificationBanner = {
+    @paragraph("returnsLanding.banner.header", extraClasses = "govuk-notification-banner__heading")
+    @paragraph(messages("returnsLanding.banner.p1"))
+    @paragraphWithLinks(
+        linkTextUrlOne = "returnsLanding.banner.p2.link1",
+        linkUrlOne = config.fileStandardReturnUrl,
+        suffixTextKey = "returnsLanding.banner.p2.text",
+        linkTextUrlTwo = "returnsLanding.banner.p2.link2",
+        linkUrlTwo = config.cisDateConfirmNilPaymentsUrl
+    )
+}
+
+@layout(
+    pageTitle = titleNoForm(messages("returnsLanding.title")),
+    showSignOut = false,
+    sidebar = Some(sidebar)
+) {
+
+    @govukNotificationBanner(NotificationBanner(
+        content = HtmlContent(htmlNotificationBanner)
+    ))
+
+    @caption(contractorName)
+    @h1(messages("returnsLanding.heading"))
+
+    @twoColumnGrid(
+        HtmlFormat.fill(Seq(
+            headingLink("returnsLanding.fileStandardReturn.h3.link", config.fileStandardReturnUrl),
+            paragraph("returnsLanding.fileStandardReturn.p1")
+        )),
+        HtmlFormat.fill(Seq(
+            headingLink("returnsLanding.fileNilReturn.h3.link", config.cisDateConfirmNilPaymentsUrl),
+            paragraph("returnsLanding.fileNilReturn.p1")
+        ))
+    )
+
+    @twoColumnGrid(
+        HtmlFormat.fill(Seq(
+            headingLink("returnsLanding.amendReturn.h3.link", config.amendReturnUrl),
+            paragraph("returnsLanding.amendReturn.p1")
+        )),
+        HtmlFormat.fill(Seq(
+            headingLink("returnsLanding.paymentsAndDeductions.h3.link", config.paymentsAndDeductionsUrl),
+            paragraph("returnsLanding.paymentsAndDeductions.p1")
+        ))
+    )
+
+    @oneColumnGrid(
+        HtmlFormat.fill(Seq(
+            headingLink("returnsLanding.noticesAndStatements.h3.link", config.noticesAndStatementsUrl),
+            paragraph("returnsLanding.noticeAndStatements.p1")
+        ))
+    )
+
+    @sectionBreak()
+
+    @h2(messages("returnsLanding.recentCisReturns.h2"))
+
+    @govukTable(
+        Table(
+            head = Some(
+                Seq(
+                    "returnsLanding.taxMonth.th",
+                    "returnsLanding.type.th",
+                    "returnsLanding.dateSubmitted.th",
+                    "returnsLanding.status.th"
+                ).map { key =>
+                    HeadCell(content = Text(messages(key)))
+                }
+            ),
+            rows = returnsList.map { item =>
+                Seq(
+                    TableRow(content = Text(item.taxMonth), classes = "govuk-table__header"),
+                    TableRow(content = Text(item.returnType)),
+                    TableRow(content = Text(item.dateSubmitted)),
+                    TableRow(content = HtmlContent(tableRowTagColour(text = item.status, colour = "govuk-tag--green")))
+                )
+            }
+        )
+    )
+
+    @link(linkTextKey = "returnsLanding.viewReturnsHistory.link", linkUrl = config.viewReturnsHistoryUrl)
+}

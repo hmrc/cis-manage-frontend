@@ -52,8 +52,14 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val payeCisForAgentsOnlineService: String              = configuration.get[String]("urls.payeCisForAgentsOnlineService")
   lazy val cisMonthlyReturnsGuidanceUrl: String               = configuration.get[String]("urls.cisMonthlyReturnsGuidance")
   lazy val cis340PenaltiesForLateReturnsUrl: String           = configuration.get[String]("urls.cis340PenaltiesForLateReturns")
+  lazy val cisLateFilingPenaltyUrl: String                    = configuration.get[String]("urls.cisLateFilingPenalty")
   lazy val cisSubcontractorGrossPaymentStatusUrl: String      =
     configuration.get[String]("urls.cisSubcontractorGrossPaymentStatus")
+  lazy val fileStandardReturnUrl: String                      = configuration.get[String]("urls.fileStandardReturn")
+  lazy val amendReturnUrl: String                             = configuration.get[String]("urls.amendReturn")
+  lazy val paymentsAndDeductionsUrl: String                   = configuration.get[String]("urls.paymentsAndDeductions")
+  lazy val noticesAndStatementsUrl: String                    = configuration.get[String]("urls.noticesAndStatements")
+  lazy val viewReturnsHistoryUrl: String                      = configuration.get[String]("urls.viewReturnsHistory")
 
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   lazy val exitSurveyUrl: String        = s"$exitSurveyBaseUrl/feedback/cis-manage-frontend"
@@ -74,4 +80,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val contractorLandingWhatIsUrl: String    = configuration.get[String]("urls.contractorLandingWhatIsUrl")
   lazy val contractorLandingGuidanceUrl: String  = configuration.get[String]("urls.contractorLandingGuidanceUrl")
   lazy val contractorLandingPenaltiesUrl: String = configuration.get[String]("urls.contractorLandingPenaltiesUrl")
+
+  private lazy val cisFrontendBaseUrl: String   = configuration.get[Service]("microservice.services.cis-frontend").baseUrl
+  lazy val cisDateConfirmNilPaymentsUrl: String = s"$cisFrontendBaseUrl/construction-industry-scheme"
 }
