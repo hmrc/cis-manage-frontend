@@ -14,14 +14,104 @@
  * limitations under the License.
  *@
 
+@import config.FrontendAppConfig
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.Select
+@import viewmodels.ManageNoticesStatementsPageViewModel
+@import views.html.components._
+
 @this(
         layout: templates.Layout,
-        govukButton: GovukButton
+        formHelper: FormWithCSRF,
+        govukButton: GovukButton,
+        govukSelect: GovukSelect,
+        govukRadios: GovukRadios,
+        h1: H1,
+        h2: H2,
+        caption: Caption,
+        paragraph: Paragraph,
+        sectionBreak: SectionBreak,
+        link: Link,
+        aside: Aside,
+        nav: Nav,
+        noticesTable: NoticesTable
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(contractorName: String, pageViewModel: ManageNoticesStatementsPageViewModel)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("manageNoticesStatements.title"))) {
+@sidebar = {
+    @aside("manageNoticesStatements.sidebar.heading", nav(Seq(
+        "manageNoticesStatements.sidebar.link1" -> config.govUkCISGuidanceUrl,
+        "manageNoticesStatements.sidebar.link2" -> config.cisMonthlyReturnsGuidanceUrl,
+        "manageNoticesStatements.sidebar.link3" -> config.cis340PenaltiesForLateReturnsUrl
+    )))
+}
 
-    <h1 class="govuk-heading-xl">@messages("manageNoticesStatements.heading")</h1>
+@layout(
+    pageTitle = titleNoForm(messages("manageNoticesStatements.title")),
+    sidebar = Some(sidebar)
+) {
+
+    @caption(contractorName)
+    @h1(messages("manageNoticesStatements.heading"))
+
+    @paragraph(messages("manageNoticesStatements.intro"))
+
+    @link(
+        "manageNoticesStatements.link.understandingNotices",
+        config.cisHelpMonthlyUrl,
+        paragraphWrapped = false
+    )
+
+    @sectionBreak()
+
+    @h2(messages("manageNoticesStatements.search.heading"))
+    @paragraph(messages("manageNoticesStatements.search.description"))
+
+    @formHelper(action = controllers.routes.ManageNoticesStatementsController.onPageLoad(), Symbol("method") -> "get", Symbol("class") -> "govuk-!-margin-bottom-6") {
+        @govukSelect(
+            Select(
+                id = "noticeType",
+                name = "noticeType",
+                label = LabelViewModel(messages("manageNoticesStatements.noticeType.label")),
+                items = pageViewModel.noticeTypeItems
+            ).withCssClass("govuk-!-width-one-third")
+        )
+
+        @govukSelect(
+            Select(
+                id = "noticeStatus",
+                name = "noticeStatus",
+                label = LabelViewModel(messages("manageNoticesStatements.readStatus.label")),
+                items = pageViewModel.readStatusItems
+            ).withCssClass("govuk-!-width-one-quarter")
+        )
+
+        @govukRadios(
+            Radios(
+                fieldset = Some(Fieldset(legend = Some(Legend(
+                    content = Text(messages("manageNoticesStatements.dateRange.legend")),
+                    classes = "govuk-fieldset__legend--m"
+                )))),
+                name = "dateRange",
+                items = pageViewModel.dateRangeItems
+            )
+        )
+
+        @govukButton(viewmodels.govuk.button.ButtonViewModel(messages("manageNoticesStatements.search.button")))
+    }
+
+    @sectionBreak()
+
+    @h2(messages("manageNoticesStatements.searchResults.heading"))
+    @paragraph("manageNoticesStatements.searchResults.summary", args = Seq(pageViewModel.notices.size, pageViewModel.totalRecords))
+
+    @h2(messages("manageNoticesStatements.recentNotices.heading"))
+
+    @noticesTable(pageViewModel.notices)
+
+    @link("manageNoticesStatements.searchResults.viewAll", config.noticesAndStatementsUrl, paragraphWrapped = false)
 }

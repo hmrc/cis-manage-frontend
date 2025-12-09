@@ -16,24 +16,67 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import controllers.actions._
-import javax.inject.Inject
-import play.api.i18n.{I18nSupport, MessagesApi}
+import pages.ContractorNamePage
+import play.api.Logging
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.{ManageNoticesStatementsPageViewModel, ManageNoticesStatementsRowViewModel}
 import views.html.ManageNoticesStatementsView
 
-class ManageNoticesStatementsController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: ManageNoticesStatementsView
-                                     ) extends FrontendBaseController with I18nSupport {
+import javax.inject.Inject
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      Ok(view())
+class ManageNoticesStatementsController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: ManageNoticesStatementsView
+)(implicit appConfig: FrontendAppConfig)
+    extends FrontendBaseController
+    with I18nSupport
+    with Logging {
+
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    implicit val messages: Messages = messagesApi.preferred(request)
+
+    val contractorName = request.userAnswers.get(ContractorNamePage).getOrElse {
+      logger.error("[ManageNoticesStatementsController] contractorName missing from userAnswers")
+      throw new IllegalStateException("contractorName missing from userAnswers")
+    }
+
+    val notices = Seq(
+      ManageNoticesStatementsRowViewModel(
+        date = "15 October 2025",
+        noticeType = messages("manageNoticesStatements.noticeType.penaltyWarnings"),
+        description = messages("manageNoticesStatements.description.penaltyWarning", "5 October 2025"),
+        status = messages("manageNoticesStatements.status.unread"),
+        statusColour = "govuk-tag--red",
+        actionUrl = appConfig.noticesAndStatementsUrl
+      ),
+      ManageNoticesStatementsRowViewModel(
+        date = "20 September 2025",
+        noticeType = messages("manageNoticesStatements.noticeType.confirmationStatements"),
+        description = messages("manageNoticesStatements.description.confirmation", "August 2025"),
+        status = messages("manageNoticesStatements.status.read"),
+        statusColour = "govuk-tag--blue",
+        actionUrl = appConfig.noticesAndStatementsUrl
+      ),
+      ManageNoticesStatementsRowViewModel(
+        date = "20 August 2025",
+        noticeType = messages("manageNoticesStatements.noticeType.confirmationStatements"),
+        description = messages("manageNoticesStatements.description.confirmation", "July 2025"),
+        status = messages("manageNoticesStatements.status.read"),
+        statusColour = "govuk-tag--blue",
+        actionUrl = appConfig.noticesAndStatementsUrl
+      )
+    )
+
+    val pageViewModel = ManageNoticesStatementsPageViewModel(notices)
+
+    Ok(view(contractorName, pageViewModel))
   }
 }
