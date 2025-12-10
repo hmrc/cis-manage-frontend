@@ -21,7 +21,7 @@ import models.{CisTaxpayer, CisTaxpayerSearchResult}
 import play.api.Logging
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, HttpResponse, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
@@ -66,4 +66,22 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
     http
       .get(url"$cisBaseUrl/agent/client-taxpayer/$taxOfficeNumber/$taxOfficeReference")
       .execute[CisTaxpayer]
+
+  def prepopulateContractorKnownFacts(
+    instanceId: String,
+    taxOfficeNumber: String,
+    taxOfficeReference: String
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/contractor-known-facts/prepopulate/$taxOfficeNumber/$taxOfficeReference/$instanceId")
+      .execute[HttpResponse]
+      .flatMap { resp =>
+        if (resp.status / 100 == 2) {
+          Future.unit
+        } else {
+          Future.failed(
+            UpstreamErrorResponse(resp.body, resp.status, resp.status)
+          )
+        }
+      }
 }

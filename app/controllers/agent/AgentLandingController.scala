@@ -18,18 +18,22 @@ package controllers.agent
 
 import controllers.actions.*
 import config.FrontendAppConfig
+import models.Target
+import models.Target.*
+import pages.AgentClientsPage
 import play.api.Logging
 
 import javax.inject.{Inject, Named}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.ManageService
-import uk.gov.hmrc.http.HeaderCarrier
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import services.{ManageService, PrepopService}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.agent.AgentLandingView
 
-import scala.concurrent.ExecutionContext
+import scala.util.control.NonFatal
+import scala.concurrent.{ExecutionContext, Future}
 
 class AgentLandingController @Inject() (
   override val messagesApi: MessagesApi,
@@ -37,6 +41,7 @@ class AgentLandingController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   manageService: ManageService,
+  prepopService: PrepopService,
   val controllerComponents: MessagesControllerComponents,
   view: AgentLandingView,
   appConfig: FrontendAppConfig
@@ -55,6 +60,7 @@ class AgentLandingController @Inject() (
         .map { viewModel =>
           Ok(
             view(
+              uniqueId = uniqueId,
               clientName = viewModel.clientName,
               employerRef = viewModel.employerRef,
               utr = viewModel.utr.getOrElse(""),
@@ -71,5 +77,67 @@ class AgentLandingController @Inject() (
           logger.error(s"[AgentLandingController][onPageLoad] Failed for uniqueId=$uniqueId", e)
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
+    }
+
+  def onTargetClick(uniqueId: String, targetKey: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
+      Target.fromKey(targetKey) match {
+        case Some(target) =>
+          val clientOpt = request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId))
+
+          clientOpt match {
+            case Some(client) if client.uniqueId.nonEmpty =>
+              val instanceId         = client.uniqueId
+              val taxOfficeNumber    = client.taxOfficeNumber
+              val taxOfficeReference = client.taxOfficeRef
+
+              prepopService
+                .prepopulateContractorKnownFacts(
+                  taxOfficeNumber = taxOfficeNumber,
+                  taxOfficeReference = taxOfficeReference,
+                  instanceId = instanceId
+                )
+                .map { _ =>
+                  Redirect(targetCall(target, instanceId))
+                }
+                .recover {
+                  case u: UpstreamErrorResponse =>
+                    logger.error(
+                      s"[AgentLandingController][onTargetClick] upstream error for uniqueId=$uniqueId: ${u.message}",
+                      u
+                    )
+                    Redirect(controllers.routes.SystemErrorController.onPageLoad())
+                  case NonFatal(e)              =>
+                    logger.error(s"[AgentLandingController][onTargetClick] unexpected error for uniqueId=$uniqueId", e)
+                    Redirect(controllers.routes.SystemErrorController.onPageLoad())
+                }
+
+            case Some(client) =>
+              logger.warn(
+                s"[AgentLandingController][onTargetClick] Client found but uniqueId is missing/empty for requested uniqueId=$uniqueId"
+              )
+              // to be updated to CRR3 controller
+              Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
+
+            case None =>
+              logger.warn(
+                s"[AgentLandingController][onTargetClick] Missing client in userAnswers for uniqueId=$uniqueId"
+              )
+              Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
+          }
+
+        case None =>
+          logger.warn(s"[AgentLandingController][onTargetClick] Unknown targetKey=$targetKey for uniqueId=$uniqueId")
+          Future.successful(NotFound("Unknown target"))
+      }
+    }
+
+  private def targetCall(target: Target, instanceId: String): Call =
+    target match {
+      case Returns       => controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
+      case Notices       => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case Subcontractor => controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId)
     }
 }

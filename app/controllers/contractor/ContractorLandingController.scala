@@ -17,21 +17,24 @@
 package controllers.contractor
 
 import ContractorLandingController.fromUserAnswers
-import models.UserAnswers
+import models.{EmployerReference, Target, UserAnswers}
 import pages.*
 import config.FrontendAppConfig
 import controllers.actions.*
+import models.Target.*
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.ManageService
-import uk.gov.hmrc.http.UpstreamErrorResponse
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import services.{ManageService, PrepopService}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import viewmodels.contractor.ContractorLandingViewModel
 import views.html.contractor.ContractorLandingView
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
+import scala.util.control.NonFatal
+import scala.concurrent.{ExecutionContext, Future}
 
 class ContractorLandingController @Inject() (
   override val messagesApi: MessagesApi,
@@ -41,7 +44,8 @@ class ContractorLandingController @Inject() (
   appConfig: FrontendAppConfig,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  manageService: ManageService
+  manageService: ManageService,
+  prepopService: PrepopService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -66,6 +70,59 @@ class ContractorLandingController @Inject() (
       }
 
   }
+
+  def onTargetClick(targetKey: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      implicit val hc: HeaderCarrier =
+        HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
+      Target.fromKey(targetKey) match {
+        case Some(target) =>
+          val maybeInstanceId: Option[String]             = request.userAnswers.get(CisIdPage)
+          val maybeEmployerRef: Option[EmployerReference] = request.employerReference
+
+          (maybeInstanceId, maybeEmployerRef) match {
+            case (Some(instanceId), Some(employerRef)) =>
+              prepopService
+                .prepopulateContractorKnownFacts(
+                  instanceId = instanceId,
+                  taxOfficeNumber = employerRef.taxOfficeNumber,
+                  taxOfficeReference = employerRef.taxOfficeReference
+                )
+                .map { _ =>
+                  Redirect(targetCall(target, instanceId))
+                }
+                .recover {
+                  case u: UpstreamErrorResponse =>
+                    logger.error(s"[ContractorLandingController][onTargetClick] upstream error: ${u.message}", u)
+                    Redirect(controllers.routes.SystemErrorController.onPageLoad())
+                  case NonFatal(e)              =>
+                    logger.error("[ContractorLandingController][onTargetClick] unexpected error", e)
+                    Redirect(controllers.routes.SystemErrorController.onPageLoad())
+                }
+
+            case (None, _) =>
+              logger.warn("[ContractorLandingController][onTargetClick] Missing CisIdPage (instanceId) in userAnswers")
+              // to be updated to CRR3 controller
+              Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
+
+            case (_, None) =>
+              logger.warn("[ContractorLandingController][onTargetClick] Missing employerReference on DataRequest")
+              Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
+          }
+
+        case None =>
+          Future.successful(NotFound("Unknown target"))
+      }
+    }
+
+  private def targetCall(target: Target, instanceId: String): Call =
+    target match {
+      case Returns       => controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
+      // to be added for NoticesLandingController
+      case Notices       => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case Subcontractor => controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId)
+    }
 }
 
 object ContractorLandingController {

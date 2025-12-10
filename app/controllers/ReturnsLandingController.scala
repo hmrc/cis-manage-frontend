@@ -18,7 +18,7 @@ package controllers
 
 import config.FrontendAppConfig
 import controllers.actions.*
-import pages.ContractorNamePage
+import pages.{AgentClientsPage, ContractorNamePage}
 import play.api.Logging
 
 import javax.inject.Inject
@@ -40,18 +40,32 @@ class ReturnsLandingController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val contractorName = request.userAnswers.get(ContractorNamePage).getOrElse {
-      logger.error("[ReturnsLandingController] contractorName missing from userAnswers")
-      throw new IllegalStateException("contractorName missing from userAnswers")
-    }
+  def onPageLoad(instanceId: String): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+      val contractorNameOpt: Option[String] =
+        if (request.isAgent) {
+          for {
+            clients <- request.userAnswers.get(AgentClientsPage)
+            client  <- clients.find(_.uniqueId == instanceId)
+            name    <- client.schemeName
+          } yield name
+        } else {
+          request.userAnswers.get(ContractorNamePage)
+        }
 
-    val returnsList = Seq(
-      ReturnLandingViewModel("August 2025", "Standard", "19 September 2025", "Accepted"),
-      ReturnLandingViewModel("July 2025", "Nil", "19 August 2025", "Accepted"),
-      ReturnLandingViewModel("June 2025", "Standard", "18 July 2025", "Accepted")
-    )
+      contractorNameOpt match {
+        case Some(contractorName) =>
+          val returnsList = Seq(
+            ReturnLandingViewModel("August 2025", "Standard", "19 September 2025", "Accepted"),
+            ReturnLandingViewModel("July 2025", "Nil", "19 August 2025", "Accepted"),
+            ReturnLandingViewModel("June 2025", "Standard", "18 July 2025", "Accepted")
+          )
 
-    Ok(view(contractorName, returnsList))
+          Ok(view(contractorName, returnsList))
+
+        case None =>
+          logger.warn(s"[ReturnsLandingController] contractorName missing (isAgent=${request.isAgent})")
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
   }
 }
