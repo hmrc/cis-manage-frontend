@@ -161,10 +161,7 @@
 
   @gridRow(classes = "govuk-!-margin-top-4") {
     @gridColumnOneHalf {
-      @headingLink(
-        messages("agent.landing.manage.clientDetails"),
-        controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "clientDetails").url
-      )
+      @headingLink(messages("agent.landing.manage.clientDetails"), "#")
       @paragraph(messages("agent.landing.manage.clientDetails.blurb"),
         false, "govuk-body", "govuk-!-font-size-16", Nil)
     }

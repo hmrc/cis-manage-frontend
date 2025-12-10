@@ -17,7 +17,6 @@
 package viewmodels
 
 import base.SpecBase
-import org.scalatest.matchers.should.Matchers.*
 
 class ReturnLandingViewModelSpec extends SpecBase {
 

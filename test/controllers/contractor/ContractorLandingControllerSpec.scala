@@ -20,16 +20,17 @@ import base.SpecBase
 import config.FrontendAppConfig
 import controllers.contractor.ContractorLandingController.fromUserAnswers
 import models.UserAnswers
-import org.mockito.Mockito.when
-import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{verify, verifyNoInteractions, when}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatestplus.mockito.MockitoSugar.mock
+import pages.CisIdPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.api.inject.bind
 import play.api.mvc.AnyContentAsEmpty
-import services.ManageService
-import uk.gov.hmrc.http.UpstreamErrorResponse
+import services.{ManageService, PrepopService}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import views.html.contractor.ContractorLandingView
 
 import scala.concurrent.Future
@@ -108,6 +109,191 @@ class ContractorLandingControllerSpec extends SpecBase {
         redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
       }
     }
+  }
 
+  "ContractorLandingController.onTargetClick" - {
+    val returnsTargetKey         = "returnDue"
+    val instanceId               = "CIS-123"
+    val uaWithCisId: UserAnswers =
+      emptyUserAnswers
+        .set(CisIdPage, instanceId)
+        .success
+        .value
+
+    "must call prepopulateContractorKnownFacts and redirect to ReturnsLandingController when cisId and employerReference are present and prepop succeeds" in {
+      val mockPrepopService = mock[PrepopService]
+
+      when(
+        mockPrepopService.prepopulateContractorKnownFacts(
+          any[String],
+          any[String],
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.unit)
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(uaWithCisId),
+          additionalBindings = Seq.empty
+        ).overrides(
+          bind[PrepopService].toInstance(mockPrepopService)
+        ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            GET,
+            controllers.contractor.routes.ContractorLandingController
+              .onTargetClick(returnsTargetKey)
+              .url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url
+
+        verify(mockPrepopService)
+          .prepopulateContractorKnownFacts(
+            eqTo(instanceId),
+            eqTo("taxOfficeNumber"),
+            eqTo("taxOfficeReference")
+          )(any[HeaderCarrier])
+      }
+    }
+
+    "must redirect to SystemErrorController when prepopulateContractorKnownFacts fails with UpstreamErrorResponse" in {
+      val mockPrepopService = mock[PrepopService]
+
+      when(
+        mockPrepopService.prepopulateContractorKnownFacts(
+          any[String],
+          any[String],
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.failed(UpstreamErrorResponse("boom", INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR))
+      )
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(uaWithCisId),
+          additionalBindings = Seq.empty
+        ).overrides(
+          bind[PrepopService].toInstance(mockPrepopService)
+        ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            GET,
+            controllers.contractor.routes.ContractorLandingController
+              .onTargetClick(returnsTargetKey)
+              .url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.SystemErrorController.onPageLoad().url
+      }
+    }
+
+    "must redirect to SystemErrorController when prepopulateContractorKnownFacts fails with an unexpected error" in {
+      val mockPrepopService = mock[PrepopService]
+
+      when(
+        mockPrepopService.prepopulateContractorKnownFacts(
+          any[String],
+          any[String],
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.failed(new RuntimeException("boom"))
+      )
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(uaWithCisId),
+          additionalBindings = Seq.empty
+        ).overrides(
+          bind[PrepopService].toInstance(mockPrepopService)
+        ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            GET,
+            controllers.contractor.routes.ContractorLandingController
+              .onTargetClick(returnsTargetKey)
+              .url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.SystemErrorController.onPageLoad().url
+      }
+    }
+
+    "must redirect to SystemErrorController when CisIdPage is missing" in {
+      val mockPrepopService = mock[PrepopService]
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          additionalBindings = Seq.empty
+        ).overrides(
+          bind[PrepopService].toInstance(mockPrepopService)
+        ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            GET,
+            controllers.contractor.routes.ContractorLandingController
+              .onTargetClick(returnsTargetKey)
+              .url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.SystemErrorController.onPageLoad().url
+
+        verifyNoInteractions(mockPrepopService)
+      }
+    }
+
+    "must return NotFound when targetKey is unknown" in {
+      val mockPrepopService = mock[PrepopService]
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(uaWithCisId),
+          additionalBindings = Seq.empty
+        ).overrides(
+          bind[PrepopService].toInstance(mockPrepopService)
+        ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            GET,
+            controllers.contractor.routes.ContractorLandingController
+              .onTargetClick("unknownTargetKey")
+              .url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe NOT_FOUND
+        verifyNoInteractions(mockPrepopService)
+      }
+    }
   }
 }

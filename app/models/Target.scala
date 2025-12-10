@@ -34,8 +34,7 @@ object Target {
   )
 
   private val subcontractorKeys = Set(
-    "subcontractors",
-    "clientDetails"
+    "subcontractors"
   )
 
   def fromKey(key: String): Option[Target] = key match {

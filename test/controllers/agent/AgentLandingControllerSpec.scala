@@ -20,13 +20,14 @@ import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import models.UserAnswers
+import models.{CisTaxpayerSearchResult, UserAnswers}
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
+import pages.AgentClientsPage
 import play.api.Application
 import play.api.inject.bind
-import services.ManageService
-import uk.gov.hmrc.http.HeaderCarrier
+import services.{ManageService, PrepopService}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import viewmodels.agent.AgentLandingViewModel
 
 import scala.concurrent.Future
@@ -40,6 +41,21 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
     employerRef = "123/AB456",
     utr = Some("1234567890")
   )
+
+  private val client = CisTaxpayerSearchResult(
+    uniqueId = uniqueId,
+    taxOfficeNumber = "163",
+    taxOfficeRef = "AB0063",
+    agentOwnRef = Some("ref123"),
+    schemeName = Some("Test Client"),
+    utr = Some("1234567890")
+  )
+
+  private val userAnswersWithAgentClient: UserAnswers =
+    emptyUserAnswers
+      .set(AgentClientsPage, List(client))
+      .success
+      .value
 
   "AgentLandingController.onPageLoad" - {
 
@@ -106,6 +122,193 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
           controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+      } finally application.stop()
+    }
+  }
+
+  "AgentLandingController.onTargetClick" - {
+
+    val returnsTargetKey = "returnDue"
+
+    "must call prepopulate and redirect to ReturnsLandingController when client is found and prepop succeeds" in {
+      val mockPrepopService = mock[PrepopService]
+
+      when(
+        mockPrepopService.prepopulateContractorKnownFacts(
+          any[String],
+          any[String],
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.unit)
+
+      val application: Application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithAgentClient),
+          additionalBindings = Seq(
+            bind[PrepopService].toInstance(mockPrepopService)
+          ),
+          isAgent = true
+        ).build()
+
+      try {
+        val request =
+          FakeRequest(
+            GET,
+            controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, returnsTargetKey).url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.ReturnsLandingController.onPageLoad(uniqueId).url
+
+        verify(mockPrepopService)
+          .prepopulateContractorKnownFacts(
+            eqTo(uniqueId),
+            eqTo("163"),
+            eqTo("AB0063")
+          )(any[HeaderCarrier])
+
+      } finally application.stop()
+    }
+
+    "must redirect to SystemErrorController when prepopulateContractorKnownFacts fails with UpstreamErrorResponse" in {
+      val mockPrepopService = mock[PrepopService]
+
+      when(
+        mockPrepopService.prepopulateContractorKnownFacts(
+          any[String],
+          any[String],
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.failed(UpstreamErrorResponse("boom", INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR))
+      )
+
+      val application: Application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithAgentClient),
+          additionalBindings = Seq(
+            bind[PrepopService].toInstance(mockPrepopService)
+          ),
+          isAgent = true
+        ).build()
+
+      try {
+        val request =
+          FakeRequest(
+            GET,
+            controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, returnsTargetKey).url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.SystemErrorController.onPageLoad().url
+
+      } finally application.stop()
+    }
+
+    "must redirect to SystemErrorController when prepopulateContractorKnownFacts fails with an unexpected error" in {
+      val mockPrepopService = mock[PrepopService]
+
+      when(
+        mockPrepopService.prepopulateContractorKnownFacts(
+          any[String],
+          any[String],
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(
+        Future.failed(new RuntimeException("boom"))
+      )
+
+      val application: Application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithAgentClient),
+          additionalBindings = Seq(
+            bind[PrepopService].toInstance(mockPrepopService)
+          ),
+          isAgent = true
+        ).build()
+
+      try {
+        val request =
+          FakeRequest(
+            GET,
+            controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, returnsTargetKey).url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.SystemErrorController.onPageLoad().url
+
+      } finally application.stop()
+    }
+
+    "must redirect to SystemErrorController when client is missing from AgentClientsPage" in {
+      val mockPrepopService = mock[PrepopService]
+
+      val uaWithoutClient =
+        emptyUserAnswers
+          .set(AgentClientsPage, List.empty[CisTaxpayerSearchResult])
+          .success
+          .value
+
+      val application: Application =
+        applicationBuilder(
+          userAnswers = Some(uaWithoutClient),
+          additionalBindings = Seq(
+            bind[PrepopService].toInstance(mockPrepopService)
+          ),
+          isAgent = true
+        ).build()
+
+      try {
+        val request =
+          FakeRequest(
+            GET,
+            controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, returnsTargetKey).url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.SystemErrorController.onPageLoad().url
+
+        verifyNoInteractions(mockPrepopService)
+
+      } finally application.stop()
+    }
+
+    "must return NotFound when targetKey is unknown" in {
+      val mockPrepopService = mock[PrepopService]
+
+      val application: Application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithAgentClient),
+          additionalBindings = Seq(
+            bind[PrepopService].toInstance(mockPrepopService)
+          ),
+          isAgent = true
+        ).build()
+
+      try {
+        val request =
+          FakeRequest(
+            GET,
+            controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "unknownTargetKey").url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe NOT_FOUND
+        verifyNoInteractions(mockPrepopService)
 
       } finally application.stop()
     }
