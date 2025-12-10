@@ -52,32 +52,34 @@ object ManageNoticesStatementsPageViewModel {
     ManageNoticesStatementsPageViewModel(
       noticeTypeItems = Seq(
         SelectItem(
-          value = Some("general"),
-          text = messages("manageNoticesStatements.noticeType.general"),
-          selected = true
+          value = Some("all"),
+          text = messages("manageNoticesStatements.noticeType.all")
+        ),
+        SelectItem(
+          value = Some("confirmationStatements"),
+          text = messages("manageNoticesStatements.noticeType.confirmationStatements")
         ),
         SelectItem(
           value = Some("penaltyWarnings"),
           text = messages("manageNoticesStatements.noticeType.penaltyWarnings")
         ),
         SelectItem(
-          value = Some("confirmationStatements"),
-          text = messages("manageNoticesStatements.noticeType.confirmationStatements")
+          value = Some("general"),
+          text = messages("manageNoticesStatements.noticeType.general")
         )
       ),
       readStatusItems = Seq(
         SelectItem(
+          value = Some("all"),
+          text = messages("manageNoticesStatements.status.all")
+        ),
+        SelectItem(
           value = Some("read"),
-          text = messages("manageNoticesStatements.status.read"),
-          selected = true
+          text = messages("manageNoticesStatements.status.read")
         ),
         SelectItem(
           value = Some("unread"),
           text = messages("manageNoticesStatements.status.unread")
-        ),
-        SelectItem(
-          value = Some("all"),
-          text = messages("manageNoticesStatements.status.all")
         )
       ),
       dateRangeItems = Seq(
@@ -95,12 +97,10 @@ object ManageNoticesStatementsPageViewModel {
         ),
         RadioItem(
           value = Some("all"),
-          content = Text(messages("manageNoticesStatements.dateFilter.all")),
-          checked = true
+          content = Text(messages("manageNoticesStatements.dateFilter.all"))
         )
       ),
       notices = notices,
       totalRecords = totalRecords
     )
 }
-

@@ -17,6 +17,7 @@
 @import config.FrontendAppConfig
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.details.Details
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.radios._
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.select.Select
@@ -29,8 +30,10 @@
         govukButton: GovukButton,
         govukSelect: GovukSelect,
         govukRadios: GovukRadios,
+        govukDetails: GovukDetails,
         h1: H1,
         h2: H2,
+        h3: H3,
         caption: Caption,
         paragraph: Paragraph,
         sectionBreak: SectionBreak,
@@ -41,6 +44,20 @@
 )
 
 @(contractorName: String, pageViewModel: ManageNoticesStatementsPageViewModel)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
+
+@detailsHtmlContent = {
+    @h3(messages("manageNoticesStatements.details.confirmationStatements.heading"))
+    @paragraph("manageNoticesStatements.details.confirmationStatements.body")
+
+    @h3(messages("manageNoticesStatements.details.penaltyWarnings.heading"))
+    @paragraph("manageNoticesStatements.details.penaltyWarnings.body")
+
+    @h3(messages("manageNoticesStatements.details.generalNotices.heading"))
+    @paragraph("manageNoticesStatements.details.generalNotices.body")
+
+    @h3(messages("manageNoticesStatements.details.howLong.heading"))
+    @paragraph("manageNoticesStatements.details.howLong.body")
+}
 
 @sidebar = {
     @aside("manageNoticesStatements.sidebar.heading", nav(Seq(
@@ -60,13 +77,12 @@
 
     @paragraph(messages("manageNoticesStatements.intro"))
 
-    @link(
-        "manageNoticesStatements.link.understandingNotices",
-        config.cisHelpMonthlyUrl,
-        paragraphWrapped = false
+    @govukDetails(
+        Details(
+            summary = Text(messages("manageNoticesStatements.link.understandingNotices")),
+            content = HtmlContent(detailsHtmlContent)
+        )
     )
-
-    @sectionBreak()
 
     @h2(messages("manageNoticesStatements.search.heading"))
     @paragraph(messages("manageNoticesStatements.search.description"))
@@ -113,5 +129,5 @@
 
     @noticesTable(pageViewModel.notices)
 
-    @link("manageNoticesStatements.searchResults.viewAll", config.noticesAndStatementsUrl, paragraphWrapped = false)
+    @link("manageNoticesStatements.searchResults.viewAll", config.noticesAndStatementsUrl)
 }
