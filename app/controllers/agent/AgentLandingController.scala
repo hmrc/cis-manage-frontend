@@ -104,10 +104,7 @@ class AgentLandingController @Inject() (
                 }
                 .recover {
                   case u: UpstreamErrorResponse =>
-                    logger.error(
-                      s"[AgentLandingController][onTargetClick] upstream error for uniqueId=$uniqueId: ${u.message}",
-                      u
-                    )
+                    logger.error(s"[AgentLandingController][onTargetClick] upstream error for uniqueId=$uniqueId: ${u.message}", u)
                     Redirect(controllers.routes.SystemErrorController.onPageLoad())
                   case NonFatal(e)              =>
                     logger.error(s"[AgentLandingController][onTargetClick] unexpected error for uniqueId=$uniqueId", e)
@@ -115,16 +112,12 @@ class AgentLandingController @Inject() (
                 }
 
             case Some(client) =>
-              logger.warn(
-                s"[AgentLandingController][onTargetClick] Client found but uniqueId is missing/empty for requested uniqueId=$uniqueId"
-              )
+              logger.warn(s"[AgentLandingController][onTargetClick] Client found but uniqueId is missing/empty for requested uniqueId=$uniqueId")
               // to be updated to CRR3 controller
               Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
 
             case None =>
-              logger.warn(
-                s"[AgentLandingController][onTargetClick] Missing client in userAnswers for uniqueId=$uniqueId"
-              )
+              logger.warn(s"[AgentLandingController][onTargetClick] Missing client in userAnswers for uniqueId=$uniqueId")
               Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
           }
 
