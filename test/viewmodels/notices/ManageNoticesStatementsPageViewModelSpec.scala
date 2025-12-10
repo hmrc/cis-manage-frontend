@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package viewmodels
+package viewmodels.notices
 
 import base.SpecBase
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
-import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
 
 class ManageNoticesStatementsPageViewModelSpec extends SpecBase {
 

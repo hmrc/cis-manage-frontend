@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.notices
 
 import config.FrontendAppConfig
 import controllers.actions._
@@ -23,8 +23,8 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.{ManageNoticesStatementsPageViewModel, ManageNoticesStatementsRowViewModel}
-import views.html.ManageNoticesStatementsView
+import viewmodels.notices.{ManageNoticesStatementsPageViewModel, ManageNoticesStatementsRowViewModel}
+import views.html.notices.ManageNoticesStatementsView
 
 import javax.inject.Inject
 

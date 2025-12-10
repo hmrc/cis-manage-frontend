@@ -21,7 +21,7 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.radios._
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.select.Select
-@import viewmodels.ManageNoticesStatementsPageViewModel
+@import viewmodels.notices.ManageNoticesStatementsPageViewModel
 @import views.html.components._
 
 @this(
@@ -87,7 +87,7 @@
     @h2(messages("manageNoticesStatements.search.heading"))
     @paragraph(messages("manageNoticesStatements.search.description"))
 
-    @formHelper(action = controllers.routes.ManageNoticesStatementsController.onPageLoad(), Symbol("method") -> "get", Symbol("class") -> "govuk-!-margin-bottom-6") {
+    @formHelper(action = controllers.notices.routes.ManageNoticesStatementsController.onPageLoad(), Symbol("method") -> "get", Symbol("class") -> "govuk-!-margin-bottom-6") {
         @govukSelect(
             Select(
                 id = "noticeType",

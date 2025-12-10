@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.notices
 
 import base.SpecBase
 import models.UserAnswers
 import pages.{CisIdPage, ContractorNamePage}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import viewmodels.{ManageNoticesStatementsPageViewModel, ManageNoticesStatementsRowViewModel}
-import views.html.ManageNoticesStatementsView
+import viewmodels.notices.{ManageNoticesStatementsPageViewModel, ManageNoticesStatementsRowViewModel}
+import views.html.notices.ManageNoticesStatementsView
 
 class ManageNoticesStatementsControllerSpec extends SpecBase {
 

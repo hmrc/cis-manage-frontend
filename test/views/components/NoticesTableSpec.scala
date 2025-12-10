@@ -22,7 +22,7 @@ import org.jsoup.nodes.Document
 import play.api.test.FakeRequest
 import play.twirl.api.Html
 import scala.jdk.CollectionConverters.*
-import viewmodels.ManageNoticesStatementsRowViewModel
+import viewmodels.notices.ManageNoticesStatementsRowViewModel
 import views.html.components.NoticesTable
 
 class NoticesTableSpec extends SpecBase {
@@ -55,11 +55,11 @@ class NoticesTableSpec extends SpecBase {
       val headers = doc.select("thead th").eachText().asScala.toSeq
       assert(
         headers == Seq(
-        messages("manageNoticesStatements.table.date"),
-        messages("manageNoticesStatements.table.type"),
-        messages("manageNoticesStatements.table.description"),
-        messages("manageNoticesStatements.table.status"),
-        messages("manageNoticesStatements.table.action")
+          messages("manageNoticesStatements.table.date"),
+          messages("manageNoticesStatements.table.type"),
+          messages("manageNoticesStatements.table.description"),
+          messages("manageNoticesStatements.table.status"),
+          messages("manageNoticesStatements.table.action")
         )
       )
 
@@ -87,8 +87,8 @@ class NoticesTableSpec extends SpecBase {
   }
 
   trait Setup {
-    val app       = applicationBuilder().build()
-    val view      = app.injector.instanceOf[NoticesTable]
+    val app                                       = applicationBuilder().build()
+    val view                                      = app.injector.instanceOf[NoticesTable]
     implicit val request: play.api.mvc.Request[_] = FakeRequest()
     implicit val messages: play.api.i18n.Messages = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,
@@ -96,4 +96,3 @@ class NoticesTableSpec extends SpecBase {
     )
   }
 }
-

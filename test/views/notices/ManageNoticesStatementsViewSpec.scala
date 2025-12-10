@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views
+package views.notices
 
 import base.SpecBase
 import org.jsoup.Jsoup
@@ -24,8 +24,8 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import scala.jdk.CollectionConverters.*
-import viewmodels.{ManageNoticesStatementsPageViewModel, ManageNoticesStatementsRowViewModel}
-import views.html.ManageNoticesStatementsView
+import viewmodels.notices.{ManageNoticesStatementsPageViewModel, ManageNoticesStatementsRowViewModel}
+import views.html.notices.ManageNoticesStatementsView
 
 class ManageNoticesStatementsViewSpec extends SpecBase {
 

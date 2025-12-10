@@ -54,4 +54,4 @@ GET        /automatic-subcontractor-update-successful-no-records    controllers.
 GET        /manage-cis-return                                       controllers.ReturnsLandingController.onPageLoad()
 GET        /manage-subcontractors                                   controllers.SubcontractorsLandingPageController.onPageLoad()
 
-GET        /manage-notices-statements                       controllers.ManageNoticesStatementsController.onPageLoad()
+GET        /manage-notices-statements                       controllers.notices.ManageNoticesStatementsController.onPageLoad()
