@@ -1,0 +1,128 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.FrontendAppConfig
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.details.Details
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.select.Select
+@import viewmodels.notices.ManageNoticesStatementsPageViewModel
+@import views.html.components._
+
+@this(
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukButton: GovukButton,
+        govukSelect: GovukSelect,
+        govukRadios: GovukRadios,
+        govukDetails: GovukDetails,
+        h1: H1,
+        h2: H2,
+        h3: H3,
+        caption: Caption,
+        paragraph: Paragraph,
+        sectionBreak: SectionBreak,
+        link: Link,
+        aside: Aside,
+        nav: Nav,
+        noticesTable: NoticesTable
+)
+
+@(contractorName: String, pageViewModel: ManageNoticesStatementsPageViewModel)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
+
+@detailsHtmlContent = {
+    @h3(messages("manageNoticesStatements.details.confirmationStatements.heading"))
+    @paragraph("manageNoticesStatements.details.confirmationStatements.body")
+
+    @h3(messages("manageNoticesStatements.details.penaltyWarnings.heading"))
+    @paragraph("manageNoticesStatements.details.penaltyWarnings.body")
+
+    @h3(messages("manageNoticesStatements.details.generalNotices.heading"))
+    @paragraph("manageNoticesStatements.details.generalNotices.body")
+
+    @h3(messages("manageNoticesStatements.details.howLong.heading"))
+    @paragraph("manageNoticesStatements.details.howLong.body")
+}
+
+@sidebar = {
+    @aside("manageNoticesStatements.sidebar.heading", nav(Seq(
+        "manageNoticesStatements.sidebar.link1" -> config.govUkCISGuidanceUrl,
+        "manageNoticesStatements.sidebar.link2" -> config.cisMonthlyReturnsGuidanceUrl,
+        "manageNoticesStatements.sidebar.link3" -> config.cis340PenaltiesForLateReturnsUrl
+    )))
+}
+
+@layout(
+    pageTitle = titleNoForm(messages("manageNoticesStatements.title")),
+    sidebar = Some(sidebar)
+) {
+
+    @caption(contractorName)
+    @h1(messages("manageNoticesStatements.heading"))
+
+    @paragraph(messages("manageNoticesStatements.intro"))
+
+    @govukDetails(
+        Details(
+            summary = Text(messages("manageNoticesStatements.link.understandingNotices")),
+            content = HtmlContent(detailsHtmlContent)
+        )
+    )
+
+    @h2(messages("manageNoticesStatements.search.heading"))
+    @paragraph(messages("manageNoticesStatements.search.description"))
+
+    @formHelper(action = controllers.notices.routes.ManageNoticesStatementsController.onPageLoad(), Symbol("method") -> "get", Symbol("class") -> "govuk-!-margin-bottom-6") {
+        @govukSelect(
+            Select(
+                id = "noticeType",
+                name = "noticeType",
+                label = LabelViewModel(messages("manageNoticesStatements.noticeType.label")),
+                items = pageViewModel.noticeTypeItems
+            ).withCssClass("govuk-!-width-one-third")
+        )
+
+        @govukSelect(
+            Select(
+                id = "noticeStatus",
+                name = "noticeStatus",
+                label = LabelViewModel(messages("manageNoticesStatements.readStatus.label")),
+                items = pageViewModel.readStatusItems
+            ).withCssClass("govuk-!-width-one-quarter")
+        )
+
+        @govukRadios(
+            Radios(
+                name = "dateRange",
+                items = pageViewModel.dateRangeItems
+            )
+        )
+
+        @govukButton(viewmodels.govuk.button.ButtonViewModel(messages("manageNoticesStatements.search.button")))
+    }
+
+    @sectionBreak()
+
+    @h2(messages("manageNoticesStatements.searchResults.heading"))
+    @paragraph("manageNoticesStatements.searchResults.summary", args = Seq(pageViewModel.notices.size, pageViewModel.totalRecords))
+
+    @h2(messages("manageNoticesStatements.recentNotices.heading"))
+
+    @noticesTable(pageViewModel.notices)
+
+    @link("manageNoticesStatements.searchResults.viewAll", config.noticesAndStatementsUrl)
+}
