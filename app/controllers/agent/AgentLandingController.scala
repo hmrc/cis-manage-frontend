@@ -83,45 +83,48 @@ class AgentLandingController @Inject() (
     (identify andThen getData andThen requireData).async { implicit request =>
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-      Target.fromKey(targetKey) match {
-        case Some(target) =>
-          val clientOpt = request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId))
+      val targetOpt                 = Target.fromKey(targetKey)
+      val clientOpt                 = request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId))
+      val systemErrorRedirect       = Redirect(controllers.routes.SystemErrorController.onPageLoad())
+      val unauthorisedAgentRedirect = Redirect(controllers.routes.UnauthorisedAgentAffinityController.onPageLoad())
 
-          clientOpt match {
-            case Some(client) if client.uniqueId.nonEmpty =>
-              val instanceId         = client.uniqueId
-              val taxOfficeNumber    = client.taxOfficeNumber
-              val taxOfficeReference = client.taxOfficeRef
+      (targetOpt, clientOpt) match {
+        case (Some(target), Some(client)) if client.uniqueId.nonEmpty =>
+          val instanceId         = client.uniqueId
+          val taxOfficeNumber    = client.taxOfficeNumber
+          val taxOfficeReference = client.taxOfficeRef
 
-              prepopService
-                .prepopulateContractorKnownFacts(
-                  taxOfficeNumber = taxOfficeNumber,
-                  taxOfficeReference = taxOfficeReference,
-                  instanceId = instanceId
+          prepopService
+            .prepopulateContractorKnownFacts(
+              taxOfficeNumber = taxOfficeNumber,
+              taxOfficeReference = taxOfficeReference,
+              instanceId = instanceId
+            )
+            .map(_ => Redirect(targetCall(target, instanceId)))
+            .recover {
+              case u: UpstreamErrorResponse =>
+                logger.error(
+                  s"[AgentLandingController][onTargetClick] upstream error for uniqueId=$uniqueId: ${u.message}",
+                  u
                 )
-                .map { _ =>
-                  Redirect(targetCall(target, instanceId))
-                }
-                .recover {
-                  case u: UpstreamErrorResponse =>
-                    logger.error(s"[AgentLandingController][onTargetClick] upstream error for uniqueId=$uniqueId: ${u.message}", u)
-                    Redirect(controllers.routes.SystemErrorController.onPageLoad())
-                  case NonFatal(e)              =>
-                    logger.error(s"[AgentLandingController][onTargetClick] unexpected error for uniqueId=$uniqueId", e)
-                    Redirect(controllers.routes.SystemErrorController.onPageLoad())
-                }
+                systemErrorRedirect
 
-            case Some(client) =>
-              logger.warn(s"[AgentLandingController][onTargetClick] Client found but uniqueId is missing/empty for requested uniqueId=$uniqueId")
-              // to be updated to CRR3 controller
-              Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
+              case NonFatal(e) =>
+                logger.error(s"[AgentLandingController][onTargetClick] unexpected error for uniqueId=$uniqueId", e)
+                systemErrorRedirect
+            }
 
-            case None =>
-              logger.warn(s"[AgentLandingController][onTargetClick] Missing client in userAnswers for uniqueId=$uniqueId")
-              Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
-          }
+        case (Some(_), Some(_)) =>
+          logger.warn(
+            s"[AgentLandingController][onTargetClick] Client found but uniqueId is missing/empty for requested uniqueId=$uniqueId"
+          )
+          Future.successful(unauthorisedAgentRedirect)
 
-        case None =>
+        case (Some(_), None) =>
+          logger.warn(s"[AgentLandingController][onTargetClick] Missing client in userAnswers for uniqueId=$uniqueId")
+          Future.successful(systemErrorRedirect)
+
+        case (None, _) =>
           logger.warn(s"[AgentLandingController][onTargetClick] Unknown targetKey=$targetKey for uniqueId=$uniqueId")
           Future.successful(NotFound("Unknown target"))
       }
@@ -130,6 +133,7 @@ class AgentLandingController @Inject() (
   private def targetCall(target: Target, instanceId: String): Call =
     target match {
       case Returns       => controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
+      // to be added for NoticesLandingController
       case Notices       => controllers.routes.JourneyRecoveryController.onPageLoad()
       case Subcontractor => controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId)
     }

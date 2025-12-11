@@ -263,7 +263,7 @@ class ContractorLandingControllerSpec extends SpecBase {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          controllers.routes.SystemErrorController.onPageLoad().url
+          controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad().url
 
         verifyNoInteractions(mockPrepopService)
       }

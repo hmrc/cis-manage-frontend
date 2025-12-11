@@ -73,45 +73,45 @@ class ContractorLandingController @Inject() (
 
   def onTargetClick(targetKey: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      implicit val hc: HeaderCarrier =
-        HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+      implicit val hc: HeaderCarrier                  = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+      val targetOpt: Option[Target]                   = Target.fromKey(targetKey)
+      val maybeInstanceId: Option[String]             = request.userAnswers.get(CisIdPage)
+      val maybeEmployerRef: Option[EmployerReference] = request.employerReference
 
-      Target.fromKey(targetKey) match {
-        case Some(target) =>
-          val maybeInstanceId: Option[String]             = request.userAnswers.get(CisIdPage)
-          val maybeEmployerRef: Option[EmployerReference] = request.employerReference
+      val systemErrorRedirect     = Redirect(controllers.routes.SystemErrorController.onPageLoad())
+      val unauthorizedOrgRedirect = Redirect(controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad())
 
-          (maybeInstanceId, maybeEmployerRef) match {
-            case (Some(instanceId), Some(employerRef)) =>
-              prepopService
-                .prepopulateContractorKnownFacts(
-                  instanceId = instanceId,
-                  taxOfficeNumber = employerRef.taxOfficeNumber,
-                  taxOfficeReference = employerRef.taxOfficeReference
-                )
-                .map { _ =>
-                  Redirect(targetCall(target, instanceId))
-                }
-                .recover {
-                  case u: UpstreamErrorResponse =>
-                    logger.error(s"[ContractorLandingController][onTargetClick] upstream error: ${u.message}", u)
-                    Redirect(controllers.routes.SystemErrorController.onPageLoad())
-                  case NonFatal(e)              =>
-                    logger.error("[ContractorLandingController][onTargetClick] unexpected error", e)
-                    Redirect(controllers.routes.SystemErrorController.onPageLoad())
-                }
+      (targetOpt, maybeInstanceId, maybeEmployerRef) match {
 
-            case (None, _) =>
-              logger.warn("[ContractorLandingController][onTargetClick] Missing CisIdPage (instanceId) in userAnswers")
-              // to be updated to CRR3 controller
-              Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
+        case (Some(target), Some(instanceId), Some(employerRef)) =>
+          prepopService
+            .prepopulateContractorKnownFacts(
+              instanceId = instanceId,
+              taxOfficeNumber = employerRef.taxOfficeNumber,
+              taxOfficeReference = employerRef.taxOfficeReference
+            )
+            .map { _ =>
+              Redirect(targetCall(target, instanceId))
+            }
+            .recover {
+              case u: UpstreamErrorResponse =>
+                logger.error(s"[ContractorLandingController][onTargetClick] upstream error: ${u.message}", u)
+                systemErrorRedirect
 
-            case (_, None) =>
-              logger.warn("[ContractorLandingController][onTargetClick] Missing employerReference on DataRequest")
-              Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
-          }
+              case NonFatal(e) =>
+                logger.error("[ContractorLandingController][onTargetClick] unexpected error", e)
+                systemErrorRedirect
+            }
 
-        case None =>
+        case (Some(_), None, _) =>
+          logger.warn("[ContractorLandingController][onTargetClick] Missing CisIdPage (instanceId) in userAnswers")
+          Future.successful(unauthorizedOrgRedirect)
+
+        case (Some(_), _, None) =>
+          logger.warn("[ContractorLandingController][onTargetClick] Missing employerReference on DataRequest")
+          Future.successful(systemErrorRedirect)
+
+        case (None, _, _) =>
           Future.successful(NotFound("Unknown target"))
       }
     }
