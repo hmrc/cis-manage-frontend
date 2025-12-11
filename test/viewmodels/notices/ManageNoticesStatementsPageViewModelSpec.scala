@@ -79,10 +79,10 @@ class ManageNoticesStatementsPageViewModelSpec extends SpecBase {
       assert(values == Seq(Some("last7Days"), Some("lastMonth"), Some("dateRange"), Some("all")))
       assert(
         contents == Seq(
-          Text("Last 7 days"),
-          Text("Last month"),
-          Text("Date range"),
-          Text("All")
+          Text(msgs("manageNoticesStatements.dateFilter.last7Days")),
+          Text(msgs("manageNoticesStatements.dateFilter.lastMonth")),
+          Text(msgs("manageNoticesStatements.dateFilter.dateRange")),
+          Text(msgs("manageNoticesStatements.dateFilter.all"))
         )
       )
       checked.foreach(isChecked => assert(isChecked == false))
