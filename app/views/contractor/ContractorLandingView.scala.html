@@ -59,14 +59,22 @@
     @h2("contractorLanding.subheading.actionRequired")
     @twoColumnGrid(
         landingCard(
-            link("contractorLanding.link.returnDue", "#", paragraphWrapped = false),
+            link(
+                "contractorLanding.link.returnDue",
+                controllers.contractor.routes.ContractorLandingController.onTargetClick("returnDue").url,
+                paragraphWrapped = false
+            ),
             HtmlFormat.fill(Seq(
                 p(vm.returnCount.toString, bold = true, baseClass = "govuk-heading-l", extraClasses = "govuk-!-margin-bottom-1"),
                 p("contractorLanding.label.dueBy", extraClasses = "govuk-!-margin-bottom-1", args = Seq(vm.returnDueDate))
             ))
         ),
         landingCard(
-            link("contractorLanding.link.newNotices", "#", paragraphWrapped = false),
+            link(
+                "contractorLanding.link.newNotices",
+                controllers.contractor.routes.ContractorLandingController.onTargetClick("newNotices").url,
+                paragraphWrapped = false
+            ),
             HtmlFormat.fill(Seq(
                 p(vm.noticeCount.toString, bold = true, baseClass = "govuk-heading-l", extraClasses = "govuk-!-margin-bottom-1"),
                 p("contractorLanding.label.newNotices", extraClasses = "govuk-!-margin-bottom-1")
@@ -78,22 +86,36 @@
 
     @twoColumnGrid(
         HtmlFormat.fill(Seq(
-            link("contractorLanding.link.subcontractors", "#", bold = true),
+            link(
+                "contractorLanding.link.subcontractors",
+                controllers.contractor.routes.ContractorLandingController.onTargetClick("subcontractors").url,
+                bold = true
+            ),
             p("contractorLanding.label.subcontractors")
         )),
         HtmlFormat.fill(Seq(
-            link("contractorLanding.link.history", "#", bold = true),
+            link(
+                "contractorLanding.link.history",
+                controllers.contractor.routes.ContractorLandingController.onTargetClick("returnHistory").url,
+                bold = true
+            ),
             p("contractorLanding.label.history")
         ))
     )
 
     @twoColumnGrid(
         HtmlFormat.fill(Seq(
-            link("contractorLanding.link.notices", "#", bold = true),
+            link(
+                "contractorLanding.link.notices",
+                controllers.contractor.routes.ContractorLandingController.onTargetClick("noticesAndStatements").url,
+                bold = true),
             p("contractorLanding.label.notices")
         )),
         HtmlFormat.fill(Seq(
-            link("contractorLanding.link.amend", "#", bold = true),
+            link(
+                "contractorLanding.link.amend",
+                controllers.contractor.routes.ContractorLandingController.onTargetClick("amendReturn").url,
+                bold = true),
             p("contractorLanding.label.amend")
         ))
     )

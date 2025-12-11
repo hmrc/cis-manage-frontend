@@ -30,6 +30,7 @@ import java.time.format.DateTimeFormatter
 
 class AgentLandingViewSpec extends SpecBase {
 
+  private val uniqueId              = "1"
   private val clientName            = "ABC Construction Ltd"
   private val employerRef           = "123/AB45678"
   private val utr                   = "1234567890"
@@ -143,6 +144,7 @@ class AgentLandingViewSpec extends SpecBase {
 
     val view = application.injector.instanceOf[AgentLandingView]
     val html = view(
+      uniqueId = uniqueId,
       clientName = clientName,
       employerRef = employerRef,
       utr = utr,

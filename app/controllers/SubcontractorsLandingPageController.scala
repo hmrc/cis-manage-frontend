@@ -18,7 +18,7 @@ package controllers
 
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import pages.ContractorNamePage
+import pages.{AgentClientsPage, ContractorNamePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -39,12 +39,29 @@ class SubcontractorsLandingPageController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val contractorName = request.userAnswers.get(ContractorNamePage).getOrElse {
-      logger.error("[SubcontractorsLandingPageController] contractorName missing from userAnswers")
-      throw new IllegalStateException("contractorName missing from userAnswers")
-    }
+  def onPageLoad(instanceId: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
 
-    Ok(view(contractorName))
-  }
+      val contractorNameOpt: Option[String] =
+        if (request.isAgent) {
+          for {
+            clients <- request.userAnswers.get(AgentClientsPage)
+            client  <- clients.find(_.uniqueId == instanceId)
+            name    <- client.schemeName
+          } yield name
+        } else {
+          request.userAnswers.get(ContractorNamePage)
+        }
+
+      contractorNameOpt match {
+        case Some(contractorName) =>
+          Ok(view(contractorName))
+
+        case None =>
+          logger.warn(
+            s"[SubcontractorsLandingPageController] contractorName missing (isAgent=${request.isAgent}, instanceId=$instanceId)"
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
 }

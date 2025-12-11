@@ -17,63 +17,202 @@
 package controllers
 
 import base.SpecBase
-import models.UserAnswers
-import pages.{CisIdPage, ContractorNamePage}
+import config.FrontendAppConfig
+import models.{CisTaxpayerSearchResult, UserAnswers}
+import org.scalatestplus.mockito.MockitoSugar
+import pages.{AgentClientsPage, CisIdPage, ContractorNamePage}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import viewmodels.ReturnLandingViewModel
 import views.html.ReturnsLandingView
 
-class ReturnsLandingControllerSpec extends SpecBase {
+class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
 
-  "ReturnsLanding Controller" - {
+  private val instanceId      = "CIS-123"
+  private val contractorName  = "ABC Construction Ltd"
+  private val agentClientName = "Client Ltd"
 
-    "must return OK and the correct view for a GET" in {
-      val returnsList = Seq(
-        ReturnLandingViewModel("August 2025", "Standard", "19 September 2025", "Accepted"),
-        ReturnLandingViewModel("July 2025", "Nil", "19 August 2025", "Accepted"),
-        ReturnLandingViewModel("June 2025", "Standard", "18 July 2025", "Accepted")
-      )
+  private val returnsList = Seq(
+    ReturnLandingViewModel("August 2025", "Standard", "19 September 2025", "Accepted"),
+    ReturnLandingViewModel("July 2025", "Nil", "19 August 2025", "Accepted"),
+    ReturnLandingViewModel("June 2025", "Standard", "18 July 2025", "Accepted")
+  )
 
-      val contractorName: String        = "ABC Construction Ltd"
-      lazy val userAnswers: UserAnswers =
+  "ReturnsLandingController.onPageLoad (contractor)" - {
+
+    "must return OK and the correct view when ContractorNamePage is present" in {
+      val userAnswers: UserAnswers =
         userAnswersWithCisId
+          .set(CisIdPage, instanceId)
+          .success
+          .value
           .set(ContractorNamePage, contractorName)
           .success
           .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers)
+        ).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.ReturnsLandingController.onPageLoad().url)
-        val result  = route(application, request).value
-        val view    = application.injector.instanceOf[ReturnsLandingView]
+        implicit val appConfig: FrontendAppConfig =
+          application.injector.instanceOf[FrontendAppConfig]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(contractorName, returnsList)(
-          request,
-          applicationConfig,
-          messages(application)
-        ).toString
+        val request = FakeRequest(
+          GET,
+          controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url
+        )
+
+        val result = route(application, request).value
+        val view   = application.injector.instanceOf[ReturnsLandingView]
+
+        status(result) mustBe OK
+        contentAsString(result) mustBe
+          view(contractorName, returnsList)(request, appConfig, messages(application)).toString
       }
     }
 
-    "must throw IllegalStateException when ContractorNamePage is missing" in {
-      lazy val userAnswers: UserAnswers =
+    "must redirect to JourneyRecoveryController when ContractorNamePage is missing" in {
+      val userAnswers: UserAnswers =
         userAnswersWithCisId
-          .set(CisIdPage, "some value")
+          .set(CisIdPage, instanceId)
           .success
           .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers)
+        ).build()
 
       running(application) {
-        val request   = FakeRequest(GET, routes.ReturnsLandingController.onPageLoad().url)
-        val exception = intercept[IllegalStateException] {
-          contentAsString(route(application, request).value)
-        }
+        val request =
+          FakeRequest(
+            GET,
+            controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url
+          )
 
-        exception.getMessage mustEqual "contractorName missing from userAnswers"
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+  }
+
+  "ReturnsLandingController.onPageLoad (agent)" - {
+
+    "must return OK and the correct view when client with matching instanceId and schemeName exists" in {
+      val client = CisTaxpayerSearchResult(
+        uniqueId = instanceId,
+        taxOfficeNumber = "163",
+        taxOfficeRef = "AB0063",
+        agentOwnRef = Some("ownRef"),
+        schemeName = Some(agentClientName),
+        utr = Some("1234567890")
+      )
+
+      val userAnswers: UserAnswers =
+        emptyUserAnswers
+          .set(AgentClientsPage, List(client))
+          .success
+          .value
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers),
+          isAgent = true
+        ).build()
+
+      running(application) {
+        implicit val appConfig: FrontendAppConfig =
+          application.injector.instanceOf[FrontendAppConfig]
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url
+          )
+
+        val result = route(application, request).value
+        val view   = application.injector.instanceOf[ReturnsLandingView]
+
+        status(result) mustBe OK
+        contentAsString(result) mustBe
+          view(agentClientName, returnsList)(request, appConfig, messages(application)).toString
+      }
+    }
+
+    "must redirect to JourneyRecoveryController when no matching client or schemeName is found" in {
+      val otherClient = CisTaxpayerSearchResult(
+        uniqueId = "OTHER-ID",
+        taxOfficeNumber = "163",
+        taxOfficeRef = "AB0063",
+        agentOwnRef = Some("ownRef"),
+        schemeName = Some(agentClientName),
+        utr = Some("1234567890")
+      )
+
+      val userAnswersNoMatch: UserAnswers =
+        emptyUserAnswers
+          .set(AgentClientsPage, List(otherClient))
+          .success
+          .value
+
+      val applicationNoMatch =
+        applicationBuilder(
+          userAnswers = Some(userAnswersNoMatch),
+          isAgent = true
+        ).build()
+
+      running(applicationNoMatch) {
+        val request =
+          FakeRequest(
+            GET,
+            controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url
+          )
+
+        val result = route(applicationNoMatch, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      val clientNoName = CisTaxpayerSearchResult(
+        uniqueId = instanceId,
+        taxOfficeNumber = "163",
+        taxOfficeRef = "AB0063",
+        agentOwnRef = Some("ownRef"),
+        schemeName = None,
+        utr = Some("1234567890")
+      )
+
+      val userAnswersNoName: UserAnswers =
+        emptyUserAnswers
+          .set(AgentClientsPage, List(clientNoName))
+          .success
+          .value
+
+      val applicationNoName =
+        applicationBuilder(
+          userAnswers = Some(userAnswersNoName),
+          isAgent = true
+        ).build()
+
+      running(applicationNoName) {
+        val request =
+          FakeRequest(
+            GET,
+            controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url
+          )
+
+        val result = route(applicationNoName, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

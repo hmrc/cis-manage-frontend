@@ -44,7 +44,8 @@
   govukSummaryList: GovukSummaryList
 )
 
-@(clientName: String,
+@(uniqueId: String,
+  clientName: String,
   employerRef: String,
   utr: String,
   returnsDueCount: Int,
@@ -93,14 +94,24 @@
 
   @gridRow() {
     @gridColumnOneHalf {
-      @summaryCard(Html(link("agent.landing.card.returnDue.title", "#", false, "", "", "").body)) {
+      @summaryCard(Html(
+        link(
+          "agent.landing.card.returnDue.title",
+          controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "returnDue").url,
+          false, "", "", ""
+        ).body)) {
         @paragraph(s"$returnsDueCount", true, "govuk-body", "govuk-!-margin-bottom-1 govuk-!-font-size-36", Nil)
         @paragraph(messages("agent.landing.card.returnDue.dueBy", returnsDueBy.format(DateTimeFormatter.ofPattern("d MMMM yyyy"))),
           false, "govuk-body", "govuk-!-margin-bottom-0", Nil)
     }
   }
   @gridColumnOneHalf {
-    @summaryCard(Html(link("agent.landing.card.notices.title", "#", false, "", "", "").body)) {
+    @summaryCard(Html(
+      link(
+        "agent.landing.card.notices.title",
+        controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "newNotices").url,
+        false, "", "", ""
+      ).body)) {
       @paragraph(s"$newNoticesCount", true, "govuk-body", "govuk-!-margin-bottom-1 govuk-!-font-size-36", Nil)
       @paragraph(messages("agent.landing.card.notices.subtitle"),
         false, "govuk-body", "govuk-!-margin-bottom-0", Nil)
@@ -112,12 +123,18 @@
 
   @gridRow() {
     @gridColumnOneHalf {
-      @headingLink(messages("agent.landing.manage.subcontractors"), "#")
+      @headingLink(
+        messages("agent.landing.manage.subcontractors"),
+        controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "subcontractors").url
+      )
       @paragraph(messages("agent.landing.manage.subcontractors.blurb"),
         false, "govuk-body", "govuk-!-font-size-16", Nil)
     }
     @gridColumnOneHalf {
-      @headingLink(messages("agent.landing.manage.returnHistory"), "#")
+      @headingLink(
+        messages("agent.landing.manage.returnHistory"),
+        controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "returnHistory").url
+      )
       @paragraph(messages("agent.landing.manage.returnHistory.blurb"),
         false, "govuk-body", "govuk-!-font-size-16", Nil)
     }
@@ -125,12 +142,18 @@
 
   @gridRow(classes = "govuk-!-margin-top-4") {
     @gridColumnOneHalf {
-      @headingLink(messages("agent.landing.manage.notices"), "#")
+      @headingLink(
+        messages("agent.landing.manage.notices"),
+        controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "noticesAndStatements").url
+      )
       @paragraph(messages("agent.landing.manage.notices.blurb"),
         false, "govuk-body", "govuk-!-font-size-16", Nil)
     }
     @gridColumnOneHalf {
-      @headingLink(messages("agent.landing.manage.amend"), "#")
+      @headingLink(
+        messages("agent.landing.manage.amend"),
+        controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "amendReturn").url
+      )
       @paragraph(messages("agent.landing.manage.amend.blurb"),
         false, "govuk-body", "govuk-!-font-size-16", Nil)
     }
