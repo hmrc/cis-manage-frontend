@@ -18,7 +18,6 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.details.Details
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.radios._
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.select.Select
 @import viewmodels.notices.ManageNoticesStatementsPageViewModel
@@ -108,10 +107,6 @@
 
         @govukRadios(
             Radios(
-                fieldset = Some(Fieldset(legend = Some(Legend(
-                    content = Text(messages("manageNoticesStatements.dateRange.legend")),
-                    classes = "govuk-fieldset__legend--m"
-                )))),
                 name = "dateRange",
                 items = pageViewModel.dateRangeItems
             )

@@ -35,10 +35,10 @@ class ManageNoticesStatementsViewSpec extends SpecBase {
       val html: HtmlFormat.Appendable = view(contractorName, pageViewModel)
       val doc: Document               = Jsoup.parse(html.body)
 
-      doc.title                                   must include(messages("manageNoticesStatements.title"))
-      doc.select("h1").text                       must include(messages("manageNoticesStatements.heading"))
-      doc.getElementsByClass("govuk-caption-l").text must include(contractorName)
-      doc.select("p").text                        must include(messages("manageNoticesStatements.intro"))
+      doc.title                                                   must include(messages("manageNoticesStatements.title"))
+      doc.select("h1").text                                       must include(messages("manageNoticesStatements.heading"))
+      doc.getElementsByClass("govuk-caption-l").text              must include(contractorName)
+      doc.select("p").text                                        must include(messages("manageNoticesStatements.intro"))
       doc.select("summary span.govuk-details__summary-text").text must include(
         messages("manageNoticesStatements.link.understandingNotices")
       )
@@ -59,7 +59,7 @@ class ManageNoticesStatementsViewSpec extends SpecBase {
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.select("h2").eachText().asScala must contain(messages("manageNoticesStatements.search.heading"))
-      doc.select("p").text must include(messages("manageNoticesStatements.search.description"))
+      doc.select("p").text                must include(messages("manageNoticesStatements.search.description"))
 
       val noticeTypeOptions = doc.select("#noticeType option").eachText().asScala.toSeq
       noticeTypeOptions mustEqual pageViewModel.noticeTypeItems.map(_.text)
@@ -71,7 +71,7 @@ class ManageNoticesStatementsViewSpec extends SpecBase {
       doc.select("#noticeStatus option").eachAttr("value").asScala.toSeq mustEqual
         pageViewModel.readStatusItems.flatMap(_.value)
 
-      doc.select("fieldset legend").text must include(messages("manageNoticesStatements.dateRange.legend"))
+      doc.select("fieldset legend").isEmpty mustBe true
       doc.select("input[name=dateRange]").eachAttr("value").asScala.toSeq mustEqual
         pageViewModel.dateRangeItems.flatMap(_.value)
       doc.select("label.govuk-radios__label").eachText().asScala.toSeq mustEqual
@@ -90,12 +90,16 @@ class ManageNoticesStatementsViewSpec extends SpecBase {
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.select("h2").eachText().asScala must contain(messages("manageNoticesStatements.searchResults.heading"))
-      doc.select("p").text must include(
-        messages("manageNoticesStatements.searchResults.summary", pageViewModel.notices.size, pageViewModel.totalRecords)
+      doc.select("p").text                must include(
+        messages(
+          "manageNoticesStatements.searchResults.summary",
+          pageViewModel.notices.size,
+          pageViewModel.totalRecords
+        )
       )
       doc.select("h2").eachText().asScala must contain(messages("manageNoticesStatements.recentNotices.heading"))
 
-      val rows = doc.select("table tbody tr")
+      val rows          = doc.select("table tbody tr")
       rows.size() mustBe pageViewModel.notices.size
       val firstRowCells = rows.get(0).select("th, td")
       firstRowCells.get(0).text() mustBe "2025-01-01"
@@ -104,21 +108,25 @@ class ManageNoticesStatementsViewSpec extends SpecBase {
       firstRowCells.get(3).select("strong").text() mustBe "Read"
       firstRowCells.get(4).select("a").attr("href") mustBe "/view/1"
 
-      val viewAllLink = doc.select("a.govuk-link").stream().iterator().asScala
+      val viewAllLink = doc
+        .select("a.govuk-link")
+        .stream()
+        .iterator()
+        .asScala
         .find(_.text() == messages("manageNoticesStatements.searchResults.viewAll"))
       viewAllLink.map(_.attr("href")) mustBe Some(applicationConfig.noticesAndStatementsUrl)
     }
   }
 
   trait Setup {
-    val app: Application                          = applicationBuilder().build()
-    val view: ManageNoticesStatementsView         = app.injector.instanceOf[ManageNoticesStatementsView]
-    implicit val request: play.api.mvc.Request[_] = FakeRequest()
-    implicit val messages: Messages               = play.api.i18n.MessagesImpl(
+    val app: Application                                    = applicationBuilder().build()
+    val view: ManageNoticesStatementsView                   = app.injector.instanceOf[ManageNoticesStatementsView]
+    implicit val request: play.api.mvc.Request[_]           = FakeRequest()
+    implicit val messages: Messages                         = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,
       app.injector.instanceOf[play.api.i18n.MessagesApi]
     )
-    val contractorName                             = "ABC Construction Ltd"
+    val contractorName                                      = "ABC Construction Ltd"
     val pageViewModel: ManageNoticesStatementsPageViewModel = ManageNoticesStatementsPageViewModel(
       Seq(
         ManageNoticesStatementsRowViewModel(

@@ -22,7 +22,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 
 class ManageNoticesStatementsPageViewModelSpec extends SpecBase {
 
-  private val app = applicationBuilder().build()
+  private val app      = applicationBuilder().build()
   given msgs: Messages = messages(app)
 
   "ManageNoticesStatementsPageViewModel" - {
@@ -58,11 +58,13 @@ class ManageNoticesStatementsPageViewModelSpec extends SpecBase {
       val values     = viewModel.readStatusItems.map(_.value)
       val selections = viewModel.readStatusItems.map(_.selected)
 
-      assert(texts == Seq(
-        msgs("manageNoticesStatements.status.all"),
-        msgs("manageNoticesStatements.status.read"),
-        msgs("manageNoticesStatements.status.unread")
-      ))
+      assert(
+        texts == Seq(
+          msgs("manageNoticesStatements.status.all"),
+          msgs("manageNoticesStatements.status.read"),
+          msgs("manageNoticesStatements.status.unread")
+        )
+      )
       assert(values == Seq(Some("all"), Some("read"), Some("unread")))
       selections.foreach(sel => assert(sel == false))
     }
@@ -75,12 +77,14 @@ class ManageNoticesStatementsPageViewModelSpec extends SpecBase {
       val checked  = viewModel.dateRangeItems.map(_.checked)
 
       assert(values == Seq(Some("last7Days"), Some("lastMonth"), Some("dateRange"), Some("all")))
-      assert(contents == Seq(
-        Text("Last 7 days"),
-        Text("Last month"),
-        Text("Date range"),
-        Text("All")
-      ))
+      assert(
+        contents == Seq(
+          Text("Last 7 days"),
+          Text("Last month"),
+          Text("Date range"),
+          Text("All")
+        )
+      )
       checked.foreach(isChecked => assert(isChecked == false))
     }
 
@@ -97,4 +101,3 @@ class ManageNoticesStatementsPageViewModelSpec extends SpecBase {
     }
   }
 }
-
