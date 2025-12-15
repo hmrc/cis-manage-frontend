@@ -73,6 +73,16 @@ class ManageService @Inject() (
       )
       .map(_ == NO_CONTENT)
 
+  def getScheme(instanceId: String)(implicit hc: HeaderCarrier): Future[(Boolean, Int)] =
+    cisConnector
+      .getScheme(instanceId)
+      .map { json =>
+        val prePopSuccessful = (json \ "prePopSuccessful").asOpt[String].contains("Y")
+        val subcontractorCounter =
+          (json \ "subcontractorCounter").asOpt[Int].getOrElse(0)
+        (prePopSuccessful, subcontractorCounter)
+      }
+
   def resolveAndStoreAgentClients(
     userAnswers: UserAnswers
   )(using HeaderCarrier): Future[(List[CisTaxpayerSearchResult], UserAnswers)] =

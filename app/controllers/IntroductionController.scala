@@ -67,11 +67,21 @@ class IntroductionController @Inject() (
       case Some(employerRef) =>
         manageService
           .prepopulateContractorAndSubcontractors(employerRef, instanceId)
-          .map { prepopSuccessful =>
+          .flatMap { prepopSuccessful =>
             if (prepopSuccessful) {
-              Redirect(controllers.routes.SuccessfulAutomaticSubcontractorUpdateController.onPageLoad())
+              manageService
+                .getScheme(instanceId)
+                .map { case (schemePrepopSuccessful, subcontractorCounter) =>
+                  if (schemePrepopSuccessful && subcontractorCounter > 0) {
+                    Redirect(controllers.routes.SuccessfulAutomaticSubcontractorUpdateController.onPageLoad())
+                  } else if (schemePrepopSuccessful && subcontractorCounter == 0) {
+                    Redirect(controllers.routes.SuccessfulNoRecordsFoundController.onPageLoad())
+                  } else {
+                    Redirect(controllers.routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad())
+                  }
+                }
             } else {
-              Redirect(controllers.routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad())
+              Future.successful(Redirect(controllers.routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad()))
             }
           }
           .recover { case exception =>

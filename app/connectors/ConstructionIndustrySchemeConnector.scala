@@ -76,4 +76,9 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .post(url"$cisBaseUrl/scheme/prepopulate/$taxOfficeNumber/$taxOfficeReference/$instanceId")
       .execute[HttpResponse]
       .map(_.status)
+
+  def getScheme(instanceId: String)(implicit hc: HeaderCarrier): Future[JsObject] =
+    http
+      .get(url"$cisBaseUrl/scheme/$instanceId")
+      .execute[JsObject]
 }
