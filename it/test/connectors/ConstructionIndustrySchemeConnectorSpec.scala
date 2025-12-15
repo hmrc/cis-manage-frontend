@@ -428,4 +428,70 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
     }
   }
 
+  "prepopulateContractorKnownFacts" should {
+
+    "return successfully when BE returns 2xx" in {
+      val instanceId = "900063"
+      val taxOfficeNumber = "163"
+      val taxOfficeRef = "AB0063"
+
+      stubFor(
+        post(urlPathEqualTo(s"/cis/contractor-known-facts/prepopulate/$taxOfficeNumber/$taxOfficeRef/$instanceId"))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      val result = connector
+        .prepopulateContractorKnownFacts(instanceId, taxOfficeNumber, taxOfficeRef)
+        .futureValue
+
+      result mustBe ()
+
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      val instanceId = "900063"
+      val taxOfficeNumber = "163"
+      val taxOfficeRef = "AB0063"
+
+      stubFor(
+        post(urlPathEqualTo(s"/cis/contractor-known-facts/prepopulate/$taxOfficeNumber/$taxOfficeRef/$instanceId"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody("boom")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.prepopulateContractorKnownFacts(instanceId, taxOfficeNumber, taxOfficeRef).futureValue
+      }
+
+      ex.getMessage must include("boom")
+    }
+
+    "propagate an upstream error when BE returns PRECONDITION_FAILED" in {
+      val instanceId = "900063"
+      val taxOfficeNumber = "163"
+      val taxOfficeRef = "AB0063"
+
+      stubFor(
+        post(urlPathEqualTo(s"/cis/contractor-known-facts/prepopulate/$taxOfficeNumber/$taxOfficeRef/$instanceId"))
+          .willReturn(
+            aResponse()
+              .withStatus(PRECONDITION_FAILED)
+              .withBody("""{"message":"CIS taxpayer not found"}""")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.prepopulateContractorKnownFacts(instanceId, taxOfficeNumber, taxOfficeRef).futureValue
+      }
+
+      ex.getMessage must include("CIS taxpayer not found")
+    }
+  }
+
 }
