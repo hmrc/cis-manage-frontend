@@ -1,0 +1,52 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
+@import viewmodels.notices.ManageNoticesStatementsRowViewModel
+
+@this(
+    govukTable: GovukTable,
+    link: Link,
+    tableRowTagColour: TableRowTagColour
+)
+
+@(notices: Seq[ManageNoticesStatementsRowViewModel])(implicit messages: Messages)
+
+@govukTable(
+    Table(
+        head = Some(
+            Seq(
+                "manageNoticesStatements.table.date",
+                "manageNoticesStatements.table.type",
+                "manageNoticesStatements.table.description",
+                "manageNoticesStatements.table.status",
+                "manageNoticesStatements.table.action"
+            ).map(key => HeadCell(content = Text(messages(key))))
+        ),
+        rows = notices.map { notice =>
+            Seq(
+                TableRow(content = Text(notice.date), classes = "govuk-table__header"),
+                TableRow(content = Text(notice.noticeType)),
+                TableRow(content = Text(notice.description)),
+                TableRow(content = HtmlContent(tableRowTagColour(notice.status, notice.statusColour))),
+                TableRow(content = HtmlContent(link("manageNoticesStatements.table.action.view", notice.actionUrl, paragraphWrapped = false)))
+            )
+        }
+    )
+)
+
