@@ -21,7 +21,7 @@ import models.{CisTaxpayer, CisTaxpayerSearchResult}
 import play.api.Logging
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, HttpResponse, StringContextOps}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
@@ -66,4 +66,14 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
     http
       .get(url"$cisBaseUrl/agent/client-taxpayer/$taxOfficeNumber/$taxOfficeReference")
       .execute[CisTaxpayer]
+
+  def prepopulateContractorAndSubcontractors(
+    taxOfficeNumber: String,
+    taxOfficeReference: String,
+    instanceId: String
+  )(implicit hc: HeaderCarrier): Future[Int] =
+    http
+      .post(url"$cisBaseUrl/scheme/prepopulate/$taxOfficeNumber/$taxOfficeReference/$instanceId")
+      .execute[HttpResponse]
+      .map(_.status)
 }

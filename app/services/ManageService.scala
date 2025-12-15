@@ -17,9 +17,10 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
-import models.{CisTaxpayerSearchResult, UserAnswers}
+import models.{CisTaxpayerSearchResult, EmployerReference, UserAnswers}
 import pages.*
 import play.api.Logging
+import play.api.http.Status.NO_CONTENT
 import play.api.libs.json.Json
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
@@ -59,6 +60,18 @@ class ManageService @Inject() (
           }
         }
     }
+
+  def prepopulateContractorAndSubcontractors(
+    employerReference: EmployerReference,
+    instanceId: String
+  )(implicit hc: HeaderCarrier): Future[Boolean] =
+    cisConnector
+      .prepopulateContractorAndSubcontractors(
+        employerReference.taxOfficeNumber,
+        employerReference.taxOfficeReference,
+        instanceId
+      )
+      .map(_ == NO_CONTENT)
 
   def resolveAndStoreAgentClients(
     userAnswers: UserAnswers
