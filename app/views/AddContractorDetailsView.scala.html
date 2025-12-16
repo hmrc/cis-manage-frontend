@@ -15,25 +15,20 @@
  *@
 
 @import views.html.components._
+
 @this(
     layout: templates.Layout,
-    govukButton: GovukButton,
     h1: H1,
     paragraph: Paragraph
 )
 
-@(runUrl: String)(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[_], messages: Messages)
 
 @layout(
-    pageTitle = titleNoForm(messages("retrievingSubcontractors.title")),
-    showBackLink = false,
+    pageTitle = titleNoForm(messages("addContractorDetails.title")),
     showSignOut = false
 ) {
 
-    <meta http-equiv="refresh" content="1; url=@runUrl">
-
-    @h1(messages("retrievingSubcontractors.heading"))
-    @paragraph(messages("retrievingSubcontractors.p1"))
-    @paragraph(messages("retrievingSubcontractors.p2"))
-    @paragraph(messages("retrievingSubcontractors.p3.bold"), bold = true)
+    @h1(messages("addContractorDetails.heading"))
+    @paragraph(messages("addContractorDetails.p1"))
 }

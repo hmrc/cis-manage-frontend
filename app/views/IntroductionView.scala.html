@@ -16,6 +16,7 @@
 
 @import views.html.components._
 @import config.FrontendAppConfig
+@import helper._
 
 @this(
     layout: templates.LayoutWithSidebar,
@@ -88,9 +89,9 @@
         )
     )
 
-    <div>
+    @form(action = controllers.routes.IntroductionController.onContinue()) {
         @govukButton(
-        ButtonViewModel(messages("site.continue")).asLink(controllers.routes.IntroductionController.affinityGroupRouting().url)
+            ButtonViewModel(messages("site.continue"))
         )
-    </div>
+    }
 }

@@ -65,33 +65,9 @@ class IntroductionController @Inject() (
 
     maybeEmployerRef match {
       case Some(employerRef) =>
-        manageService
-          .prepopulateContractorAndSubcontractors(employerRef, instanceId)
-          .flatMap { prepopSuccessful =>
-            if (prepopSuccessful) {
-              manageService
-                .getScheme(instanceId)
-                .map { case (schemePrepopSuccessful, subcontractorCounter) =>
-                  if (schemePrepopSuccessful && subcontractorCounter > 0) {
-                    Redirect(controllers.routes.SuccessfulAutomaticSubcontractorUpdateController.onPageLoad())
-                  } else if (schemePrepopSuccessful && subcontractorCounter == 0) {
-                    Redirect(controllers.routes.SuccessfulNoRecordsFoundController.onPageLoad())
-                  } else {
-                    Redirect(controllers.routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad())
-                  }
-                }
-            } else {
-              Future.successful(Redirect(controllers.routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad()))
-            }
-          }
-          .recover { case exception =>
-            logger.error(
-              s"[IntroductionController][onContinue] Prepopulation contractor and subcontractors failed: ${exception.getMessage}",
-              exception
-            )
-            Redirect(controllers.routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad())
-          }
-
+        Future.successful(
+          Redirect(controllers.routes.RetrievingSubcontractorsController.onPageLoad(instanceId))
+        )
       case None =>
         logger.error("[IntroductionController][onContinue] Employer reference missing in identifier request")
         Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))

@@ -83,6 +83,18 @@ class ManageService @Inject() (
         (prePopSuccessful, subcontractorCounter)
       }
 
+  def getSchemeStatus(instanceId: String)(implicit hc: HeaderCarrier): Future[SchemeStatus] =
+    cisConnector
+      .getScheme(instanceId)
+      .map { json =>
+        SchemeStatus(
+          prePopSuccessful = (json \ "prePopSuccessful").asOpt[String].contains("Y"),
+          subcontractorCounter = (json \ "subcontractorCounter").asOpt[Int].getOrElse(0),
+          name = (json \ "name").asOpt[String].filter(_.nonEmpty),
+          utr = (json \ "utr").asOpt[String].filter(_.nonEmpty)
+        )
+      }
+
   def resolveAndStoreAgentClients(
     userAnswers: UserAnswers
   )(using HeaderCarrier): Future[(List[CisTaxpayerSearchResult], UserAnswers)] =
@@ -129,3 +141,10 @@ class ManageService @Inject() (
         }
     }
 }
+
+final case class SchemeStatus(
+  prePopSuccessful: Boolean,
+  subcontractorCounter: Int,
+  name: Option[String],
+  utr: Option[String]
+)
