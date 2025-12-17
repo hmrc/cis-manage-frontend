@@ -16,10 +16,9 @@
 
 package connectors
 
-import models.GetClientListStatusResponse
-import models.{CisTaxpayer, CisTaxpayerSearchResult}
+import models.{CisTaxpayer, CisTaxpayerSearchResult, GetClientListStatusResponse, Scheme}
 import play.api.Logging
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, HttpResponse, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -82,6 +81,43 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
           Future.failed(
             UpstreamErrorResponse(resp.body, resp.status, resp.status)
           )
+        }
+      }
+
+  def prepopulateContractorAndSubcontractors(
+    taxOfficeNumber: String,
+    taxOfficeReference: String,
+    instanceId: String
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/scheme/prepopulate/$taxOfficeNumber/$taxOfficeReference/$instanceId")
+      .execute[HttpResponse]
+      .flatMap { resp =>
+        resp.status match {
+          case 204   =>
+            Future.unit
+          case other =>
+            logger.warn(s"[prepopulateContractorAndSubcontractors] Unexpected status=$other body=${resp.body}")
+            Future.failed(UpstreamErrorResponse(resp.body, other, other))
+        }
+      }
+
+  def getScheme(instanceId: String)(implicit hc: HeaderCarrier): Future[Option[Scheme]] =
+    http
+      .get(url"$cisBaseUrl/scheme/$instanceId")
+      .execute[HttpResponse]
+      .map { resp =>
+        resp.status match {
+          case 200 =>
+            val json: JsValue = resp.json
+            Some(json.as[Scheme])
+
+          case 404 =>
+            None
+
+          case other =>
+            logger.warn(s"[getScheme] Unexpected status=$other body=${resp.body}")
+            throw UpstreamErrorResponse(resp.body, other, other)
         }
       }
 }

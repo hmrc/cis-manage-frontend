@@ -17,14 +17,16 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
+import models.Scheme
 import uk.gov.hmrc.http.HeaderCarrier
+
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class PrepopService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector
-) {
+)(implicit ec: ExecutionContext) {
 
   def prepopulateContractorKnownFacts(
     instanceId: String,
@@ -36,4 +38,23 @@ class PrepopService @Inject() (
       taxOfficeNumber = taxOfficeNumber,
       taxOfficeReference = taxOfficeReference
     )
+
+  def prepopulate(
+    taxOfficeNumber: String,
+    taxOfficeReference: String,
+    instanceId: String
+  )(implicit hc: HeaderCarrier): Future[Boolean] =
+    cisConnector
+      .prepopulateContractorAndSubcontractors(
+        taxOfficeNumber = taxOfficeNumber,
+        taxOfficeReference = taxOfficeReference,
+        instanceId = instanceId
+      )
+      .map(_ => true)
+      .recover { case _ =>
+        false
+      }
+
+  def getScheme(instanceId: String)(implicit hc: HeaderCarrier): Future[Option[Scheme]] =
+    cisConnector.getScheme(instanceId)
 }

@@ -47,11 +47,20 @@ GET         /page-not-found                                         controllers.
 GET         /access-denied                                          controllers.AccessDeniedController.onPageLoad()
 GET         /system-error/there-is-a-problem                        controllers.SystemErrorController.onPageLoad()
 
-GET        /your-subcontractors                                     controllers.RetrievingSubcontractorsController.onPageLoad()
-GET        /check-subcontractor-records                             controllers.CheckSubcontractorRecordsController.onPageLoad()
-GET        /automatic-subcontractor-update-unsuccessful             controllers.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad()
-GET        /automatic-subcontractor-update-successful               controllers.SuccessfulAutomaticSubcontractorUpdateController.onPageLoad()
-GET        /automatic-subcontractor-update-successful-no-records    controllers.SuccessfulNoRecordsFoundController.onPageLoad()
+GET        /your-subcontractors/:taxOfficeNumber/:taxOfficeReference/:instanceId/:targetKey                                     controllers.RetrievingSubcontractorsController.onPageLoad(taxOfficeNumber: String, taxOfficeReference: String, instanceId: String, targetKey: String)
+GET        /your-subcontractors/start/:taxOfficeNumber/:taxOfficeReference/:instanceId/:targetKey/start                         controllers.RetrievingSubcontractorsController.start(taxOfficeNumber: String, taxOfficeReference: String, instanceId: String, targetKey: String)
+
+GET        /check-subcontractor-records/:taxOfficeNumber/:taxOfficeReference/:instanceId/:targetKey                             controllers.CheckSubcontractorRecordsController.onPageLoad(taxOfficeNumber: String, taxOfficeReference: String, instanceId: String, targetKey: String)
+POST       /check-subcontractor-records/:taxOfficeNumber/:taxOfficeReference/:instanceId/:targetKey                             controllers.CheckSubcontractorRecordsController.onSubmit(taxOfficeNumber: String, taxOfficeReference: String, instanceId: String, targetKey: String)
+
+GET        /automatic-subcontractor-update-unsuccessful/:instanceId/:targetKey             controllers.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId: String, targetKey: String)
+POST       /automatic-subcontractor-update-unsuccessful/:instanceId/:targetKey             controllers.UnsuccessfulAutomaticSubcontractorUpdateController.onSubmit(instanceId: String, targetKey: String)
+
+GET        /automatic-subcontractor-update-successful/:instanceId/:targetKey               controllers.SuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId: String, targetKey: String)
+POST       /automatic-subcontractor-update-successful/:instanceId/:targetKey               controllers.SuccessfulAutomaticSubcontractorUpdateController.onSubmit(instanceId: String, targetKey: String)
+
+GET        /automatic-subcontractor-update-successful-no-records/:instanceId/:targetKey    controllers.SuccessfulNoRecordsFoundController.onPageLoad(instanceId: String, targetKey: String)
+POST       /automatic-subcontractor-update-successful-no-records/:instanceId/:targetKey    controllers.SuccessfulNoRecordsFoundController.onSubmit(instanceId: String, targetKey: String)
 
 GET        /manage-cis-return/:instanceId                           controllers.ReturnsLandingController.onPageLoad(instanceId: String)
 GET        /manage-subcontractors/:instanceId                       controllers.SubcontractorsLandingPageController.onPageLoad(instanceId: String)
