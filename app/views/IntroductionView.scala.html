@@ -16,11 +16,11 @@
 
 @import views.html.components._
 @import config.FrontendAppConfig
-@import helper._
 
 @this(
     layout: templates.LayoutWithSidebar,
     sidebarLinks: templates.SidebarLinks,
+    formHelper: FormWithCSRF,
     govukInsetText: GovukInsetText,
     govukDetails: GovukDetails,
     govukButton: GovukButton,
@@ -89,8 +89,7 @@
         )
     )
 
-    @form(action = controllers.routes.IntroductionController.onContinue()) {
-        @CSRF.formField
+    @formHelper(action = controllers.routes.IntroductionController.onContinue()) {
         @govukButton(
             ButtonViewModel(messages("site.continue"))
         )

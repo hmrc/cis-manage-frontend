@@ -36,12 +36,13 @@ class RetrievingSubcontractorsController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(instanceId: String): Action[AnyContent] = identify { implicit request =>
-    val runUrl = controllers.routes.RetrievingSubcontractorsController.run(instanceId).url
-    Ok(view(runUrl))
-  }
+  def onPageLoad(instanceId: String): Action[AnyContent] = identify.async { implicit request =>
+    import uk.gov.hmrc.http.HeaderCarrier
+    import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
-  def run(instanceId: String): Action[AnyContent] = identify.async { implicit request =>
+    implicit val hc: HeaderCarrier =
+      HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
     request.employerReference match {
       case Some(employerRef) =>
         manageService

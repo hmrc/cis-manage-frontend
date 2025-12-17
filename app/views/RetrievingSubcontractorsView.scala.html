@@ -22,15 +22,13 @@
     paragraph: Paragraph
 )
 
-@(runUrl: String)(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = titleNoForm(messages("retrievingSubcontractors.title")),
     showBackLink = false,
     showSignOut = false
 ) {
-
-    <meta http-equiv="refresh" content="1; url=@runUrl">
 
     @h1(messages("retrievingSubcontractors.heading"))
     @paragraph(messages("retrievingSubcontractors.p1"))

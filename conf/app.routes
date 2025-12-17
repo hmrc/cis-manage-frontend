@@ -48,7 +48,6 @@ GET         /access-denied                                          controllers.
 GET         /system-error/there-is-a-problem                        controllers.SystemErrorController.onPageLoad()
 
 GET        /your-subcontractors/:instanceId                         controllers.RetrievingSubcontractorsController.onPageLoad(instanceId: String)
-GET        /your-subcontractors/run/:instanceId                     controllers.RetrievingSubcontractorsController.run(instanceId: String)
 GET        /check-subcontractor-records                             controllers.CheckSubcontractorRecordsController.onPageLoad()
 GET        /add-contractor-details                                   controllers.AddContractorDetailsController.onPageLoad()
 GET        /automatic-subcontractor-update-unsuccessful             controllers.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad()

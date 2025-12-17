@@ -17,31 +17,106 @@
 package controllers
 
 import base.SpecBase
+import models.EmployerReference
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar.mock
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.RetrievingSubcontractorsView
+import play.api.test.CSRFTokenHelper.CSRFRequest
+import services.ManageService
+import uk.gov.hmrc.http.HeaderCarrier
+
+import scala.concurrent.Future
 
 class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
   "RetrievingSubcontractors Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must redirect to PS-05 when F2 succeeds with subcontractors" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val mockManageService = mock[ManageService]
+      when(
+        mockManageService.prepopulateContractorAndSubcontractors(any[EmployerReference], any[String])(
+          any[HeaderCarrier]
+        )
+      )
+        .thenReturn(Future.successful(true))
+      when(mockManageService.getScheme(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful((true, 5)))
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[ManageService].toInstance(mockManageService))
+        .build()
 
       running(application) {
         val instanceId = "instance-123"
-        val request    = FakeRequest(GET, routes.RetrievingSubcontractorsController.onPageLoad(instanceId).url)
+        val request    =
+          FakeRequest(GET, routes.RetrievingSubcontractorsController.onPageLoad(instanceId).url).withCSRFToken
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[RetrievingSubcontractorsView]
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.SuccessfulAutomaticSubcontractorUpdateController
+          .onPageLoad()
+          .url
+      }
+    }
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(routes.RetrievingSubcontractorsController.run(instanceId).url)(
-          request,
-          messages(application)
-        ).toString
+    "must redirect to PS-05b when F2 succeeds with no subcontractors" in {
+
+      val mockManageService = mock[ManageService]
+      when(
+        mockManageService.prepopulateContractorAndSubcontractors(any[EmployerReference], any[String])(
+          any[HeaderCarrier]
+        )
+      )
+        .thenReturn(Future.successful(true))
+      when(mockManageService.getScheme(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful((true, 0)))
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[ManageService].toInstance(mockManageService))
+        .build()
+
+      running(application) {
+        val instanceId = "instance-123"
+        val request    =
+          FakeRequest(GET, routes.RetrievingSubcontractorsController.onPageLoad(instanceId).url).withCSRFToken
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.SuccessfulNoRecordsFoundController.onPageLoad().url
+      }
+    }
+
+    "must redirect to PS-04 when F2 fails" in {
+
+      val mockManageService = mock[ManageService]
+      when(
+        mockManageService.prepopulateContractorAndSubcontractors(any[EmployerReference], any[String])(
+          any[HeaderCarrier]
+        )
+      )
+        .thenReturn(Future.successful(false))
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[ManageService].toInstance(mockManageService))
+        .build()
+
+      running(application) {
+        val instanceId = "instance-123"
+        val request    =
+          FakeRequest(GET, routes.RetrievingSubcontractorsController.onPageLoad(instanceId).url).withCSRFToken
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.UnsuccessfulAutomaticSubcontractorUpdateController
+          .onPageLoad()
+          .url
       }
     }
   }

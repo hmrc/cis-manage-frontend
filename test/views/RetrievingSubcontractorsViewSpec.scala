@@ -28,9 +28,8 @@ class RetrievingSubcontractorsViewSpec extends SpecBase {
   "RetrievingSubcontractorsView" - {
 
     "must render the header and paragraphs on the page" in new Setup {
-      val runUrl = "/your-subcontractors/run/instance-123"
-      val html   = view(runUrl)
-      val doc    = Jsoup.parse(html.body)
+      val html = view()
+      val doc  = Jsoup.parse(html.body)
 
       doc.title             must include(messages("retrievingSubcontractors.title"))
       doc.select("h1").text must include(messages("retrievingSubcontractors.heading"))
