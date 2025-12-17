@@ -24,7 +24,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{ManageService, SchemeStatus}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl.*
-import uk.gov.hmrc.play.bootstrap.binders.*
+import uk.gov.hmrc.play.bootstrap.binders.{RedirectUrl => SafeRedirectUrl, *}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import pages.CisIdPage
@@ -42,7 +42,7 @@ class PrepopulationRoutingController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def route(target: RedirectUrl): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+  def route(target: SafeRedirectUrl): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     implicit val hc: HeaderCarrier =
       HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 

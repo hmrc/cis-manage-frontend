@@ -21,7 +21,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.i18n.Messages
-import play.api.test.FakeRequest
+import play.api.test.{CSRFTokenHelper, FakeRequest}
 import play.twirl.api.HtmlFormat
 import views.html.IntroductionView
 
@@ -59,7 +59,7 @@ class IntroductionViewSpec extends SpecBase {
       doc.select("p").text                      must include(messages("introduction.details.p2"))
       doc.getElementsByClass("govuk-link").text must include(messages("introduction.details.link"))
 
-      doc.select("a.govuk-button").text must include(messages("site.continue"))
+      doc.select(".govuk-button").text must include(messages("site.continue"))
     }
 
     "must render the page with the correct sidebar links and header" in new Setup {
@@ -77,7 +77,7 @@ class IntroductionViewSpec extends SpecBase {
   trait Setup {
     val app: Application                          = applicationBuilder().build()
     val view: IntroductionView                    = app.injector.instanceOf[IntroductionView]
-    implicit val request: play.api.mvc.Request[_] = FakeRequest()
+    implicit val request: play.api.mvc.Request[_] = CSRFTokenHelper.addCSRFToken(FakeRequest())
     implicit val messages: Messages               = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,
       app.injector.instanceOf[play.api.i18n.MessagesApi]

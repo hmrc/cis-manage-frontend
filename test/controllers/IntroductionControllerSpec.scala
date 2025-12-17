@@ -21,7 +21,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject.bind
-import play.api.test.FakeRequest
+import play.api.test.{CSRFTokenHelper, FakeRequest}
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.IntroductionView
@@ -36,7 +36,7 @@ class IntroductionControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.IntroductionController.onPageLoad().url)
+        val request = CSRFTokenHelper.addCSRFToken(FakeRequest(GET, routes.IntroductionController.onPageLoad().url))
 
         val result = route(application, request).value
 
@@ -49,6 +49,21 @@ class IntroductionControllerSpec extends SpecBase {
           messages(application)
         ).toString
 
+      }
+    }
+  }
+
+  "IntroductionController.onContinue" - {
+    "must redirect to RetrievingSubcontractorsController when employer reference is present" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = CSRFTokenHelper.addCSRFToken(FakeRequest(POST, routes.IntroductionController.onContinue().url))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
       }
     }
   }
