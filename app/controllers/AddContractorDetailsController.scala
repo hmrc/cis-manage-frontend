@@ -34,4 +34,3 @@ class AddContractorDetailsController @Inject() (
     Ok(view())
   }
 }
-

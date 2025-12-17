@@ -1,3 +1,19 @@
+/*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package controllers
 
 import config.FrontendAppConfig
@@ -6,8 +22,11 @@ import models.UserAnswers
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{ManageService, SchemeStatus}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl.*
+import uk.gov.hmrc.play.bootstrap.binders.*
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.bootstrap.frontend.http.RedirectUrl
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import pages.CisIdPage
 
 import javax.inject.Inject
@@ -17,30 +36,44 @@ class PrepopulationRoutingController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  controllerComponents: MessagesControllerComponents,
+  override val controllerComponents: MessagesControllerComponents,
   manageService: ManageService
 )(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
     with I18nSupport {
 
   def route(target: RedirectUrl): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    val safeTarget = target.getEither.toOption.filter(_.isRelativeUrl).map(_.url).getOrElse(controllers.routes.PageNotFoundController.onPageLoad().url)
-    val ua        = request.userAnswers.getOrElse(UserAnswers(request.userId))
+    implicit val hc: HeaderCarrier =
+      HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    getOrCreateCisId(ua).flatMap { case (cisId, updatedUa) =>
-      manageService
-        .getSchemeStatus(cisId)
-        .map { status =>
-          val destination = decideDestination(status, safeTarget)
-          Redirect(destination)
-        }
-        .recover { _ =>
-          Redirect(controllers.routes.SystemErrorController.onPageLoad())
-        }
-    }
+    val safeTarget = target
+      .getEither(OnlyRelative)
+      .map(_.url)
+      .getOrElse(controllers.routes.PageNotFoundController.onPageLoad().url)
+
+    val ua0 = request.userAnswers.getOrElse(UserAnswers(request.userId))
+
+    val cisIdF: Future[(String, UserAnswers)] =
+      ua0.get(CisIdPage) match {
+        case Some(cisId) => Future.successful((cisId, ua0))
+        case None        => manageService.resolveAndStoreCisId(ua0)
+      }
+
+    cisIdF
+      .flatMap { case (cisId, _) =>
+        manageService
+          .getSchemeStatus(cisId)
+          .map { status =>
+            val destination = decideDestination(status, safeTarget)
+            Redirect(destination)
+          }
+      }
+      .recover { _ =>
+        Redirect(controllers.routes.SystemErrorController.onPageLoad())
+      }
   }
 
-  private def decideDestination(status: SchemeStatus, targetUrl: String): String = {
+  private def decideDestination(status: SchemeStatus, targetUrl: String): String =
     if (status.prePopSuccessful) {
       targetUrl
     } else {
@@ -48,7 +81,7 @@ class PrepopulationRoutingController @Inject() (
       val utrPresent  = status.utr.exists(_.nonEmpty)
 
       (namePresent, utrPresent) match {
-        case (true, true) =>
+        case (true, true)   =>
           targetUrl
         case (false, false) =>
           if (status.subcontractorCounter > 0) {
@@ -56,16 +89,9 @@ class PrepopulationRoutingController @Inject() (
           } else {
             controllers.routes.IntroductionController.onPageLoad().url
           }
-        case _ =>
+        case _              =>
           controllers.routes.AddContractorDetailsController.onPageLoad().url
       }
     }
-  }
 
-  private def getOrCreateCisId(ua: UserAnswers)(implicit request: models.requests.IdentifierRequest[_]): Future[(String, UserAnswers)] =
-    ua.get(pages.CisIdPage) match {
-      case Some(cisId) => Future.successful((cisId, ua))
-      case None        => manageService.resolveAndStoreCisId(ua)
-    }
 }
-

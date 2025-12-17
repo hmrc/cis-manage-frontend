@@ -60,7 +60,9 @@ class RetrievingSubcontractorsController @Inject() (
                   }
                 }
             } else {
-              Future.successful(Redirect(controllers.routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad()))
+              Future.successful(
+                Redirect(controllers.routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad())
+              )
             }
           }
           .recover { case exception =>

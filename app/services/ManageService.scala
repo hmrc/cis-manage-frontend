@@ -77,7 +77,7 @@ class ManageService @Inject() (
     cisConnector
       .getScheme(instanceId)
       .map { json =>
-        val prePopSuccessful = (json \ "prePopSuccessful").asOpt[String].contains("Y")
+        val prePopSuccessful     = (json \ "prePopSuccessful").asOpt[String].contains("Y")
         val subcontractorCounter =
           (json \ "subcontractorCounter").asOpt[Int].getOrElse(0)
         (prePopSuccessful, subcontractorCounter)

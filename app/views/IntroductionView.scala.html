@@ -90,6 +90,7 @@
     )
 
     @form(action = controllers.routes.IntroductionController.onContinue()) {
+        @CSRF.formField
         @govukButton(
             ButtonViewModel(messages("site.continue"))
         )

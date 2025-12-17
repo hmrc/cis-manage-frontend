@@ -41,7 +41,7 @@ GET         /org/cis-return-dashboard                               controllers.
 GET         /sign-into-cis                                          controllers.IntroductionController.onPageLoad()
 GET        /sign-into-cis-routing                                  controllers.IntroductionController.affinityGroupRouting()
 POST       /sign-into-cis/continue                                 controllers.IntroductionController.onContinue()
-GET         /cis/route                                              controllers.PrepopulationRoutingController.route(target: uk.gov.hmrc.play.bootstrap.frontend.http.RedirectUrl)
+GET         /cis/route                                              controllers.PrepopulationRoutingController.route(target: uk.gov.hmrc.play.bootstrap.binders.RedirectUrl)
 
 GET         /page-not-found                                         controllers.PageNotFoundController.onPageLoad()
 GET         /access-denied                                          controllers.AccessDeniedController.onPageLoad()

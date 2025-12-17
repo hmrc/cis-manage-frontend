@@ -20,7 +20,6 @@ import config.FrontendAppConfig
 import controllers.actions.IdentifierAction
 import models.UserAnswers
 import play.api.Logging
-import services.ManageService
 
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -37,8 +36,7 @@ class IntroductionController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
   sessionRepository: SessionRepository,
-  view: IntroductionView,
-  manageService: ManageService
+  view: IntroductionView
 )(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
     with I18nSupport
@@ -68,7 +66,7 @@ class IntroductionController @Inject() (
         Future.successful(
           Redirect(controllers.routes.RetrievingSubcontractorsController.onPageLoad(instanceId))
         )
-      case None =>
+      case None              =>
         logger.error("[IntroductionController][onContinue] Employer reference missing in identifier request")
         Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
     }
