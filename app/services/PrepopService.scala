@@ -17,14 +17,17 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
+import models.Scheme
+import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
+
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class PrepopService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector
-) {
+)(implicit ec: ExecutionContext) {
 
   def prepopulateContractorKnownFacts(
     instanceId: String,
@@ -36,4 +39,55 @@ class PrepopService @Inject() (
       taxOfficeNumber = taxOfficeNumber,
       taxOfficeReference = taxOfficeReference
     )
+
+  def prepopulate(
+    taxOfficeNumber: String,
+    taxOfficeReference: String,
+    instanceId: String
+  )(implicit hc: HeaderCarrier): Future[Boolean] =
+    cisConnector
+      .prepopulateContractorAndSubcontractors(
+        taxOfficeNumber = taxOfficeNumber,
+        taxOfficeReference = taxOfficeReference,
+        instanceId = instanceId
+      )
+      .map(_ => true)
+      .recover { case _ =>
+        false
+      }
+
+  def getScheme(instanceId: String)(implicit hc: HeaderCarrier): Future[Option[Scheme]] =
+    cisConnector.getScheme(instanceId)
+
+  private def isNonEmpty(opt: Option[String]): Boolean =
+    opt.exists(_.trim.nonEmpty)
+
+  def determineLandingDestination(
+    targetCall: Call,
+    instanceId: String,
+    scheme: Scheme,
+    addContractorDetailsCall: Call,
+    checkSubcontractorRecordsCall: Call
+  ): Call = {
+    val prePopOk = scheme.prePopSuccessful.contains("Y")
+
+    val hasName = isNonEmpty(scheme.name)
+    val hasUtr  = isNonEmpty(scheme.utr)
+
+    val subCount = scheme.subcontractorCounter.getOrElse(0)
+
+    if (prePopOk) {
+      targetCall
+    } else if (hasName && hasUtr) {
+      targetCall
+    } else if (hasName ^ hasUtr) {
+      addContractorDetailsCall
+    } else {
+      if (subCount > 0) {
+        addContractorDetailsCall
+      } else {
+        checkSubcontractorRecordsCall
+      }
+    }
+  }
 }

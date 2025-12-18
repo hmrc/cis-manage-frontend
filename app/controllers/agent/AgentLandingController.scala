@@ -18,14 +18,15 @@ package controllers.agent
 
 import controllers.actions.*
 import config.FrontendAppConfig
-import models.Target
+import models.{CisTaxpayerSearchResult, Target}
 import models.Target.*
+import models.requests.DataRequest
 import pages.AgentClientsPage
 import play.api.Logging
 
 import javax.inject.{Inject, Named}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
 import services.{ManageService, PrepopService}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -81,60 +82,103 @@ class AgentLandingController @Inject() (
 
   def onTargetClick(uniqueId: String, targetKey: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+      implicit val hc: HeaderCarrier =
+        HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-      val targetOpt                 = Target.fromKey(targetKey)
-      val clientOpt                 = request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId))
       val systemErrorRedirect       = Redirect(controllers.routes.SystemErrorController.onPageLoad())
       val unauthorisedAgentRedirect = Redirect(controllers.routes.UnauthorisedAgentAffinityController.onPageLoad())
 
-      (targetOpt, clientOpt) match {
-        case (Some(target), Some(client)) if client.uniqueId.nonEmpty =>
-          val instanceId         = client.uniqueId
-          val taxOfficeNumber    = client.taxOfficeNumber
-          val taxOfficeReference = client.taxOfficeRef
-
-          prepopService
-            .prepopulateContractorKnownFacts(
-              taxOfficeNumber = taxOfficeNumber,
-              taxOfficeReference = taxOfficeReference,
-              instanceId = instanceId
-            )
-            .map(_ => Redirect(targetCall(target, instanceId)))
-            .recover {
-              case u: UpstreamErrorResponse =>
-                logger.error(
-                  s"[AgentLandingController][onTargetClick] upstream error for uniqueId=$uniqueId: ${u.message}",
-                  u
-                )
-                systemErrorRedirect
-
-              case NonFatal(e) =>
-                logger.error(s"[AgentLandingController][onTargetClick] unexpected error for uniqueId=$uniqueId", e)
-                systemErrorRedirect
-            }
-
-        case (Some(_), Some(_)) =>
-          logger.warn(
-            s"[AgentLandingController][onTargetClick] Client found but uniqueId is missing/empty for requested uniqueId=$uniqueId"
-          )
-          Future.successful(unauthorisedAgentRedirect)
-
-        case (Some(_), None) =>
-          logger.warn(s"[AgentLandingController][onTargetClick] Missing client in userAnswers for uniqueId=$uniqueId")
-          Future.successful(systemErrorRedirect)
-
-        case (None, _) =>
-          logger.warn(s"[AgentLandingController][onTargetClick] Unknown targetKey=$targetKey for uniqueId=$uniqueId")
-          Future.successful(NotFound("Unknown target"))
+      resolveInputs(uniqueId, targetKey, systemErrorRedirect, unauthorisedAgentRedirect) match {
+        case Left(result)            =>
+          Future.successful(result)
+        case Right((target, client)) =>
+          handleTargetClick(uniqueId, targetKey, target, client, systemErrorRedirect)
       }
     }
+
+  private def resolveInputs(
+    uniqueId: String,
+    targetKey: String,
+    systemErrorRedirect: Result,
+    unauthorisedAgentRedirect: Result
+  )(implicit request: DataRequest[_]): Either[Result, (Target, CisTaxpayerSearchResult)] =
+    Target.fromKey(targetKey) match {
+      case None =>
+        logger.warn(s"[AgentLandingController][onTargetClick] Unknown targetKey=$targetKey for uniqueId=$uniqueId")
+        Left(NotFound("Unknown target"))
+
+      case Some(target) =>
+        request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId)) match {
+          case None =>
+            logger.warn(s"[AgentLandingController][onTargetClick] Missing client in userAnswers for uniqueId=$uniqueId")
+            Left(systemErrorRedirect)
+
+          case Some(client) if client.uniqueId.trim.isEmpty =>
+            logger.warn(
+              s"[AgentLandingController][onTargetClick] Client found but uniqueId is missing/empty for requested uniqueId=$uniqueId"
+            )
+            Left(unauthorisedAgentRedirect)
+
+          case Some(client) =>
+            Right((target, client))
+        }
+    }
+
+  private def handleTargetClick(
+    uniqueId: String,
+    targetKey: String,
+    target: Target,
+    client: CisTaxpayerSearchResult,
+    systemErrorRedirect: Result
+  )(implicit hc: HeaderCarrier): Future[Result] = {
+    val instanceId                    = client.uniqueId
+    val addContractorDetailsCall      = controllers.routes.AddContractorDetailsController.onPageLoad()
+    val checkSubcontractorRecordsCall = controllers.routes.CheckSubcontractorRecordsController.onPageLoad(
+      client.taxOfficeNumber,
+      client.taxOfficeRef,
+      instanceId,
+      targetKey
+    )
+
+    prepopService
+      .prepopulateContractorKnownFacts(instanceId, client.taxOfficeNumber, client.taxOfficeRef)
+      .flatMap(_ => prepopService.getScheme(instanceId))
+      .map {
+        case Some(scheme) =>
+          Redirect(
+            prepopService.determineLandingDestination(
+              targetCall = targetCall(target, instanceId),
+              instanceId = instanceId,
+              scheme = scheme,
+              addContractorDetailsCall = addContractorDetailsCall,
+              checkSubcontractorRecordsCall = checkSubcontractorRecordsCall
+            )
+          )
+
+        case None =>
+          logger.warn(
+            s"[AgentLandingController][onTargetClick] No scheme found for instanceId=$instanceId (uniqueId=$uniqueId)"
+          )
+          systemErrorRedirect
+      }
+      .recover {
+        case u: UpstreamErrorResponse =>
+          logger.error(
+            s"[AgentLandingController][onTargetClick] upstream error for uniqueId=$uniqueId: ${u.message}",
+            u
+          )
+          systemErrorRedirect
+
+        case NonFatal(e) =>
+          logger.error(s"[AgentLandingController][onTargetClick] unexpected error for uniqueId=$uniqueId", e)
+          systemErrorRedirect
+      }
+  }
 
   private def targetCall(target: Target, instanceId: String): Call =
     target match {
       case Returns       => controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
-      // to be added for NoticesLandingController
-      case Notices       => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case Notices       => controllers.notices.routes.ManageNoticesStatementsController.onPageLoad(instanceId)
       case Subcontractor => controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId)
     }
 }

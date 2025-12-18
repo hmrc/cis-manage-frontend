@@ -18,11 +18,12 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import itutil.ApplicationWithWiremock
+import models.Scheme
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
   with Matchers
@@ -491,6 +492,98 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
       }
 
       ex.getMessage must include("CIS taxpayer not found")
+    }
+  }
+
+  "prepopulateContractorAndSubcontractors" should {
+
+    "return successfully when BE returns 204" in {
+      val taxOfficeNumber = "163"
+      val taxOfficeReference = "AB0063"
+      val instanceId = "900063"
+
+      stubFor(
+        post(urlPathEqualTo(s"/cis/scheme/prepopulate/$taxOfficeNumber/$taxOfficeReference/$instanceId"))
+          .willReturn(aResponse().withStatus(NO_CONTENT))
+      )
+
+      connector
+        .prepopulateContractorAndSubcontractors(taxOfficeNumber, taxOfficeReference, instanceId)
+        .futureValue mustBe ()
+    }
+
+
+    "fail when BE returns non-204" in {
+      val taxOfficeNumber = "163"
+      val taxOfficeReference = "AB0063"
+      val instanceId = "900063"
+
+      stubFor(
+        post(urlPathEqualTo(s"/cis/scheme/prepopulate/$taxOfficeNumber/$taxOfficeReference/$instanceId"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = connector
+        .prepopulateContractorAndSubcontractors(taxOfficeNumber, taxOfficeReference, instanceId)
+        .failed
+        .futureValue
+
+      ex mustBe a[UpstreamErrorResponse]
+      ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe INTERNAL_SERVER_ERROR
+      ex.getMessage must include("boom")
+    }
+  }
+
+
+  "getScheme" should {
+
+    "return Some(Scheme) when BE returns 200 with valid JSON" in {
+      val instanceId = "900063"
+
+      stubFor(
+        get(urlPathEqualTo(s"/cis/scheme/$instanceId"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                """{
+                  |  "schemeId": 123,
+                  |  "instanceId": "900063",
+                  |  "utr": null,
+                  |  "name": null,
+                  |  "prePopSuccessful": null,
+                  |  "subcontractorCounter": null
+                  |}""".stripMargin
+              )
+          )
+      )
+
+      val result = connector.getScheme(instanceId).futureValue
+      result mustBe Some(Scheme(123, "900063", None, None, None, None))
+    }
+
+    "return None when BE returns 404" in {
+      val instanceId = "900063"
+
+      stubFor(
+        get(urlPathEqualTo(s"/cis/scheme/$instanceId"))
+          .willReturn(aResponse().withStatus(NOT_FOUND))
+      )
+
+      connector.getScheme(instanceId).futureValue mustBe None
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      val instanceId = "900063"
+
+      stubFor(
+        get(urlPathEqualTo(s"/cis/scheme/$instanceId"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = connector.getScheme(instanceId).failed.futureValue
+      ex mustBe a[UpstreamErrorResponse]
+      ex.getMessage must include("boom")
     }
   }
 

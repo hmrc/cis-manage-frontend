@@ -386,3 +386,7 @@ manageNoticesStatements.sidebar.link1 = What is the Construction Industry Scheme
 manageNoticesStatements.sidebar.link2 = CIS monthly returns guidance
 manageNoticesStatements.sidebar.link3 = CIS 340: Penalties for late returns
 manageNoticesStatements.searchResults.viewAll = View all notices
+
+addContractorDetails.title = Add contractor details
+addContractorDetails.heading = Add contractor details
+addContractorDetails.p1 = This is a placeholder page for adding contractor details.

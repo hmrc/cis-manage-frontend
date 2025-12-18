@@ -29,7 +29,13 @@ class CheckSubcontractorRecordsViewSpec extends SpecBase {
   "UnsuccessfulAutomaticSubcontractorUpdateView" - {
 
     "must render the page with the correct heading, paragraphs and button" in new Setup {
-      val html: HtmlFormat.Appendable = view()
+
+      val taxOfficeNumber    = "101"
+      val taxOfficeReference = "AB0001"
+      val instanceId         = "900001"
+      val targetKey          = "subcontractors"
+
+      val html: HtmlFormat.Appendable = view(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.title                                   must include(messages("checkSubcontractorRecords.title"))

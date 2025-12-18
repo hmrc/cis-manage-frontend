@@ -32,7 +32,7 @@ class ManageNoticesStatementsViewSpec extends SpecBase {
   "ManageNoticesStatementsView" - {
 
     "must render headings, details content and intro" in new Setup {
-      val html: HtmlFormat.Appendable = view(contractorName, pageViewModel)
+      val html: HtmlFormat.Appendable = view(contractorName, instanceId, pageViewModel)
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.title                                                   must include(messages("manageNoticesStatements.title"))
@@ -55,7 +55,7 @@ class ManageNoticesStatementsViewSpec extends SpecBase {
     }
 
     "must render search filters with provided options and button" in new Setup {
-      val html: HtmlFormat.Appendable = view(contractorName, pageViewModel)
+      val html: HtmlFormat.Appendable = view(contractorName, instanceId, pageViewModel)
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.select("h2").eachText().asScala must contain(messages("manageNoticesStatements.search.heading"))
@@ -86,7 +86,7 @@ class ManageNoticesStatementsViewSpec extends SpecBase {
     }
 
     "must show search results summary, table rows and view all link" in new Setup {
-      val html: HtmlFormat.Appendable = view(contractorName, pageViewModel)
+      val html: HtmlFormat.Appendable = view(contractorName, instanceId, pageViewModel)
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.select("h2").eachText().asScala must contain(messages("manageNoticesStatements.searchResults.heading"))
@@ -127,6 +127,7 @@ class ManageNoticesStatementsViewSpec extends SpecBase {
       app.injector.instanceOf[play.api.i18n.MessagesApi]
     )
     val contractorName                                      = "ABC Construction Ltd"
+    val instanceId                                          = "123"
     val pageViewModel: ManageNoticesStatementsPageViewModel = ManageNoticesStatementsPageViewModel(
       Seq(
         ManageNoticesStatementsRowViewModel(

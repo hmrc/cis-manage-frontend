@@ -29,14 +29,17 @@ class SuccessfulNoRecordsFoundViewSpec extends SpecBase {
 
   "SuccessfulNoRecordsFoundView" - {
     "must render the page with the correct heading, paragraphs, link and button" in new Setup {
-      val html: HtmlFormat.Appendable = view()
+      val instanceId = "900001"
+      val targetKey  = "subcontractors"
+
+      val html: HtmlFormat.Appendable = view(instanceId, targetKey)
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.title                                   must include(messages("successfulNoRecordsFound.title"))
       doc.select("h1").text                       must include(messages("successfulNoRecordsFound.heading"))
       doc.select("p").text                        must include(messages("successfulNoRecordsFound.p1"))
       doc.select("p").text                        must include(messages("successfulNoRecordsFound.p2"))
-      doc.getElementsByClass("govuk-link").text   must (include(messages("successfulNoRecordsFound.p2.link")))
+      doc.getElementsByClass("govuk-link").text   must include(messages("successfulNoRecordsFound.p2.link"))
       doc.getElementsByClass("govuk-button").text must include(messages("site.continue"))
     }
   }

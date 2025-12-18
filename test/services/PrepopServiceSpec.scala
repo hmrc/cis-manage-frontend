@@ -17,12 +17,14 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import models.Scheme
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -106,6 +108,125 @@ class PrepopServiceSpec extends AnyWordSpec with Matchers with MockitoSugar with
         )(any[HeaderCarrier])
 
       verifyNoMoreInteractions(mockConnector)
+    }
+  }
+
+  "PrepopService.prepopulate" should {
+
+    "return true when connector call succeeds" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val service       = new PrepopService(mockConnector)
+
+      when(
+        mockConnector.prepopulateContractorAndSubcontractors(any[String], any[String], any[String])(any[HeaderCarrier])
+      ).thenReturn(Future.unit)
+
+      val result = service.prepopulate("163", "AB0063", "CIS-123").futureValue
+      result mustBe true
+
+      verify(mockConnector)
+        .prepopulateContractorAndSubcontractors(eqTo("163"), eqTo("AB0063"), eqTo("CIS-123"))(any[HeaderCarrier])
+
+      verifyNoMoreInteractions(mockConnector)
+    }
+
+    "return false when connector call fails" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val service       = new PrepopService(mockConnector)
+
+      when(
+        mockConnector.prepopulateContractorAndSubcontractors(any[String], any[String], any[String])(any[HeaderCarrier])
+      ).thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val result = service.prepopulate("163", "AB0063", "CIS-123").futureValue
+      result mustBe false
+
+      verify(mockConnector)
+        .prepopulateContractorAndSubcontractors(eqTo("163"), eqTo("AB0063"), eqTo("CIS-123"))(any[HeaderCarrier])
+
+      verifyNoMoreInteractions(mockConnector)
+    }
+  }
+
+  "PrepopService.getScheme" should {
+
+    "delegate to the connector" in {
+      val mockConnector = mock[ConstructionIndustrySchemeConnector]
+      val service       = new PrepopService(mockConnector)
+
+      val scheme = Scheme(123, "CIS-123", None, None, None, None)
+
+      when(mockConnector.getScheme(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(scheme)))
+
+      service.getScheme("CIS-123").futureValue mustBe Some(scheme)
+
+      verify(mockConnector).getScheme(eqTo("CIS-123"))(any[HeaderCarrier])
+      verifyNoMoreInteractions(mockConnector)
+    }
+  }
+
+  "PrepopService.determineLandingDestination" should {
+
+    val mockConnector = mock[ConstructionIndustrySchemeConnector]
+    val service       = new PrepopService(mockConnector)
+
+    val targetCall: Call                    = controllers.routes.ReturnsLandingController.onPageLoad("CIS-123")
+    val addContractorDetailsCall: Call      = controllers.routes.AddContractorDetailsController.onPageLoad()
+    val checkSubcontractorRecordsCall: Call =
+      controllers.routes.CheckSubcontractorRecordsController.onPageLoad("163", "AB0063", "CIS-123", "returnDue")
+
+    "return targetCall when prePopSuccessful is Y" in {
+      val scheme = Scheme(1, "CIS-123", None, None, Some("Y"), None)
+      service.determineLandingDestination(
+        targetCall,
+        "CIS-123",
+        scheme,
+        addContractorDetailsCall,
+        checkSubcontractorRecordsCall
+      ) mustBe targetCall
+    }
+
+    "return addContractorDetailsCall when exactly one of name/utr is present" in {
+      val schemeNameOnly = Scheme(1, "CIS-123", None, Some("Name"), None, None)
+      service.determineLandingDestination(
+        targetCall,
+        "CIS-123",
+        schemeNameOnly,
+        addContractorDetailsCall,
+        checkSubcontractorRecordsCall
+      ) mustBe addContractorDetailsCall
+
+      val schemeUtrOnly = Scheme(1, "CIS-123", Some("123"), None, None, None)
+      service.determineLandingDestination(
+        targetCall,
+        "CIS-123",
+        schemeUtrOnly,
+        addContractorDetailsCall,
+        checkSubcontractorRecordsCall
+      ) mustBe addContractorDetailsCall
+    }
+
+    "return checkSubcontractorRecordsCall when neither name nor utr is present and subCount is 0" in {
+      val scheme = Scheme(1, "CIS-123", None, None, None, Some(0))
+      service.determineLandingDestination(
+        targetCall,
+        "CIS-123",
+        scheme,
+        addContractorDetailsCall,
+        checkSubcontractorRecordsCall
+      ) mustBe checkSubcontractorRecordsCall
+    }
+
+    "return addContractorDetailsCall when neither name nor utr is present and subCount > 0" in {
+      val scheme = Scheme(1, "CIS-123", None, None, None, Some(2))
+      service.determineLandingDestination(
+        targetCall,
+        "CIS-123",
+        scheme,
+        addContractorDetailsCall,
+        checkSubcontractorRecordsCall
+      ) mustBe addContractorDetailsCall
     }
   }
 }

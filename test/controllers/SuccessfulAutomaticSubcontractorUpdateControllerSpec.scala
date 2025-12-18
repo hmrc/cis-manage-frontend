@@ -36,17 +36,25 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
       )
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val instanceId  = "900001"
+      val targetKey   = "subcontractors"
 
       running(application) {
 
-        val request = FakeRequest(GET, routes.SuccessfulAutomaticSubcontractorUpdateController.onPageLoad().url)
+        val request = FakeRequest(
+          GET,
+          routes.SuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId, targetKey).url
+        )
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[SuccessfulAutomaticSubcontractorUpdateView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(subcontractorsList)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(subcontractorsList, instanceId, targetKey)(
+          request,
+          messages(application)
+        ).toString
       }
     }
   }

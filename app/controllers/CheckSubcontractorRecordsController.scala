@@ -16,6 +16,7 @@
 
 package controllers
 
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -25,12 +26,34 @@ import javax.inject.Inject
 
 class CheckSubcontractorRecordsController @Inject() (
   override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: CheckSubcontractorRecordsView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = Action { implicit request =>
-    Ok(view())
-  }
+  def onPageLoad(
+    taxOfficeNumber: String,
+    taxOfficeReference: String,
+    instanceId: String,
+    targetKey: String
+  ): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      Ok(view(taxOfficeNumber, taxOfficeReference, instanceId, targetKey))
+    }
+
+  def onSubmit(
+    taxOfficeNumber: String,
+    taxOfficeReference: String,
+    instanceId: String,
+    targetKey: String
+  ): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      Redirect(
+        controllers.routes.RetrievingSubcontractorsController
+          .onPageLoad(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
+      )
+    }
 }

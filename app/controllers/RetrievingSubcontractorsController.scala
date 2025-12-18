@@ -18,19 +18,90 @@ package controllers
 
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.PrepopService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.RetrievingSubcontractorsView
-
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class RetrievingSubcontractorsController @Inject() (
   override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: RetrievingSubcontractorsView
-) extends FrontendBaseController
+  view: RetrievingSubcontractorsView,
+  prepopService: PrepopService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = Action { implicit request =>
-    Ok(view())
-  }
+  def onPageLoad(
+    taxOfficeNumber: String,
+    taxOfficeReference: String,
+    instanceId: String,
+    targetKey: String
+  ): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      Ok(view())
+        .withHeaders(
+          "Refresh" -> s"0; url=${controllers.routes.RetrievingSubcontractorsController.start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey).url}"
+        )
+    }
+
+  def start(
+    taxOfficeNumber: String,
+    taxOfficeReference: String,
+    instanceId: String,
+    targetKey: String
+  ): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+      for {
+        prepopOk  <- prepopService.prepopulate(taxOfficeNumber, taxOfficeReference, instanceId)
+        schemeOpt <- if (prepopOk) prepopService.getScheme(instanceId) else Future.successful(None)
+        result    <- schemeOpt match {
+                       case None =>
+                         Future.successful(
+                           Redirect(
+                             routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId, targetKey)
+                           )
+                         )
+
+                       case Some(scheme) =>
+                         scheme.prePopSuccessful match {
+                           case Some("Y") if scheme.subcontractorCounter.exists(_ > 0) =>
+                             Future.successful(
+                               Redirect(
+                                 routes.SuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId, targetKey)
+                               )
+                             )
+
+                           case Some("Y") =>
+                             Future.successful(
+                               Redirect(routes.SuccessfulNoRecordsFoundController.onPageLoad(instanceId, targetKey))
+                             )
+
+                           case Some("N") =>
+                             Future.successful(
+                               Redirect(
+                                 routes.UnsuccessfulAutomaticSubcontractorUpdateController
+                                   .onPageLoad(instanceId, targetKey)
+                               )
+                             )
+
+                           case _ =>
+                             Future.successful(
+                               Redirect(
+                                 routes.UnsuccessfulAutomaticSubcontractorUpdateController
+                                   .onPageLoad(instanceId, targetKey)
+                               )
+                             )
+                         }
+                     }
+      } yield result
+    }
 }

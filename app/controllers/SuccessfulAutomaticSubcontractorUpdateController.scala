@@ -16,26 +16,46 @@
 
 package controllers
 
+import models.Target
+import models.Target.*
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.SuccessfulAutomaticSubcontractorUpdateViewModel
 import views.html.SuccessfulAutomaticSubcontractorUpdateView
-
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import javax.inject.Inject
 
 class SuccessfulAutomaticSubcontractorUpdateController @Inject() (
   override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: SuccessfulAutomaticSubcontractorUpdateView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = Action { implicit request =>
-    val subcontractorsList: Seq[SuccessfulAutomaticSubcontractorUpdateViewModel] = getSubcontractorsList
+  def onPageLoad(instanceId: String, targetKey: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      val subcontractorsList: Seq[SuccessfulAutomaticSubcontractorUpdateViewModel] = getSubcontractorsList
+      Ok(view(subcontractorsList, instanceId, targetKey))
+    }
 
-    Ok(view(subcontractorsList))
-  }
+  def onSubmit(instanceId: String, targetKey: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      Target.fromKey(targetKey) match {
+        case Some(target) => Redirect(targetCall(target, instanceId))
+        case None         => NotFound("Unknown target")
+      }
+    }
+
+  private def targetCall(target: Target, instanceId: String): Call =
+    target match {
+      case Returns       => controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
+      case Notices       => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case Subcontractor => controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId)
+    }
 
   private def getSubcontractorsList: Seq[SuccessfulAutomaticSubcontractorUpdateViewModel] =
     Seq(
