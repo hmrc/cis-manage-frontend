@@ -509,7 +509,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
 
       connector
         .prepopulateContractorAndSubcontractors(taxOfficeNumber, taxOfficeReference, instanceId)
-        .futureValue mustBe (())
+        .futureValue mustBe ()
     }
 
 
