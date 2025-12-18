@@ -16,17 +16,26 @@
 
 package models
 
-import play.api.libs.json.{Json, OFormat}
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers
+import play.api.libs.json._
 
-case class Scheme(
-  schemeId: Int,
-  instanceId: String,
-  utr: Option[String],
-  name: Option[String],
-  prePopSuccessful: Option[String],
-  subcontractorCounter: Option[Int]
-)
+class SchemeSpec extends AnyFreeSpec with Matchers {
 
-object Scheme {
-  implicit val format: OFormat[Scheme] = Json.format[Scheme]
+  "Scheme JSON" - {
+
+    "round-trips" in {
+      val model = Scheme(123, "CIS-123", Some("1234567890"), Some("Test Ltd"), Some("Y"), Some(2))
+      Json.toJson(model).as[Scheme] shouldBe model
+    }
+
+    "reads when optional fields are missing" in {
+      val json = Json.obj(
+        "schemeId"   -> 123,
+        "instanceId" -> "CIS-123"
+      )
+
+      json.as[Scheme] shouldBe Scheme(123, "CIS-123", None, None, None, None)
+    }
+  }
 }

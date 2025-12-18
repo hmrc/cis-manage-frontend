@@ -171,7 +171,6 @@ class ContractorLandingController @Inject() (
   private def targetCall(target: Target, instanceId: String): Call =
     target match {
       case Returns       => controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
-      // to be added for NoticesLandingController
       case Notices       => controllers.notices.routes.ManageNoticesStatementsController.onPageLoad(instanceId)
       case Subcontractor => controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId)
     }

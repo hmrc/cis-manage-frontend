@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package models
+package controllers
 
-import play.api.libs.json.{Json, OFormat}
+import org.scalatestplus.play.*
+import play.api.test.Helpers.*
+import play.api.test.FakeRequest
+import play.api.inject.guice.GuiceApplicationBuilder
 
-case class Scheme(
-  schemeId: Int,
-  instanceId: String,
-  utr: Option[String],
-  name: Option[String],
-  prePopSuccessful: Option[String],
-  subcontractorCounter: Option[Int]
-)
+class AddContractorDetailsControllerSpec extends PlaySpec {
 
-object Scheme {
-  implicit val format: OFormat[Scheme] = Json.format[Scheme]
+  "AddContractorDetailsController.onPageLoad" should {
+    "return OK" in {
+      val app     = new GuiceApplicationBuilder().build()
+      val request = FakeRequest(GET, controllers.routes.AddContractorDetailsController.onPageLoad().url)
+
+      val result = route(app, request).value
+
+      status(result) mustBe OK
+    }
+  }
 }

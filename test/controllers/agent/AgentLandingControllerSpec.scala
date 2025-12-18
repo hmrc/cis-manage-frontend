@@ -20,12 +20,13 @@ import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import models.{CisTaxpayerSearchResult, UserAnswers}
+import models.{CisTaxpayerSearchResult, Scheme, UserAnswers}
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import pages.AgentClientsPage
 import play.api.Application
 import play.api.inject.bind
+import play.api.mvc.Call
 import services.{ManageService, PrepopService}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import viewmodels.agent.AgentLandingViewModel
@@ -131,48 +132,79 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
 
     val returnsTargetKey = "returnDue"
 
-//    "must call prepopulate and redirect to ReturnsLandingController when client is found and prepop succeeds" in {
-//      val mockPrepopService = mock[PrepopService]
-//
-//      when(
-//        mockPrepopService.prepopulateContractorKnownFacts(
-//          any[String],
-//          any[String],
-//          any[String]
-//        )(any[HeaderCarrier])
-//      ).thenReturn(Future.unit)
-//
-//      val application: Application =
-//        applicationBuilder(
-//          userAnswers = Some(userAnswersWithAgentClient),
-//          additionalBindings = Seq(
-//            bind[PrepopService].toInstance(mockPrepopService)
-//          ),
-//          isAgent = true
-//        ).build()
-//
-//      try {
-//        val request =
-//          FakeRequest(
-//            GET,
-//            controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, returnsTargetKey).url
-//          )
-//
-//        val result = route(application, request).value
-//
-//        status(result) mustBe SEE_OTHER
-//        redirectLocation(result).value mustBe
-//          controllers.routes.ReturnsLandingController.onPageLoad(uniqueId).url
-//
-//        verify(mockPrepopService)
-//          .prepopulateContractorKnownFacts(
-//            eqTo(uniqueId),
-//            eqTo("163"),
-//            eqTo("AB0063")
-//          )(any[HeaderCarrier])
-//
-//      } finally application.stop()
-//    }
+    "must call prepopulate + getScheme and redirect using determineLandingDestination when scheme is found" in {
+      val mockPrepopService = mock[PrepopService]
+
+      val scheme = Scheme(
+        schemeId = 123,
+        instanceId = uniqueId,
+        utr = Some("1234567890"),
+        name = Some("Test Client"),
+        prePopSuccessful = Some("Y"),
+        subcontractorCounter = Some(0)
+      )
+
+      when(
+        mockPrepopService.prepopulateContractorKnownFacts(
+          any[String],
+          any[String],
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.unit)
+
+      when(
+        mockPrepopService.getScheme(any[String])(any[HeaderCarrier])
+      ).thenReturn(Future.successful(Some(scheme)))
+
+      when(
+        mockPrepopService.determineLandingDestination(
+          any[Call],
+          any[String],
+          any[Scheme],
+          any[Call],
+          any[Call]
+        )
+      ).thenReturn(controllers.routes.ReturnsLandingController.onPageLoad(uniqueId))
+
+      val application: Application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithAgentClient),
+          additionalBindings = Seq(
+            bind[PrepopService].toInstance(mockPrepopService)
+          ),
+          isAgent = true
+        ).build()
+
+      try {
+        val request =
+          FakeRequest(
+            GET,
+            controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, returnsTargetKey).url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value must endWith(
+          controllers.routes.ReturnsLandingController.onPageLoad(uniqueId).url
+        )
+
+        verify(mockPrepopService)
+          .prepopulateContractorKnownFacts(eqTo(uniqueId), eqTo("163"), eqTo("AB0063"))(any[HeaderCarrier])
+
+        verify(mockPrepopService)
+          .getScheme(eqTo(uniqueId))(any[HeaderCarrier])
+
+        verify(mockPrepopService)
+          .determineLandingDestination(
+            any[Call],
+            eqTo(uniqueId),
+            eqTo(scheme),
+            any[Call],
+            any[Call]
+          )
+      } finally application.stop()
+    }
 
     "must redirect to SystemErrorController when prepopulateContractorKnownFacts fails with UpstreamErrorResponse" in {
       val mockPrepopService = mock[PrepopService]
@@ -310,6 +342,43 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe NOT_FOUND
         verifyNoInteractions(mockPrepopService)
 
+      } finally application.stop()
+    }
+
+    "must redirect to SystemErrorController when getScheme returns None" in {
+      val mockPrepopService = mock[PrepopService]
+
+      when(
+        mockPrepopService.prepopulateContractorKnownFacts(any[String], any[String], any[String])(any[HeaderCarrier])
+      ).thenReturn(Future.unit)
+
+      when(
+        mockPrepopService.getScheme(any[String])(any[HeaderCarrier])
+      ).thenReturn(Future.successful(None))
+
+      val application: Application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithAgentClient),
+          additionalBindings = Seq(bind[PrepopService].toInstance(mockPrepopService)),
+          isAgent = true
+        ).build()
+
+      try {
+        val request =
+          FakeRequest(
+            GET,
+            controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, returnsTargetKey).url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe controllers.routes.SystemErrorController.onPageLoad().url
+
+        verify(mockPrepopService)
+          .prepopulateContractorKnownFacts(eqTo(uniqueId), eqTo("163"), eqTo("AB0063"))(any[HeaderCarrier])
+        verify(mockPrepopService)
+          .getScheme(eqTo(uniqueId))(any[HeaderCarrier])
       } finally application.stop()
     }
   }
