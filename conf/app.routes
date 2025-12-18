@@ -65,4 +65,6 @@ POST       /automatic-subcontractor-update-successful-no-records/:instanceId/:ta
 GET        /manage-cis-return/:instanceId                           controllers.ReturnsLandingController.onPageLoad(instanceId: String)
 GET        /manage-subcontractors/:instanceId                       controllers.SubcontractorsLandingPageController.onPageLoad(instanceId: String)
 
-GET        /manage-notices-statements                       controllers.notices.ManageNoticesStatementsController.onPageLoad()
+GET        /manage-notices-statements/:instanceId                   controllers.notices.ManageNoticesStatementsController.onPageLoad(instanceId: String)
+
+GET        /add-contractor-details                                  controllers.AddContractorDetailsController.onPageLoad()

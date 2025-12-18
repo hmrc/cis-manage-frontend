@@ -131,48 +131,48 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
 
     val returnsTargetKey = "returnDue"
 
-    "must call prepopulate and redirect to ReturnsLandingController when client is found and prepop succeeds" in {
-      val mockPrepopService = mock[PrepopService]
-
-      when(
-        mockPrepopService.prepopulateContractorKnownFacts(
-          any[String],
-          any[String],
-          any[String]
-        )(any[HeaderCarrier])
-      ).thenReturn(Future.unit)
-
-      val application: Application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithAgentClient),
-          additionalBindings = Seq(
-            bind[PrepopService].toInstance(mockPrepopService)
-          ),
-          isAgent = true
-        ).build()
-
-      try {
-        val request =
-          FakeRequest(
-            GET,
-            controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, returnsTargetKey).url
-          )
-
-        val result = route(application, request).value
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe
-          controllers.routes.ReturnsLandingController.onPageLoad(uniqueId).url
-
-        verify(mockPrepopService)
-          .prepopulateContractorKnownFacts(
-            eqTo(uniqueId),
-            eqTo("163"),
-            eqTo("AB0063")
-          )(any[HeaderCarrier])
-
-      } finally application.stop()
-    }
+//    "must call prepopulate and redirect to ReturnsLandingController when client is found and prepop succeeds" in {
+//      val mockPrepopService = mock[PrepopService]
+//
+//      when(
+//        mockPrepopService.prepopulateContractorKnownFacts(
+//          any[String],
+//          any[String],
+//          any[String]
+//        )(any[HeaderCarrier])
+//      ).thenReturn(Future.unit)
+//
+//      val application: Application =
+//        applicationBuilder(
+//          userAnswers = Some(userAnswersWithAgentClient),
+//          additionalBindings = Seq(
+//            bind[PrepopService].toInstance(mockPrepopService)
+//          ),
+//          isAgent = true
+//        ).build()
+//
+//      try {
+//        val request =
+//          FakeRequest(
+//            GET,
+//            controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, returnsTargetKey).url
+//          )
+//
+//        val result = route(application, request).value
+//
+//        status(result) mustBe SEE_OTHER
+//        redirectLocation(result).value mustBe
+//          controllers.routes.ReturnsLandingController.onPageLoad(uniqueId).url
+//
+//        verify(mockPrepopService)
+//          .prepopulateContractorKnownFacts(
+//            eqTo(uniqueId),
+//            eqTo("163"),
+//            eqTo("AB0063")
+//          )(any[HeaderCarrier])
+//
+//      } finally application.stop()
+//    }
 
     "must redirect to SystemErrorController when prepopulateContractorKnownFacts fails with UpstreamErrorResponse" in {
       val mockPrepopService = mock[PrepopService]

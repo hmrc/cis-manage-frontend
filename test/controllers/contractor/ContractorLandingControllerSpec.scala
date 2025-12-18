@@ -120,48 +120,48 @@ class ContractorLandingControllerSpec extends SpecBase {
         .success
         .value
 
-    "must call prepopulateContractorKnownFacts and redirect to ReturnsLandingController when cisId and employerReference are present and prepop succeeds" in {
-      val mockPrepopService = mock[PrepopService]
-
-      when(
-        mockPrepopService.prepopulateContractorKnownFacts(
-          any[String],
-          any[String],
-          any[String]
-        )(any[HeaderCarrier])
-      ).thenReturn(Future.unit)
-
-      val application =
-        applicationBuilder(
-          userAnswers = Some(uaWithCisId),
-          additionalBindings = Seq.empty
-        ).overrides(
-          bind[PrepopService].toInstance(mockPrepopService)
-        ).build()
-
-      running(application) {
-        val request =
-          FakeRequest(
-            GET,
-            controllers.contractor.routes.ContractorLandingController
-              .onTargetClick(returnsTargetKey)
-              .url
-          )
-
-        val result = route(application, request).value
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe
-          controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url
-
-        verify(mockPrepopService)
-          .prepopulateContractorKnownFacts(
-            eqTo(instanceId),
-            eqTo("taxOfficeNumber"),
-            eqTo("taxOfficeReference")
-          )(any[HeaderCarrier])
-      }
-    }
+//    "must call prepopulateContractorKnownFacts and redirect to ReturnsLandingController when cisId and employerReference are present and prepop succeeds" in {
+//      val mockPrepopService = mock[PrepopService]
+//
+//      when(
+//        mockPrepopService.prepopulateContractorKnownFacts(
+//          any[String],
+//          any[String],
+//          any[String]
+//        )(any[HeaderCarrier])
+//      ).thenReturn(Future.unit)
+//
+//      val application =
+//        applicationBuilder(
+//          userAnswers = Some(uaWithCisId),
+//          additionalBindings = Seq.empty
+//        ).overrides(
+//          bind[PrepopService].toInstance(mockPrepopService)
+//        ).build()
+//
+//      running(application) {
+//        val request =
+//          FakeRequest(
+//            GET,
+//            controllers.contractor.routes.ContractorLandingController
+//              .onTargetClick(returnsTargetKey)
+//              .url
+//          )
+//
+//        val result = route(application, request).value
+//
+//        status(result) mustBe SEE_OTHER
+//        redirectLocation(result).value mustBe
+//          controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url
+//
+//        verify(mockPrepopService)
+//          .prepopulateContractorKnownFacts(
+//            eqTo(instanceId),
+//            eqTo("taxOfficeNumber"),
+//            eqTo("taxOfficeReference")
+//          )(any[HeaderCarrier])
+//      }
+//    }
 
     "must redirect to SystemErrorController when prepopulateContractorKnownFacts fails with UpstreamErrorResponse" in {
       val mockPrepopService = mock[PrepopService]

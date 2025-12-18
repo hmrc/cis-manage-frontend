@@ -30,6 +30,7 @@ class ManageNoticesStatementsControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
       val contractorName: String        = "ABC Construction Ltd"
+      val instanceId: String            = "123"
       lazy val userAnswers: UserAnswers =
         userAnswersWithCisId
           .set(ContractorNamePage, contractorName)
@@ -39,7 +40,7 @@ class ManageNoticesStatementsControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.ManageNoticesStatementsController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.ManageNoticesStatementsController.onPageLoad(instanceId).url)
 
         val notices       = Seq(
           ManageNoticesStatementsRowViewModel(
@@ -74,7 +75,7 @@ class ManageNoticesStatementsControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[ManageNoticesStatementsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(contractorName, pageViewModel)(
+        contentAsString(result) mustEqual view(contractorName, instanceId, pageViewModel)(
           request,
           applicationConfig,
           messages(application)
@@ -82,7 +83,9 @@ class ManageNoticesStatementsControllerSpec extends SpecBase {
       }
     }
 
-    "must throw IllegalStateException when ContractorNamePage is missing" in {
+    "must redirect to SystemErrorController when contractorName is missing" in {
+      val instanceId: String = "123"
+
       lazy val userAnswers: UserAnswers =
         userAnswersWithCisId
           .set(CisIdPage, "some value")
@@ -92,12 +95,11 @@ class ManageNoticesStatementsControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request   = FakeRequest(GET, routes.ManageNoticesStatementsController.onPageLoad().url)
-        val exception = intercept[IllegalStateException] {
-          contentAsString(route(application, request).value)
-        }
+        val request = FakeRequest(GET, routes.ManageNoticesStatementsController.onPageLoad(instanceId).url)
+        val result  = route(application, request).value
 
-        exception.getMessage mustEqual "contractorName missing from userAnswers"
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe controllers.routes.SystemErrorController.onPageLoad().url
       }
     }
   }
