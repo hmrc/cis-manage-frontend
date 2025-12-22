@@ -26,7 +26,7 @@ object PaginationFluency {
 
     def apply(): PaginationViewModel =
       PaginationViewModel(
-        items = Nil,
+        items = Seq.empty,
         previous = None,
         next = None,
         landmarkLabel = "site.pagination.landmark",
@@ -46,7 +46,7 @@ object PaginationFluency {
   }
 
   case class PaginationViewModel(
-    items: Seq[PaginationItemViewModel] = Nil,
+    items: Seq[PaginationItemViewModel] = Seq.empty,
     previous: Option[PaginationLinkViewModel] = None,
     next: Option[PaginationLinkViewModel] = None,
     landmarkLabel: String = "site.pagination.landmark",
