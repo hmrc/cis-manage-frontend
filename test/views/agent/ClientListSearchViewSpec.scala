@@ -44,6 +44,7 @@ import play.api.data.Form
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
+import scala.jdk.CollectionConverters._
 import viewmodels.agent.ClientStatus.Active
 import viewmodels.agent.{ClientListViewModel, SearchByList}
 import views.ViewSpecGetters
@@ -77,6 +78,32 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
 
       doc.getElementById("table-heading").text mustBe messages("agent.clientListSearch.table.caption")
 
+    }
+
+    "must render the client list table with headers and rows" in new Setup {
+      val html: HtmlFormat.Appendable = view(form = form, searchByOptions = searchOptions, clientList = clientList)
+      val doc: Document               = Jsoup.parse(html.body)
+
+      val table = doc.getElementById("agent-client-list")
+      table must not be null
+      table.attr("data-module") mustBe "moj-sortable-table"
+
+      val headers = table.select("thead th").eachText().asScala.toSeq
+      headers mustBe Seq(
+        messages("agent.clientListSearch.th.clientName"),
+        messages("agent.clientListSearch.th.employersReference"),
+        messages("agent.clientListSearch.th.clientReference"),
+        messages("agent.clientListSearch.th.actions")
+      )
+
+      val rows = table.select("tbody tr").asScala
+      rows.size mustBe clientList.size
+
+      val firstRowCells = rows.head.select("td").asScala
+      firstRowCells(0).text() mustBe clientList.head.clientName
+      firstRowCells(1).text() mustBe clientList.head.employerReference
+      firstRowCells(2).text() mustBe clientList.head.clientReference
+      firstRowCells(3).text() mustBe messages("agent.clientListSearch.td.actions.remove")
     }
 
     "must show error summary and messages when form has errors" in new Setup {

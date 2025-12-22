@@ -35,6 +35,7 @@
     govukSelect: GovukSelect,
     govukDetails: GovukDetails,
     paragraph: Paragraph,
+    sectionBreak: SectionBreak,
     link: Link,
     h1: H1,
     h2: H2,
@@ -134,7 +135,7 @@ additionalCss = Some(css)) {
 
     }
 
-    <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+    @sectionBreak()
 
     @h2(messages("agent.clientListSearch.table.caption"), id = Some("table-heading"))
 
