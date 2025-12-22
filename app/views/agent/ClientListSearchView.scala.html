@@ -20,6 +20,9 @@
 @import viewmodels.agent.{ClientListViewModel, SearchByList}
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accessibleautocomplete.AccessibleAutocomplete
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
 @import config.FrontendAppConfig
 @import forms.mappings.Constants
 
@@ -35,6 +38,7 @@
     link: Link,
     h1: H1,
     h2: H2,
+    govukTable: GovukTable,
     appConfig: FrontendAppConfig
 )
 
@@ -64,6 +68,18 @@
     @link("agent.clientListSearch.details.2.link", appConfig.commercialSoftwareSuppliersUrl, isNewTab = true)
 }
 
+@clientNameCell(agentClient: ClientListViewModel) = {
+    @agentClient.clientLink.map { link =>
+        <a href="@link.href" class="govuk-link">@link.text</a>
+    }
+}
+
+@removeLinkCell(agentClient: ClientListViewModel) = {
+    @agentClient.removeLink.map { link =>
+        <a href="@link.href" class="govuk-link">@link.text</a>
+    }
+}
+
 @layout(pageTitle = title(form, messages("agent.clientListSearch.title")),
 additionalScripts = Some(scripts),
 additionalCss = Some(css)) {
@@ -81,7 +97,7 @@ additionalCss = Some(css)) {
         @govukSelect(
             SelectViewModel(
                 field = form(Constants.SearchBy),
-                items = Seq(SelectItem(value = Some(""), text = "Select an option")) ++
+                items = Seq(SelectItem(value = Some(""), text = messages("agent.clientListSearch.searchBy.placeholder"))) ++
                     searchByOptions.map(searchOption =>
                         SelectItem(
                             value = Some(searchOption.value),
@@ -123,40 +139,68 @@ additionalCss = Some(css)) {
     @h2(messages("agent.clientListSearch.table.caption"), id = Some("table-heading"))
 
     @if(clientList.isEmpty) {
-        <table id="agent-client-no-list" class="govuk-table">
-            <caption class="govuk-table__caption govuk-table__caption--m govuk-visually-hidden">@messages("agent.clientListSearch.table.caption")</caption>
-            <tr class="govuk-table__row">
-                <td class="govuk-table__cell">@messages("agent.clientListSearch.noResults")</td>
-            </tr>
-        </table>
+        @govukTable(
+            Table(
+                caption = Some(messages("agent.clientListSearch.table.caption")),
+                captionClasses = "govuk-table__caption govuk-table__caption--m govuk-visually-hidden",
+                rows = Seq(
+                    Seq(
+                        TableRow(
+                            content = Text(messages("agent.clientListSearch.noResults"))
+                        )
+                    )
+                ),
+                attributes = Map(
+                    "id" -> "agent-client-no-list"
+                )
+            )
+        )
     } else {
-        <table id="agent-client-list" class="govuk-table" data-module="moj-sortable-table">
-            <caption class="govuk-table__caption govuk-table__caption--m govuk-visually-hidden">@messages("agent.clientListSearch.table.caption")</caption>
-            <thead class="govuk-table__head">
-            <tr class="govuk-table__row">
-                <th class="govuk-table__header" scope="col" aria-sort="ascending">@messages("agent.clientListSearch.th.clientName")</th>
-                <th class="govuk-table__header" scope="col" aria-sort="none">@messages("agent.clientListSearch.th.employersReference")</th>
-                <th class="govuk-table__header" scope="col" aria-sort="none">@messages("agent.clientListSearch.th.clientReference")</th>
-                <th class="govuk-table__header" scope="col">@messages("agent.clientListSearch.th.actions")</th>
-            </tr>
-            </thead>
-            @clientList.map { agentClient =>
-                <tr class="govuk-table__row">
-                    <td class="govuk-table__cell">
-                        @agentClient.clientLink.map { link =>
-                            <a href="@link.href" class="govuk-link">@link.text</a>
-                        }
-                    </td>
-                    <td class="govuk-table__cell">@agentClient.employerReference</td>
-                    <td class="govuk-table__cell">@agentClient.clientReference</td>
-                    <td class="govuk-table__cell">
-                        @agentClient.removeLink.map { link =>
-                            <a href="@link.href" class="govuk-link">@link.text</a>
-                        }
-                    </td>
-                </tr>
-            }
-        </table>
+        @govukTable(
+            Table(
+                caption = Some(messages("agent.clientListSearch.table.caption")),
+                captionClasses = "govuk-table__caption govuk-table__caption--m govuk-visually-hidden",
+                head = Some(
+                    Seq(
+                        HeadCell(
+                            content = Text(messages("agent.clientListSearch.th.clientName")),
+                            attributes = Map("aria-sort" -> "ascending")
+                        ),
+                        HeadCell(
+                            content = Text(messages("agent.clientListSearch.th.employersReference")),
+                            attributes = Map("aria-sort" -> "none")
+                        ),
+                        HeadCell(
+                            content = Text(messages("agent.clientListSearch.th.clientReference")),
+                            attributes = Map("aria-sort" -> "none")
+                        ),
+                        HeadCell(
+                            content = Text(messages("agent.clientListSearch.th.actions"))
+                        )
+                    )
+                ),
+                rows = clientList.map { agentClient =>
+                    Seq(
+                        TableRow(
+                            content = HtmlContent(clientNameCell(agentClient))
+                        ),
+                        TableRow(
+                            content = Text(agentClient.employerReference)
+                        ),
+                        TableRow(
+                            content = Text(agentClient.clientReference)
+                        ),
+                        TableRow(
+                            content = HtmlContent(removeLinkCell(agentClient))
+                        )
+                    )
+                },
+                attributes = Map(
+                    "id" -> "agent-client-list",
+                    "data-module" -> "moj-sortable-table"
+                )
+            )
+        )
     }
 
     @govukDetails(
