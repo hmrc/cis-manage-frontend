@@ -31,9 +31,10 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.agent.ClientListSearchView
 import pages.ClientListSearchPage
-import services.ManageService
+import services.{ManageService, PaginationService}
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.agent.{ClientListViewModel, SearchByList}
+import viewmodels.govuk.PaginationFluency._
 
 import scala.concurrent.Future
 
@@ -92,15 +93,26 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
     "must return OK and the correct view for a GET" in {
       val app = appWith()
       running(app) {
-        val req    = FakeRequest(GET, "/agent/file-monthly-cis-returns")
-        val result = route(app, req).value
-        val view   = app.injector.instanceOf[ClientListSearchView]
+        val req               = FakeRequest(GET, "/agent/file-monthly-cis-returns")
+        val result            = route(app, req).value
+        val view              = app.injector.instanceOf[ClientListSearchView]
+        val paginationService = app.injector.instanceOf[PaginationService]
 
-        val filtered = ClientListViewModel.filterByField("", "", allVm)
+        val filtered         = ClientListViewModel.filterByField("", "", allVm)
+        val paginationResult = paginationService.paginateClientList(
+          filtered,
+          1,
+          onPageLoadRoute
+        )
 
         status(result) mustBe OK
         contentAsString(result) mustBe
-          view(form, SearchByList.searchByOptions, filtered)(req, messages(app)).toString
+          view(
+            form,
+            SearchByList.searchByOptions,
+            paginationResult.paginatedData,
+            paginationResult.paginationViewModel
+          )(req, messages(app)).toString
       }
     }
 
@@ -110,16 +122,27 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
       val app = appWith(returnedUa = uaWithSearch)
       running(app) {
-        val req    = FakeRequest(GET, onPageLoadRoute)
-        val result = route(app, req).value
-        val view   = app.injector.instanceOf[ClientListSearchView]
+        val req               = FakeRequest(GET, onPageLoadRoute)
+        val result            = route(app, req).value
+        val view              = app.injector.instanceOf[ClientListSearchView]
+        val paginationService = app.injector.instanceOf[PaginationService]
 
-        val prepared = form.fill(ClientListFormData("CN", "ABC"))
-        val filtered = ClientListViewModel.filterByField("CN", "ABC", allVm)
+        val prepared         = form.fill(ClientListFormData("CN", "ABC"))
+        val filtered         = ClientListViewModel.filterByField("CN", "ABC", allVm)
+        val paginationResult = paginationService.paginateClientList(
+          filtered,
+          1,
+          onPageLoadRoute
+        )
 
         status(result) mustBe OK
         contentAsString(result) mustBe
-          view(prepared, SearchByList.searchByOptions, filtered)(req, messages(app)).toString
+          view(
+            prepared,
+            SearchByList.searchByOptions,
+            paginationResult.paginatedData,
+            paginationResult.paginationViewModel
+          )(req, messages(app)).toString
       }
     }
 
@@ -144,15 +167,26 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
           FakeRequest(POST, onPageLoadRoute)
             .withFormUrlEncodedBody("value" -> "")
 
-        val result    = route(app, req).value
-        val view      = app.injector.instanceOf[ClientListSearchView]
-        val boundForm = form.bind(Map("value" -> ""))
+        val result            = route(app, req).value
+        val view              = app.injector.instanceOf[ClientListSearchView]
+        val paginationService = app.injector.instanceOf[PaginationService]
+        val boundForm         = form.bind(Map("value" -> ""))
 
-        val filtered = ClientListViewModel.filterByField("", "", allVm)
+        val filtered         = ClientListViewModel.filterByField("", "", allVm)
+        val paginationResult = paginationService.paginateClientList(
+          filtered,
+          1,
+          onPageLoadRoute
+        )
 
         status(result) mustBe BAD_REQUEST
         contentAsString(result) mustBe
-          view(boundForm, SearchByList.searchByOptions, filtered)(req, messages(app)).toString
+          view(
+            boundForm,
+            SearchByList.searchByOptions,
+            paginationResult.paginatedData,
+            paginationResult.paginationViewModel
+          )(req, messages(app)).toString
       }
     }
 
@@ -190,13 +224,57 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
       "must remove form data from user answers and display the client list search page" in {
         val app = appWith()
         running(app) {
-          val req    = FakeRequest(GET, clearFilterRoute)
-          val result = route(app, req).value
-          val view   = app.injector.instanceOf[ClientListSearchView]
+          val req               = FakeRequest(GET, clearFilterRoute)
+          val result            = route(app, req).value
+          val view              = app.injector.instanceOf[ClientListSearchView]
+          val paginationService = app.injector.instanceOf[PaginationService]
+
+          val paginationResult = paginationService.paginateClientList(
+            allVm,
+            1,
+            onPageLoadRoute
+          )
 
           status(result) mustBe OK
           contentAsString(result) mustBe
-            view(form, SearchByList.searchByOptions, allVm)(req, messages(app)).toString
+            view(
+              form,
+              SearchByList.searchByOptions,
+              paginationResult.paginatedData,
+              paginationResult.paginationViewModel
+            )(req, messages(app)).toString
+        }
+      }
+    }
+
+    "pagination" - {
+      "must handle page query parameter correctly" in {
+        val app = appWith()
+        running(app) {
+          val req    = FakeRequest(GET, s"$onPageLoadRoute?page=1")
+          val result = route(app, req).value
+
+          status(result) mustBe OK
+        }
+      }
+
+      "must handle invalid page parameter by defaulting to page 1" in {
+        val app = appWith()
+        running(app) {
+          val req    = FakeRequest(GET, s"$onPageLoadRoute?page=invalid")
+          val result = route(app, req).value
+
+          status(result) mustBe OK
+        }
+      }
+
+      "must handle negative page parameter by defaulting to page 1" in {
+        val app = appWith()
+        running(app) {
+          val req    = FakeRequest(GET, s"$onPageLoadRoute?page=-1")
+          val result = route(app, req).value
+
+          status(result) mustBe OK
         }
       }
     }
