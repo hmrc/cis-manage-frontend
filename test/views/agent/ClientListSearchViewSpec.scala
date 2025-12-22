@@ -47,6 +47,7 @@ import play.twirl.api.HtmlFormat
 import scala.jdk.CollectionConverters._
 import viewmodels.agent.ClientStatus.Active
 import viewmodels.agent.{ClientListViewModel, SearchByList}
+import viewmodels.govuk.PaginationFluency._
 import views.ViewSpecGetters
 import views.html.agent.ClientListSearchView
 
@@ -55,7 +56,12 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
   "ClientListSearchView" - {
 
     "must render the page with heading, paragraph, input and button" in new Setup {
-      val html: HtmlFormat.Appendable = view(form = form, searchByOptions = searchOptions, clientList = clientList)
+      val html: HtmlFormat.Appendable = view(
+        form = form,
+        searchByOptions = searchOptions,
+        clientList = clientList,
+        paginationViewModel = PaginationViewModel()
+      )
       val doc: Document               = Jsoup.parse(html.body)
       doc.title                must include(messages("agent.clientListSearch.title"))
       doc.select("h1").text mustBe messages("agent.clientListSearch.heading")
@@ -81,7 +87,12 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
     }
 
     "must render the client list table with headers and rows" in new Setup {
-      val html: HtmlFormat.Appendable = view(form = form, searchByOptions = searchOptions, clientList = clientList)
+      val html: HtmlFormat.Appendable = view(
+        form = form,
+        searchByOptions = searchOptions,
+        clientList = clientList,
+        paginationViewModel = PaginationViewModel()
+      )
       val doc: Document               = Jsoup.parse(html.body)
 
       val table = doc.getElementById("agent-client-list")
@@ -109,13 +120,111 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
     "must show error summary and messages when form has errors" in new Setup {
       val boundWithError: Form[ClientListFormData] = form.bind(Map("searchBy" -> "", "searchFilter" -> ""))
       val html: HtmlFormat.Appendable              =
-        view(form = boundWithError, searchByOptions = searchOptions, clientList = clientList)
+        view(
+          form = boundWithError,
+          searchByOptions = searchOptions,
+          clientList = clientList,
+          paginationViewModel = PaginationViewModel()
+        )
       val doc: Document                            = Jsoup.parse(html.body)
 
       doc.title must startWith(messages("error.title.prefix"))
       doc.select(".govuk-error-summary").size() mustBe 1
       val expected: String = messages("agent.clientListSearch.searchBy.error.required")
       doc.text() must include(expected)
+    }
+
+    "must not render pagination when there are 10 or fewer clients" in new Setup {
+      val html: HtmlFormat.Appendable = view(
+        form = form,
+        searchByOptions = searchOptions,
+        clientList = clientList,
+        paginationViewModel = PaginationViewModel()
+      )
+      val doc: Document               = Jsoup.parse(html.body)
+
+      doc.select(".govuk-pagination").size() mustBe 1
+      doc.select(".govuk-pagination__list").size() mustBe 0
+      doc.select(".govuk-pagination__prev").size() mustBe 0
+      doc.select(".govuk-pagination__next").size() mustBe 0
+    }
+
+    "must render pagination when paginationViewModel has items" in new Setup {
+      val paginationViewModel = PaginationViewModel(
+        items = Seq(
+          PaginationItemViewModel("1", "/test?page=1").withCurrent(true),
+          PaginationItemViewModel("2", "/test?page=2")
+        ),
+        next = Some(PaginationLinkViewModel("/test?page=2").withText("site.pagination.next"))
+      )
+
+      val html: HtmlFormat.Appendable = view(
+        form = form,
+        searchByOptions = searchOptions,
+        clientList = clientList,
+        paginationViewModel = paginationViewModel
+      )
+      val doc: Document               = Jsoup.parse(html.body)
+
+      doc.select(".govuk-pagination").size() mustBe 1
+      doc.select(".govuk-pagination__list").size() mustBe 1
+      doc.select(".govuk-pagination__item").size() mustBe 2
+      doc.select(".govuk-pagination__item--current").size() mustBe 1
+      doc.select(".govuk-pagination__next").size() mustBe 1
+      doc.select(".govuk-pagination__prev").size() mustBe 0
+    }
+
+    "must render pagination with previous link on page 2" in new Setup {
+      val paginationViewModel = PaginationViewModel(
+        items = Seq(
+          PaginationItemViewModel("1", "/test?page=1"),
+          PaginationItemViewModel("2", "/test?page=2").withCurrent(true)
+        ),
+        previous = Some(PaginationLinkViewModel("/test?page=1").withText("site.pagination.previous")),
+        next = Some(PaginationLinkViewModel("/test?page=3").withText("site.pagination.next"))
+      )
+
+      val html: HtmlFormat.Appendable = view(
+        form = form,
+        searchByOptions = searchOptions,
+        clientList = clientList,
+        paginationViewModel = paginationViewModel
+      )
+      val doc: Document               = Jsoup.parse(html.body)
+
+      doc.select(".govuk-pagination__prev").size() mustBe 1
+      doc.select(".govuk-pagination__next").size() mustBe 1
+      doc.select(".govuk-pagination__item--current").size() mustBe 1
+    }
+
+    "must render pagination below the table" in new Setup {
+      val paginationViewModel = PaginationViewModel(
+        items = Seq(
+          PaginationItemViewModel("1", "/test?page=1").withCurrent(true)
+        )
+      )
+
+      val html: HtmlFormat.Appendable = view(
+        form = form,
+        searchByOptions = searchOptions,
+        clientList = clientList,
+        paginationViewModel = paginationViewModel
+      )
+      val doc: Document               = Jsoup.parse(html.body)
+
+      val table      = doc.getElementById("agent-client-list")
+      val pagination = doc.select(".govuk-pagination").first()
+
+      table      must not be null
+      pagination must not be null
+
+      val bodyHtml        = html.body
+      val tableIndex      = bodyHtml.indexOf("agent-client-list")
+      val paginationIndex = bodyHtml.indexOf("govuk-pagination")
+
+      tableIndex      must be >= 0
+      paginationIndex must be >= 0
+      paginationIndex must be > tableIndex
     }
   }
 

@@ -46,8 +46,8 @@ class PaginationService @Inject() {
     baseUrl: String
   ): ClientListPaginationResult = {
 
-    val totalRecords = allClients.length
-    val totalPages = calculateTotalPages(totalRecords)
+    val totalRecords     = allClients.length
+    val totalPages       = calculateTotalPages(totalRecords)
     val validCurrentPage = validateCurrentPage(currentPage, totalPages)
 
     val (startIndex, endIndex) = calculatePageIndices(validCurrentPage, totalRecords)
@@ -56,16 +56,16 @@ class PaginationService @Inject() {
 
     val paginationViewModel = createPaginationViewModel(
       currentPage = validCurrentPage,
-      totalPages  = totalPages,
-      baseUrl     = baseUrl
+      totalPages = totalPages,
+      baseUrl = baseUrl
     )
 
     ClientListPaginationResult(
-      paginatedData       = paginatedData,
+      paginatedData = paginatedData,
       paginationViewModel = paginationViewModel,
-      totalRecords        = totalRecords,
-      currentPage         = validCurrentPage,
-      totalPages          = totalPages
+      totalRecords = totalRecords,
+      currentPage = validCurrentPage,
+      totalPages = totalPages
     )
   }
 
@@ -77,7 +77,7 @@ class PaginationService @Inject() {
 
   private def calculatePageIndices(currentPage: Int, totalRecords: Int): (Int, Int) = {
     val startIndex = (currentPage - 1) * config.recordsPerPage
-    val endIndex = Math.min(startIndex + config.recordsPerPage, totalRecords)
+    val endIndex   = Math.min(startIndex + config.recordsPerPage, totalRecords)
     (startIndex, endIndex)
   }
 
@@ -85,21 +85,20 @@ class PaginationService @Inject() {
     currentPage: Int,
     totalPages: Int,
     baseUrl: String
-  ): PaginationViewModel = {
+  ): PaginationViewModel =
     if (totalPages <= 1) {
       PaginationViewModel()
     } else {
-      val items = generatePageItems(currentPage, totalPages, baseUrl)
+      val items    = generatePageItems(currentPage, totalPages, baseUrl)
       val previous = createPreviousLink(currentPage, baseUrl)
-      val next = createNextLink(currentPage, totalPages, baseUrl)
+      val next     = createNextLink(currentPage, totalPages, baseUrl)
 
       PaginationViewModel(
-        items    = items,
+        items = items,
         previous = previous,
-        next     = next
+        next = next
       )
     }
-  }
 
   private def createPreviousLink(currentPage: Int, baseUrl: String): Option[PaginationLinkViewModel] =
     if (currentPage > 1) {
@@ -121,7 +120,7 @@ class PaginationService @Inject() {
     baseUrl: String
   ): Seq[PaginationItemViewModel] = {
     val pageRange = calculatePageRange(currentPage, totalPages)
-    val items = scala.collection.mutable.ListBuffer[PaginationItemViewModel]()
+    val items     = scala.collection.mutable.ListBuffer[PaginationItemViewModel]()
 
     if (pageRange.head > 1) {
       items += PaginationItemViewModel("1", s"$baseUrl?page=1").withCurrent(1 == currentPage)
@@ -133,7 +132,7 @@ class PaginationService @Inject() {
     pageRange.foreach { page =>
       items += PaginationItemViewModel(
         number = page.toString,
-        href   = s"$baseUrl?page=$page"
+        href = s"$baseUrl?page=$page"
       ).withCurrent(page == currentPage)
     }
 
@@ -141,7 +140,9 @@ class PaginationService @Inject() {
       if (pageRange.last < totalPages - 1) {
         items += PaginationItemViewModel.ellipsis()
       }
-      items += PaginationItemViewModel(totalPages.toString, s"$baseUrl?page=$totalPages").withCurrent(totalPages == currentPage)
+      items += PaginationItemViewModel(totalPages.toString, s"$baseUrl?page=$totalPages").withCurrent(
+        totalPages == currentPage
+      )
     }
 
     items.toSeq
@@ -149,8 +150,8 @@ class PaginationService @Inject() {
 
   private def calculatePageRange(currentPage: Int, totalPages: Int): Range = {
     val halfVisible = config.maxVisiblePages / 2
-    val startPage = Math.max(1, currentPage - halfVisible)
-    val endPage = Math.min(totalPages, startPage + config.maxVisiblePages - 1)
+    val startPage   = Math.max(1, currentPage - halfVisible)
+    val endPage     = Math.min(totalPages, startPage + config.maxVisiblePages - 1)
 
     val adjustedStartPage = if (endPage - startPage < config.maxVisiblePages - 1) {
       Math.max(1, endPage - config.maxVisiblePages + 1)
@@ -159,4 +160,3 @@ class PaginationService @Inject() {
     adjustedStartPage to endPage
   }
 }
-
