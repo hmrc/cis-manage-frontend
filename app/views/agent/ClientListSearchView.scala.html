@@ -18,6 +18,7 @@
 @import viewmodels.InputWidth._
 @import views.html.components._
 @import viewmodels.agent.{ClientListViewModel, SearchByList}
+@import viewmodels.govuk.PaginationFluency._
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accessibleautocomplete.AccessibleAutocomplete
 @import uk.gov.hmrc.govukfrontend.views.html.components._
@@ -40,10 +41,11 @@
     h1: H1,
     h2: H2,
     govukTable: GovukTable,
+    pageNavigator: PageNavigator,
     appConfig: FrontendAppConfig
 )
 
-@(form: Form[_], searchByOptions: Seq[SearchByList], clientList: Seq[ClientListViewModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], searchByOptions: Seq[SearchByList], clientList: Seq[ClientListViewModel], paginationViewModel: PaginationViewModel = PaginationViewModel())(implicit request: Request[_], messages: Messages)
 
 @scripts = {
     <script src='@controllers.routes.Assets.versioned("javascripts/jquery-3.6.3.min.js")' @{CSPNonce.attr}></script>
@@ -202,6 +204,8 @@ additionalCss = Some(css)) {
                 )
             )
         )
+
+        @pageNavigator(paginationViewModel)
     }
 
     @govukDetails(

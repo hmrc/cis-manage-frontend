@@ -27,11 +27,12 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
-import services.ManageService
+import services.{ClientListPaginationResult, ManageService, PaginationService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import viewmodels.agent.{ClientListViewModel, SearchByList}
+import viewmodels.govuk.PaginationFluency.*
 import views.html.agent.ClientListSearchView
 
 import javax.inject.{Inject, Named}
@@ -45,6 +46,7 @@ class ClientListSearchController @Inject() (
   requireData: DataRequiredAction,
   formProvider: ClientListSearchFormProvider,
   manageService: ManageService,
+  paginationService: PaginationService,
   val controllerComponents: MessagesControllerComponents,
   view: ClientListSearchView
 )(implicit ec: ExecutionContext)
@@ -59,6 +61,8 @@ class ClientListSearchController @Inject() (
 
       implicit val hc: HeaderCarrier =
         HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
+      val currentPage = request.getQueryString("page").flatMap(_.toIntOption).getOrElse(1)
 
       manageService
         .resolveAndStoreAgentClients(request.userAnswers)
@@ -75,7 +79,13 @@ class ClientListSearchController @Inject() (
             val allClientsVm      = ClientListViewModel.fromCisClients(cisClients)
             val filteredClientsVm = ClientListViewModel.filterByField(searchBy, searchFilter, allClientsVm)
 
-            saveSearchAndRender(uaWithClients, preparedForm, searchBy, searchFilter, filteredClientsVm)
+            val paginationResult = paginationService.paginateClientList(
+              allClients = filteredClientsVm,
+              currentPage = currentPage,
+              baseUrl = routes.ClientListSearchController.onPageLoad().url
+            )
+
+            saveSearchAndRender(uaWithClients, preparedForm, searchBy, searchFilter, paginationResult)
         }
         .recover { case e =>
           logger.error(s"[ClientListSearchController][onPageLoad] failed: ${e.getMessage}", e)
@@ -94,10 +104,23 @@ class ClientListSearchController @Inject() (
         .flatMap { case (cisClients, uaWithClients) =>
           val allClientsVm = ClientListViewModel.fromCisClients(cisClients)
 
+          val paginationResult = paginationService.paginateClientList(
+            allClients = allClientsVm,
+            currentPage = 1,
+            baseUrl = routes.ClientListSearchController.onPageLoad().url
+          )
+
           for {
             updatedAnswers <- Future.fromTry(uaWithClients.remove(ClientListSearchPage))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Ok(view(form, SearchByList.searchByOptions, allClientsVm))
+          } yield Ok(
+            view(
+              form,
+              SearchByList.searchByOptions,
+              paginationResult.paginatedData,
+              paginationResult.paginationViewModel
+            )
+          )
         }
         .recover { case e =>
           logger.error(s"[ClientListSearchController][clearFilter] failed: ${e.getMessage}", e)
@@ -116,12 +139,25 @@ class ClientListSearchController @Inject() (
         .flatMap { case (cisClients, uaWithClients) =>
           val allClientsVm = ClientListViewModel.fromCisClients(cisClients)
 
+          val paginationResult = paginationService.paginateClientList(
+            allClients = allClientsVm,
+            currentPage = 1,
+            baseUrl = routes.ClientListSearchController.onPageLoad().url
+          )
+
           form
             .bindFromRequest()
             .fold(
               formWithErrors =>
                 Future.successful(
-                  BadRequest(view(formWithErrors, SearchByList.searchByOptions, allClientsVm))
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      SearchByList.searchByOptions,
+                      paginationResult.paginatedData,
+                      paginationResult.paginationViewModel
+                    )
+                  )
                 ),
               value =>
                 for {
@@ -189,12 +225,19 @@ class ClientListSearchController @Inject() (
     preparedForm: Form[ClientListFormData],
     searchBy: String,
     searchFilter: String,
-    filteredClients: Seq[ClientListViewModel]
+    paginationResult: ClientListPaginationResult
   )(implicit request: DataRequest[_]): Future[Result] =
     for {
       updatedAnswers <- Future.fromTry(ua.set(ClientListSearchPage, ClientListFormData(searchBy, searchFilter)))
       _              <- sessionRepository.set(updatedAnswers)
-    } yield Ok(view(preparedForm, SearchByList.searchByOptions, filteredClients))
+    } yield Ok(
+      view(
+        preparedForm,
+        SearchByList.searchByOptions,
+        paginationResult.paginatedData,
+        paginationResult.paginationViewModel
+      )
+    )
 
   private def csvEscape(raw: String): String = {
     val trimmed     = raw.dropWhile(_.isWhitespace)
