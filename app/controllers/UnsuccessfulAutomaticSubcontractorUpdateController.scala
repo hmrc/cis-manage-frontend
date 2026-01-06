@@ -16,10 +16,8 @@
 
 package controllers
 
-import models.Target
-import models.Target.*
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.UnsuccessfulAutomaticSubcontractorUpdateView
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
@@ -35,24 +33,14 @@ class UnsuccessfulAutomaticSubcontractorUpdateController @Inject() (
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(instanceId: String, targetKey: String): Action[AnyContent] =
+  def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      Ok(view(instanceId, targetKey))
+      Ok(view())
     }
 
-  def onSubmit(instanceId: String, targetKey: String): Action[AnyContent] =
+  def onSubmit: Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      Target.fromKey(targetKey) match {
-        case Some(target) => Redirect(targetCall(target, instanceId))
-        case None         => NotFound("Unknown target")
-      }
-    }
-
-  private def targetCall(target: Target, instanceId: String): Call =
-    target match {
-      case Returns       => controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
-      case Notices       => controllers.routes.JourneyRecoveryController.onPageLoad()
-      case Subcontractor => controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId)
+      Redirect(controllers.routes.AddContractorDetailsController.onPageLoad())
     }
 
 }

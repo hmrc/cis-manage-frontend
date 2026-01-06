@@ -24,7 +24,7 @@
     paragraph: Paragraph,
 )
 
-@(instanceId: String, targetKey: String)(implicit request: Request[_], messages: Messages)
+@(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = titleNoForm(messages("unsuccessfulAutomaticSubcontractorUpdate.title")),
@@ -39,8 +39,7 @@
 
     @paragraph(messages("unsuccessfulAutomaticSubcontractorUpdate.p3"))
     @formHelper(
-        action = controllers.routes.UnsuccessfulAutomaticSubcontractorUpdateController
-            .onSubmit(instanceId, targetKey)
+        action = controllers.routes.UnsuccessfulAutomaticSubcontractorUpdateController.onSubmit()
         ) {
             @govukButton(ButtonViewModel(messages("site.continue")))
     }
