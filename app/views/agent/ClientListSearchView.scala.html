@@ -45,7 +45,7 @@
     appConfig: FrontendAppConfig
 )
 
-@(form: Form[_], searchByOptions: Seq[SearchByList], clientList: Seq[ClientListViewModel], paginationViewModel: PaginationViewModel = PaginationViewModel())(implicit request: Request[_], messages: Messages)
+@(form: Form[_], searchByOptions: Seq[SearchByList], clientList: Seq[ClientListViewModel], paginationViewModel: PaginationViewModel = PaginationViewModel(), sortBy: Option[String] = None, sortOrder: Option[String] = None)(implicit request: Request[_], messages: Messages)
 
 @scripts = {
     <script src='@controllers.routes.Assets.versioned("javascripts/jquery-3.6.3.min.js")' @{CSPNonce.attr}></script>
@@ -80,6 +80,14 @@
 @removeLinkCell(agentClient: ClientListViewModel) = {
     @agentClient.removeLink.map { link =>
         <a href="@link.href" class="govuk-link">@link.text</a>
+    }
+}
+
+@getSortState(column: String) = @{
+    if (sortBy.contains(column)) {
+        sortOrder.getOrElse("ascending")
+    } else {
+        "none"
     }
 }
 
@@ -167,15 +175,15 @@ additionalCss = Some(css)) {
                     Seq(
                         HeadCell(
                             content = Text(messages("agent.clientListSearch.th.clientName")),
-                            attributes = Map("aria-sort" -> "ascending")
+                            attributes = Map("aria-sort" -> getSortState("clientName"), "data-sort-column" -> "clientName")
                         ),
                         HeadCell(
                             content = Text(messages("agent.clientListSearch.th.employersReference")),
-                            attributes = Map("aria-sort" -> "none")
+                            attributes = Map("aria-sort" -> getSortState("employerReference"), "data-sort-column" -> "employerReference")
                         ),
                         HeadCell(
                             content = Text(messages("agent.clientListSearch.th.clientReference")),
-                            attributes = Map("aria-sort" -> "none")
+                            attributes = Map("aria-sort" -> getSortState("clientReference"), "data-sort-column" -> "clientReference")
                         ),
                         HeadCell(
                             content = Text(messages("agent.clientListSearch.th.actions"))
@@ -185,7 +193,8 @@ additionalCss = Some(css)) {
                 rows = clientList.map { agentClient =>
                     Seq(
                         TableRow(
-                            content = HtmlContent(clientNameCell(agentClient))
+                            content = HtmlContent(clientNameCell(agentClient)),
+                            attributes = Map("data-sort-value" -> agentClient.clientName)
                         ),
                         TableRow(
                             content = Text(agentClient.employerReference)

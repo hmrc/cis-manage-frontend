@@ -99,10 +99,13 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
         val paginationService = app.injector.instanceOf[PaginationService]
 
         val filtered         = ClientListViewModel.filterByField("", "", allVm)
+        val sorted           = ClientListViewModel.sortClients(filtered, None, None)
         val paginationResult = paginationService.paginateClientList(
-          filtered,
+          sorted,
           1,
-          onPageLoadRoute
+          onPageLoadRoute,
+          None,
+          None
         )
 
         status(result) mustBe OK
@@ -111,7 +114,9 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
             form,
             SearchByList.searchByOptions,
             paginationResult.paginatedData,
-            paginationResult.paginationViewModel
+            paginationResult.paginationViewModel,
+            None,
+            None
           )(req, messages(app)).toString
       }
     }
@@ -129,10 +134,13 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
         val prepared         = form.fill(ClientListFormData("CN", "ABC"))
         val filtered         = ClientListViewModel.filterByField("CN", "ABC", allVm)
+        val sorted           = ClientListViewModel.sortClients(filtered, None, None)
         val paginationResult = paginationService.paginateClientList(
-          filtered,
+          sorted,
           1,
-          onPageLoadRoute
+          onPageLoadRoute,
+          None,
+          None
         )
 
         status(result) mustBe OK
@@ -141,7 +149,9 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
             prepared,
             SearchByList.searchByOptions,
             paginationResult.paginatedData,
-            paginationResult.paginationViewModel
+            paginationResult.paginationViewModel,
+            None,
+            None
           )(req, messages(app)).toString
       }
     }
@@ -173,10 +183,13 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
         val boundForm         = form.bind(Map("value" -> ""))
 
         val filtered         = ClientListViewModel.filterByField("", "", allVm)
+        val sorted           = ClientListViewModel.sortClients(filtered, None, None)
         val paginationResult = paginationService.paginateClientList(
-          filtered,
+          sorted,
           1,
-          onPageLoadRoute
+          onPageLoadRoute,
+          None,
+          None
         )
 
         status(result) mustBe BAD_REQUEST
@@ -185,7 +198,9 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
             boundForm,
             SearchByList.searchByOptions,
             paginationResult.paginatedData,
-            paginationResult.paginationViewModel
+            paginationResult.paginationViewModel,
+            None,
+            None
           )(req, messages(app)).toString
       }
     }
@@ -229,10 +244,13 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
           val view              = app.injector.instanceOf[ClientListSearchView]
           val paginationService = app.injector.instanceOf[PaginationService]
 
+          val sorted           = ClientListViewModel.sortClients(allVm, None, None)
           val paginationResult = paginationService.paginateClientList(
-            allVm,
+            sorted,
             1,
-            onPageLoadRoute
+            onPageLoadRoute,
+            None,
+            None
           )
 
           status(result) mustBe OK
@@ -241,7 +259,9 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
               form,
               SearchByList.searchByOptions,
               paginationResult.paginatedData,
-              paginationResult.paginationViewModel
+              paginationResult.paginationViewModel,
+              None,
+              None
             )(req, messages(app)).toString
         }
       }
@@ -275,6 +295,80 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
           val result = route(app, req).value
 
           status(result) mustBe OK
+        }
+      }
+    }
+
+    "sorting" - {
+      "must sort clients by clientName ascending when sortBy=clientName and sortOrder=ascending" in {
+        val app = appWith()
+        running(app) {
+          val req    = FakeRequest(GET, s"$onPageLoadRoute?sortBy=clientName&sortOrder=ascending")
+          val result = route(app, req).value
+
+          status(result) mustBe OK
+        }
+      }
+
+      "must sort clients by clientName descending when sortBy=clientName and sortOrder=descending" in {
+        val app = appWith()
+        running(app) {
+          val req    = FakeRequest(GET, s"$onPageLoadRoute?sortBy=clientName&sortOrder=descending")
+          val result = route(app, req).value
+
+          status(result) mustBe OK
+        }
+      }
+
+      "must sort clients by employerReference when sortBy=employerReference" in {
+        val app = appWith()
+        running(app) {
+          val req    = FakeRequest(GET, s"$onPageLoadRoute?sortBy=employerReference&sortOrder=ascending")
+          val result = route(app, req).value
+
+          status(result) mustBe OK
+        }
+      }
+
+      "must sort clients by clientReference when sortBy=clientReference" in {
+        val app = appWith()
+        running(app) {
+          val req    = FakeRequest(GET, s"$onPageLoadRoute?sortBy=clientReference&sortOrder=ascending")
+          val result = route(app, req).value
+
+          status(result) mustBe OK
+        }
+      }
+
+      "must reset to page 1 when sortBy is provided without page parameter" in {
+        val app = appWith()
+        running(app) {
+          val req    = FakeRequest(GET, s"$onPageLoadRoute?sortBy=clientName&sortOrder=ascending")
+          val result = route(app, req).value
+
+          status(result) mustBe OK
+        }
+      }
+
+      "must preserve page number when both sortBy and page are provided" in {
+        val app = appWith()
+        running(app) {
+          val req    = FakeRequest(GET, s"$onPageLoadRoute?sortBy=clientName&sortOrder=ascending&page=2")
+          val result = route(app, req).value
+
+          status(result) mustBe OK
+        }
+      }
+
+      "must apply sorting to entire dataset before pagination" in {
+        val app = appWith()
+        running(app) {
+          val req    = FakeRequest(GET, s"$onPageLoadRoute?sortBy=clientName&sortOrder=ascending")
+          val result = route(app, req).value
+
+          status(result) mustBe OK
+          val content = contentAsString(result)
+          content must include("ABC Construction Ltd")
         }
       }
     }

@@ -60,7 +60,9 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
         form = form,
         searchByOptions = searchOptions,
         clientList = clientList,
-        paginationViewModel = PaginationViewModel()
+        paginationViewModel = PaginationViewModel(),
+        sortBy = None,
+        sortOrder = None
       )
       val doc: Document               = Jsoup.parse(html.body)
       doc.title                must include(messages("agent.clientListSearch.title"))
@@ -91,7 +93,9 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
         form = form,
         searchByOptions = searchOptions,
         clientList = clientList,
-        paginationViewModel = PaginationViewModel()
+        paginationViewModel = PaginationViewModel(),
+        sortBy = None,
+        sortOrder = None
       )
       val doc: Document               = Jsoup.parse(html.body)
 
@@ -117,6 +121,127 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
       firstRowCells(3).text() mustBe messages("agent.clientListSearch.td.actions.remove")
     }
 
+    "must include data-sort-value attribute on client name rows" in new Setup {
+      val html: HtmlFormat.Appendable = view(
+        form = form,
+        searchByOptions = searchOptions,
+        clientList = clientList,
+        paginationViewModel = PaginationViewModel(),
+        sortBy = None,
+        sortOrder = None
+      )
+      val doc: Document               = Jsoup.parse(html.body)
+
+      val rows = doc.select("#agent-client-list tbody tr").asScala
+      rows.zip(clientList).foreach { case (row, client) =>
+        val firstCell = row.select("td").first()
+        firstCell.attr("data-sort-value") mustBe client.clientName
+      }
+    }
+
+    "must include data-sort-column attributes on sortable headers" in new Setup {
+      val html: HtmlFormat.Appendable = view(
+        form = form,
+        searchByOptions = searchOptions,
+        clientList = clientList,
+        paginationViewModel = PaginationViewModel(),
+        sortBy = None,
+        sortOrder = None
+      )
+      val doc: Document               = Jsoup.parse(html.body)
+
+      val headers = doc.select("#agent-client-list thead th").asScala
+      headers(0).attr("data-sort-column") mustBe "clientName"
+      headers(1).attr("data-sort-column") mustBe "employerReference"
+      headers(2).attr("data-sort-column") mustBe "clientReference"
+      headers(3).attr("data-sort-column") mustBe ""
+    }
+
+    "must display correct aria-sort state when sorting by clientName ascending" in new Setup {
+      val html: HtmlFormat.Appendable = view(
+        form = form,
+        searchByOptions = searchOptions,
+        clientList = clientList,
+        paginationViewModel = PaginationViewModel(),
+        sortBy = Some("clientName"),
+        sortOrder = Some("ascending")
+      )
+      val doc: Document               = Jsoup.parse(html.body)
+
+      val headers = doc.select("#agent-client-list thead th").asScala
+      headers(0).attr("aria-sort") mustBe "ascending"
+      headers(1).attr("aria-sort") mustBe "none"
+      headers(2).attr("aria-sort") mustBe "none"
+    }
+
+    "must display correct aria-sort state when sorting by clientName descending" in new Setup {
+      val html: HtmlFormat.Appendable = view(
+        form = form,
+        searchByOptions = searchOptions,
+        clientList = clientList,
+        paginationViewModel = PaginationViewModel(),
+        sortBy = Some("clientName"),
+        sortOrder = Some("descending")
+      )
+      val doc: Document               = Jsoup.parse(html.body)
+
+      val headers = doc.select("#agent-client-list thead th").asScala
+      headers(0).attr("aria-sort") mustBe "descending"
+      headers(1).attr("aria-sort") mustBe "none"
+      headers(2).attr("aria-sort") mustBe "none"
+    }
+
+    "must display correct aria-sort state when sorting by employerReference" in new Setup {
+      val html: HtmlFormat.Appendable = view(
+        form = form,
+        searchByOptions = searchOptions,
+        clientList = clientList,
+        paginationViewModel = PaginationViewModel(),
+        sortBy = Some("employerReference"),
+        sortOrder = Some("ascending")
+      )
+      val doc: Document               = Jsoup.parse(html.body)
+
+      val headers = doc.select("#agent-client-list thead th").asScala
+      headers(0).attr("aria-sort") mustBe "none"
+      headers(1).attr("aria-sort") mustBe "ascending"
+      headers(2).attr("aria-sort") mustBe "none"
+    }
+
+    "must display correct aria-sort state when sorting by clientReference" in new Setup {
+      val html: HtmlFormat.Appendable = view(
+        form = form,
+        searchByOptions = searchOptions,
+        clientList = clientList,
+        paginationViewModel = PaginationViewModel(),
+        sortBy = Some("clientReference"),
+        sortOrder = Some("descending")
+      )
+      val doc: Document               = Jsoup.parse(html.body)
+
+      val headers = doc.select("#agent-client-list thead th").asScala
+      headers(0).attr("aria-sort") mustBe "none"
+      headers(1).attr("aria-sort") mustBe "none"
+      headers(2).attr("aria-sort") mustBe "descending"
+    }
+
+    "must display none for all columns when no sorting is applied" in new Setup {
+      val html: HtmlFormat.Appendable = view(
+        form = form,
+        searchByOptions = searchOptions,
+        clientList = clientList,
+        paginationViewModel = PaginationViewModel(),
+        sortBy = None,
+        sortOrder = None
+      )
+      val doc: Document               = Jsoup.parse(html.body)
+
+      val headers = doc.select("#agent-client-list thead th").asScala
+      headers(0).attr("aria-sort") mustBe "none"
+      headers(1).attr("aria-sort") mustBe "none"
+      headers(2).attr("aria-sort") mustBe "none"
+    }
+
     "must show error summary and messages when form has errors" in new Setup {
       val boundWithError: Form[ClientListFormData] = form.bind(Map("searchBy" -> "", "searchFilter" -> ""))
       val html: HtmlFormat.Appendable              =
@@ -124,7 +249,9 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
           form = boundWithError,
           searchByOptions = searchOptions,
           clientList = clientList,
-          paginationViewModel = PaginationViewModel()
+          paginationViewModel = PaginationViewModel(),
+          sortBy = None,
+          sortOrder = None
         )
       val doc: Document                            = Jsoup.parse(html.body)
 
@@ -139,7 +266,9 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
         form = form,
         searchByOptions = searchOptions,
         clientList = clientList,
-        paginationViewModel = PaginationViewModel()
+        paginationViewModel = PaginationViewModel(),
+        sortBy = None,
+        sortOrder = None
       )
       val doc: Document               = Jsoup.parse(html.body)
 
@@ -162,7 +291,9 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
         form = form,
         searchByOptions = searchOptions,
         clientList = clientList,
-        paginationViewModel = paginationViewModel
+        paginationViewModel = paginationViewModel,
+        sortBy = None,
+        sortOrder = None
       )
       val doc: Document               = Jsoup.parse(html.body)
 
@@ -188,7 +319,9 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
         form = form,
         searchByOptions = searchOptions,
         clientList = clientList,
-        paginationViewModel = paginationViewModel
+        paginationViewModel = paginationViewModel,
+        sortBy = None,
+        sortOrder = None
       )
       val doc: Document               = Jsoup.parse(html.body)
 
@@ -208,7 +341,9 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
         form = form,
         searchByOptions = searchOptions,
         clientList = clientList,
-        paginationViewModel = paginationViewModel
+        paginationViewModel = paginationViewModel,
+        sortBy = None,
+        sortOrder = None
       )
       val doc: Document               = Jsoup.parse(html.body)
 

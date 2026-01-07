@@ -62,7 +62,11 @@ class ClientListSearchController @Inject() (
       implicit val hc: HeaderCarrier =
         HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-      val currentPage = request.getQueryString("page").flatMap(_.toIntOption).getOrElse(1)
+      val sortBy      = request.getQueryString("sortBy")
+      val sortOrder   = request.getQueryString("sortOrder")
+      val pageParam   = request.getQueryString("page")
+      val currentPage = pageParam.flatMap(_.toIntOption).getOrElse(1)
+      val pageToUse   = if ((sortBy.isDefined || sortOrder.isDefined) && pageParam.isEmpty) 1 else currentPage
 
       manageService
         .resolveAndStoreAgentClients(request.userAnswers)
@@ -78,14 +82,25 @@ class ClientListSearchController @Inject() (
 
             val allClientsVm      = ClientListViewModel.fromCisClients(cisClients)
             val filteredClientsVm = ClientListViewModel.filterByField(searchBy, searchFilter, allClientsVm)
+            val sortedClientsVm   = ClientListViewModel.sortClients(filteredClientsVm, sortBy, sortOrder)
 
             val paginationResult = paginationService.paginateClientList(
-              allClients = filteredClientsVm,
-              currentPage = currentPage,
-              baseUrl = routes.ClientListSearchController.onPageLoad().url
+              allClients = sortedClientsVm,
+              currentPage = pageToUse,
+              baseUrl = routes.ClientListSearchController.onPageLoad().url,
+              sortBy = sortBy,
+              sortOrder = sortOrder
             )
 
-            saveSearchAndRender(uaWithClients, preparedForm, searchBy, searchFilter, paginationResult)
+            saveSearchAndRender(
+              uaWithClients,
+              preparedForm,
+              searchBy,
+              searchFilter,
+              paginationResult,
+              sortBy,
+              sortOrder
+            )
         }
         .recover { case e =>
           logger.error(s"[ClientListSearchController][onPageLoad] failed: ${e.getMessage}", e)
@@ -107,7 +122,9 @@ class ClientListSearchController @Inject() (
           val paginationResult = paginationService.paginateClientList(
             allClients = allClientsVm,
             currentPage = 1,
-            baseUrl = routes.ClientListSearchController.onPageLoad().url
+            baseUrl = routes.ClientListSearchController.onPageLoad().url,
+            sortBy = None,
+            sortOrder = None
           )
 
           for {
@@ -118,7 +135,9 @@ class ClientListSearchController @Inject() (
               form,
               SearchByList.searchByOptions,
               paginationResult.paginatedData,
-              paginationResult.paginationViewModel
+              paginationResult.paginationViewModel,
+              None,
+              None
             )
           )
         }
@@ -142,7 +161,9 @@ class ClientListSearchController @Inject() (
           val paginationResult = paginationService.paginateClientList(
             allClients = allClientsVm,
             currentPage = 1,
-            baseUrl = routes.ClientListSearchController.onPageLoad().url
+            baseUrl = routes.ClientListSearchController.onPageLoad().url,
+            sortBy = None,
+            sortOrder = None
           )
 
           form
@@ -155,7 +176,9 @@ class ClientListSearchController @Inject() (
                       formWithErrors,
                       SearchByList.searchByOptions,
                       paginationResult.paginatedData,
-                      paginationResult.paginationViewModel
+                      paginationResult.paginationViewModel,
+                      None,
+                      None
                     )
                   )
                 ),
@@ -225,7 +248,9 @@ class ClientListSearchController @Inject() (
     preparedForm: Form[ClientListFormData],
     searchBy: String,
     searchFilter: String,
-    paginationResult: ClientListPaginationResult
+    paginationResult: ClientListPaginationResult,
+    sortBy: Option[String],
+    sortOrder: Option[String]
   )(implicit request: DataRequest[_]): Future[Result] =
     for {
       updatedAnswers <- Future.fromTry(ua.set(ClientListSearchPage, ClientListFormData(searchBy, searchFilter)))
@@ -235,7 +260,9 @@ class ClientListSearchController @Inject() (
         preparedForm,
         SearchByList.searchByOptions,
         paginationResult.paginatedData,
-        paginationResult.paginationViewModel
+        paginationResult.paginationViewModel,
+        sortBy,
+        sortOrder
       )
     )
 

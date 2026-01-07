@@ -43,7 +43,9 @@ class PaginationService @Inject() {
   def paginateClientList(
     allClients: Seq[ClientListViewModel],
     currentPage: Int = 1,
-    baseUrl: String
+    baseUrl: String,
+    sortBy: Option[String] = None,
+    sortOrder: Option[String] = None
   ): ClientListPaginationResult = {
 
     val totalRecords     = allClients.length
@@ -57,7 +59,9 @@ class PaginationService @Inject() {
     val paginationViewModel = createPaginationViewModel(
       currentPage = validCurrentPage,
       totalPages = totalPages,
-      baseUrl = baseUrl
+      baseUrl = baseUrl,
+      sortBy = sortBy,
+      sortOrder = sortOrder
     )
 
     ClientListPaginationResult(
@@ -84,14 +88,16 @@ class PaginationService @Inject() {
   private def createPaginationViewModel(
     currentPage: Int,
     totalPages: Int,
-    baseUrl: String
+    baseUrl: String,
+    sortBy: Option[String],
+    sortOrder: Option[String]
   ): PaginationViewModel =
     if (totalPages <= 1) {
       PaginationViewModel()
     } else {
-      val items    = generatePageItems(currentPage, totalPages, baseUrl)
-      val previous = createPreviousLink(currentPage, baseUrl)
-      val next     = createNextLink(currentPage, totalPages, baseUrl)
+      val items    = generatePageItems(currentPage, totalPages, baseUrl, sortBy, sortOrder)
+      val previous = createPreviousLink(currentPage, baseUrl, sortBy, sortOrder)
+      val next     = createNextLink(currentPage, totalPages, baseUrl, sortBy, sortOrder)
 
       PaginationViewModel(
         items = items,
@@ -100,16 +106,46 @@ class PaginationService @Inject() {
       )
     }
 
-  private def createPreviousLink(currentPage: Int, baseUrl: String): Option[PaginationLinkViewModel] =
+  private def buildUrlWithParams(
+    baseUrl: String,
+    page: Int,
+    sortBy: Option[String],
+    sortOrder: Option[String]
+  ): String = {
+    val params = scala.collection.mutable.ListBuffer[String]()
+    params += s"page=$page"
+    sortBy.foreach(sb => params += s"sortBy=$sb")
+    sortOrder.foreach(so => params += s"sortOrder=$so")
+    s"$baseUrl?${params.mkString("&")}"
+  }
+
+  private def createPreviousLink(
+    currentPage: Int,
+    baseUrl: String,
+    sortBy: Option[String],
+    sortOrder: Option[String]
+  ): Option[PaginationLinkViewModel] =
     if (currentPage > 1) {
-      Some(PaginationLinkViewModel(s"$baseUrl?page=${currentPage - 1}").withText("site.pagination.previous"))
+      Some(
+        PaginationLinkViewModel(buildUrlWithParams(baseUrl, currentPage - 1, sortBy, sortOrder))
+          .withText("site.pagination.previous")
+      )
     } else {
       None
     }
 
-  private def createNextLink(currentPage: Int, totalPages: Int, baseUrl: String): Option[PaginationLinkViewModel] =
+  private def createNextLink(
+    currentPage: Int,
+    totalPages: Int,
+    baseUrl: String,
+    sortBy: Option[String],
+    sortOrder: Option[String]
+  ): Option[PaginationLinkViewModel] =
     if (currentPage < totalPages) {
-      Some(PaginationLinkViewModel(s"$baseUrl?page=${currentPage + 1}").withText("site.pagination.next"))
+      Some(
+        PaginationLinkViewModel(buildUrlWithParams(baseUrl, currentPage + 1, sortBy, sortOrder))
+          .withText("site.pagination.next")
+      )
     } else {
       None
     }
@@ -117,13 +153,17 @@ class PaginationService @Inject() {
   private def generatePageItems(
     currentPage: Int,
     totalPages: Int,
-    baseUrl: String
+    baseUrl: String,
+    sortBy: Option[String],
+    sortOrder: Option[String]
   ): Seq[PaginationItemViewModel] = {
     val pageRange = calculatePageRange(currentPage, totalPages)
     val items     = scala.collection.mutable.ListBuffer[PaginationItemViewModel]()
 
     if (pageRange.head > 1) {
-      items += PaginationItemViewModel("1", s"$baseUrl?page=1").withCurrent(1 == currentPage)
+      items += PaginationItemViewModel("1", buildUrlWithParams(baseUrl, 1, sortBy, sortOrder)).withCurrent(
+        1 == currentPage
+      )
       if (pageRange.head > 2) {
         items += PaginationItemViewModel.ellipsis()
       }
@@ -132,7 +172,7 @@ class PaginationService @Inject() {
     pageRange.foreach { page =>
       items += PaginationItemViewModel(
         number = page.toString,
-        href = s"$baseUrl?page=$page"
+        href = buildUrlWithParams(baseUrl, page, sortBy, sortOrder)
       ).withCurrent(page == currentPage)
     }
 
@@ -140,9 +180,10 @@ class PaginationService @Inject() {
       if (pageRange.last < totalPages - 1) {
         items += PaginationItemViewModel.ellipsis()
       }
-      items += PaginationItemViewModel(totalPages.toString, s"$baseUrl?page=$totalPages").withCurrent(
-        totalPages == currentPage
-      )
+      items += PaginationItemViewModel(totalPages.toString, buildUrlWithParams(baseUrl, totalPages, sortBy, sortOrder))
+        .withCurrent(
+          totalPages == currentPage
+        )
     }
 
     items.toSeq

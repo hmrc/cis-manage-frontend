@@ -173,6 +173,119 @@ class ClientListViewModelSpec extends SpecBase {
     }
   }
 
+  "ClientListViewModel.sortClients" - {
+    "return unsorted clients when sortBy is None" in {
+      val result = ClientListViewModel.sortClients(sampleClients, None, None)
+      result shouldBe sampleClients
+    }
+
+    "return unsorted clients when sortBy is empty" in {
+      val result = ClientListViewModel.sortClients(sampleClients, Some(""), None)
+      result shouldBe sampleClients
+    }
+
+    "sort by clientName ascending" in {
+      val result = ClientListViewModel.sortClients(sampleClients, Some("clientName"), Some("ascending"))
+      result.map(_.clientName) shouldBe Seq(
+        "ABC Construction Ltd",
+        "ABC Property Services",
+        "Capital Construction Group"
+      )
+    }
+
+    "sort by clientName descending" in {
+      val result = ClientListViewModel.sortClients(sampleClients, Some("clientName"), Some("descending"))
+      result.map(_.clientName) shouldBe Seq(
+        "Capital Construction Group",
+        "ABC Property Services",
+        "ABC Construction Ltd"
+      )
+    }
+
+    "sort by clientName case-insensitively" in {
+      val mixedCaseClients = Seq(
+        ClientListViewModel("123", "zebra Construction", "123/AB45678", "ABC-001", Active),
+        ClientListViewModel("123", "Alpha Services", "789/EF23456", "ABC-002", Active),
+        ClientListViewModel("123", "Beta Group", "345/IJ67890", "CAP-001", Active)
+      )
+      val result           = ClientListViewModel.sortClients(mixedCaseClients, Some("clientName"), Some("ascending"))
+      result.map(_.clientName) shouldBe Seq(
+        "Alpha Services",
+        "Beta Group",
+        "zebra Construction"
+      )
+    }
+
+    "sort by employerReference ascending" in {
+      val result = ClientListViewModel.sortClients(sampleClients, Some("employerReference"), Some("ascending"))
+      result.map(_.employerReference) shouldBe Seq(
+        "123/AB45678",
+        "345/IJ67890",
+        "789/EF23456"
+      )
+    }
+
+    "sort by employerReference descending" in {
+      val result = ClientListViewModel.sortClients(sampleClients, Some("employerReference"), Some("descending"))
+      result.map(_.employerReference) shouldBe Seq(
+        "789/EF23456",
+        "345/IJ67890",
+        "123/AB45678"
+      )
+    }
+
+    "sort by employerReference as single field (both parts together)" in {
+      val clientsWithDifferentTON = Seq(
+        ClientListViewModel("123", "Client A", "999/AA11111", "REF-001", Active),
+        ClientListViewModel("123", "Client B", "100/AA11111", "REF-002", Active),
+        ClientListViewModel("123", "Client C", "50/AA11111", "REF-003", Active)
+      )
+      val result                  =
+        ClientListViewModel.sortClients(clientsWithDifferentTON, Some("employerReference"), Some("ascending"))
+      result.map(_.employerReference) shouldBe Seq(
+        "100/AA11111",
+        "50/AA11111",
+        "999/AA11111"
+      )
+    }
+
+    "sort by clientReference ascending" in {
+      val result = ClientListViewModel.sortClients(sampleClients, Some("clientReference"), Some("ascending"))
+      result.map(_.clientReference) shouldBe Seq(
+        "ABC-001",
+        "ABC-002",
+        "CAP-001"
+      )
+    }
+
+    "sort by clientReference descending" in {
+      val result = ClientListViewModel.sortClients(sampleClients, Some("clientReference"), Some("descending"))
+      result.map(_.clientReference) shouldBe Seq(
+        "CAP-001",
+        "ABC-002",
+        "ABC-001"
+      )
+    }
+
+    "default to ascending when sortOrder is None" in {
+      val result = ClientListViewModel.sortClients(sampleClients, Some("clientName"), None)
+      result.map(_.clientName) shouldBe Seq(
+        "ABC Construction Ltd",
+        "ABC Property Services",
+        "Capital Construction Group"
+      )
+    }
+
+    "default to ascending when sortOrder is not 'ascending' or 'descending'" in {
+      val result = ClientListViewModel.sortClients(sampleClients, Some("clientName"), Some("invalid"))
+      result.map(_.clientName) shouldBe Seq(
+        "ABC Construction Ltd",
+        "ABC Property Services",
+        "Capital Construction Group"
+      )
+    }
+  }
+
   "SearchBy.values" - {
     "contain CN, CR and ER in order" in {
       SearchBy.values shouldBe Seq(SearchBy.CN, SearchBy.CR, SearchBy.ER)
