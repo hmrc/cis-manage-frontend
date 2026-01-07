@@ -16,22 +16,27 @@
 
 package controllers
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{AuthorizedForSchemeActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.PrepopService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.CheckSubcontractorRecordsView
 
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class CheckSubcontractorRecordsController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  requireSchemeAccess: AuthorizedForSchemeActionProvider,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: CheckSubcontractorRecordsView
-) extends FrontendBaseController
+  view: CheckSubcontractorRecordsView,
+  service: PrepopService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(
@@ -40,9 +45,17 @@ class CheckSubcontractorRecordsController @Inject() (
     instanceId: String,
     targetKey: String
   ): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      Ok(view(taxOfficeNumber, taxOfficeReference, instanceId, targetKey))
-    }
+    (identify andThen getData andThen requireData andThen requireSchemeAccess(taxOfficeNumber, taxOfficeReference))
+      .async { implicit request =>
+        service.getScheme(instanceId).map {
+          case None                                                  =>
+            Redirect(routes.SystemErrorController.onPageLoad())
+          case Some(scheme) if scheme.prePopSuccessful.contains("Y") =>
+            Redirect(routes.JourneyRecoveryController.onPageLoad())
+          case _                                                     =>
+            Ok(view(taxOfficeNumber, taxOfficeReference, instanceId, targetKey))
+        }
+      }
 
   def onSubmit(
     taxOfficeNumber: String,

@@ -26,8 +26,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait AuthorizedForSchemeAction extends ActionRefiner[DataRequest, DataRequest]
 
-object AuthorizedForSchemeAction {
-  def canAccessScheme(employerReference: EmployerReference)(using ec: ExecutionContext): AuthorizedForSchemeAction =
+class AuthorizedForSchemeActionProvider {
+  def apply(employerReference: EmployerReference)(using ec: ExecutionContext): AuthorizedForSchemeAction =
     new AuthorizedForSchemeAction {
       override protected def refine[A](request: DataRequest[A]): Future[Either[Result, DataRequest[A]]] = {
         val authorized = if (request.isAgent) {
@@ -51,7 +51,7 @@ object AuthorizedForSchemeAction {
       override def executionContext: ExecutionContext = ec
     }
 
-  def requireSchemeAccess(taxOfficeNumber: String, taxOfficeReference: String)(using
+  def apply(taxOfficeNumber: String, taxOfficeReference: String)(using
     ec: ExecutionContext
-  ): AuthorizedForSchemeAction = canAccessScheme(EmployerReference(taxOfficeNumber, taxOfficeReference))
+  ): AuthorizedForSchemeAction = apply(EmployerReference(taxOfficeNumber, taxOfficeReference))
 }

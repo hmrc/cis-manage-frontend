@@ -64,7 +64,7 @@ class AuthorizedForSchemeActionSpec extends SpecBase {
           val userAnswers = emptyUserAnswers.set(AgentClientsPage, List(client1, client2)).success.value
           val request     = DataRequest(FakeRequest(), "id", userAnswers, None, Some("agentRef"), isAgent = true)
 
-          val action = AuthorizedForSchemeAction.canAccessScheme(employerReference)
+          val action = new AuthorizedForSchemeActionProvider().apply(employerReference)
           val result = action.invokeBlock(request, implicit request => Future.successful(Results.NoContent))
 
           whenReady(result) { result =>
@@ -78,7 +78,7 @@ class AuthorizedForSchemeActionSpec extends SpecBase {
           val userAnswers = emptyUserAnswers.set(AgentClientsPage, List(client2)).success.value
           val request     = DataRequest(FakeRequest(), "id", userAnswers, None, Some("agentRef"), isAgent = true)
 
-          val action = AuthorizedForSchemeAction.canAccessScheme(employerReference)
+          val action = new AuthorizedForSchemeActionProvider().apply(employerReference)
           val result = action.invokeBlock(request, implicit request => Future.successful(Results.NoContent))
 
           whenReady(result) { result =>
@@ -96,7 +96,7 @@ class AuthorizedForSchemeActionSpec extends SpecBase {
           val userAnswers = emptyUserAnswers.set(AgentClientsPage, List.empty).success.value
           val request     = DataRequest(FakeRequest(), "id", userAnswers, None, Some("agentRef"), isAgent = true)
 
-          val action = AuthorizedForSchemeAction.canAccessScheme(employerReference)
+          val action = new AuthorizedForSchemeActionProvider().apply(employerReference)
           val result = action.invokeBlock(request, implicit request => Future.successful(Results.NoContent))
 
           whenReady(result) { result =>
@@ -112,7 +112,7 @@ class AuthorizedForSchemeActionSpec extends SpecBase {
         "must redirect to unauthorised page" in {
           val request = DataRequest(FakeRequest(), "id", emptyUserAnswers, None, Some("agentRef"), isAgent = true)
 
-          val action = AuthorizedForSchemeAction.canAccessScheme(employerReference)
+          val action = new AuthorizedForSchemeActionProvider().apply(employerReference)
           val result = action.invokeBlock(request, implicit request => Future.successful(Results.NoContent))
 
           whenReady(result) { result =>
@@ -132,7 +132,7 @@ class AuthorizedForSchemeActionSpec extends SpecBase {
           val request =
             DataRequest(FakeRequest(), "id", emptyUserAnswers, Some(employerReference), None)
 
-          val action = AuthorizedForSchemeAction.canAccessScheme(employerReference)
+          val action = new AuthorizedForSchemeActionProvider().apply(employerReference)
           val result = action.invokeBlock(request, implicit request => Future.successful(Results.NoContent))
 
           whenReady(result) { result =>
@@ -146,7 +146,7 @@ class AuthorizedForSchemeActionSpec extends SpecBase {
           val request =
             DataRequest(FakeRequest(), "id", emptyUserAnswers, Some(otherEmployerReference), None)
 
-          val action = AuthorizedForSchemeAction.canAccessScheme(employerReference)
+          val action = new AuthorizedForSchemeActionProvider().apply(employerReference)
           val result = action.invokeBlock(request, implicit request => Future.successful(Results.NoContent))
 
           whenReady(result) { result =>
@@ -162,7 +162,7 @@ class AuthorizedForSchemeActionSpec extends SpecBase {
         "must redirect to unauthorised page" in {
           val request = DataRequest(FakeRequest(), "id", emptyUserAnswers, None, None)
 
-          val action = AuthorizedForSchemeAction.canAccessScheme(employerReference)
+          val action = new AuthorizedForSchemeActionProvider().apply(employerReference)
           val result = action.invokeBlock(request, implicit request => Future.successful(Results.NoContent))
 
           whenReady(result) { result =>
@@ -180,7 +180,7 @@ class AuthorizedForSchemeActionSpec extends SpecBase {
         val request =
           DataRequest(FakeRequest(), "id", emptyUserAnswers, Some(employerReference), None)
 
-        val action = AuthorizedForSchemeAction.requireSchemeAccess(taxOfficeNumber, taxOfficeReference)
+        val action = new AuthorizedForSchemeActionProvider().apply(taxOfficeNumber, taxOfficeReference)
         val result = action.invokeBlock(request, implicit request => Future.successful(Results.NoContent))
 
         whenReady(result) { result =>
