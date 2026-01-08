@@ -19,7 +19,7 @@ package controllers.actions
 import base.SpecBase
 import models.{CisTaxpayerSearchResult, EmployerReference}
 import models.requests.DataRequest
-import pages.AgentClientsPage
+import pages.{AgentClientsPage, CisIdPage}
 import play.api.mvc.Results
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -185,6 +185,126 @@ class AuthorizedForSchemeActionSpec extends SpecBase {
 
         whenReady(result) { result =>
           result mustBe Results.NoContent
+        }
+      }
+    }
+
+    "when checking access by instanceId" - {
+
+      "for agents" - {
+
+        "when the instanceId matches a client's uniqueId" - {
+          "must allow access" in {
+            val userAnswers = emptyUserAnswers.set(AgentClientsPage, List(client1, client2)).success.value
+            val request     = DataRequest(FakeRequest(), "id", userAnswers, None, Some("agentRef"), isAgent = true)
+
+            val action = new AuthorizedForSchemeActionProvider().apply("id1")
+            val result = action.invokeBlock(request, implicit request => Future.successful(Results.NoContent))
+
+            whenReady(result) { result =>
+              result mustBe Results.NoContent
+            }
+          }
+        }
+
+        "when the instanceId does not match any client's uniqueId" - {
+          "must redirect to unauthorised page" in {
+            val userAnswers = emptyUserAnswers.set(AgentClientsPage, List(client1, client2)).success.value
+            val request     = DataRequest(FakeRequest(), "id", userAnswers, None, Some("agentRef"), isAgent = true)
+
+            val action = new AuthorizedForSchemeActionProvider().apply("id3")
+            val result = action.invokeBlock(request, implicit request => Future.successful(Results.NoContent))
+
+            whenReady(result) { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustBe Some(
+                controllers.routes.UnauthorisedController.onPageLoad().url
+              )
+            }
+          }
+        }
+
+        "when the agent has no clients in their list" - {
+          "must redirect to unauthorised page" in {
+            val userAnswers = emptyUserAnswers.set(AgentClientsPage, List.empty).success.value
+            val request     = DataRequest(FakeRequest(), "id", userAnswers, None, Some("agentRef"), isAgent = true)
+
+            val action = new AuthorizedForSchemeActionProvider().apply("id1")
+            val result = action.invokeBlock(request, implicit request => Future.successful(Results.NoContent))
+
+            whenReady(result) { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustBe Some(
+                controllers.routes.UnauthorisedController.onPageLoad().url
+              )
+            }
+          }
+        }
+
+        "when AgentClientsPage is not set in UserAnswers" - {
+          "must redirect to unauthorised page" in {
+            val request = DataRequest(FakeRequest(), "id", emptyUserAnswers, None, Some("agentRef"), isAgent = true)
+
+            val action = new AuthorizedForSchemeActionProvider().apply("id1")
+            val result = action.invokeBlock(request, implicit request => Future.successful(Results.NoContent))
+
+            whenReady(result) { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustBe Some(
+                controllers.routes.UnauthorisedController.onPageLoad().url
+              )
+            }
+          }
+        }
+      }
+
+      "for non-agents" - {
+
+        "when the instanceId matches the value in InstanceIdPage" - {
+          "must allow access" in {
+            val userAnswers = emptyUserAnswers.set(CisIdPage, "instance123").success.value
+            val request     = DataRequest(FakeRequest(), "id", userAnswers, None, None)
+
+            val action = new AuthorizedForSchemeActionProvider().apply("instance123")
+            val result = action.invokeBlock(request, implicit request => Future.successful(Results.NoContent))
+
+            whenReady(result) { result =>
+              result mustBe Results.NoContent
+            }
+          }
+        }
+
+        "when the instanceId does not match the value in InstanceIdPage" - {
+          "must redirect to unauthorised page" in {
+            val userAnswers = emptyUserAnswers.set(CisIdPage, "instance123").success.value
+            val request     = DataRequest(FakeRequest(), "id", userAnswers, None, None)
+
+            val action = new AuthorizedForSchemeActionProvider().apply("instance456")
+            val result = action.invokeBlock(request, implicit request => Future.successful(Results.NoContent))
+
+            whenReady(result) { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustBe Some(
+                controllers.routes.UnauthorisedController.onPageLoad().url
+              )
+            }
+          }
+        }
+
+        "when InstanceIdPage is not set in UserAnswers" - {
+          "must redirect to unauthorised page" in {
+            val request = DataRequest(FakeRequest(), "id", emptyUserAnswers, None, None)
+
+            val action = new AuthorizedForSchemeActionProvider().apply("instance123")
+            val result = action.invokeBlock(request, implicit request => Future.successful(Results.NoContent))
+
+            whenReady(result) { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustBe Some(
+                controllers.routes.UnauthorisedController.onPageLoad().url
+              )
+            }
+          }
         }
       }
     }

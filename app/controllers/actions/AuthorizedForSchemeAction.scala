@@ -18,7 +18,7 @@ package controllers.actions
 
 import models.EmployerReference
 import models.requests.DataRequest
-import pages.AgentClientsPage
+import pages.{AgentClientsPage, CisIdPage}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result}
 
@@ -54,4 +54,29 @@ class AuthorizedForSchemeActionProvider {
   def apply(taxOfficeNumber: String, taxOfficeReference: String)(using
     ec: ExecutionContext
   ): AuthorizedForSchemeAction = apply(EmployerReference(taxOfficeNumber, taxOfficeReference))
+
+  def apply(instanceId: String)(using ec: ExecutionContext): AuthorizedForSchemeAction =
+    new AuthorizedForSchemeAction {
+      override protected def refine[A](request: DataRequest[A]): Future[Either[Result, DataRequest[A]]] = {
+        val authorized = if (request.isAgent) {
+          request.userAnswers
+            .get(AgentClientsPage)
+            .toList
+            .flatten
+            .exists(_.uniqueId == instanceId)
+        } else {
+          request.userAnswers
+            .get(CisIdPage)
+            .contains(instanceId)
+        }
+
+        if (authorized) {
+          Future.successful(Right(request))
+        } else {
+          Future.successful(Left(Redirect(controllers.routes.UnauthorisedController.onPageLoad())))
+        }
+      }
+
+      override def executionContext: ExecutionContext = ec
+    }
 }

@@ -48,11 +48,11 @@ class CheckSubcontractorRecordsController @Inject() (
     (identify andThen getData andThen requireData andThen requireSchemeAccess(taxOfficeNumber, taxOfficeReference))
       .async { implicit request =>
         service.getScheme(instanceId).map {
-          case None                                                  =>
+          case None                                                          =>
             Redirect(routes.SystemErrorController.onPageLoad())
-          case Some(scheme) if scheme.prePopSuccessful.contains("Y") =>
+          case Some(scheme) if scheme.prePopSuccessful.exists(_.equals("Y")) =>
             Redirect(routes.JourneyRecoveryController.onPageLoad())
-          case _                                                     =>
+          case _                                                             =>
             Ok(view(taxOfficeNumber, taxOfficeReference, instanceId, targetKey))
         }
       }
