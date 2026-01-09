@@ -29,15 +29,28 @@ class CheckSubcontractorRecordsControllerSpec extends SpecBase {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
+      val taxOfficeNumber    = "101"
+      val taxOfficeReference = "AB0001"
+      val instanceId         = "900001"
+      val targetKey          = "subcontractors"
+
       running(application) {
-        val request = FakeRequest(GET, routes.CheckSubcontractorRecordsController.onPageLoad().url)
+        val request = FakeRequest(
+          GET,
+          routes.CheckSubcontractorRecordsController
+            .onPageLoad(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
+            .url
+        )
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[CheckSubcontractorRecordsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)(
+          request,
+          messages(application)
+        ).toString
       }
     }
   }

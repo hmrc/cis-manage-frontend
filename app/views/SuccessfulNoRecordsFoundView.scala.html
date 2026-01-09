@@ -18,13 +18,14 @@
 
 @this(
     layout: templates.Layout,
+    formHelper: FormWithCSRF,
     govukButton: GovukButton,
     h1: H1,
     paragraph: Paragraph,
     link: Link
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(instanceId: String, targetKey: String)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = titleNoForm(messages("successfulNoRecordsFound.title")),
@@ -39,8 +40,11 @@
         hasFullStop = true,
         prefixTextKey = "successfulNoRecordsFound.p2"
     )
-
-    @govukButton(
-        ButtonViewModel(messages("site.continue"))
-    )
+    
+    @formHelper(
+        action = controllers.routes.SuccessfulNoRecordsFoundController
+            .onSubmit(instanceId, targetKey)
+        ) {
+            @govukButton(ButtonViewModel(messages("site.continue")))
+    }
 }

@@ -18,12 +18,13 @@
 
 @this(
     layout: templates.Layout,
+    formHelper: FormWithCSRF,
     govukButton: GovukButton,
     h1: H1,
     paragraph: Paragraph,
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle = titleNoForm(messages("unsuccessfulAutomaticSubcontractorUpdate.title")),
@@ -37,7 +38,9 @@
     )
 
     @paragraph(messages("unsuccessfulAutomaticSubcontractorUpdate.p3"))
-    @govukButton(
-        ButtonViewModel(messages("site.continue"))
-    )
+    @formHelper(
+        action = controllers.routes.UnsuccessfulAutomaticSubcontractorUpdateController.onSubmit()
+        ) {
+            @govukButton(ButtonViewModel(messages("site.continue")))
+    }
 }

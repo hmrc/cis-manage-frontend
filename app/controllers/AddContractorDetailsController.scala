@@ -19,28 +19,18 @@ package controllers
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.UnsuccessfulAutomaticSubcontractorUpdateView
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import views.html.AddContractorDetailsView
+
 import javax.inject.Inject
 
-class UnsuccessfulAutomaticSubcontractorUpdateController @Inject() (
+class AddContractorDetailsController @Inject() (
   override val messagesApi: MessagesApi,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: UnsuccessfulAutomaticSubcontractorUpdateView
+  view: AddContractorDetailsView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      Ok(view())
-    }
-
-  def onSubmit: Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      Redirect(controllers.routes.AddContractorDetailsController.onPageLoad())
-    }
-
+  def onPageLoad: Action[AnyContent] = Action { implicit request =>
+    Ok(view())
+  }
 }

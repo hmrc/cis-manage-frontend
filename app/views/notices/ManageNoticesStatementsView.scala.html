@@ -42,7 +42,7 @@
         noticesTable: NoticesTable
 )
 
-@(contractorName: String, pageViewModel: ManageNoticesStatementsPageViewModel)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
+@(contractorName: String,  instanceId: String, pageViewModel: ManageNoticesStatementsPageViewModel)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
 
 @detailsHtmlContent = {
     @h3(messages("manageNoticesStatements.details.confirmationStatements.heading"))
@@ -86,7 +86,7 @@
     @h2(messages("manageNoticesStatements.search.heading"))
     @paragraph(messages("manageNoticesStatements.search.description"))
 
-    @formHelper(action = controllers.notices.routes.ManageNoticesStatementsController.onPageLoad(), Symbol("method") -> "get", Symbol("class") -> "govuk-!-margin-bottom-6") {
+    @formHelper(action = controllers.notices.routes.ManageNoticesStatementsController.onPageLoad(instanceId), Symbol("method") -> "get", Symbol("class") -> "govuk-!-margin-bottom-6") {
         @govukSelect(
             Select(
                 id = "noticeType",

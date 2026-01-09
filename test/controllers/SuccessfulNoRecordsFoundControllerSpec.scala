@@ -29,15 +29,18 @@ class SuccessfulNoRecordsFoundControllerSpec extends SpecBase {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
+      val instanceId = "900001"
+      val targetKey  = "subcontractors"
+
       running(application) {
-        val request = FakeRequest(GET, routes.SuccessfulNoRecordsFoundController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.SuccessfulNoRecordsFoundController.onPageLoad(instanceId, targetKey).url)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[SuccessfulNoRecordsFoundView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(instanceId, targetKey)(request, messages(application)).toString
       }
     }
   }

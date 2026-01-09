@@ -30,7 +30,10 @@ class SuccessfulAutomaticSubcontractorUpdateViewSpec extends SpecBase {
 
   "SuccessfulAutomaticSubcontractorUpdateViewS" - {
     "must render the page with the correct heading, paragraph, table and button" in new Setup {
-      val html: HtmlFormat.Appendable = view(subcontractorsList)
+      val instanceId = "900001"
+      val targetKey  = "subcontractors"
+
+      val html: HtmlFormat.Appendable = view(subcontractorsList, instanceId, targetKey)
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.title                                   must include(messages("successfulAutomaticSubcontractorUpdate.title"))

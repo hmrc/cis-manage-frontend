@@ -16,21 +16,42 @@
 
 package controllers
 
+import models.Target
+import models.Target.*
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.SuccessfulNoRecordsFoundView
-
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import javax.inject.Inject
 
 class SuccessfulNoRecordsFoundController @Inject() (
   override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: SuccessfulNoRecordsFoundView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = Action { implicit request =>
-    Ok(view())
-  }
+  def onPageLoad(instanceId: String, targetKey: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      Ok(view(instanceId, targetKey))
+    }
+
+  def onSubmit(instanceId: String, targetKey: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      Target.fromKey(targetKey) match {
+        case Some(target) => Redirect(targetCall(target, instanceId))
+        case None         => NotFound("Unknown target")
+      }
+    }
+
+  private def targetCall(target: Target, instanceId: String): Call =
+    target match {
+      case Returns       => controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
+      case Notices       => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case Subcontractor => controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId)
+    }
 }

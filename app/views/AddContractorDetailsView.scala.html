@@ -18,24 +18,17 @@
 
 @this(
     layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukButton: GovukButton,
     h1: H1,
     paragraph: Paragraph
 )
 
-@(taxOfficeNumber: String, taxOfficeReference: String, instanceId: String, targetKey: String)(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[_], messages: Messages)
 
 @layout(
-    pageTitle = titleNoForm(messages("checkSubcontractorRecords.title")),
+    pageTitle = titleNoForm(messages("addContractorDetails.title")),
     showSignOut = false
-) {
-
-    @h1(messages("checkSubcontractorRecords.heading"))
-    @paragraph(messages("checkSubcontractorRecords.p1"))
-    @paragraph(messages("checkSubcontractorRecords.p2"))
-
-    @formHelper(action = controllers.routes.CheckSubcontractorRecordsController.onSubmit(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)) {
-        @govukButton(ButtonViewModel(messages("site.continue")))
-    }
+    ) {
+    
+    @h1(messages("addContractorDetails.heading"))
+    @paragraph(messages("addContractorDetails.p1"))
 }
