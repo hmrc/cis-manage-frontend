@@ -47,7 +47,7 @@ class SuccessfulAutomaticSubcontractorUpdateController @Inject() (
       service.getScheme(instanceId).map {
         case None                                                  =>
           Redirect(routes.SystemErrorController.onPageLoad())
-        case Some(scheme) if scheme.prePopSuccessful.contains("Y") =>
+        case Some(scheme) if scheme.prePopSuccessful.contains("N") =>
           Redirect(routes.JourneyRecoveryController.onPageLoad())
         case _                                                     =>
           val subcontractorsList: Seq[SuccessfulAutomaticSubcontractorUpdateViewModel] = getSubcontractorsList

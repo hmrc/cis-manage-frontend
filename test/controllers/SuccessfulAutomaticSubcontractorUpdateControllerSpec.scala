@@ -74,7 +74,7 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
                 instanceId = instanceId,
                 utr = Some("ABC123"),
                 name = Some("John"),
-                prePopSuccessful = Some("N"),
+                prePopSuccessful = Some("Y"),
                 subcontractorCounter = Some(1)
               )
             )
@@ -122,7 +122,7 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
                 instanceId = instanceId,
                 utr = Some("ABC123"),
                 name = Some("John"),
-                prePopSuccessful = Some("Y"),
+                prePopSuccessful = Some("N"),
                 subcontractorCounter = Some(1)
               )
             )
