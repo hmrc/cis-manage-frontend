@@ -18,7 +18,10 @@ package services
 
 import connectors.ConstructionIndustrySchemeConnector
 import models.Scheme
+<<<<<<< HEAD
 import play.api.mvc.Call
+=======
+>>>>>>> 7ab676b ([DTR-1103] wiring F2 pages routing)
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
@@ -58,6 +61,7 @@ class PrepopService @Inject() (
 
   def getScheme(instanceId: String)(implicit hc: HeaderCarrier): Future[Option[Scheme]] =
     cisConnector.getScheme(instanceId)
+<<<<<<< HEAD
 
   private def isNonEmpty(opt: Option[String]): Boolean =
     opt.exists(_.trim.nonEmpty)
@@ -90,4 +94,6 @@ class PrepopService @Inject() (
       }
     }
   }
+=======
+>>>>>>> 7ab676b ([DTR-1103] wiring F2 pages routing)
 }

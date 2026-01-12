@@ -22,8 +22,11 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.SuccessfulNoRecordsFoundView
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{AuthorizedForSchemeActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import services.PrepopService
+
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class SuccessfulNoRecordsFoundController @Inject() (
   override val messagesApi: MessagesApi,
@@ -31,17 +34,27 @@ class SuccessfulNoRecordsFoundController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: SuccessfulNoRecordsFoundView
-) extends FrontendBaseController
+  view: SuccessfulNoRecordsFoundView,
+  requireSchemeAccess: AuthorizedForSchemeActionProvider,
+  service: PrepopService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(instanceId: String, targetKey: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      Ok(view(instanceId, targetKey))
+    (identify andThen getData andThen requireData andThen requireSchemeAccess(instanceId)).async { implicit request =>
+      service.getScheme(instanceId).map {
+        case None                                                  =>
+          Redirect(routes.SystemErrorController.onPageLoad())
+        case Some(scheme) if scheme.prePopSuccessful.contains("Y") =>
+          Redirect(routes.JourneyRecoveryController.onPageLoad())
+        case _                                                     =>
+          Ok(view(instanceId, targetKey))
+      }
     }
 
   def onSubmit(instanceId: String, targetKey: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen requireData andThen requireSchemeAccess(instanceId)) { implicit request =>
       Target.fromKey(targetKey) match {
         case Some(target) => Redirect(targetCall(target, instanceId))
         case None         => NotFound("Unknown target")
