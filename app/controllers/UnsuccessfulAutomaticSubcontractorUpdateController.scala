@@ -39,7 +39,7 @@ class UnsuccessfulAutomaticSubcontractorUpdateController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] =
+  def onPageLoad(instanceId: String): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireSchemeAccess(instanceId)).async { implicit request =>
       service.getScheme(instanceId).map {
         case None                                                  =>
@@ -47,11 +47,11 @@ class UnsuccessfulAutomaticSubcontractorUpdateController @Inject() (
         case Some(scheme) if scheme.prePopSuccessful.contains("Y") =>
           Redirect(routes.JourneyRecoveryController.onPageLoad())
         case _                                                     =>
-          Ok(view())
+          Ok(view(instanceId))
       }
     }
 
-  def onSubmit: Action[AnyContent] =
+  def onSubmit(instanceId: String): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireSchemeAccess(instanceId)) { implicit request =>
       Redirect(controllers.routes.AddContractorDetailsController.onPageLoad())
     }

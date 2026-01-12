@@ -48,12 +48,11 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
         .build()
 
       val instanceId = "900001"
-      val targetKey  = "subcontractors"
 
       running(application) {
         val request = FakeRequest(
           GET,
-          routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId, targetKey).url
+          routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId).url
         )
 
         when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
@@ -79,7 +78,7 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[UnsuccessfulAutomaticSubcontractorUpdateView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(instanceId, targetKey)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(instanceId)(request, messages(application)).toString
       }
     }
 
@@ -93,12 +92,11 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
         .build()
 
       val instanceId = "900001"
-      val targetKey  = "subcontractors"
 
       running(application) {
         val request = FakeRequest(
           GET,
-          routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId, targetKey).url
+          routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId).url
         )
 
         when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
@@ -137,12 +135,11 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
         .build()
 
       val instanceId = "900001"
-      val targetKey  = "subcontractors"
 
       running(application) {
         val request = FakeRequest(
           GET,
-          routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId, targetKey).url
+          routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId).url
         )
 
         when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(

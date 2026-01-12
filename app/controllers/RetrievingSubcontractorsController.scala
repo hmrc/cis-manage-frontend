@@ -66,7 +66,7 @@ class RetrievingSubcontractorsController @Inject() (
         result    <- schemeOpt match {
                        case None =>
                          Future.successful(
-                           Redirect(routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad())
+                           Redirect(routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId))
                          )
 
                        case Some(scheme) =>
@@ -85,12 +85,12 @@ class RetrievingSubcontractorsController @Inject() (
 
                            case Some("N") =>
                              Future.successful(
-                               Redirect(routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad())
+                               Redirect(routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId))
                              )
 
                            case _ =>
                              Future.successful(
-                               Redirect(routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad())
+                               Redirect(routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId))
                              )
                          }
                      }
