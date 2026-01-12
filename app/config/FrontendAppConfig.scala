@@ -83,4 +83,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   private lazy val cisFrontendBaseUrl: String   = configuration.get[String]("cis-frontend.host")
   lazy val cisDateConfirmNilPaymentsUrl: String = s"$cisFrontendBaseUrl/construction-industry-scheme"
+
+  lazy val cisTypeOfSubcontractorUrl: String = configuration.get[String]("urls.cis-contractor-frontend")
 }
