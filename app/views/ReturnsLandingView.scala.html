@@ -110,39 +110,66 @@
 
     @h2(messages("returnsLanding.recentCisReturns.h2"))
 
-    @govukTable(
-        Table(
-            head = Some(
-                Seq(
-                    "returnsLanding.taxMonth.th",
-                    "returnsLanding.type.th",
-                    "returnsLanding.dateSubmitted.th",
-                    "returnsLanding.status.th"
-                ).map { key =>
-                    HeadCell(content = Text(messages(key)))
-                }
-            ),
-            rows = returnsList.map { item =>
-                Seq(
-                    TableRow(content = Text(item.taxMonth), classes = "govuk-table__header"),
-                    TableRow(content = Text(item.returnType)),
-                    TableRow(content = Text(item.dateSubmitted)),
-                    TableRow(content = HtmlContent(
-                                tableRowTagColour(
-                                    text = item.status, 
+    @if(returnsList.isEmpty) {
+        @paragraph(messages("returnsLanding.noUnsubmittedReturns"))
+    } else  {
+        @govukTable(
+            Table(
+                head = Some(
+                    Seq(
+                        "returnsLanding.taxMonth.th",
+                        "returnsLanding.type.th",
+                        "returnsLanding.status.th",
+                        "returnsLanding.lastUpdated.th",
+                        "returnsLanding.delete.th"
+                    ).map { key =>
+                        HeadCell(content = Text(messages(key)))
+                    }
+                ),
+                rows = returnsList.map { item =>
+                    val isFailed = item.status.trim.equalsIgnoreCase("Failed")
+
+                    Seq(
+                        TableRow(
+                            content =
+                                if (!isFailed) HtmlContent(s"""<a href="#" class="govuk-link">${item.taxMonth}</a>""")
+                                else Text(item.taxMonth),
+                            classes = "govuk-table__header"
+                        ),
+                        TableRow(content = Text(item.returnType)),
+                        TableRow(
+                            content = {
+                                val tag = tableRowTagColour(
+                                    text = item.status,
                                     colour = item.status.trim.toUpperCase match {
-                                        case "REJECTED" => "govuk-tag--red"
-                                        case "PENDING" => "govuk-tag--blue"
-                                        case "VALIDATED" => "govuk-tag--turquoise"
-                                        case "STARTED" => "govuk-tag--green"
-                                        case _ => "blue"
+                                        case "IN PROGRESS" => "govuk-tag--light-blue"
+                                        case "AWAITING CONFIRMATION" => "govuk-tag--blue"
+                                        case "FAILED" => "govuk-tag--red"
+                                        case _ => "govuk-tag--light-blue"
                                     }
                                 )
-                    ))
-                )
-            }
+
+                                if (isFailed)
+                                    HtmlContent(s"""<a href="#" class="govuk-link">$tag</a>""")
+                                else
+                                    HtmlContent(tag)
+                            }
+                        ),
+                        TableRow(content = Text(item.dateSubmitted)),
+                        TableRow(content =
+                            if (item.status.trim.equalsIgnoreCase("In progress")) {
+                                HtmlContent(
+                                    s"""<a href="#" class="govuk-link">Delete</a>"""
+                                )
+                            } else {
+                                HtmlContent("")
+                            }
+                        )
+                    )
+                }
+            )
         )
-    )
+    }
 
     @link(linkTextKey = "returnsLanding.viewReturnsHistory.link", linkUrl = config.viewReturnsHistoryUrl)
 }
