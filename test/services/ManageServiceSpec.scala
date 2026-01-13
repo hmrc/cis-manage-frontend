@@ -17,9 +17,9 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
-import models.{CisTaxpayer, CisTaxpayerSearchResult, UserAnswers}
+import models.{CisTaxpayer, CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, UnsubmittedMonthlyReturnsRow, UserAnswers}
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.*
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
@@ -347,6 +347,49 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       verify(connector).getAgentClientTaxpayer("111", "test111")(hc)
       verifyNoMoreInteractions(connector)
+    }
+  }
+
+  "getUnsubmittedMonthlyReturns" should {
+
+    "delegate to connector and return response (happy path)" in {
+      val (service, connector, sessionRepo) = newService()
+      val instanceId                        = "900063"
+
+      val resp = UnsubmittedMonthlyReturnsResponse(
+        unsubmittedCisReturns = Seq(
+          UnsubmittedMonthlyReturnsRow(
+            taxYear = 2025,
+            taxMonth = 1,
+            returnType = "Nil",
+            status = "PENDING",
+            lastUpdate = None
+          )
+        )
+      )
+
+      when(connector.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(resp))
+
+      service.getUnsubmittedMonthlyReturns(instanceId).futureValue mustBe resp
+
+      verify(connector).getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+
+    "propagate failure from connector" in {
+      val (service, connector, sessionRepo) = newService()
+      val instanceId                        = "900063"
+      val boom                              = new RuntimeException("Backend error")
+
+      when(connector.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(boom))
+
+      val ex = service.getUnsubmittedMonthlyReturns(instanceId).failed.futureValue
+      ex mustBe boom
+
+      verify(connector).getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
     }
   }
 

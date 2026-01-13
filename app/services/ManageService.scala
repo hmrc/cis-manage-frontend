@@ -17,7 +17,7 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
-import models.{CisTaxpayerSearchResult, UserAnswers}
+import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, UserAnswers}
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
@@ -105,4 +105,9 @@ class ManageService @Inject() (
             }
         }
     }
+
+  def getUnsubmittedMonthlyReturns(instanceId: String)(implicit
+    hc: HeaderCarrier
+  ): Future[UnsubmittedMonthlyReturnsResponse] =
+    cisConnector.getUnsubmittedMonthlyReturns(instanceId)
 }

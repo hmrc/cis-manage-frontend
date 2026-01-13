@@ -587,4 +587,54 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
     }
   }
 
+  "getUnsubmittedMonthlyReturns" should {
+
+    "return UnsubmittedMonthlyReturnsResponse when BE returns 200 with valid JSON" in {
+      val instanceId = "900063"
+
+      stubFor(
+        get(urlPathEqualTo(s"/cis/monthly-returns/unsubmitted/$instanceId"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                """{
+                  |  "unsubmittedCisReturns": [
+                  |    {
+                  |      "taxYear": 2025,
+                  |      "taxMonth": 1,
+                  |      "returnType": "Nil",
+                  |      "status": "PENDING",
+                  |      "lastUpdate": null
+                  |    }
+                  |  ]
+                  |}""".stripMargin
+              )
+          )
+      )
+
+      val result = connector.getUnsubmittedMonthlyReturns(instanceId).futureValue
+      result.unsubmittedCisReturns.length mustBe 1
+      result.unsubmittedCisReturns.head.taxYear mustBe 2025
+      result.unsubmittedCisReturns.head.taxMonth mustBe 1
+      result.unsubmittedCisReturns.head.returnType mustBe "Nil"
+      result.unsubmittedCisReturns.head.status mustBe "PENDING"
+      result.unsubmittedCisReturns.head.lastUpdate mustBe None
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      val instanceId = "900063"
+
+      stubFor(
+        get(urlPathEqualTo(s"/cis/monthly-returns/unsubmitted/$instanceId"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = intercept[Exception] {
+        connector.getUnsubmittedMonthlyReturns(instanceId).futureValue
+      }
+      ex.getMessage must include("returned 500")
+    }
+  }
+
 }

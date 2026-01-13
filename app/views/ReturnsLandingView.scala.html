@@ -127,7 +127,18 @@
                     TableRow(content = Text(item.taxMonth), classes = "govuk-table__header"),
                     TableRow(content = Text(item.returnType)),
                     TableRow(content = Text(item.dateSubmitted)),
-                    TableRow(content = HtmlContent(tableRowTagColour(text = item.status, colour = "govuk-tag--green")))
+                    TableRow(content = HtmlContent(
+                                tableRowTagColour(
+                                    text = item.status, 
+                                    colour = item.status.trim.toUpperCase match {
+                                        case "REJECTED" => "govuk-tag--red"
+                                        case "PENDING" => "govuk-tag--green"
+                                        case "VALIDATED" => "govuk-tag--blue"
+                                        case "STARTED" => "govuk-tag--grey"
+                                        case _ => "blue"
+                                    }
+                                )
+                    ))
                 )
             }
         )
