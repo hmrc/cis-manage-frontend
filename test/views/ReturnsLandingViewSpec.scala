@@ -57,7 +57,7 @@ class ReturnsLandingViewSpec extends SpecBase {
       doc.select("th").text must include(messages("returnsLanding.type.th"))
       doc.select("th").text must include(messages("returnsLanding.lastUpdated.th"))
       doc.select("th").text must include(messages("returnsLanding.status.th"))
-      doc.select("th").text must include(messages("returnsLanding.delete.th"))
+      doc.select("th").text must include(messages("site.delete"))
 
       doc.getElementsByClass("govuk-link").text must include(messages("returnsLanding.viewReturnsHistory.link"))
 

@@ -11,6 +11,7 @@ site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
+site.delete = Delete
 
 date.day = Day
 date.month = Month
@@ -323,7 +324,6 @@ returnsLanding.aside.link2 = CIS monthly returns guidance
 returnsLanding.aside.link3 = CIS 340: Penalties for late returns
 returnsLanding.aside.link4 = Understanding CIS penalties
 returnsLanding.noUnsubmittedReturns = There are no unsubmitted Monthly Returns to view
-returnsLanding.delete.th = Delete
 
 subcontractorsLandingPage.title = Manage your CIS return subcontractor
 subcontractorsLandingPage.heading = Manage your CIS return subcontractor

@@ -127,6 +127,42 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
           controllers.routes.SystemErrorController.onPageLoad().url
       }
     }
+
+    "must redirect to SystemErrorController when ManageService throws a NonFatal exception" in {
+      val userAnswers: UserAnswers =
+        userAnswersWithCisId
+          .set(CisIdPage, instanceId)
+          .success
+          .value
+          .set(ContractorNamePage, contractorName)
+          .success
+          .value
+
+      val mockManageService = mock[ManageService]
+      when(mockManageService.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers),
+          additionalBindings = Seq(
+            inject.bind[ManageService].toInstance(mockManageService)
+          )
+        ).build()
+
+      running(application) {
+        val request = FakeRequest(
+          GET,
+          controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url
+        )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.SystemErrorController.onPageLoad().url
+      }
+    }
   }
 
   "ReturnsLandingController.onPageLoad (agent)" - {
