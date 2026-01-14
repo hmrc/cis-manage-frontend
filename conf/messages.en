@@ -11,6 +11,9 @@ site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
+site.pagination.landmark = Pagination
+site.pagination.previous = Previous
+site.pagination.next = Next
 site.delete = Delete
 
 date.day = Day

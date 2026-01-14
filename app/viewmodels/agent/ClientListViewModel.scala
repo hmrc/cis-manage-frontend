@@ -61,6 +61,36 @@ object ClientListViewModel {
     }
   }
 
+  def sortClients(
+    clients: Seq[ClientListViewModel],
+    sortBy: Option[String],
+    sortOrder: Option[String]
+  ): Seq[ClientListViewModel] = {
+    val isAscending = sortOrder.contains("ascending") || sortOrder.isEmpty || !sortOrder.contains("descending")
+    val sorted      = sortBy match {
+      case Some("clientName")        =>
+        if (isAscending) {
+          clients.sortBy(_.clientName.toLowerCase)
+        } else {
+          clients.sortBy(_.clientName.toLowerCase)(Ordering[String].reverse)
+        }
+      case Some("employerReference") =>
+        if (isAscending) {
+          clients.sortBy(_.employerReference.toLowerCase)
+        } else {
+          clients.sortBy(_.employerReference.toLowerCase)(Ordering[String].reverse)
+        }
+      case Some("clientReference")   =>
+        if (isAscending) {
+          clients.sortBy(_.clientReference.toLowerCase)
+        } else {
+          clients.sortBy(_.clientReference.toLowerCase)(Ordering[String].reverse)
+        }
+      case _                         => clients
+    }
+    sorted
+  }
+
   def fromCisClients(clients: List[CisTaxpayerSearchResult]): Seq[ClientListViewModel] =
     clients.map { client =>
       ClientListViewModel(
