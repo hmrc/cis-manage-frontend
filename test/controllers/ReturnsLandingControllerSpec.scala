@@ -67,9 +67,16 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
         val view   = application.injector.instanceOf[ReturnsLandingView]
 
+        val standardReturnLink = appConfig.fileStandardReturnUrl
+        val nilReturnLink      = appConfig.fileNilReturnUrl
+
         status(result) mustBe OK
         contentAsString(result) mustBe
-          view(contractorName, returnsList)(request, appConfig, messages(application)).toString
+          view(contractorName, returnsList, standardReturnLink, nilReturnLink)(
+            request,
+            appConfig,
+            messages(application)
+          ).toString
       }
     }
 
@@ -138,9 +145,18 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
         val view   = application.injector.instanceOf[ReturnsLandingView]
 
+        val standardReturnLink =
+          appConfig.fileStandardReturnUrl(client.taxOfficeNumber, client.taxOfficeRef, instanceId)
+        val nilReturnLink      =
+          appConfig.fileNilReturnUrl(client.taxOfficeNumber, client.taxOfficeRef, instanceId)
+
         status(result) mustBe OK
         contentAsString(result) mustBe
-          view(agentClientName, returnsList)(request, appConfig, messages(application)).toString
+          view(agentClientName, returnsList, standardReturnLink, nilReturnLink)(
+            request,
+            appConfig,
+            messages(application)
+          ).toString
       }
     }
 

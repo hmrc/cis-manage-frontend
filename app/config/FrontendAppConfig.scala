@@ -21,6 +21,9 @@ import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
 
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
+
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration) {
 
@@ -55,7 +58,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val cisLateFilingPenaltyUrl: String                    = configuration.get[String]("urls.cisLateFilingPenalty")
   lazy val cisSubcontractorGrossPaymentStatusUrl: String      =
     configuration.get[String]("urls.cisSubcontractorGrossPaymentStatus")
-  lazy val fileStandardReturnUrl: String                      = configuration.get[String]("urls.fileStandardReturn")
   lazy val amendReturnUrl: String                             = configuration.get[String]("urls.amendReturn")
   lazy val paymentsAndDeductionsUrl: String                   = configuration.get[String]("urls.paymentsAndDeductions")
   lazy val noticesAndStatementsUrl: String                    = configuration.get[String]("urls.noticesAndStatements")
@@ -81,8 +83,30 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val contractorLandingGuidanceUrl: String  = configuration.get[String]("urls.contractorLandingGuidanceUrl")
   lazy val contractorLandingPenaltiesUrl: String = configuration.get[String]("urls.contractorLandingPenaltiesUrl")
 
-  private lazy val cisFrontendBaseUrl: String   = configuration.get[String]("cis-frontend.host")
-  lazy val cisDateConfirmNilPaymentsUrl: String = s"$cisFrontendBaseUrl/construction-industry-scheme"
+  private lazy val cisFrontendBaseUrl: String = configuration.get[String]("cis-frontend.host")
+  lazy val fileStandardReturnPath: String     = configuration.get[String]("urls.fileStandardReturn")
+  lazy val fileNilReturnPath: String          = configuration.get[String]("urls.fileNilReturn")
+
+  def fileStandardReturnUrl: String = s"$cisFrontendBaseUrl$fileStandardReturnPath"
+
+  def fileStandardReturnUrl(taxOfficeNumber: String, taxOfficeReference: String, instanceId: String): String = {
+    def encode(s: String) = URLEncoder.encode(s, StandardCharsets.UTF_8.name())
+    s"$cisFrontendBaseUrl$fileStandardReturnPath" +
+      s"?taxOfficeNumber=${encode(taxOfficeNumber)}" +
+      s"&taxOfficeReference=${encode(taxOfficeReference)}" +
+      s"&instanceId=${encode(instanceId)}"
+  }
+
+  def fileNilReturnUrl: String = s"$cisFrontendBaseUrl$fileNilReturnPath"
+
+  def fileNilReturnUrl(taxOfficeNumber: String, taxOfficeReference: String, instanceId: String): String = {
+    def encode(s: String) = URLEncoder.encode(s, StandardCharsets.UTF_8.name())
+
+    s"$cisFrontendBaseUrl$fileNilReturnPath" +
+      s"?taxOfficeNumber=${encode(taxOfficeNumber)}" +
+      s"&taxOfficeReference=${encode(taxOfficeReference)}" +
+      s"&instanceId=${encode(instanceId)}"
+  }
 
   lazy val cisTypeOfSubcontractorUrl: String = configuration.get[String]("urls.cis-contractor-frontend")
 }

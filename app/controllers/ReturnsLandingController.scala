@@ -42,30 +42,50 @@ class ReturnsLandingController @Inject() (
 
   def onPageLoad(instanceId: String): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-      val contractorNameOpt: Option[String] =
-        if (request.isAgent) {
+
+      val returnsList = Seq(
+        ReturnLandingViewModel("August 2025", "Standard", "19 September 2025", "Accepted"),
+        ReturnLandingViewModel("July 2025", "Nil", "19 August 2025", "Accepted"),
+        ReturnLandingViewModel("June 2025", "Standard", "18 July 2025", "Accepted")
+      )
+
+      if (request.isAgent) {
+        val clientOpt =
           for {
             clients <- request.userAnswers.get(AgentClientsPage)
             client  <- clients.find(_.uniqueId == instanceId)
-            name    <- client.schemeName
-          } yield name
-        } else {
-          request.userAnswers.get(ContractorNamePage)
+          } yield client
+
+        clientOpt match {
+          case Some(client) =>
+            client.schemeName match {
+              case Some(contractorName) =>
+                val standardReturnLink =
+                  appConfig.fileStandardReturnUrl(client.taxOfficeNumber, client.taxOfficeRef, instanceId)
+                val nilReturnLink      =
+                  appConfig.fileNilReturnUrl(client.taxOfficeNumber, client.taxOfficeRef, instanceId)
+                Ok(view(contractorName, returnsList, standardReturnLink, nilReturnLink))
+              case None                 =>
+                logger.warn(
+                  s"[ReturnsLandingController][onPageLoad] - Agent client scheme name missing for instanceId=$instanceId"
+                )
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
+          case None         =>
+            logger.warn(s"[ReturnsLandingController][onPageLoad] - Agent client missing for instanceId=$instanceId")
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
+      } else {
+        request.userAnswers.get(ContractorNamePage) match {
+          case Some(contractorName) =>
+            val standardReturnLink = appConfig.fileStandardReturnUrl
+            val nilReturnLink      = appConfig.fileNilReturnUrl
 
-      contractorNameOpt match {
-        case Some(contractorName) =>
-          val returnsList = Seq(
-            ReturnLandingViewModel("August 2025", "Standard", "19 September 2025", "Accepted"),
-            ReturnLandingViewModel("July 2025", "Nil", "19 August 2025", "Accepted"),
-            ReturnLandingViewModel("June 2025", "Standard", "18 July 2025", "Accepted")
-          )
-
-          Ok(view(contractorName, returnsList))
-
-        case None =>
-          logger.warn(s"[ReturnsLandingController] contractorName missing (isAgent=${request.isAgent})")
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            Ok(view(contractorName, returnsList, standardReturnLink, nilReturnLink))
+          case None                 =>
+            logger.warn(s"[ReturnsLandingController] - Contractor name missing (isAgent=false)")
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
       }
   }
 }

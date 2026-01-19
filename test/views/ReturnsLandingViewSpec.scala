@@ -17,6 +17,7 @@
 package views
 
 import base.SpecBase
+import config.FrontendAppConfig
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
@@ -30,7 +31,7 @@ class ReturnsLandingViewSpec extends SpecBase {
 
   "ReturnsLandingView" - {
     "must render the page with the correct html elements" in new Setup {
-      val html: HtmlFormat.Appendable = view(contractorName, returnsList)
+      val html: HtmlFormat.Appendable = view(contractorName, returnsList, standardReturnLink, nilReturnLink)
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.title                                 must include(messages("returnsLanding.title"))
@@ -77,11 +78,15 @@ class ReturnsLandingViewSpec extends SpecBase {
       play.api.i18n.Lang.defaultLang,
       app.injector.instanceOf[play.api.i18n.MessagesApi]
     )
+    implicit val appConfig: FrontendAppConfig     =
+      app.injector.instanceOf[FrontendAppConfig]
     val contractorName                            = "ABC Ltd..."
     val returnsList                               = Seq(
       ReturnLandingViewModel("August 2025", "Standard", "19 September 2025", "Accepted"),
       ReturnLandingViewModel("July 2025", "Nil", "19 August 2025", "Accepted"),
       ReturnLandingViewModel("June 2025", "Standard", "18 July 2025", "Accepted")
     )
+    val standardReturnLink: String                = appConfig.fileStandardReturnUrl
+    val nilReturnLink: String                     = appConfig.fileNilReturnUrl
   }
 }
