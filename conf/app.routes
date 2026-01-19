@@ -53,8 +53,8 @@ GET        /your-subcontractors/start/:taxOfficeNumber/:taxOfficeReference/:inst
 GET        /check-subcontractor-records/:taxOfficeNumber/:taxOfficeReference/:instanceId/:targetKey                             controllers.CheckSubcontractorRecordsController.onPageLoad(taxOfficeNumber: String, taxOfficeReference: String, instanceId: String, targetKey: String)
 POST       /check-subcontractor-records/:taxOfficeNumber/:taxOfficeReference/:instanceId/:targetKey                             controllers.CheckSubcontractorRecordsController.onSubmit(taxOfficeNumber: String, taxOfficeReference: String, instanceId: String, targetKey: String)
 
-GET        /automatic-subcontractor-update-unsuccessful             controllers.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId: String)
-POST       /automatic-subcontractor-update-unsuccessful             controllers.UnsuccessfulAutomaticSubcontractorUpdateController.onSubmit(instanceId: String)
+GET        /automatic-subcontractor-update-unsuccessful/:instanceId             controllers.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId: String)
+POST       /automatic-subcontractor-update-unsuccessful/:instanceId             controllers.UnsuccessfulAutomaticSubcontractorUpdateController.onSubmit(instanceId: String)
 
 GET        /automatic-subcontractor-update-successful/:instanceId/:targetKey               controllers.SuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId: String, targetKey: String)
 POST       /automatic-subcontractor-update-successful/:instanceId/:targetKey               controllers.SuccessfulAutomaticSubcontractorUpdateController.onSubmit(instanceId: String, targetKey: String)
