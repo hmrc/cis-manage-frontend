@@ -18,6 +18,5 @@
 
 @(text: String, href: String, headingClass: String = "govuk-heading-s")(implicit messages: Messages)
 
-<h3 class="@headingClass">
-  <a href="@href" class="govuk-link">@messages(text)</a>
-</h3>
+
+<a href="@href" class="govuk-link @headingClass">@messages(text)</a>
