@@ -56,8 +56,9 @@ class ReturnsLandingViewSpec extends SpecBase {
       doc.select("h2").text must include(messages("returnsLanding.recentCisReturns.h2"))
       doc.select("th").text must include(messages("returnsLanding.taxMonth.th"))
       doc.select("th").text must include(messages("returnsLanding.type.th"))
-      doc.select("th").text must include(messages("returnsLanding.dateSubmitted.th"))
+      doc.select("th").text must include(messages("returnsLanding.lastUpdated.th"))
       doc.select("th").text must include(messages("returnsLanding.status.th"))
+      doc.select("th").text must include(messages("site.delete"))
 
       doc.getElementsByClass("govuk-link").text must include(messages("returnsLanding.viewReturnsHistory.link"))
 

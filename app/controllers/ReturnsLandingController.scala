@@ -24,9 +24,16 @@ import play.api.Logging
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.ManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.ReturnLandingViewModel
 import views.html.ReturnsLandingView
+
+import java.time.LocalDateTime
+import java.time.format.{DateTimeFormatter, TextStyle}
+import java.util.Locale
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class ReturnsLandingController @Inject() (
   override val messagesApi: MessagesApi,
@@ -34,58 +41,87 @@ class ReturnsLandingController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: ReturnsLandingView
-)(implicit appConfig: FrontendAppConfig)
+  view: ReturnsLandingView,
+  service: ManageService
+)(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  def onPageLoad(instanceId: String): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(instanceId: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-
-      val returnsList = Seq(
-        ReturnLandingViewModel("August 2025", "Standard", "19 September 2025", "Accepted"),
-        ReturnLandingViewModel("July 2025", "Nil", "19 August 2025", "Accepted"),
-        ReturnLandingViewModel("June 2025", "Standard", "18 July 2025", "Accepted")
-      )
-
-      if (request.isAgent) {
-        val clientOpt =
+      val contractorNameOpt: Option[String] =
+        if (request.isAgent) {
           for {
             clients <- request.userAnswers.get(AgentClientsPage)
             client  <- clients.find(_.uniqueId == instanceId)
-          } yield client
+            name    <- client.schemeName
+          } yield name
+        } else {
+          request.userAnswers.get(ContractorNamePage)
+        }
+      val (standardReturnLink, nilReturnLink) =
+        if (request.isAgent) {
+          val clientOpt =
+            for {
+              clients <- request.userAnswers.get(AgentClientsPage)
+              client  <- clients.find(_.uniqueId == instanceId)
+            } yield client
 
-        clientOpt match {
-          case Some(client) =>
-            client.schemeName match {
-              case Some(contractorName) =>
-                val standardReturnLink =
-                  appConfig.fileStandardReturnUrl(client.taxOfficeNumber, client.taxOfficeRef, instanceId)
-                val nilReturnLink      =
-                  appConfig.fileNilReturnUrl(client.taxOfficeNumber, client.taxOfficeRef, instanceId)
-                Ok(view(contractorName, returnsList, standardReturnLink, nilReturnLink))
-              case None                 =>
-                logger.warn(
-                  s"[ReturnsLandingController][onPageLoad] - Agent client scheme name missing for instanceId=$instanceId"
-                )
-                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          clientOpt match {
+            case Some(client) =>
+              (
+                appConfig.fileStandardReturnUrl(client.taxOfficeNumber, client.taxOfficeRef, instanceId),
+                appConfig.fileNilReturnUrl(client.taxOfficeNumber, client.taxOfficeRef, instanceId)
+              )
+            case None         =>
+              logger.warn(s"[ReturnsLandingController][onPageLoad] - Agent client missing for instanceId=$instanceId")
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
+        } else {
+          (appConfig.fileStandardReturnUrl, appConfig.fileNilReturnUrl)
+        }
+
+      contractorNameOpt match {
+        case Some(contractorName) =>
+          service
+            .getUnsubmittedMonthlyReturns(instanceId)
+            .map { response =>
+              val returnsList: Seq[ReturnLandingViewModel] =
+                response.unsubmittedCisReturns.map { r =>
+                  ReturnLandingViewModel(
+                    taxMonth = formatPeriod(r.taxMonth, r.taxYear),
+                    returnType = r.returnType,
+                    dateSubmitted = formatLastUpdate(r.lastUpdate),
+                    status = r.status
+                  )
+                }
+
+              Ok(view(contractorName, returnsList, standardReturnLink, nilReturnLink))
             }
-          case None         =>
-            logger.warn(s"[ReturnsLandingController][onPageLoad] - Agent client missing for instanceId=$instanceId")
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
-      } else {
-        request.userAnswers.get(ContractorNamePage) match {
-          case Some(contractorName) =>
-            val standardReturnLink = appConfig.fileStandardReturnUrl
-            val nilReturnLink      = appConfig.fileNilReturnUrl
-
-            Ok(view(contractorName, returnsList, standardReturnLink, nilReturnLink))
-          case None                 =>
-            logger.warn(s"[ReturnsLandingController] - Contractor name missing (isAgent=false)")
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
+            .recover { case NonFatal(e) =>
+              logger.error(
+                s"[ReturnsLandingController] Error fetching unsubmitted returns for instanceId: $instanceId",
+                e
+              )
+              Redirect(controllers.routes.SystemErrorController.onPageLoad())
+            }
+        case None =>
+          logger.warn(s"[ReturnsLandingController] contractorName missing (isAgent=${request.isAgent})")
+          Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
       }
+    }
+
+  private def formatPeriod(taxMonth: Int, taxYear: Int): String = {
+    val monthName = java.time.Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)
+    s"$monthName $taxYear"
   }
+
+  private def formatLastUpdate(lastUpdate: Option[LocalDateTime]): String =
+    lastUpdate match {
+      case Some(dateTime) =>
+        dateTime.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK))
+      case None           => ""
+    }
+
 }
