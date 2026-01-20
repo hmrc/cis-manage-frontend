@@ -27,7 +27,7 @@ class HeadingLinkSpec extends SpecBase {
 
   "HeadingLink" - {
 
-    "render an h3 with the default class and a linked, translated text" in {
+    "render a link with the default class and translated text" in {
       implicit val msgs = messages(app)
 
       val html = template(
@@ -37,13 +37,10 @@ class HeadingLinkSpec extends SpecBase {
 
       val doc = Jsoup.parse(html.body)
 
-      val h3 = doc.selectFirst("h3")
-      h3               should not be null
-      h3.className() shouldBe "govuk-heading-s"
-
-      val a = h3.selectFirst("a.govuk-link")
+      val a = doc.selectFirst("a.govuk-link")
       a                should not be null
       a.attr("href") shouldBe "#"
+      a.className()  shouldBe "govuk-link govuk-heading-s"
       a.text()       shouldBe "test.nonexisting.key"
     }
 
@@ -58,12 +55,10 @@ class HeadingLinkSpec extends SpecBase {
 
       val doc = Jsoup.parse(html.body)
 
-      val h3 = doc.selectFirst("h3")
-      h3               should not be null
-      h3.className() shouldBe "govuk-heading-l"
-
-      val a = h3.selectFirst("a.govuk-link")
+      val a = doc.selectFirst("a.govuk-link")
+      a                should not be null
       a.attr("href") shouldBe "/path"
+      a.className()  shouldBe "govuk-link govuk-heading-l"
       a.text()       shouldBe "test.nonexisting.key"
     }
   }
