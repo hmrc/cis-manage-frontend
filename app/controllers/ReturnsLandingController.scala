@@ -24,9 +24,16 @@ import play.api.Logging
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.ManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.ReturnLandingViewModel
 import views.html.ReturnsLandingView
+
+import java.time.LocalDateTime
+import java.time.format.{DateTimeFormatter, TextStyle}
+import java.util.Locale
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class ReturnsLandingController @Inject() (
   override val messagesApi: MessagesApi,
@@ -34,13 +41,14 @@ class ReturnsLandingController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: ReturnsLandingView
-)(implicit appConfig: FrontendAppConfig)
+  view: ReturnsLandingView,
+  service: ManageService
+)(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  def onPageLoad(instanceId: String): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(instanceId: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       val contractorNameOpt: Option[String] =
         if (request.isAgent) {
@@ -55,17 +63,45 @@ class ReturnsLandingController @Inject() (
 
       contractorNameOpt match {
         case Some(contractorName) =>
-          val returnsList = Seq(
-            ReturnLandingViewModel("August 2025", "Standard", "19 September 2025", "Accepted"),
-            ReturnLandingViewModel("July 2025", "Nil", "19 August 2025", "Accepted"),
-            ReturnLandingViewModel("June 2025", "Standard", "18 July 2025", "Accepted")
-          )
+          service
+            .getUnsubmittedMonthlyReturns(instanceId)
+            .map { response =>
+              val returnsList: Seq[ReturnLandingViewModel] =
+                response.unsubmittedCisReturns.map { r =>
+                  ReturnLandingViewModel(
+                    taxMonth = formatPeriod(r.taxMonth, r.taxYear),
+                    returnType = r.returnType,
+                    dateSubmitted = formatLastUpdate(r.lastUpdate),
+                    status = r.status
+                  )
+                }
 
-          Ok(view(contractorName, returnsList))
+              Ok(view(contractorName, returnsList))
+            }
+            .recover { case NonFatal(e) =>
+              logger.error(
+                s"[ReturnsLandingController] Error fetching unsubmitted returns for instanceId: $instanceId",
+                e
+              )
+              Redirect(controllers.routes.SystemErrorController.onPageLoad())
+            }
 
         case None =>
           logger.warn(s"[ReturnsLandingController] contractorName missing (isAgent=${request.isAgent})")
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
       }
   }
+
+  private def formatPeriod(taxMonth: Int, taxYear: Int): String = {
+    val monthName = java.time.Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)
+    s"$monthName $taxYear"
+  }
+
+  private def formatLastUpdate(lastUpdate: Option[LocalDateTime]): String =
+    lastUpdate match {
+      case Some(dateTime) =>
+        dateTime.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK))
+      case None           => ""
+    }
+
 }

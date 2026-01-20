@@ -16,15 +16,23 @@
 
 package controllers
 
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import base.SpecBase
 import config.FrontendAppConfig
-import models.{CisTaxpayerSearchResult, UserAnswers}
+import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, UnsubmittedMonthlyReturnsRow, UserAnswers}
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{AgentClientsPage, CisIdPage, ContractorNamePage}
+import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import services.ManageService
+import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.ReturnLandingViewModel
 import views.html.ReturnsLandingView
+
+import java.time.LocalDateTime
+import scala.concurrent.Future
 
 class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
 
@@ -36,6 +44,14 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
     ReturnLandingViewModel("August 2025", "Standard", "19 September 2025", "Accepted"),
     ReturnLandingViewModel("July 2025", "Nil", "19 August 2025", "Accepted"),
     ReturnLandingViewModel("June 2025", "Standard", "18 July 2025", "Accepted")
+  )
+
+  private val unsubmittedResponse = UnsubmittedMonthlyReturnsResponse(
+    unsubmittedCisReturns = Seq(
+      UnsubmittedMonthlyReturnsRow(2025, 8, "Standard", "Accepted", Some(LocalDateTime.parse("2025-09-19T00:00:00"))),
+      UnsubmittedMonthlyReturnsRow(2025, 7, "Nil", "Accepted", Some(LocalDateTime.parse("2025-08-19T00:00:00"))),
+      UnsubmittedMonthlyReturnsRow(2025, 6, "Standard", "Accepted", Some(LocalDateTime.parse("2025-07-18T00:00:00")))
+    )
   )
 
   "ReturnsLandingController.onPageLoad (contractor)" - {
@@ -50,9 +66,16 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
+      val mockManageService = mock[ManageService]
+      when(mockManageService.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(unsubmittedResponse))
+
       val application =
         applicationBuilder(
-          userAnswers = Some(userAnswers)
+          userAnswers = Some(userAnswers),
+          additionalBindings = Seq(
+            inject.bind[ManageService].toInstance(mockManageService)
+          )
         ).build()
 
       running(application) {
@@ -73,16 +96,21 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecoveryController when ContractorNamePage is missing" in {
+    "must redirect to SystemErrorController when ContractorNamePage is missing" in {
       val userAnswers: UserAnswers =
         userAnswersWithCisId
           .set(CisIdPage, instanceId)
           .success
           .value
 
+      val mockManageService = mock[ManageService]
+
       val application =
         applicationBuilder(
-          userAnswers = Some(userAnswers)
+          userAnswers = Some(userAnswers),
+          additionalBindings = Seq(
+            inject.bind[ManageService].toInstance(mockManageService)
+          )
         ).build()
 
       running(application) {
@@ -96,7 +124,43 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
+          controllers.routes.SystemErrorController.onPageLoad().url
+      }
+    }
+
+    "must redirect to SystemErrorController when ManageService throws a NonFatal exception" in {
+      val userAnswers: UserAnswers =
+        userAnswersWithCisId
+          .set(CisIdPage, instanceId)
+          .success
+          .value
+          .set(ContractorNamePage, contractorName)
+          .success
+          .value
+
+      val mockManageService = mock[ManageService]
+      when(mockManageService.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers),
+          additionalBindings = Seq(
+            inject.bind[ManageService].toInstance(mockManageService)
+          )
+        ).build()
+
+      running(application) {
+        val request = FakeRequest(
+          GET,
+          controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url
+        )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe
+          controllers.routes.SystemErrorController.onPageLoad().url
       }
     }
   }
@@ -119,10 +183,17 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
+      val mockManageService = mock[ManageService]
+      when(mockManageService.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(unsubmittedResponse))
+
       val application =
         applicationBuilder(
           userAnswers = Some(userAnswers),
-          isAgent = true
+          isAgent = true,
+          additionalBindings = Seq(
+            inject.bind[ManageService].toInstance(mockManageService)
+          )
         ).build()
 
       running(application) {
@@ -144,7 +215,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecoveryController when no matching client or schemeName is found" in {
+    "must redirect to SystemErrorController when no matching client or schemeName is found" in {
       val otherClient = CisTaxpayerSearchResult(
         uniqueId = "OTHER-ID",
         taxOfficeNumber = "163",
@@ -160,10 +231,15 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
+      val mockManageService = mock[ManageService]
+
       val applicationNoMatch =
         applicationBuilder(
           userAnswers = Some(userAnswersNoMatch),
-          isAgent = true
+          isAgent = true,
+          additionalBindings = Seq(
+            inject.bind[ManageService].toInstance(mockManageService)
+          )
         ).build()
 
       running(applicationNoMatch) {
@@ -177,7 +253,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
+          controllers.routes.SystemErrorController.onPageLoad().url
       }
 
       val clientNoName = CisTaxpayerSearchResult(
@@ -198,7 +274,10 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
       val applicationNoName =
         applicationBuilder(
           userAnswers = Some(userAnswersNoName),
-          isAgent = true
+          isAgent = true,
+          additionalBindings = Seq(
+            inject.bind[ManageService].toInstance(mockManageService)
+          )
         ).build()
 
       running(applicationNoName) {
@@ -212,7 +291,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
+          controllers.routes.SystemErrorController.onPageLoad().url
       }
     }
   }

@@ -14,6 +14,7 @@ site.govuk = GOV.UK
 site.pagination.landmark = Pagination
 site.pagination.previous = Previous
 site.pagination.next = Next
+site.delete = Delete
 
 date.day = Day
 date.month = Month
@@ -317,7 +318,7 @@ returnsLanding.noticeAndStatements.p1 = View HMRC notices, penalty warnings and 
 returnsLanding.recentCisReturns.h2 = Recent CIS returns
 returnsLanding.taxMonth.th = Tax month
 returnsLanding.type.th = Type
-returnsLanding.dateSubmitted.th = Date submitted
+returnsLanding.lastUpdated.th = Last updated
 returnsLanding.status.th = Status
 returnsLanding.viewReturnsHistory.link = View returns history
 returnsLanding.aside.h2 = Help and guidance
@@ -325,6 +326,7 @@ returnsLanding.aside.link1 = What is the Construction Industry Scheme
 returnsLanding.aside.link2 = CIS monthly returns guidance
 returnsLanding.aside.link3 = CIS 340: Penalties for late returns
 returnsLanding.aside.link4 = Understanding CIS penalties
+returnsLanding.noUnsubmittedReturns = There are no unsubmitted Monthly Returns to view
 
 subcontractorsLandingPage.title = Manage your CIS return subcontractor
 subcontractorsLandingPage.heading = Manage your CIS return subcontractor

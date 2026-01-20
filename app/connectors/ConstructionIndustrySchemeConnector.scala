@@ -16,7 +16,7 @@
 
 package connectors
 
-import models.{CisTaxpayer, CisTaxpayerSearchResult, GetClientListStatusResponse, Scheme}
+import models.{CisTaxpayer, CisTaxpayerSearchResult, GetClientListStatusResponse, Scheme, UnsubmittedMonthlyReturnsResponse}
 import play.api.Logging
 import play.api.libs.json.{JsObject, JsValue, Json}
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -120,4 +120,11 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
             throw UpstreamErrorResponse(resp.body, other, other)
         }
       }
+
+  def getUnsubmittedMonthlyReturns(
+    instanceId: String
+  )(implicit hc: HeaderCarrier): Future[UnsubmittedMonthlyReturnsResponse] =
+    http
+      .get(url"$cisBaseUrl/monthly-returns/unsubmitted/$instanceId")
+      .execute[UnsubmittedMonthlyReturnsResponse]
 }
