@@ -99,13 +99,13 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
         val paginationService = app.injector.instanceOf[PaginationService]
 
         val filtered         = ClientListViewModel.filterByField("", "", allVm)
-        val sorted           = ClientListViewModel.sortClients(filtered, None, None)
+        val sorted           = ClientListViewModel.sortClients(filtered, Some("clientName"), Some("descending"))
         val paginationResult = paginationService.paginateClientList(
           sorted,
           1,
           onPageLoadRoute,
-          None,
-          None
+          Some("clientName"),
+          Some("descending")
         )
 
         status(result) mustBe OK
@@ -115,8 +115,7 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
             SearchByList.searchByOptions,
             paginationResult.paginatedData,
             paginationResult.paginationViewModel,
-            None,
-            None
+            Some("clientName"), Some("descending")
           )(req, messages(app)).toString
       }
     }
@@ -134,13 +133,13 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
         val prepared         = form.fill(ClientListFormData("CN", "ABC"))
         val filtered         = ClientListViewModel.filterByField("CN", "ABC", allVm)
-        val sorted           = ClientListViewModel.sortClients(filtered, None, None)
+        val sorted           = ClientListViewModel.sortClients(filtered, Some("clientName"), Some("descending"))
         val paginationResult = paginationService.paginateClientList(
           sorted,
           1,
           onPageLoadRoute,
-          None,
-          None
+          Some("clientName"),
+          Some("descending")
         )
 
         status(result) mustBe OK
@@ -150,8 +149,8 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
             SearchByList.searchByOptions,
             paginationResult.paginatedData,
             paginationResult.paginationViewModel,
-            None,
-            None
+            Some("clientName"),
+            Some("descending")
           )(req, messages(app)).toString
       }
     }
