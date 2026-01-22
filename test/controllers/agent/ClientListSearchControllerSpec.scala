@@ -98,13 +98,13 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
         val paginationService = app.injector.instanceOf[PaginationService]
 
         val filtered         = ClientListViewModel.filterByField("", "", allVm)
-        val sorted           = ClientListViewModel.sortClients(filtered, Some("clientName"), Some("descending"))
+        val sorted           = ClientListViewModel.sortClients(filtered, Some("clientName"), Some("ascending"))
         val paginationResult = paginationService.paginateClientList(
           sorted,
           1,
           onPageLoadRoute,
           Some("clientName"),
-          Some("descending")
+          Some("ascending")
         )
 
         status(result) mustBe OK
@@ -115,7 +115,7 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
             paginationResult.paginatedData,
             paginationResult.paginationViewModel,
             Some("clientName"),
-            Some("descending")
+            Some("ascending")
           )(req, messages(app)).toString
       }
     }
@@ -133,13 +133,13 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
         val prepared         = form.fill(ClientListFormData("CN", "ABC"))
         val filtered         = ClientListViewModel.filterByField("CN", "ABC", allVm)
-        val sorted           = ClientListViewModel.sortClients(filtered, Some("clientName"), Some("descending"))
+        val sorted           = ClientListViewModel.sortClients(filtered, Some("clientName"), Some("ascending"))
         val paginationResult = paginationService.paginateClientList(
           sorted,
           1,
           onPageLoadRoute,
           Some("clientName"),
-          Some("descending")
+          Some("ascending")
         )
 
         status(result) mustBe OK
@@ -150,7 +150,7 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
             paginationResult.paginatedData,
             paginationResult.paginationViewModel,
             Some("clientName"),
-            Some("descending")
+            Some("ascending")
           )(req, messages(app)).toString
       }
     }

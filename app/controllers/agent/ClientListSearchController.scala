@@ -62,7 +62,7 @@ class ClientListSearchController @Inject() (
         HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       val sortBy      = request.getQueryString("sortBy").orElse(Some("clientName"))
-      val sortOrder   = request.getQueryString("sortOrder").orElse(Some("descending"))
+      val sortOrder   = request.getQueryString("sortOrder").orElse(Some("ascending"))
       val pageParam   = request.getQueryString("page")
       val currentPage = pageParam.flatMap(_.toIntOption).getOrElse(1)
       val pageToUse   = if ((sortBy.isDefined || sortOrder.isDefined) && pageParam.isEmpty) 1 else currentPage
