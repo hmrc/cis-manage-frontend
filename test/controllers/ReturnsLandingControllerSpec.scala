@@ -103,7 +103,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to SystemErrorController when ManageService returns None OR fails" in {
+    "must redirect to SystemErrorController when ManageService returns None" in {
       val mockManageService = mock[ManageService]
 
       when(
@@ -113,6 +113,32 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
           any[Boolean]
         )(using any[HeaderCarrier])
       ).thenReturn(Future.successful(None))
+
+      val app =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithCisId),
+          additionalBindings = Seq(bind[ManageService].toInstance(mockManageService))
+        ).build()
+
+      running(app) {
+        val req = FakeRequest(GET, controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url)
+        val res = route(app, req).value
+
+        status(res) mustBe SEE_OTHER
+        redirectLocation(res).value mustBe controllers.routes.SystemErrorController.onPageLoad().url
+      }
+    }
+
+    "must redirect to SystemErrorController when ManageService fails" in {
+      val mockManageService = mock[ManageService]
+
+      when(
+        mockManageService.buildReturnsLandingContext(
+          eqTo(instanceId),
+          any[UserAnswers],
+          any[Boolean]
+        )(using any[HeaderCarrier])
+      ).thenReturn(Future.failed(new RuntimeException("boom")))
 
       val app =
         applicationBuilder(

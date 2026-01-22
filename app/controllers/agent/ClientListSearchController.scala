@@ -32,7 +32,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import viewmodels.agent.{ClientListViewModel, SearchByList}
-import viewmodels.govuk.PaginationFluency.*
 import views.html.agent.ClientListSearchView
 
 import javax.inject.{Inject, Named}
