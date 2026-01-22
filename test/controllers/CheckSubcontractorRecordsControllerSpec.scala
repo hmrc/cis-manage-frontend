@@ -136,7 +136,6 @@ class CheckSubcontractorRecordsControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[CheckSubcontractorRecordsView]
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).isDefined mustEqual true
@@ -179,7 +178,6 @@ class CheckSubcontractorRecordsControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[CheckSubcontractorRecordsView]
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).isDefined mustEqual true
