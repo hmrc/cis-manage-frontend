@@ -32,7 +32,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import viewmodels.agent.{ClientListViewModel, SearchByList}
-import viewmodels.govuk.PaginationFluency.*
 import views.html.agent.ClientListSearchView
 
 import javax.inject.{Inject, Named}
@@ -116,30 +115,11 @@ class ClientListSearchController @Inject() (
 
       manageService
         .resolveAndStoreAgentClients(request.userAnswers)
-        .flatMap { case (cisClients, uaWithClients) =>
-          val allClientsVm = ClientListViewModel.fromCisClients(cisClients)
-
-          val paginationResult = paginationService.paginateClientList(
-            allClients = allClientsVm,
-            currentPage = 1,
-            baseUrl = routes.ClientListSearchController.onPageLoad().url,
-            sortBy = None,
-            sortOrder = None
-          )
-
+        .flatMap { case (_, uaWithClients) =>
           for {
             updatedAnswers <- Future.fromTry(uaWithClients.remove(ClientListSearchPage))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Ok(
-            view(
-              form,
-              SearchByList.searchByOptions,
-              paginationResult.paginatedData,
-              paginationResult.paginationViewModel,
-              None,
-              None
-            )
-          )
+          } yield Redirect(routes.ClientListSearchController.onPageLoad())
         }
         .recover { case e =>
           logger.error(s"[ClientListSearchController][clearFilter] failed: ${e.getMessage}", e)

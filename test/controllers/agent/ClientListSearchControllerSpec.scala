@@ -24,17 +24,16 @@ import models.{CisTaxpayerSearchResult, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import pages.ClientListSearchPage
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.agent.ClientListSearchView
-import pages.ClientListSearchPage
 import services.{ManageService, PaginationService}
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.agent.{ClientListViewModel, SearchByList}
-import viewmodels.govuk.PaginationFluency._
+import views.html.agent.ClientListSearchView
 
 import scala.concurrent.Future
 
@@ -115,7 +114,8 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
             SearchByList.searchByOptions,
             paginationResult.paginatedData,
             paginationResult.paginationViewModel,
-            Some("clientName"), Some("descending")
+            Some("clientName"),
+            Some("descending")
           )(req, messages(app)).toString
       }
     }
@@ -238,30 +238,12 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
       "must remove form data from user answers and display the client list search page" in {
         val app = appWith()
         running(app) {
-          val req               = FakeRequest(GET, clearFilterRoute)
-          val result            = route(app, req).value
-          val view              = app.injector.instanceOf[ClientListSearchView]
-          val paginationService = app.injector.instanceOf[PaginationService]
+          val req    = FakeRequest(GET, clearFilterRoute)
+          val result = route(app, req).value
 
-          val sorted           = ClientListViewModel.sortClients(allVm, None, None)
-          val paginationResult = paginationService.paginateClientList(
-            sorted,
-            1,
-            onPageLoadRoute,
-            None,
-            None
-          )
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe onPageLoadRoute
 
-          status(result) mustBe OK
-          contentAsString(result) mustBe
-            view(
-              form,
-              SearchByList.searchByOptions,
-              paginationResult.paginatedData,
-              paginationResult.paginationViewModel,
-              None,
-              None
-            )(req, messages(app)).toString
         }
       }
     }
