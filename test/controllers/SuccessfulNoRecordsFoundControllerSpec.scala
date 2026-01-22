@@ -80,7 +80,7 @@ class SuccessfulNoRecordsFoundControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to journey recovery if prepopSuccessful is 'Y'" in {
+    "must redirect to journey recovery if prepopSuccessful is 'N'" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
@@ -148,6 +148,113 @@ class SuccessfulNoRecordsFoundControllerSpec extends SpecBase {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).isDefined mustEqual true
         redirectLocation(result).value mustEqual "/system-error/there-is-a-problem"
+      }
+    }
+
+    "must redirect to SubcontractorsLandingPageController on submit with subcontractors target" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(
+          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider)
+        )
+        .build()
+
+      val instanceId = "900001"
+      val targetKey  = "subcontractors"
+
+      running(application) {
+        val request = FakeRequest(
+          POST,
+          routes.SuccessfulNoRecordsFoundController.onSubmit(instanceId, targetKey).url
+        )
+
+        when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
+          .thenReturn(new FakeAuthorizedForSchemeAction)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.SubcontractorsLandingPageController.onPageLoad(instanceId).url
+      }
+    }
+
+    "must redirect to ReturnsLandingController on submit with returns target" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(
+          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider)
+        )
+        .build()
+
+      val instanceId = "900001"
+      val targetKey  = "returnDue"
+
+      running(application) {
+        val request = FakeRequest(
+          POST,
+          routes.SuccessfulNoRecordsFoundController.onSubmit(instanceId, targetKey).url
+        )
+
+        when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
+          .thenReturn(new FakeAuthorizedForSchemeAction)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.ReturnsLandingController.onPageLoad(instanceId).url
+      }
+    }
+
+    "must redirect to JourneyRecoveryController on submit with notices target" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(
+          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider)
+        )
+        .build()
+
+      val instanceId = "900001"
+      val targetKey  = "newNotices"
+
+      running(application) {
+        val request = FakeRequest(
+          POST,
+          routes.SuccessfulNoRecordsFoundController.onSubmit(instanceId, targetKey).url
+        )
+
+        when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
+          .thenReturn(new FakeAuthorizedForSchemeAction)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return NotFound on submit with unknown target" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(
+          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider)
+        )
+        .build()
+
+      val instanceId = "900001"
+      val targetKey  = "unknownTarget"
+
+      running(application) {
+        val request = FakeRequest(
+          POST,
+          routes.SuccessfulNoRecordsFoundController.onSubmit(instanceId, targetKey).url
+        )
+
+        when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
+          .thenReturn(new FakeAuthorizedForSchemeAction)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual NOT_FOUND
       }
     }
   }

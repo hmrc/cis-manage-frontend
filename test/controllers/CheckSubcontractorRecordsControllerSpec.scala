@@ -186,5 +186,32 @@ class CheckSubcontractorRecordsControllerSpec extends SpecBase {
         redirectLocation(result).value mustEqual "/system-error/there-is-a-problem"
       }
     }
+
+    "must redirect to RetrievingSubcontractorsController on submit" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .build()
+
+      val taxOfficeNumber    = "101"
+      val taxOfficeReference = "AB0001"
+      val instanceId         = "900001"
+      val targetKey          = "subcontractors"
+
+      running(application) {
+        val request = FakeRequest(
+          POST,
+          routes.CheckSubcontractorRecordsController
+            .onSubmit(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
+            .url
+        )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.RetrievingSubcontractorsController
+          .onPageLoad(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
+          .url
+      }
+    }
   }
 }

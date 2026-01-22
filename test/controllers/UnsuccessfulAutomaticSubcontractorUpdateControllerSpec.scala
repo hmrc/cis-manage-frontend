@@ -156,5 +156,31 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
         redirectLocation(result).value mustEqual "/system-error/there-is-a-problem"
       }
     }
+
+    "must redirect to AddContractorDetailsController on submit" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(
+          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider)
+        )
+        .build()
+
+      val instanceId = "900001"
+
+      running(application) {
+        val request = FakeRequest(
+          POST,
+          routes.UnsuccessfulAutomaticSubcontractorUpdateController.onSubmit(instanceId).url
+        )
+
+        when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
+          .thenReturn(new FakeAuthorizedForSchemeAction)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.AddContractorDetailsController.onPageLoad().url
+      }
+    }
   }
 }
