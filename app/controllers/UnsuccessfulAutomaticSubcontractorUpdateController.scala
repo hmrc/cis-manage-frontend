@@ -20,8 +20,11 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.UnsuccessfulAutomaticSubcontractorUpdateView
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{AuthorizedForSchemeActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import services.PrepopService
+
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class UnsuccessfulAutomaticSubcontractorUpdateController @Inject() (
   override val messagesApi: MessagesApi,
@@ -29,17 +32,27 @@ class UnsuccessfulAutomaticSubcontractorUpdateController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: UnsuccessfulAutomaticSubcontractorUpdateView
-) extends FrontendBaseController
+  view: UnsuccessfulAutomaticSubcontractorUpdateView,
+  requireSchemeAccess: AuthorizedForSchemeActionProvider,
+  service: PrepopService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      Ok(view())
+  def onPageLoad(instanceId: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireSchemeAccess(instanceId)).async { implicit request =>
+      service.getScheme(instanceId).map {
+        case None                                                  =>
+          Redirect(routes.SystemErrorController.onPageLoad())
+        case Some(scheme) if scheme.prePopSuccessful.contains("Y") =>
+          Redirect(routes.JourneyRecoveryController.onPageLoad())
+        case _                                                     =>
+          Ok(view(instanceId))
+      }
     }
 
-  def onSubmit: Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+  def onSubmit(instanceId: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireSchemeAccess(instanceId)) { implicit request =>
       Redirect(controllers.routes.AddContractorDetailsController.onPageLoad())
     }
 
