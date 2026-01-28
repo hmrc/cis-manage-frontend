@@ -45,15 +45,15 @@ class ManageService @Inject() (
       case Some(cisId) => Future.successful((cisId, ua))
       case None        =>
         logger.info("[resolveAndStoreCisId] cache-miss: fetching CIS taxpayer from backend")
-        cisConnector.getCisTaxpayer().flatMap { tp =>
-          logger.info(s"[resolveAndStoreCisId] taxpayer payload:\n${Json.prettyPrint(Json.toJson(tp))}")
-          val cisId = tp.uniqueId.trim
+        cisConnector.getCisTaxpayer().flatMap { taxpayer =>
+          logger.info(s"[resolveAndStoreCisId] taxpayer payload:\n${Json.prettyPrint(Json.toJson(taxpayer))}")
+          val cisId = taxpayer.uniqueId.trim
           if (cisId.isEmpty) {
             Future.failed(new RuntimeException("Empty cisId (uniqueId) returned from /cis/taxpayer"))
           } else {
-            val contractorName = tp.schemeName.getOrElse("")
-            val employerRef    = s"${tp.taxOfficeNumber}/${tp.taxOfficeRef}"
-            val utr            = tp.utr.getOrElse("")
+            val contractorName = taxpayer.schemeName.getOrElse("")
+            val employerRef    = s"${taxpayer.taxOfficeNumber}/${taxpayer.taxOfficeRef}"
+            val utr            = taxpayer.utr.getOrElse("")
             for {
               ua1 <- Future.fromTry(ua.set(CisIdPage, cisId))
               ua2 <- Future.fromTry(ua1.set(ContractorNamePage, contractorName))

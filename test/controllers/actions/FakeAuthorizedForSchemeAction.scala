@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,11 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@this()
+package controllers.actions
 
-@(text: String, href: String, headingClass: String = "govuk-heading-s")(implicit messages: Messages)
+import models.requests.DataRequest
+import play.api.mvc.*
 
+import scala.concurrent.ExecutionContext.global
+import scala.concurrent.{ExecutionContext, Future}
 
-<a href="@href" class="govuk-link @headingClass">@messages(text)</a>
+class FakeAuthorizedForSchemeAction extends AuthorizedForSchemeAction {
+
+  override def refine[A](request: DataRequest[A]): Future[Either[Result, DataRequest[A]]] =
+    Future.successful(Right(request))
+
+  override protected def executionContext: ExecutionContext = global
+}
