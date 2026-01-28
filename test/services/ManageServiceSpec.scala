@@ -16,10 +16,11 @@
 
 package services
 
+import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.{CisTaxpayer, CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, UnsubmittedMonthlyReturnsRow, UserAnswers}
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
@@ -30,12 +31,14 @@ import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.agent.AgentLandingViewModel
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Failure
 
 class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val hc: HeaderCarrier            = HeaderCarrier()
+  implicit val ec: ExecutionContext         = global
+  implicit val appConfig: FrontendAppConfig = mock(classOf[FrontendAppConfig])
 
   private def newService(): (ManageService, ConstructionIndustrySchemeConnector, SessionRepository) = {
     val connector   = mock(classOf[ConstructionIndustrySchemeConnector])
@@ -389,6 +392,82 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       ex mustBe boom
 
       verify(connector).getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+  }
+
+  "buildReturnsLandingContext" should {
+
+    "return Some(context) for agent when name + client exist and connector returns returns" in {
+      val (service, connector, sessionRepo) = newService()
+
+      when(appConfig.fileStandardReturnUrl(any[String], any[String], any[String])).thenReturn("/standard")
+      when(appConfig.fileNilReturnUrl(any[String], any[String], any[String])).thenReturn("/nil")
+
+      val instanceId = "CLIENT-123"
+      val client     = createClient(id = instanceId).copy(schemeName = Some("Client Ltd"))
+
+      val ua = UserAnswers("test-user").set(AgentClientsPage, List(client)).get
+
+      val resp = UnsubmittedMonthlyReturnsResponse(Nil)
+      when(connector.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(resp))
+
+      val context = service.buildReturnsLandingContext(instanceId, ua, isAgent = true).futureValue
+
+      context.isDefined mustBe true
+      context.get.contractorName mustBe "Client Ltd"
+      context.get.standardReturnLink mustBe "/standard"
+      context.get.nilReturnLink mustBe "/nil"
+
+      verify(connector).getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+
+    "return None for agent when client missing" in {
+      val (service, connector, sessionRepo) = newService()
+
+      val ua = UserAnswers("test-user").set(AgentClientsPage, List(createClient("OTHER"))).get
+
+      val context = service.buildReturnsLandingContext("CLIENT-123", ua, isAgent = true).futureValue
+      context mustBe None
+
+      verifyNoInteractions(connector)
+      verifyNoInteractions(sessionRepo)
+    }
+
+    "return Some(context) for org when ContractorNamePage exists" in {
+      val (service, connector, sessionRepo) = newService()
+
+      when(appConfig.fileStandardReturnUrl).thenReturn("/standard-org")
+      when(appConfig.fileNilReturnUrl).thenReturn("/nil-org")
+
+      val ua = UserAnswers("test-user").set(ContractorNamePage, "Org Ltd").get
+
+      val resp = UnsubmittedMonthlyReturnsResponse(Nil)
+      when(connector.getUnsubmittedMonthlyReturns(eqTo("CIS-123"))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(resp))
+
+      val context = service.buildReturnsLandingContext("CIS-123", ua, isAgent = false).futureValue
+
+      context.isDefined mustBe true
+      context.get.contractorName mustBe "Org Ltd"
+      context.get.standardReturnLink mustBe "/standard-org"
+      context.get.nilReturnLink mustBe "/nil-org"
+
+      verify(connector).getUnsubmittedMonthlyReturns(eqTo("CIS-123"))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+
+    "return None for org when ContractorNamePage missing" in {
+      val (service, connector, sessionRepo) = newService()
+
+      val ua = UserAnswers("test-user")
+
+      val context = service.buildReturnsLandingContext("CIS-123", ua, isAgent = false).futureValue
+      context mustBe None
+
+      verifyNoInteractions(connector)
       verifyNoInteractions(sessionRepo)
     }
   }

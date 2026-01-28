@@ -16,6 +16,7 @@
 
 package services
 
+import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, UserAnswers}
 import pages.*
@@ -23,8 +24,12 @@ import play.api.Logging
 import play.api.libs.json.Json
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
+import viewmodels.{ReturnLandingViewModel, ReturnsLandingContext}
 import viewmodels.agent.AgentLandingViewModel
 
+import java.time.LocalDateTime
+import java.time.format.{DateTimeFormatter, TextStyle}
+import java.util.Locale
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -32,7 +37,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ManageService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector,
   sessionRepository: SessionRepository
-)(implicit ec: ExecutionContext)
+)(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends Logging {
 
   def resolveAndStoreCisId(ua: UserAnswers)(implicit hc: HeaderCarrier): Future[(String, UserAnswers)] =
@@ -110,4 +115,66 @@ class ManageService @Inject() (
     hc: HeaderCarrier
   ): Future[UnsubmittedMonthlyReturnsResponse] =
     cisConnector.getUnsubmittedMonthlyReturns(instanceId)
+
+  def buildReturnsLandingContext(
+    instanceId: String,
+    userAnswers: UserAnswers,
+    isAgent: Boolean
+  )(using hc: HeaderCarrier): Future[Option[ReturnsLandingContext]] = {
+    val contractorNameOpt: Option[String] =
+      if (isAgent) {
+        for {
+          clients <- userAnswers.get(AgentClientsPage)
+          client  <- clients.find(_.uniqueId == instanceId)
+          name    <- client.schemeName
+        } yield name
+      } else {
+        userAnswers.get(ContractorNamePage)
+      }
+
+    val linksOpt: Option[(String, String)] =
+      if (isAgent) {
+        for {
+          clients <- userAnswers.get(AgentClientsPage)
+          client  <- clients.find(_.uniqueId == instanceId)
+        } yield (
+          appConfig.fileStandardReturnUrl(client.taxOfficeNumber, client.taxOfficeRef, instanceId),
+          appConfig.fileNilReturnUrl(client.taxOfficeNumber, client.taxOfficeRef, instanceId)
+        )
+      } else {
+        Some((appConfig.fileStandardReturnUrl, appConfig.fileNilReturnUrl))
+      }
+
+    (contractorNameOpt, linksOpt) match {
+      case (Some(name), Some((standardLink, nilLink))) =>
+        getUnsubmittedMonthlyReturns(instanceId).map { response =>
+          val returnsList =
+            response.unsubmittedCisReturns.map { r =>
+              ReturnLandingViewModel(
+                taxMonth = formatPeriod(r.taxMonth, r.taxYear),
+                returnType = r.returnType,
+                dateSubmitted = formatLastUpdate(r.lastUpdate),
+                status = r.status
+              )
+            }
+
+          Some(ReturnsLandingContext(name, standardLink, nilLink, returnsList))
+        }
+
+      case _ =>
+        Future.successful(None)
+    }
+  }
+
+  private def formatPeriod(taxMonth: Int, taxYear: Int): String = {
+    val monthName = java.time.Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)
+    s"$monthName $taxYear"
+  }
+
+  private def formatLastUpdate(lastUpdate: Option[LocalDateTime]): String =
+    lastUpdate match {
+      case Some(dateTime) =>
+        dateTime.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK))
+      case None           => ""
+    }
 }

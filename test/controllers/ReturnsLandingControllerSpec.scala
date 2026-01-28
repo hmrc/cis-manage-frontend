@@ -18,280 +18,140 @@ package controllers
 
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import base.SpecBase
-import config.FrontendAppConfig
-import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, UnsubmittedMonthlyReturnsRow, UserAnswers}
-import org.mockito.Mockito.when
+import models.UserAnswers
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{AgentClientsPage, CisIdPage, ContractorNamePage}
-import play.api.inject
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.ManageService
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.ReturnLandingViewModel
-import views.html.ReturnsLandingView
-
-import java.time.LocalDateTime
+import viewmodels.{ReturnLandingViewModel, ReturnsLandingContext}
 import scala.concurrent.Future
 
 class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
 
-  private val instanceId      = "CIS-123"
-  private val contractorName  = "ABC Construction Ltd"
-  private val agentClientName = "Client Ltd"
+  private val instanceId = "CIS-123"
 
-  private val returnsList = Seq(
-    ReturnLandingViewModel("August 2025", "Standard", "19 September 2025", "Accepted"),
-    ReturnLandingViewModel("July 2025", "Nil", "19 August 2025", "Accepted"),
-    ReturnLandingViewModel("June 2025", "Standard", "18 July 2025", "Accepted")
-  )
-
-  private val unsubmittedResponse = UnsubmittedMonthlyReturnsResponse(
-    unsubmittedCisReturns = Seq(
-      UnsubmittedMonthlyReturnsRow(2025, 8, "Standard", "Accepted", Some(LocalDateTime.parse("2025-09-19T00:00:00"))),
-      UnsubmittedMonthlyReturnsRow(2025, 7, "Nil", "Accepted", Some(LocalDateTime.parse("2025-08-19T00:00:00"))),
-      UnsubmittedMonthlyReturnsRow(2025, 6, "Standard", "Accepted", Some(LocalDateTime.parse("2025-07-18T00:00:00")))
+  private val context = ReturnsLandingContext(
+    contractorName = "ABC Construction Ltd",
+    standardReturnLink = "/standard-link",
+    nilReturnLink = "/nil-link",
+    returnsList = Seq(
+      ReturnLandingViewModel("August 2025", "Standard", "19 September 2025", "In progress"),
+      ReturnLandingViewModel("July 2025", "Nil", "19 August 2025", "In progress")
     )
   )
 
-  "ReturnsLandingController.onPageLoad (contractor)" - {
+  "ReturnsLandingController.onPageLoad" - {
 
-    "must return OK and the correct view when ContractorNamePage is present" in {
-      val userAnswers: UserAnswers =
-        userAnswersWithCisId
-          .set(CisIdPage, instanceId)
-          .success
-          .value
-          .set(ContractorNamePage, contractorName)
-          .success
-          .value
-
+    "must return OK when ManageService returns context (org)" in {
       val mockManageService = mock[ManageService]
-      when(mockManageService.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(unsubmittedResponse))
 
-      val application =
+      when(
+        mockManageService.buildReturnsLandingContext(
+          eqTo(instanceId),
+          any[UserAnswers],
+          eqTo(false)
+        )(using any[HeaderCarrier])
+      ).thenReturn(Future.successful(Some(context)))
+
+      val app =
         applicationBuilder(
-          userAnswers = Some(userAnswers),
-          additionalBindings = Seq(
-            inject.bind[ManageService].toInstance(mockManageService)
-          )
+          userAnswers = Some(userAnswersWithCisId),
+          isAgent = false,
+          additionalBindings = Seq(bind[ManageService].toInstance(mockManageService))
         ).build()
 
-      running(application) {
-        implicit val appConfig: FrontendAppConfig =
-          application.injector.instanceOf[FrontendAppConfig]
+      running(app) {
+        val req = FakeRequest(GET, controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url)
+        val res = route(app, req).value
 
-        val request = FakeRequest(
-          GET,
-          controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url
-        )
-
-        val result = route(application, request).value
-        val view   = application.injector.instanceOf[ReturnsLandingView]
-
-        status(result) mustBe OK
-        contentAsString(result) mustBe
-          view(contractorName, returnsList)(request, appConfig, messages(application)).toString
+        status(res) mustBe OK
       }
     }
 
-    "must redirect to SystemErrorController when ContractorNamePage is missing" in {
-      val userAnswers: UserAnswers =
-        userAnswersWithCisId
-          .set(CisIdPage, instanceId)
-          .success
-          .value
-
+    "must return OK when ManageService returns context (agent)" in {
       val mockManageService = mock[ManageService]
 
-      val application =
+      when(
+        mockManageService.buildReturnsLandingContext(
+          eqTo(instanceId),
+          any[UserAnswers],
+          eqTo(true)
+        )(using any[HeaderCarrier])
+      ).thenReturn(Future.successful(Some(context.copy(contractorName = "Client Ltd"))))
+
+      val app =
         applicationBuilder(
-          userAnswers = Some(userAnswers),
-          additionalBindings = Seq(
-            inject.bind[ManageService].toInstance(mockManageService)
-          )
-        ).build()
-
-      running(application) {
-        val request =
-          FakeRequest(
-            GET,
-            controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url
-          )
-
-        val result = route(application, request).value
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe
-          controllers.routes.SystemErrorController.onPageLoad().url
-      }
-    }
-
-    "must redirect to SystemErrorController when ManageService throws a NonFatal exception" in {
-      val userAnswers: UserAnswers =
-        userAnswersWithCisId
-          .set(CisIdPage, instanceId)
-          .success
-          .value
-          .set(ContractorNamePage, contractorName)
-          .success
-          .value
-
-      val mockManageService = mock[ManageService]
-      when(mockManageService.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
-        .thenReturn(Future.failed(new RuntimeException("boom")))
-
-      val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswers),
-          additionalBindings = Seq(
-            inject.bind[ManageService].toInstance(mockManageService)
-          )
-        ).build()
-
-      running(application) {
-        val request = FakeRequest(
-          GET,
-          controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url
-        )
-
-        val result = route(application, request).value
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe
-          controllers.routes.SystemErrorController.onPageLoad().url
-      }
-    }
-  }
-
-  "ReturnsLandingController.onPageLoad (agent)" - {
-
-    "must return OK and the correct view when client with matching instanceId and schemeName exists" in {
-      val client = CisTaxpayerSearchResult(
-        uniqueId = instanceId,
-        taxOfficeNumber = "163",
-        taxOfficeRef = "AB0063",
-        agentOwnRef = Some("ownRef"),
-        schemeName = Some(agentClientName),
-        utr = Some("1234567890")
-      )
-
-      val userAnswers: UserAnswers =
-        emptyUserAnswers
-          .set(AgentClientsPage, List(client))
-          .success
-          .value
-
-      val mockManageService = mock[ManageService]
-      when(mockManageService.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(unsubmittedResponse))
-
-      val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswers),
+          userAnswers = Some(userAnswersWithCisId),
           isAgent = true,
-          additionalBindings = Seq(
-            inject.bind[ManageService].toInstance(mockManageService)
-          )
+          additionalBindings = Seq(bind[ManageService].toInstance(mockManageService))
         ).build()
 
-      running(application) {
-        implicit val appConfig: FrontendAppConfig =
-          application.injector.instanceOf[FrontendAppConfig]
+      running(app) {
+        val req = FakeRequest(GET, controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url)
+        val res = route(app, req).value
 
-        val request =
-          FakeRequest(
-            GET,
-            controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url
-          )
+        status(res) mustBe OK
 
-        val result = route(application, request).value
-        val view   = application.injector.instanceOf[ReturnsLandingView]
-
-        status(result) mustBe OK
-        contentAsString(result) mustBe
-          view(agentClientName, returnsList)(request, appConfig, messages(application)).toString
+        verify(mockManageService).buildReturnsLandingContext(
+          eqTo(instanceId),
+          any[UserAnswers],
+          eqTo(true)
+        )(using any[HeaderCarrier])
       }
     }
 
-    "must redirect to SystemErrorController when no matching client or schemeName is found" in {
-      val otherClient = CisTaxpayerSearchResult(
-        uniqueId = "OTHER-ID",
-        taxOfficeNumber = "163",
-        taxOfficeRef = "AB0063",
-        agentOwnRef = Some("ownRef"),
-        schemeName = Some(agentClientName),
-        utr = Some("1234567890")
-      )
-
-      val userAnswersNoMatch: UserAnswers =
-        emptyUserAnswers
-          .set(AgentClientsPage, List(otherClient))
-          .success
-          .value
-
+    "must redirect to SystemErrorController when ManageService returns None" in {
       val mockManageService = mock[ManageService]
 
-      val applicationNoMatch =
+      when(
+        mockManageService.buildReturnsLandingContext(
+          eqTo(instanceId),
+          any[UserAnswers],
+          any[Boolean]
+        )(using any[HeaderCarrier])
+      ).thenReturn(Future.successful(None))
+
+      val app =
         applicationBuilder(
-          userAnswers = Some(userAnswersNoMatch),
-          isAgent = true,
-          additionalBindings = Seq(
-            inject.bind[ManageService].toInstance(mockManageService)
-          )
+          userAnswers = Some(userAnswersWithCisId),
+          additionalBindings = Seq(bind[ManageService].toInstance(mockManageService))
         ).build()
 
-      running(applicationNoMatch) {
-        val request =
-          FakeRequest(
-            GET,
-            controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url
-          )
+      running(app) {
+        val req = FakeRequest(GET, controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url)
+        val res = route(app, req).value
 
-        val result = route(applicationNoMatch, request).value
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe
-          controllers.routes.SystemErrorController.onPageLoad().url
+        status(res) mustBe SEE_OTHER
+        redirectLocation(res).value mustBe controllers.routes.SystemErrorController.onPageLoad().url
       }
+    }
 
-      val clientNoName = CisTaxpayerSearchResult(
-        uniqueId = instanceId,
-        taxOfficeNumber = "163",
-        taxOfficeRef = "AB0063",
-        agentOwnRef = Some("ownRef"),
-        schemeName = None,
-        utr = Some("1234567890")
-      )
+    "must redirect to SystemErrorController when ManageService fails" in {
+      val mockManageService = mock[ManageService]
 
-      val userAnswersNoName: UserAnswers =
-        emptyUserAnswers
-          .set(AgentClientsPage, List(clientNoName))
-          .success
-          .value
+      when(
+        mockManageService.buildReturnsLandingContext(
+          eqTo(instanceId),
+          any[UserAnswers],
+          any[Boolean]
+        )(using any[HeaderCarrier])
+      ).thenReturn(Future.failed(new RuntimeException("boom")))
 
-      val applicationNoName =
+      val app =
         applicationBuilder(
-          userAnswers = Some(userAnswersNoName),
-          isAgent = true,
-          additionalBindings = Seq(
-            inject.bind[ManageService].toInstance(mockManageService)
-          )
+          userAnswers = Some(userAnswersWithCisId),
+          additionalBindings = Seq(bind[ManageService].toInstance(mockManageService))
         ).build()
 
-      running(applicationNoName) {
-        val request =
-          FakeRequest(
-            GET,
-            controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url
-          )
+      running(app) {
+        val req = FakeRequest(GET, controllers.routes.ReturnsLandingController.onPageLoad(instanceId).url)
+        val res = route(app, req).value
 
-        val result = route(applicationNoName, request).value
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe
-          controllers.routes.SystemErrorController.onPageLoad().url
+        status(res) mustBe SEE_OTHER
+        redirectLocation(res).value mustBe controllers.routes.SystemErrorController.onPageLoad().url
       }
     }
   }

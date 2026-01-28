@@ -41,7 +41,7 @@
     tableRowTagColour: TableRowTagColour
 )
 
-@(contractorName: String, returnsList: Seq[ReturnLandingViewModel])(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
+@(contractorName: String, returnsList: Seq[ReturnLandingViewModel], standardReturnLink: String, nilReturnLink: String)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
 
 @sidebar = {
     @aside("returnsLanding.aside.h2", nav(Seq(
@@ -57,10 +57,10 @@
     @paragraph(messages("returnsLanding.banner.p1"))
     @paragraphWithLinks(
         linkTextUrlOne = "returnsLanding.banner.p2.link1",
-        linkUrlOne = config.fileStandardReturnUrl,
+        linkUrlOne = standardReturnLink,
         suffixTextKey = "returnsLanding.banner.p2.text",
         linkTextUrlTwo = "returnsLanding.banner.p2.link2",
-        linkUrlTwo = config.cisDateConfirmNilPaymentsUrl
+        linkUrlTwo = nilReturnLink
     )
 }
 
@@ -79,11 +79,11 @@
 
     @twoColumnGrid(
         HtmlFormat.fill(Seq(
-            headingLink("returnsLanding.fileStandardReturn.h3.link", config.fileStandardReturnUrl),
+            headingLink("returnsLanding.fileStandardReturn.h3.link", standardReturnLink),
             paragraph("returnsLanding.fileStandardReturn.p1")
         )),
         HtmlFormat.fill(Seq(
-            headingLink("returnsLanding.fileNilReturn.h3.link", config.cisDateConfirmNilPaymentsUrl),
+            headingLink("returnsLanding.fileNilReturn.h3.link", nilReturnLink),
             paragraph("returnsLanding.fileNilReturn.p1")
         ))
     )

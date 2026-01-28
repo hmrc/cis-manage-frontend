@@ -18,21 +18,17 @@ package controllers
 
 import config.FrontendAppConfig
 import controllers.actions.*
-import pages.{AgentClientsPage, ContractorNamePage}
 import play.api.Logging
-
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ManageService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.ReturnLandingViewModel
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.ReturnsLandingView
 
-import java.time.LocalDateTime
-import java.time.format.{DateTimeFormatter, TextStyle}
-import java.util.Locale
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
 
 class ReturnsLandingController @Inject() (
@@ -48,60 +44,24 @@ class ReturnsLandingController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(instanceId: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      val contractorNameOpt: Option[String] =
-        if (request.isAgent) {
-          for {
-            clients <- request.userAnswers.get(AgentClientsPage)
-            client  <- clients.find(_.uniqueId == instanceId)
-            name    <- client.schemeName
-          } yield name
-        } else {
-          request.userAnswers.get(ContractorNamePage)
+  def onPageLoad(instanceId: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
+      service
+        .buildReturnsLandingContext(instanceId, request.userAnswers, request.isAgent)
+        .map {
+          case Some(context) =>
+            Ok(view(context.contractorName, context.returnsList, context.standardReturnLink, context.nilReturnLink))
+          case None          =>
+            logger.warn(
+              s"[ReturnsLandingController] missing context (isAgent=${request.isAgent}, instanceId=$instanceId)"
+            )
+            Redirect(controllers.routes.SystemErrorController.onPageLoad())
         }
-
-      contractorNameOpt match {
-        case Some(contractorName) =>
-          service
-            .getUnsubmittedMonthlyReturns(instanceId)
-            .map { response =>
-              val returnsList: Seq[ReturnLandingViewModel] =
-                response.unsubmittedCisReturns.map { r =>
-                  ReturnLandingViewModel(
-                    taxMonth = formatPeriod(r.taxMonth, r.taxYear),
-                    returnType = r.returnType,
-                    dateSubmitted = formatLastUpdate(r.lastUpdate),
-                    status = r.status
-                  )
-                }
-
-              Ok(view(contractorName, returnsList))
-            }
-            .recover { case NonFatal(e) =>
-              logger.error(
-                s"[ReturnsLandingController] Error fetching unsubmitted returns for instanceId: $instanceId",
-                e
-              )
-              Redirect(controllers.routes.SystemErrorController.onPageLoad())
-            }
-
-        case None =>
-          logger.warn(s"[ReturnsLandingController] contractorName missing (isAgent=${request.isAgent})")
-          Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
-      }
-  }
-
-  private def formatPeriod(taxMonth: Int, taxYear: Int): String = {
-    val monthName = java.time.Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)
-    s"$monthName $taxYear"
-  }
-
-  private def formatLastUpdate(lastUpdate: Option[LocalDateTime]): String =
-    lastUpdate match {
-      case Some(dateTime) =>
-        dateTime.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK))
-      case None           => ""
+        .recover { case NonFatal(e) =>
+          logger.error(s"[ReturnsLandingController] failed for instanceId=$instanceId)", e)
+          Redirect(controllers.routes.SystemErrorController.onPageLoad())
+        }
     }
-
 }
