@@ -35,6 +35,7 @@ import scala.concurrent.Future
 
 class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
 
+  private val userId   = "id"
   private val uniqueId = "some-unique-id"
 
   private val landingViewModel = AgentLandingViewModel(
@@ -66,7 +67,8 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
       when(
         mockManageService.getAgentLandingData(
           eqTo(uniqueId),
-          any[UserAnswers]
+          any[UserAnswers],
+          eqTo(userId)
         )(using any[HeaderCarrier])
       ).thenReturn(Future.successful(landingViewModel))
 
@@ -91,7 +93,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
         body must include("1234567890")
 
         verify(mockManageService)
-          .getAgentLandingData(eqTo(uniqueId), any[UserAnswers])(using any[HeaderCarrier])
+          .getAgentLandingData(eqTo(uniqueId), any[UserAnswers], eqTo(userId))(using any[HeaderCarrier])
       } finally application.stop()
     }
 
@@ -101,7 +103,8 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
       when(
         mockManageService.getAgentLandingData(
           eqTo(uniqueId),
-          any[UserAnswers]
+          any[UserAnswers],
+          eqTo(userId)
         )(using any[HeaderCarrier])
       ).thenReturn(Future.failed(new RuntimeException("boom")))
 

@@ -57,7 +57,7 @@ class AgentLandingController @Inject() (
       implicit val hc: HeaderCarrier         = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       manageService
-        .getAgentLandingData(uniqueId, request.userAnswers)
+        .getAgentLandingData(uniqueId, request.userAnswers, request.userId)
         .map { viewModel =>
           Ok(
             view(

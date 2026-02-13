@@ -101,17 +101,11 @@ class FrontendAppConfigSpec extends SpecBase {
     }
 
     "must build a URL with encoded query params" in new Setup {
-      val url = appConfig.fileStandardReturnUrl(
-        taxOfficeNumber = "123/45",
-        taxOfficeReference = "AB 12",
-        instanceId = "inst+id?=x"
-      )
+      val url: String = appConfig.fileStandardReturnUrl(instanceId = "inst+id?=x")
 
       url mustBe
         "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-monthly-return" +
-        "?taxOfficeNumber=123%2F45" +
-        "&taxOfficeReference=AB+12" +
-        "&instanceId=inst%2Bid%3F%3Dx"
+        "?instanceId=inst%2Bid%3F%3Dx"
     }
   }
 
@@ -122,17 +116,11 @@ class FrontendAppConfigSpec extends SpecBase {
     }
 
     "must build a URL with encoded query params" in new Setup {
-      val url = appConfig.fileNilReturnUrl(
-        taxOfficeNumber = "123/45",
-        taxOfficeReference = "AB 12",
-        instanceId = "inst+id?=x"
-      )
+      val url: String = appConfig.fileNilReturnUrl(instanceId = "inst+id?=x")
 
       url mustBe
         "http://localhost:6993/construction-industry-scheme/monthly-return/date-confirm-nil-payments" +
-        "?taxOfficeNumber=123%2F45" +
-        "&taxOfficeReference=AB+12" +
-        "&instanceId=inst%2Bid%3F%3Dx"
+        "?instanceId=inst%2Bid%3F%3Dx"
     }
   }
 

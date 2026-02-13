@@ -136,7 +136,6 @@ class CheckSubcontractorRecordsControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).isDefined mustEqual true
         redirectLocation(result).value mustEqual "/there-is-a-problem"
@@ -177,7 +176,6 @@ class CheckSubcontractorRecordsControllerSpec extends SpecBase {
           .thenReturn(new FakeAuthorizedForSchemeAction)
 
         val result = route(application, request).value
-
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).isDefined mustEqual true

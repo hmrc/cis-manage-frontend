@@ -18,6 +18,7 @@ package services
 
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
+import models.agent.AgentClientData
 import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, UserAnswers}
 import pages.*
 import play.api.Logging
@@ -81,7 +82,8 @@ class ManageService @Inject() (
 
   def getAgentLandingData(
     uniqueId: String,
-    ua: UserAnswers
+    ua: UserAnswers,
+    userId: String
   )(using HeaderCarrier): Future[AgentLandingViewModel] =
     ua.get(AgentClientsPage) match {
       case None =>
@@ -99,9 +101,12 @@ class ManageService @Inject() (
               val updatedList   =
                 clients.map(c => if (c.uniqueId == client.uniqueId) updatedClient else c)
 
+              val agentClient = AgentClientData(client.uniqueId, client.taxOfficeNumber, client.taxOfficeRef)
+
               for {
                 updatedUa <- Future.fromTry(ua.set(AgentClientsPage, updatedList))
                 _         <- sessionRepository.set(updatedUa)
+                _         <- cisConnector.saveAgentClient(userId, Json.toJson(agentClient))
               } yield AgentLandingViewModel(
                 clientName = updatedClient.schemeName.getOrElse(""),
                 employerRef = s"${updatedClient.taxOfficeNumber}/${updatedClient.taxOfficeRef}",
@@ -138,8 +143,8 @@ class ManageService @Inject() (
           clients <- userAnswers.get(AgentClientsPage)
           client  <- clients.find(_.uniqueId == instanceId)
         } yield (
-          appConfig.fileStandardReturnUrl(client.taxOfficeNumber, client.taxOfficeRef, instanceId),
-          appConfig.fileNilReturnUrl(client.taxOfficeNumber, client.taxOfficeRef, instanceId)
+          appConfig.fileStandardReturnUrl(instanceId),
+          appConfig.fileNilReturnUrl(instanceId)
         )
       } else {
         Some((appConfig.fileStandardReturnUrl, appConfig.fileNilReturnUrl))

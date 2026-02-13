@@ -16,14 +16,17 @@
 
 package connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, *}
 import itutil.ApplicationWithWiremock
 import models.Scheme
+import models.agent.AgentClientData
+import org.scalacheck.Gen
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
-import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.{HeaderCarrier, HttpException, UpstreamErrorResponse}
 
 class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
   with Matchers
@@ -634,6 +637,54 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
         connector.getUnsubmittedMonthlyReturns(instanceId).futureValue
       }
       ex.getMessage must include("returned 500")
+    }
+  }
+
+  "Save" should {
+
+    val userId = "900063"
+    val agentClientData: AgentClientData = AgentClientData(
+      uniqueId = "1",
+      taxOfficeNumber = "123",
+      taxOfficeReference = "ABC1234"
+    )
+
+    "return Some(json) when the backend has returned 200 OK with data" in {
+      val json = Json.toJson(agentClientData)
+
+      stubFor(
+        post(urlPathEqualTo(s"/cis/user-cache/agent-client/$userId"))
+          .willReturn(
+            aResponse()
+            .withStatus(OK)
+          )
+      )
+
+      val result: Unit = connector
+        .saveAgentClient(userId, json)
+        .futureValue
+
+      result mustBe ()
+    }
+
+    "return None when the backend has returned a non-success status code" in {
+
+      val json = Json.toJson(agentClientData)
+
+      stubFor(
+        post(urlPathEqualTo(s"/cis/user-cache/agent-client/$userId"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+          )
+      )
+
+      val result = connector
+        .saveAgentClient(userId, json)
+        .failed
+        .futureValue
+
+      result mustBe a[HttpException]
     }
   }
 

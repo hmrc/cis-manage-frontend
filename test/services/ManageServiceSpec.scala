@@ -18,6 +18,7 @@ package services
 
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
+import models.agent.AgentClientData
 import models.{CisTaxpayer, CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, UnsubmittedMonthlyReturnsRow, UserAnswers}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -26,6 +27,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import pages.*
+import play.api.libs.json.{JsValue, Json}
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.agent.AgentLandingViewModel
@@ -280,12 +282,14 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
   "getAgentLandingData" should {
 
+    val userId = "some-user-id"
+
     "fail when AgentClientsPage is missing from UserAnswers" in {
       val (service, connector, sessionRepo) = newService()
       val ua                                = UserAnswers("test-user")
 
       val ex = intercept[RuntimeException] {
-        service.getAgentLandingData("CLIENT-001", ua).futureValue
+        service.getAgentLandingData("CLIENT-001", ua, userId).futureValue
       }
 
       ex.getMessage must include("AgentClientsPage missing in UserAnswers")
@@ -300,7 +304,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       val uaWithClient = UserAnswers("test-user").set(AgentClientsPage, clients).get
 
       val ex = intercept[RuntimeException] {
-        service.getAgentLandingData("OTHER-ID", uaWithClient).futureValue
+        service.getAgentLandingData("OTHER-ID", uaWithClient, userId).futureValue
       }
 
       ex.getMessage must include("Client with uniqueId=OTHER-ID not found in AgentClientsPage")
@@ -327,8 +331,11 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       when(sessionRepo.set(any[UserAnswers]))
         .thenReturn(Future.successful(true))
 
+      when(connector.saveAgentClient(any[String], any[JsValue])(using any()))
+        .thenReturn(Future.unit)
+
       val result: AgentLandingViewModel =
-        service.getAgentLandingData(uniqueId, ua).futureValue
+        service.getAgentLandingData(uniqueId, ua, userId).futureValue
 
       result.clientName mustBe "ABC Construction Ltd"
       result.employerRef mustBe "111/test111"
@@ -348,7 +355,10 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       val updatedClientOpt = storedClients.find(_.uniqueId == uniqueId)
       updatedClientOpt.flatMap(_.utr) mustBe Some("5555555555")
 
+      val agentClientData = Json.toJson(AgentClientData("CLIENT-123", "111", "test111"))
+
       verify(connector).getAgentClientTaxpayer("111", "test111")(hc)
+      verify(connector).saveAgentClient("some-user-id", agentClientData)(hc)
       verifyNoMoreInteractions(connector)
     }
   }
@@ -401,8 +411,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
     "return Some(context) for agent when name + client exist and connector returns returns" in {
       val (service, connector, sessionRepo) = newService()
 
-      when(appConfig.fileStandardReturnUrl(any[String], any[String], any[String])).thenReturn("/standard")
-      when(appConfig.fileNilReturnUrl(any[String], any[String], any[String])).thenReturn("/nil")
+      when(appConfig.fileStandardReturnUrl(any[String])).thenReturn("/standard")
+      when(appConfig.fileNilReturnUrl(any[String])).thenReturn("/nil")
 
       val instanceId = "CLIENT-123"
       val client     = createClient(id = instanceId).copy(schemeName = Some("Client Ltd"))
