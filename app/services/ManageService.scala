@@ -101,7 +101,8 @@ class ManageService @Inject() (
               val updatedList   =
                 clients.map(c => if (c.uniqueId == client.uniqueId) updatedClient else c)
 
-              val agentClient = AgentClientData(client.uniqueId, client.taxOfficeNumber, client.taxOfficeRef)
+              val agentClient =
+                AgentClientData(client.uniqueId, client.taxOfficeNumber, client.taxOfficeRef, client.schemeName)
 
               for {
                 updatedUa <- Future.fromTry(ua.set(AgentClientsPage, updatedList))

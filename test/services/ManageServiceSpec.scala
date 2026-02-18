@@ -355,8 +355,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       val updatedClientOpt = storedClients.find(_.uniqueId == uniqueId)
       updatedClientOpt.flatMap(_.utr) mustBe Some("5555555555")
 
-      val agentClientData = Json.toJson(AgentClientData("CLIENT-123", "111", "test111"))
-
+      val agentClientData = Json.toJson(AgentClientData("CLIENT-123", "111", "test111", Some("ABC Construction Ltd")))
       verify(connector).getAgentClientTaxpayer("111", "test111")(hc)
       verify(connector).saveAgentClient("some-user-id", agentClientData)(hc)
       verifyNoMoreInteractions(connector)

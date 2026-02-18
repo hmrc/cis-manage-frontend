@@ -20,7 +20,6 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, *}
 import itutil.ApplicationWithWiremock
 import models.Scheme
 import models.agent.AgentClientData
-import org.scalacheck.Gen
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -646,7 +645,8 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
     val agentClientData: AgentClientData = AgentClientData(
       uniqueId = "1",
       taxOfficeNumber = "123",
-      taxOfficeReference = "ABC1234"
+      taxOfficeReference = "ABC1234",
+      schemeName = Some("ABC Construction Ltd")
     )
 
     "return Some(json) when the backend has returned 200 OK with data" in {
