@@ -16,6 +16,7 @@
 
 package connectors
 
+import models.agent.AgentClientData
 import models.{CisTaxpayer, CisTaxpayerSearchResult, GetClientListStatusResponse, Scheme, UnsubmittedMonthlyReturnsResponse}
 import play.api.Logging
 import play.api.http.Status.OK
@@ -130,7 +131,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .get(url"$cisBaseUrl/monthly-returns/unsubmitted/$instanceId")
       .execute[UnsubmittedMonthlyReturnsResponse]
 
-  def saveAgentClient(userId: String, agentClientData: JsValue)(implicit
+  def saveAgentClient(userId: String, agentClientData: AgentClientData)(implicit
     hc: HeaderCarrier
   ): Future[Unit] =
     http
@@ -139,7 +140,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .execute[HttpResponse]
       .map { response =>
         response.status match {
-          case OK => Future.unit
+          case OK => ()
           case _  => throw new HttpException(response.body, response.status)
         }
       }

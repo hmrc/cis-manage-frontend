@@ -16,7 +16,7 @@
 
 package connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, *}
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import itutil.ApplicationWithWiremock
 import models.Scheme
 import models.agent.AgentClientData
@@ -24,7 +24,6 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
-import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpException, UpstreamErrorResponse}
 
 class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
@@ -650,7 +649,6 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
     )
 
     "return Some(json) when the backend has returned 200 OK with data" in {
-      val json = Json.toJson(agentClientData)
 
       stubFor(
         post(urlPathEqualTo(s"/cis/user-cache/agent-client/$userId"))
@@ -661,15 +659,13 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
       )
 
       val result: Unit = connector
-        .saveAgentClient(userId, json)
+        .saveAgentClient(userId, agentClientData)
         .futureValue
 
       result mustBe ()
     }
 
     "return None when the backend has returned a non-success status code" in {
-
-      val json = Json.toJson(agentClientData)
 
       stubFor(
         post(urlPathEqualTo(s"/cis/user-cache/agent-client/$userId"))
@@ -680,7 +676,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
       )
 
       val result = connector
-        .saveAgentClient(userId, json)
+        .saveAgentClient(userId, agentClientData)
         .failed
         .futureValue
 

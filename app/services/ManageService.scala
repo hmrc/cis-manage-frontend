@@ -107,7 +107,7 @@ class ManageService @Inject() (
               for {
                 updatedUa <- Future.fromTry(ua.set(AgentClientsPage, updatedList))
                 _         <- sessionRepository.set(updatedUa)
-                _         <- cisConnector.saveAgentClient(userId, Json.toJson(agentClient))
+                _         <- cisConnector.saveAgentClient(userId, agentClient)
               } yield AgentLandingViewModel(
                 clientName = updatedClient.schemeName.getOrElse(""),
                 employerRef = s"${updatedClient.taxOfficeNumber}/${updatedClient.taxOfficeRef}",
