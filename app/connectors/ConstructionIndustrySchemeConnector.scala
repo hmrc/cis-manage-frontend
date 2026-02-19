@@ -16,11 +16,14 @@
 
 package connectors
 
+import models.agent.AgentClientData
 import models.{CisTaxpayer, CisTaxpayerSearchResult, GetClientListStatusResponse, Scheme, UnsubmittedMonthlyReturnsResponse}
 import play.api.Logging
+import play.api.http.Status.OK
 import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, HttpResponse, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpException, HttpReadsInstances, HttpResponse, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
@@ -127,4 +130,19 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
     http
       .get(url"$cisBaseUrl/monthly-returns/unsubmitted/$instanceId")
       .execute[UnsubmittedMonthlyReturnsResponse]
+
+  def saveAgentClient(userId: String, agentClientData: AgentClientData)(implicit
+    hc: HeaderCarrier
+  ): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/user-cache/agent-client/$userId")
+      .withBody(Json.toJson(agentClientData))
+      .execute[HttpResponse]
+      .map { response =>
+        response.status match {
+          case OK => ()
+          case _  => throw new HttpException(response.body, response.status)
+        }
+      }
+
 }

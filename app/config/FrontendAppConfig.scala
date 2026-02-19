@@ -83,29 +83,24 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val contractorLandingGuidanceUrl: String  = configuration.get[String]("urls.contractorLandingGuidanceUrl")
   lazy val contractorLandingPenaltiesUrl: String = configuration.get[String]("urls.contractorLandingPenaltiesUrl")
 
-  private lazy val cisFrontendBaseUrl: String = configuration.get[String]("cis-frontend.host")
-  lazy val fileStandardReturnPath: String     = configuration.get[String]("urls.fileStandardReturn")
-  lazy val fileNilReturnPath: String          = configuration.get[String]("urls.fileNilReturn")
+  private lazy val cisFrontendBaseUrl: String     = configuration.get[String]("cis-frontend.host")
+  private lazy val fileStandardReturnPath: String = configuration.get[String]("urls.fileStandardReturn")
+  private lazy val fileNilReturnPath: String      = configuration.get[String]("urls.fileNilReturn")
 
   def fileStandardReturnUrl: String = s"$cisFrontendBaseUrl$fileStandardReturnPath"
 
-  def fileStandardReturnUrl(taxOfficeNumber: String, taxOfficeReference: String, instanceId: String): String = {
+  def fileStandardReturnUrl(instanceId: String): String = {
     def encode(s: String) = URLEncoder.encode(s, StandardCharsets.UTF_8.name())
     s"$cisFrontendBaseUrl$fileStandardReturnPath" +
-      s"?taxOfficeNumber=${encode(taxOfficeNumber)}" +
-      s"&taxOfficeReference=${encode(taxOfficeReference)}" +
-      s"&instanceId=${encode(instanceId)}"
+      s"?instanceId=${encode(instanceId)}"
   }
 
   def fileNilReturnUrl: String = s"$cisFrontendBaseUrl$fileNilReturnPath"
 
-  def fileNilReturnUrl(taxOfficeNumber: String, taxOfficeReference: String, instanceId: String): String = {
+  def fileNilReturnUrl(instanceId: String): String = {
     def encode(s: String) = URLEncoder.encode(s, StandardCharsets.UTF_8.name())
-
     s"$cisFrontendBaseUrl$fileNilReturnPath" +
-      s"?taxOfficeNumber=${encode(taxOfficeNumber)}" +
-      s"&taxOfficeReference=${encode(taxOfficeReference)}" +
-      s"&instanceId=${encode(instanceId)}"
+      s"?instanceId=${encode(instanceId)}"
   }
 
   lazy val cisTypeOfSubcontractorUrl: String = configuration.get[String]("urls.cis-contractor-frontend")
