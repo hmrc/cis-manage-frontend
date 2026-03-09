@@ -112,14 +112,14 @@ class FrontendAppConfigSpec extends SpecBase {
   "fileNilReturnUrl" - {
 
     "must build the base URL from cis-frontend.host and urls.fileNilReturn" in new Setup {
-      appConfig.fileNilReturnUrl mustBe "http://localhost:6993/construction-industry-scheme/monthly-return/date-confirm-nil-payments"
+      appConfig.fileNilReturnUrl mustBe "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-nil-return"
     }
 
     "must build a URL with encoded query params" in new Setup {
       val url: String = appConfig.fileNilReturnUrl(instanceId = "inst+id?=x")
 
       url mustBe
-        "http://localhost:6993/construction-industry-scheme/monthly-return/date-confirm-nil-payments" +
+        "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-nil-return" +
         "?instanceId=inst%2Bid%3F%3Dx"
     }
   }
