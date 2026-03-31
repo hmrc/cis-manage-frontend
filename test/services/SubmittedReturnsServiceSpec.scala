@@ -1,3 +1,19 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package services
 
 import base.SpecBase
@@ -62,30 +78,30 @@ class SubmittedReturnsServiceSpec extends SpecBase {
     "buildAllYearsViewModel must return a view model when data exists" in {
       val result = service.buildAllYearsViewModel(userAnswers)
 
-      result.value.selectedTaxYear shouldBe None
+      result.value.selectedTaxYear                shouldBe None
       result.value.taxYears.map(_.taxYearCaption) shouldBe Seq(
         "Tax year 2023 to 2024",
         "Tax year 2022 to 2023"
       )
 
       val firstRow = result.value.taxYears.head.rows.head
-      firstRow.returnPeriodEnd shouldBe "March 2023"
-      firstRow.dateSubmitted shouldBe "1 April 2024"
-      firstRow.monthlyReturn.text shouldBe "Print"
+      firstRow.returnPeriodEnd        shouldBe "March 2023"
+      firstRow.dateSubmitted          shouldBe "1 April 2024"
+      firstRow.monthlyReturn.text     shouldBe "Print"
       firstRow.submissionReceipt.text shouldBe "View"
-      firstRow.status shouldBe Text("Amend")
+      firstRow.status                 shouldBe Text("Amend")
     }
 
     "buildSingleYearViewModel must return only the selected tax year" in {
       val result = service.buildSingleYearViewModel(userAnswers, "2023")
 
-      result.value.selectedTaxYear shouldBe Some("2023")
-      result.value.taxYears.map(_.taxYearCaption) shouldBe Seq("Tax year 2023 to 2024")
+      result.value.selectedTaxYear                         shouldBe Some("2023")
+      result.value.taxYears.map(_.taxYearCaption)          shouldBe Seq("Tax year 2023 to 2024")
       result.value.taxYears.head.rows.head.returnPeriodEnd shouldBe "March 2023"
     }
 
     "return None when SubmittedReturnsDataPage is missing" in {
-      service.buildAllYearsViewModel(emptyUserAnswers) shouldBe None
+      service.buildAllYearsViewModel(emptyUserAnswers)           shouldBe None
       service.buildSingleYearViewModel(emptyUserAnswers, "2023") shouldBe None
     }
   }

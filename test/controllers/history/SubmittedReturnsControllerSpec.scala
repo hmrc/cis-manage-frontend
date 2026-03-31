@@ -61,8 +61,8 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadSingleYear("2024").url)
-        val result = route(application, request).value
-        val view = application.injector.instanceOf[SubmittedReturnsView]
+        val result  = route(application, request).value
+        val view    = application.injector.instanceOf[SubmittedReturnsView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
@@ -79,7 +79,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadSingleYear("2024").url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
@@ -96,8 +96,8 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadAllYears().url)
-        val result = route(application, request).value
-        val view = application.injector.instanceOf[SubmittedReturnsView]
+        val result  = route(application, request).value
+        val view    = application.injector.instanceOf[SubmittedReturnsView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
@@ -114,7 +114,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadAllYears().url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url

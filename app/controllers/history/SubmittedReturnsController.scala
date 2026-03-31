@@ -26,7 +26,7 @@ import views.html.history.SubmittedReturnsView
 
 import javax.inject.Inject
 
-class SubmittedReturnsController @Inject()(
+class SubmittedReturnsController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
@@ -34,31 +34,35 @@ class SubmittedReturnsController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: SubmittedReturnsView,
   service: SubmittedReturnsService
-) extends FrontendBaseController with I18nSupport {
+) extends FrontendBaseController
+    with I18nSupport {
 
   def onPageLoadSingleYear(taxYear: String): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
       val userAnswersWithStub =
-        if (request.userAnswers.get(SubmittedReturnsDataPage).isDefined) request.userAnswers
-        else StubSubmittedReturnsData.addTo(request.userAnswers)
+        request.userAnswers.get(SubmittedReturnsDataPage) match {
+          case Some(_) => request.userAnswers
+          case None    => StubSubmittedReturnsData.addTo(request.userAnswers)
+        }
 
       service.buildSingleYearViewModel(userAnswersWithStub, taxYear) match {
         case Some(vm) => Ok(view(vm))
-        case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
   }
 
-  def onPageLoadAllYears: Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
+  def onPageLoadAllYears: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
-      val userAnswersWithStub =
-        if (request.userAnswers.get(SubmittedReturnsDataPage).isDefined) request.userAnswers
-        else StubSubmittedReturnsData.addTo(request.userAnswers)
-
-      service.buildAllYearsViewModel(userAnswersWithStub) match {
-        case Some(vm) => Ok(view(vm))
-        case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    val userAnswersWithStub =
+      request.userAnswers.get(SubmittedReturnsDataPage) match {
+        case Some(_) => request.userAnswers
+        case None    => StubSubmittedReturnsData.addTo(request.userAnswers)
       }
+
+    service.buildAllYearsViewModel(userAnswersWithStub) match {
+      case Some(vm) => Ok(view(vm))
+      case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 }
