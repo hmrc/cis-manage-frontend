@@ -31,3 +31,14 @@
     z-index: 0;
     pointer-events: none;
 }
+
+/* Return history table width */
+.return-history-table {
+  width: 100%;
+}
+
+.return-history-table .rh-col-period {width : 22%;}
+.return-history-table .rh-col-date {width : 22%;}
+.return-history-table .rh-col-return {width : 14%;}
+.return-history-table .rh-col-receipt {width : 18%;}
+.return-history-table .rh-col-status {width : 24%;}

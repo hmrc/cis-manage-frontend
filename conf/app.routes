@@ -68,3 +68,5 @@ GET        /manage-subcontractors/:instanceId                       controllers.
 GET        /manage-notices-statements/:instanceId                   controllers.notices.ManageNoticesStatementsController.onPageLoad(instanceId: String)
 
 GET        /add-contractor-details                                  controllers.AddContractorDetailsController.onPageLoad()
+GET        /monthly-return-history-all-tax-years                    controllers.history.SubmittedReturnsController.onPageLoadAllYears()
+GET        /monthly-return-history-tax-year/:taxYear                controllers.history.SubmittedReturnsController.onPageLoadSingleYear(taxYear)

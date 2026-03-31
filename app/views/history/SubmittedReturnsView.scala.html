@@ -1,0 +1,127 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import viewmodels.{SubmittedReturnsPageViewModel, StatusViewModel}
+@import views.html.components.*
+
+@this(
+    layout: templates.Layout,
+    govukTable: GovukTable,
+    caption: Caption,
+    h1: H1,
+    paragraph: Paragraph,
+    link: Link
+)
+
+@(viewModel: SubmittedReturnsPageViewModel)(implicit request: Request[_], messages: Messages)
+
+@pageHeading = @{
+    viewModel.selectedTaxYear match {
+        case Some(taxYear) => messages("returnHistory.singleYear.heading", taxYear, (taxYear.toInt + 1).toString)
+        case None          => messages("returnHistory.allYears.heading")
+    }
+}
+
+@pageTitleText = @{
+    viewModel.selectedTaxYear match {
+        case Some(taxYear) => messages("returnHistory.singleYear.title", taxYear, (taxYear.toInt + 1).toString)
+        case None          => messages("returnHistory.allYears.title")
+    }
+}
+
+
+@layout(
+    pageTitle = titleNoForm(pageTitleText)
+) {
+    @caption(messages("returnHistory.caption"))
+    @h1(pageHeading)
+
+    @if(viewModel.taxYears.isEmpty) {
+        @paragraph(messages("returnHistory.noSubmittedReturns"))
+    } else {
+        @for(taxYear <- viewModel.taxYears) {
+            @govukTable(
+                Table(
+                    caption = Some(taxYear.taxYearCaption),
+                    captionClasses = "govuk-table__caption govuk-table__caption--m",
+                    classes = "govuk-!-margin-bottom-8 return-history-table",
+                    firstCellIsHeader = true,
+                    head = Some(
+                        Seq(
+                            HeadCell(content = Text(messages("returnHistory.table.returnPeriodEnd")), classes = "rh-col-period"),
+                            HeadCell(content = Text(messages("returnHistory.table.dateSubmitted")), classes = "rh-col-date"),
+                            HeadCell(content = Text(messages("returnHistory.table.monthlyReturn")), classes = "rh-col-return"),
+                            HeadCell(content = Text(messages("returnHistory.table.submissionReceipt")), classes = "rh-col-receipt"),
+                            HeadCell(content = Text(messages("returnHistory.table.status")), classes = "rh-col-status")
+                        )
+                    ),
+                    rows = taxYear.rows.map { row =>
+                        Seq(
+                            TableRow(
+                                content = Text(row.returnPeriodEnd),
+                                classes = "rh-col-period govuk-table__header",
+                            ),
+                            TableRow(
+                                content = Text(row.dateSubmitted),
+                                classes = "rh-col-date",
+                            ),
+                            TableRow(
+                                content = HtmlContent(
+                                    s"""<a href="${row.monthlyReturn.url}" class="govuk-link">
+                                    |${row.monthlyReturn.text}<span class="govuk-visually-hidden">${row.monthlyReturn.hiddenText}</span>
+                                    |</a>""".stripMargin
+                                ),
+                                classes = "rh-col-return",
+                            ),
+                            TableRow(
+                                content =
+                                    if (row.submissionReceipt.text.nonEmpty) {
+                                            HtmlContent(
+                                                s"""<a href="${row.submissionReceipt.url}" class="govuk-link">
+                                                |${row.submissionReceipt.text}<span class="govuk-visually-hidden">${row.submissionReceipt.hiddenText}</span>
+                                                |</a>""".stripMargin
+                                            )
+                                    } else {
+                                        HtmlContent("")
+                                    },
+                                classes = "rh-col-receipt",
+                            ),
+                            TableRow(
+                                content = row.status match {
+                                    case StatusViewModel.Text(value) =>
+                                        Text(value)
+
+                                    case StatusViewModel.Link(linkValue) =>
+                                        HtmlContent(
+                                            s"""<a href="${linkValue.url}" class="govuk-link">
+                                            |${linkValue.text}<span class="govuk-visually-hidden">${linkValue.hiddenText}</span>
+                                            |</a>""".stripMargin
+                                        )
+                                },
+                                classes = "rh-col-status",
+                            )
+                        )
+                    }
+                )
+            )
+        }
+    }
+
+    @link(
+        linkTextKey = "returnHistory.backLink",
+        linkUrl = "#"
+    )
+}
