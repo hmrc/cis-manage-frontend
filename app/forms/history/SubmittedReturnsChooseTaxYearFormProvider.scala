@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-package generators
+package forms.history
 
-trait ModelGenerators {
-  implicit lazy val arbitrarySubmittedReturnsChooseTaxYear: Arbitrary[SubmittedReturnsChooseTaxYear] =
-    Arbitrary {
-      Gen.oneOf(SubmittedReturnsChooseTaxYear.values.toSeq)
-    }
+import forms.mappings.Mappings
+import models.history.SubmittedReturnsChooseTaxYear
+import play.api.data.Form
+
+import javax.inject.Inject
+
+class SubmittedReturnsChooseTaxYearFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[SubmittedReturnsChooseTaxYear] =
+    Form(
+      "value" -> enumerable[SubmittedReturnsChooseTaxYear]("submittedReturnsChooseTaxYear.error.required")
+    )
 }

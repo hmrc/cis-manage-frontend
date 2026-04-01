@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package generators
+package pages.history
 
-trait ModelGenerators {
-  implicit lazy val arbitrarySubmittedReturnsChooseTaxYear: Arbitrary[SubmittedReturnsChooseTaxYear] =
-    Arbitrary {
-      Gen.oneOf(SubmittedReturnsChooseTaxYear.values.toSeq)
-    }
+import models.history.SubmittedReturnsChooseTaxYear
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+
+case object SubmittedReturnsChooseTaxYearPage extends QuestionPage[SubmittedReturnsChooseTaxYear] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "submittedReturnsChooseTaxYear"
 }
