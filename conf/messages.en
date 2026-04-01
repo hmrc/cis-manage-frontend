@@ -15,6 +15,7 @@ site.pagination.landmark = Pagination
 site.pagination.previous = Previous
 site.pagination.next = Next
 site.delete = Delete
+site.or = or
 
 date.day = Day
 date.month = Month
@@ -396,10 +397,10 @@ addContractorDetails.title = Add contractor details
 addContractorDetails.heading = Add contractor details
 addContractorDetails.p1 = This is a placeholder page for adding contractor details.
 
-submittedReturnsChooseTaxYear.title = submittedReturnsChooseTaxYear
-submittedReturnsChooseTaxYear.heading = submittedReturnsChooseTaxYear
-submittedReturnsChooseTaxYear.option1 = Option 1
-submittedReturnsChooseTaxYear.option2 = Option 2
-submittedReturnsChooseTaxYear.checkYourAnswersLabel = submittedReturnsChooseTaxYear
-submittedReturnsChooseTaxYear.error.required = Select submittedReturnsChooseTaxYear
-submittedReturnsChooseTaxYear.change.hidden = SubmittedReturnsChooseTaxYear
+history.submittedReturnsChooseTaxYear.title = What tax year do you want to view?
+history.submittedReturnsChooseTaxYear.heading = What tax year do you want to view?
+history.submittedReturnsChooseTaxYear.caption = Submitted returns
+history.submittedReturnsChooseTaxYear.viewAll = View all tax years
+history.submittedReturnsChooseTaxYear.checkYourAnswersLabel = Submitted returns choose tax year
+history.submittedReturnsChooseTaxYear.error.required = Select a tax year or all tax years
+history.submittedReturnsChooseTaxYear.change.hidden = Submitted Returns Choose Tax Year

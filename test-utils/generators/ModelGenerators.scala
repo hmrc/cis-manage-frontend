@@ -16,9 +16,11 @@
 
 package generators
 
+import models.history.SubmittedReturnsChooseTaxYear
+import org.scalacheck.{Arbitrary, Gen}
+
 trait ModelGenerators {
-  implicit lazy val arbitrarySubmittedReturnsChooseTaxYear: Arbitrary[SubmittedReturnsChooseTaxYear] =
-    Arbitrary {
-      Gen.oneOf(SubmittedReturnsChooseTaxYear.values.toSeq)
-    }
+
+  implicit def arbitrarySubmittedReturnsChooseTaxYear(implicit taxYears: Seq[String]): Arbitrary[String] =
+    Arbitrary(Gen.oneOf(taxYears :+ "all"))
 }
