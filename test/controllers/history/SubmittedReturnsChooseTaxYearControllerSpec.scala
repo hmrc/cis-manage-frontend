@@ -19,7 +19,7 @@ package controllers.history
 import base.SpecBase
 import controllers.routes
 import forms.history.SubmittedReturnsChooseTaxYearFormProvider
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -40,7 +40,7 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
   def onwardRoute = Call("GET", "/foo")
 
   lazy val submittedReturnsChooseTaxYearRoute: String =
-    controllers.history.routes.SubmittedReturnsChooseTaxYearController.onPageLoad(NormalMode).url
+    controllers.history.routes.SubmittedReturnsChooseTaxYearController.onPageLoad().url
   val taxYears: Seq[String]                           =
     Seq("2021 to 2022", "2022 to 2023", "2023 to 2024", "2024 to 2025")
 
@@ -61,7 +61,7 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
         val view = application.injector.instanceOf[SubmittedReturnsChooseTaxYearView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, taxYears)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, taxYears)(request, messages(application)).toString
       }
     }
 
@@ -82,17 +82,16 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(taxYears.head), NormalMode, taxYears)(
+        contentAsString(result) mustEqual view(form.fill(taxYears.head), taxYears)(
           request,
           messages(application)
         ).toString
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect back to the same page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
-
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
@@ -111,11 +110,11 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual
+          controllers.history.routes.SubmittedReturnsChooseTaxYearController.onPageLoad().url
       }
     }
 
-    // TODO: Adjust this test if needed after PR review.
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val userAnswers = emptyUserAnswers
@@ -137,7 +136,7 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, taxYears)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, taxYears)(request, messages(application)).toString
       }
     }
 
@@ -162,7 +161,7 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
       running(application) {
         val request =
           FakeRequest(POST, submittedReturnsChooseTaxYearRoute)
-            .withFormUrlEncodedBody(("value", taxYears.head.toString))
+            .withFormUrlEncodedBody(("value", taxYears.head))
 
         val result = route(application, request).value
 

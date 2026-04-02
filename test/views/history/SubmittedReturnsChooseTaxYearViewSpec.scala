@@ -18,7 +18,6 @@ package views.history
 
 import base.SpecBase
 import forms.history.SubmittedReturnsChooseTaxYearFormProvider
-import models.NormalMode
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.freespec.AnyFreeSpec
@@ -74,6 +73,6 @@ class SubmittedReturnsChooseTaxYearViewSpec extends SpecBase {
       app.injector.instanceOf[MessagesApi]
     )
 
-    val html: HtmlFormat.Appendable = view(form, NormalMode, taxYears)
+    val html: HtmlFormat.Appendable = view(form, taxYears)
   }
 }

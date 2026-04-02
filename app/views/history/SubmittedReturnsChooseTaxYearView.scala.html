@@ -26,11 +26,11 @@
     caption: components.Caption
 )
 
-@(form: Form[_], mode: Mode, taxYears: Seq[String])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], taxYears: Seq[String])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("history.submittedReturnsChooseTaxYear.title"))) {
 
-    @formHelper(action = controllers.history.routes.SubmittedReturnsChooseTaxYearController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.history.routes.SubmittedReturnsChooseTaxYearController.onSubmit(), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))

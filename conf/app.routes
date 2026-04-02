@@ -69,7 +69,5 @@ GET        /manage-notices-statements/:instanceId                   controllers.
 
 GET        /add-contractor-details                                  controllers.AddContractorDetailsController.onPageLoad()
 
-GET        /history/view-tax-year-submission-history                controllers.history.SubmittedReturnsChooseTaxYearController.onPageLoad(mode: Mode = NormalMode)
-POST       /history/view-tax-year-submission-history                controllers.history.SubmittedReturnsChooseTaxYearController.onSubmit(mode: Mode = NormalMode)
-GET        /history/change-view-tax-year-submission-history         controllers.history.SubmittedReturnsChooseTaxYearController.onPageLoad(mode: Mode = CheckMode)
-POST       /history/change-view-tax-year-submission-history         controllers.history.SubmittedReturnsChooseTaxYearController.onSubmit(mode: Mode = CheckMode)
+GET        /history/view-tax-year-submission-history                controllers.history.SubmittedReturnsChooseTaxYearController.onPageLoad()
+POST       /history/view-tax-year-submission-history                controllers.history.SubmittedReturnsChooseTaxYearController.onSubmit()

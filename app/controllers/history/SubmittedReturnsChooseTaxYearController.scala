@@ -18,8 +18,6 @@ package controllers.history
 
 import controllers.actions.*
 import forms.history.SubmittedReturnsChooseTaxYearFormProvider
-import models.Mode
-import navigation.Navigator
 import pages.history.SubmittedReturnsChooseTaxYearPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -34,7 +32,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class SubmittedReturnsChooseTaxYearController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
-  navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -49,27 +46,26 @@ class SubmittedReturnsChooseTaxYearController @Inject() (
     Seq("2021 to 2022", "2022 to 2023", "2023 to 2024", "2024 to 2025")
   val form: Form[String]    = formProvider(taxYears)
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
     val preparedForm = request.userAnswers.get(SubmittedReturnsChooseTaxYearPage) match {
       case None        => form
       case Some(value) => form.fill(value)
     }
 
-    Ok(view(preparedForm, mode, taxYears))
+    Ok(view(preparedForm, taxYears))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, taxYears))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(SubmittedReturnsChooseTaxYearPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(SubmittedReturnsChooseTaxYearPage, mode, updatedAnswers))
-        )
+  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+    form
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, taxYears))),
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(SubmittedReturnsChooseTaxYearPage, value))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(controllers.history.routes.SubmittedReturnsChooseTaxYearController.onPageLoad())
+      )
   }
 }

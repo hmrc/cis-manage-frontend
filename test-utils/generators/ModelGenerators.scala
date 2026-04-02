@@ -16,7 +16,6 @@
 
 package generators
 
-import models.history.SubmittedReturnsChooseTaxYear
 import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {
