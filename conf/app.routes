@@ -68,3 +68,15 @@ GET        /manage-subcontractors/:instanceId                       controllers.
 GET        /manage-notices-statements/:instanceId                   controllers.notices.ManageNoticesStatementsController.onPageLoad(instanceId: String)
 
 GET        /add-contractor-details                                  controllers.AddContractorDetailsController.onPageLoad()
+
+GET        /delete/delete-monthly-return                        controllers.delete.DeleteMonthlyReturnController.onPageLoad(mode: Mode = NormalMode)
+POST       /delete/delete-monthly-return                        controllers.delete.DeleteMonthlyReturnController.onSubmit(mode: Mode = NormalMode)
+
+GET        /delete/delete-nil-monthly-return                    controllers.delete.DeleteNilMonthlyReturnController.onPageLoad(mode: Mode = NormalMode)
+POST       /delete/delete-nil-monthly-return                    controllers.delete.DeleteNilMonthlyReturnController.onSubmit(mode: Mode = NormalMode)
+
+GET        /delete/delete-amended-monthly-return                controllers.delete.DeleteAmendedMonthlyReturnController.onPageLoad(mode: Mode = NormalMode)
+POST       /delete/delete-amended-monthly-return                controllers.delete.DeleteAmendedMonthlyReturnController.onSubmit(mode: Mode = NormalMode)
+
+GET        /delete/delete-amended-nil-monthly-return            controllers.delete.DeleteAmendedNilMonthlyReturnController.onPageLoad(mode: Mode = NormalMode)
+POST       /delete/delete-amended-nil-monthly-return            controllers.delete.DeleteAmendedNilMonthlyReturnController.onSubmit(mode: Mode = NormalMode)
