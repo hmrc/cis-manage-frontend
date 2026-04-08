@@ -397,8 +397,8 @@ addContractorDetails.title = Add contractor details
 addContractorDetails.heading = Add contractor details
 addContractorDetails.p1 = This is a placeholder page for adding contractor details.
 
-history.submittedReturnsChooseTaxYear.title = What tax year do you want to view?
-history.submittedReturnsChooseTaxYear.heading = What tax year do you want to view?
+history.submittedReturnsChooseTaxYear.title = Which tax year do you want to view?
+history.submittedReturnsChooseTaxYear.heading = Which tax year do you want to view?
 history.submittedReturnsChooseTaxYear.caption = Submitted returns
 history.submittedReturnsChooseTaxYear.viewAll = View all tax years
 history.submittedReturnsChooseTaxYear.error.required = Select a tax year or all tax years
