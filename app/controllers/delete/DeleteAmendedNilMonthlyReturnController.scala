@@ -18,19 +18,18 @@ package controllers.delete
 
 import controllers.actions.*
 import forms.delete.DeleteAmendedNilMonthlyReturnFormProvider
-import models.{Mode, UnsubmittedReturn}
+import models.Mode
 import navigation.Navigator
 import pages.delete.DeleteAmendedNilMonthlyReturnPage
 import play.api.Logging
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, Lang, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.delete.UnsubmittedReturnToDeleteQuery
 import repositories.SessionRepository
+import services.ManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.delete.DeleteAmendedNilMonthlyReturnView
 
-import java.util.Locale
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -42,6 +41,7 @@ class DeleteAmendedNilMonthlyReturnController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   deletableReturnAction: DeletableReturnAction,
+  service: ManageService,
   formProvider: DeleteAmendedNilMonthlyReturnFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: DeleteAmendedNilMonthlyReturnView
@@ -75,11 +75,21 @@ class DeleteAmendedNilMonthlyReturnController @Inject() (
             val monthYear = request.returnToDelete.monthYear(langCode)
             Future.successful(BadRequest(view(formWithErrors, monthYear, mode)))
           },
-          value =>
-            for {
+          value => {
+            val result = for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(DeleteAmendedNilMonthlyReturnPage, value))
+              _              <- service.deleteUnsubmittedMonthlyReturn(request.returnToDelete)
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(DeleteAmendedNilMonthlyReturnPage, mode, updatedAnswers))
+
+            result.recover { case ex =>
+              logger.error(
+                s"[DeleteAmendedNilMonthlyReturnController] Failed to delete returnId=${request.returnToDelete.monthlyReturnId}: ${ex.getMessage}",
+                ex
+              )
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
+          }
         )
     }
 }

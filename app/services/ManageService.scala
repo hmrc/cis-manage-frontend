@@ -19,6 +19,7 @@ package services
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
+import models.requests.DeleteUnsubmittedMonthlyReturnRequest
 import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, UnsubmittedReturn, UserAnswers}
 import pages.*
 import play.api.Logging
@@ -194,27 +195,37 @@ class ManageService @Inject() (
     }
   }
 
-  def getDeleteRoute(monthlyReturnId: Long): Future[Call] =
-    unsubmittedReturnRepository.get(monthlyReturnId).map {
-      case Some(record) =>
-        (record.returnType, record.amendment) match {
-          case ("Nil", Some("Y"))      =>
-            controllers.delete.routes.DeleteAmendedNilMonthlyReturnController.onPageLoad()
-          case ("Nil", Some("N"))      =>
-            controllers.delete.routes.DeleteNilMonthlyReturnController.onPageLoad()
-          case ("Standard", Some("Y")) =>
-            controllers.delete.routes.DeleteAmendedMonthlyReturnController.onPageLoad()
-          case ("Standard", Some("N")) =>
-            controllers.delete.routes.DeleteMonthlyReturnController.onPageLoad()
-          case _                       =>
-            controllers.routes.JourneyRecoveryController.onPageLoad()
-        }
-      case None         =>
-        logger.warn(
-          s"[getDeleteRoute] missing monthlyReturnId: $monthlyReturnId"
-        )
-        controllers.routes.JourneyRecoveryController.onPageLoad()
-    }
+  def deleteUnsubmittedMonthlyReturn(returnToDelete: UnsubmittedReturn)(implicit hc: HeaderCarrier): Future[Unit] =
+    cisConnector.deleteUnsubmittedMonthlyReturn(
+      DeleteUnsubmittedMonthlyReturnRequest(
+        instanceId = returnToDelete.instanceId,
+        taxYear = returnToDelete.taxYear,
+        taxMonth = returnToDelete.taxMonth,
+        amendment = returnToDelete.amendment.get
+      )
+    )
+
+  //  def getDeleteRoute(monthlyReturnId: Long): Future[Call] =
+//    unsubmittedReturnRepository.get(monthlyReturnId).map {
+//      case Some(record) =>
+//        (record.returnType, record.amendment) match {
+//          case ("Nil", Some("Y"))      =>
+//            controllers.delete.routes.DeleteAmendedNilMonthlyReturnController.onPageLoad()
+//          case ("Nil", Some("N"))      =>
+//            controllers.delete.routes.DeleteNilMonthlyReturnController.onPageLoad()
+//          case ("Standard", Some("Y")) =>
+//            controllers.delete.routes.DeleteAmendedMonthlyReturnController.onPageLoad()
+//          case ("Standard", Some("N")) =>
+//            controllers.delete.routes.DeleteMonthlyReturnController.onPageLoad()
+//          case _                       =>
+//            controllers.routes.JourneyRecoveryController.onPageLoad()
+//        }
+//      case None         =>
+//        logger.warn(
+//          s"[getDeleteRoute] missing monthlyReturnId: $monthlyReturnId"
+//        )
+//        controllers.routes.JourneyRecoveryController.onPageLoad()
+//    }
 
   private def formatPeriod(taxMonth: Int, taxYear: Int): String = {
     val monthName = java.time.Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)
