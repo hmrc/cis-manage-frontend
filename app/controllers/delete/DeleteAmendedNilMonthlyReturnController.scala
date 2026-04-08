@@ -41,6 +41,7 @@ class DeleteAmendedNilMonthlyReturnController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  deletableReturnAction: DeletableReturnAction,
   formProvider: DeleteAmendedNilMonthlyReturnFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: DeleteAmendedNilMonthlyReturnView
@@ -51,50 +52,34 @@ class DeleteAmendedNilMonthlyReturnController @Inject() (
 
   val form: Form[Boolean] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    request.userAnswers.get(UnsubmittedReturnToDeleteQuery) match {
-      case Some(returnToDelete) if returnToDelete.deletable =>
-        val preparedForm = request.userAnswers.get(DeleteAmendedNilMonthlyReturnPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
-        val langCode     = messagesApi.preferred(request).lang.code
-
-        val monthYear = returnToDelete.monthYear(langCode)
-        Ok(view(preparedForm, monthYear, mode))
-
-      case Some(returnToDelete) =>
-        logger.warn(
-          s"[DeleteAmendedNilMonthlyReturn] Record not deletable for monthlyReturnId=${returnToDelete.monthlyReturnId}"
-        )
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-
-      case None =>
-        logger.error("[DeleteAmendedNilMonthlyReturn] UnsubmittedReturnToDeleteQuery missing")
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-    }
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      getPeriodEnd match {
-        case Some(monthYear) =>
-          form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, monthYear, mode))),
-              value =>
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(DeleteAmendedNilMonthlyReturnPage, value))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(DeleteAmendedNilMonthlyReturnPage, mode, updatedAnswers))
-            )
-        case None            =>
-          logger.error("[DeleteAmendedNilMonthlyReturn] dateConfirmPayments missing")
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen deletableReturnAction) { implicit request =>
+      val preparedForm = request.userAnswers.get(DeleteAmendedNilMonthlyReturnPage) match {
+        case None        => form
+        case Some(value) => form.fill(value)
       }
-  }
 
-  private def getPeriodEnd: Option[String] =
-    Some("March 2026")
+      val langCode  = messagesApi.preferred(request).lang.code
+      val monthYear = request.returnToDelete.monthYear(langCode)
+
+      Ok(view(preparedForm, monthYear, mode))
+    }
+
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen deletableReturnAction).async { implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => {
+            val langCode  = messagesApi.preferred(request).lang.code
+            val monthYear = request.returnToDelete.monthYear(langCode)
+            Future.successful(BadRequest(view(formWithErrors, monthYear, mode)))
+          },
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(DeleteAmendedNilMonthlyReturnPage, value))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(DeleteAmendedNilMonthlyReturnPage, mode, updatedAnswers))
+        )
+    }
 }
