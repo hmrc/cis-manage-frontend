@@ -201,7 +201,7 @@ class ManageService @Inject() (
         instanceId = returnToDelete.instanceId,
         taxYear = returnToDelete.taxYear,
         taxMonth = returnToDelete.taxMonth,
-        amendment = returnToDelete.amendment.get
+        amendment = returnToDelete.amendment.getOrElse("N")
       )
     )
 
