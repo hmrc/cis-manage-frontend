@@ -15,6 +15,7 @@ site.pagination.landmark = Pagination
 site.pagination.previous = Previous
 site.pagination.next = Next
 site.delete = Delete
+site.or = or
 
 date.day = Day
 date.month = Month
@@ -411,3 +412,9 @@ delete.deleteAmendedMonthlyReturn.error.required = Select yes to delete this ame
 delete.deleteAmendedNilMonthlyReturn.title = Are you sure you want to delete the amended nil monthly return for {0}?
 delete.deleteAmendedNilMonthlyReturn.heading = Are you sure you want to delete the amended nil monthly return for {0}?
 delete.deleteAmendedNilMonthlyReturn.error.required = Select yes to delete this amended nil monthly return.
+
+history.submittedReturnsChooseTaxYear.title = Which tax year do you want to view?
+history.submittedReturnsChooseTaxYear.heading = Which tax year do you want to view?
+history.submittedReturnsChooseTaxYear.caption = Submitted returns
+history.submittedReturnsChooseTaxYear.viewAll = View all tax years
+history.submittedReturnsChooseTaxYear.error.required = Select a tax year or all tax years

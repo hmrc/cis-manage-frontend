@@ -80,3 +80,6 @@ POST       /delete/delete-amended-monthly-return                controllers.dele
 
 GET        /delete/delete-amended-nil-monthly-return            controllers.delete.DeleteAmendedNilMonthlyReturnController.onPageLoad(mode: Mode = NormalMode)
 POST       /delete/delete-amended-nil-monthly-return            controllers.delete.DeleteAmendedNilMonthlyReturnController.onSubmit(mode: Mode = NormalMode)
+
+GET        /history/view-tax-year-submission-history                controllers.history.SubmittedReturnsChooseTaxYearController.onPageLoad()
+POST       /history/view-tax-year-submission-history                controllers.history.SubmittedReturnsChooseTaxYearController.onSubmit()
