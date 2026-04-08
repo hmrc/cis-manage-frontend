@@ -19,11 +19,12 @@ package services
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
-import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, UserAnswers}
+import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, UnsubmittedReturn, UserAnswers}
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
-import repositories.SessionRepository
+import play.api.mvc.Call
+import repositories.{SessionRepository, UnsubmittedReturnRepository}
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ReturnLandingViewModel, ReturnsLandingContext}
 import viewmodels.agent.AgentLandingViewModel
@@ -37,7 +38,8 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ManageService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector,
-  sessionRepository: SessionRepository
+  sessionRepository: SessionRepository,
+  unsubmittedReturnRepository: UnsubmittedReturnRepository
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends Logging {
 
@@ -153,24 +155,66 @@ class ManageService @Inject() (
 
     (contractorNameOpt, linksOpt) match {
       case (Some(name), Some((standardLink, nilLink))) =>
-        getUnsubmittedMonthlyReturns(instanceId).map { response =>
+        getUnsubmittedMonthlyReturns(instanceId).flatMap { response =>
+
           val returnsList =
             response.unsubmittedCisReturns.map { r =>
               ReturnLandingViewModel(
+                monthlyReturnId = r.monthlyReturnId,
                 taxMonth = formatPeriod(r.taxMonth, r.taxYear),
                 returnType = r.returnType,
                 dateSubmitted = formatLastUpdate(r.lastUpdate),
-                status = r.status
+                status = r.status,
+                amendment = r.amendment
               )
             }
 
-          Some(ReturnsLandingContext(name, standardLink, nilLink, returnsList))
+          val unsubmittedReturnsToPersist = response.unsubmittedCisReturns.map { r =>
+            UnsubmittedReturn(
+              instanceId = instanceId,
+              monthlyReturnId = r.monthlyReturnId,
+              taxYear = r.taxYear,
+              taxMonth = r.taxMonth,
+              returnType = r.returnType,
+              status = r.status,
+              amendment = r.amendment,
+              deletable = r.deletable
+            )
+          }
+
+          Future
+            .sequence(unsubmittedReturnsToPersist.map(unsubmittedReturnRepository.set))
+            .map { _ =>
+              Some(ReturnsLandingContext(name, standardLink, nilLink, returnsList))
+            }
         }
 
       case _ =>
         Future.successful(None)
     }
   }
+
+  def getDeleteRoute(monthlyReturnId: Long): Future[Call] =
+    unsubmittedReturnRepository.get(monthlyReturnId).map {
+      case Some(record) =>
+        (record.returnType, record.amendment) match {
+          case ("Nil", Some("Y"))      =>
+            controllers.delete.routes.DeleteAmendedNilMonthlyReturnController.onPageLoad()
+          case ("Nil", Some("N"))      =>
+            controllers.delete.routes.DeleteNilMonthlyReturnController.onPageLoad()
+          case ("Standard", Some("Y")) =>
+            controllers.delete.routes.DeleteAmendedMonthlyReturnController.onPageLoad()
+          case ("Standard", Some("N")) =>
+            controllers.delete.routes.DeleteMonthlyReturnController.onPageLoad()
+          case _                       =>
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+        }
+      case None         =>
+        logger.warn(
+          s"[getDeleteRoute] missing monthlyReturnId: $monthlyReturnId"
+        )
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
 
   private def formatPeriod(taxMonth: Int, taxYear: Int): String = {
     val monthName = java.time.Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)

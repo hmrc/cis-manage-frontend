@@ -18,17 +18,19 @@ package controllers.delete
 
 import controllers.actions.*
 import forms.delete.DeleteAmendedNilMonthlyReturnFormProvider
-import models.Mode
+import models.{Mode, UnsubmittedReturn}
 import navigation.Navigator
 import pages.delete.DeleteAmendedNilMonthlyReturnPage
 import play.api.Logging
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Lang, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.delete.UnsubmittedReturnToDeleteQuery
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.delete.DeleteAmendedNilMonthlyReturnView
 
+import java.util.Locale
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -50,15 +52,25 @@ class DeleteAmendedNilMonthlyReturnController @Inject() (
   val form: Form[Boolean] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    getPeriodEnd match {
-      case Some(monthYear) =>
+    request.userAnswers.get(UnsubmittedReturnToDeleteQuery) match {
+      case Some(returnToDelete) if returnToDelete.deletable =>
         val preparedForm = request.userAnswers.get(DeleteAmendedNilMonthlyReturnPage) match {
           case None        => form
           case Some(value) => form.fill(value)
         }
+        val langCode     = messagesApi.preferred(request).lang.code
+
+        val monthYear = returnToDelete.monthYear(langCode)
         Ok(view(preparedForm, monthYear, mode))
-      case None            =>
-        logger.error("[DeleteAmendedNilMonthlyReturn] dateConfirmPayments missing")
+
+      case Some(returnToDelete) =>
+        logger.warn(
+          s"[DeleteAmendedNilMonthlyReturn] Record not deletable for monthlyReturnId=${returnToDelete.monthlyReturnId}"
+        )
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+      case None =>
+        logger.error("[DeleteAmendedNilMonthlyReturn] UnsubmittedReturnToDeleteQuery missing")
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }

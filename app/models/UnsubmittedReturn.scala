@@ -18,27 +18,28 @@ package models
 
 import play.api.libs.json.{Json, OFormat}
 
-import java.time.LocalDateTime
+import java.time.{Instant, LocalDateTime}
+import java.util.Locale
+import play.api.i18n.{I18nSupport, Lang, MessagesApi}
+import utils.Utils.monthName
 
-case class UnsubmittedMonthlyReturnsRow(
+case class UnsubmittedReturn(
+  instanceId: String,
   monthlyReturnId: Long,
   taxYear: Int,
   taxMonth: Int,
   returnType: String,
   status: String,
-  lastUpdate: Option[LocalDateTime],
   amendment: Option[String],
-  deletable: Boolean
-)
-
-object UnsubmittedMonthlyReturnsRow {
-  given format: OFormat[UnsubmittedMonthlyReturnsRow] = Json.format[UnsubmittedMonthlyReturnsRow]
+  deletable: Boolean,
+  updatedAt: Instant = Instant.now
+) {
+  def monthYear(langCode: String): String = {
+    val locale: Locale = Lang.get(langCode).map(_.locale).getOrElse(Locale.UK)
+    s"${monthName(taxMonth, locale)} $taxYear"
+  }
 }
 
-case class UnsubmittedMonthlyReturnsResponse(
-  unsubmittedCisReturns: Seq[UnsubmittedMonthlyReturnsRow]
-)
-
-object UnsubmittedMonthlyReturnsResponse {
-  given format: OFormat[UnsubmittedMonthlyReturnsResponse] = Json.format[UnsubmittedMonthlyReturnsResponse]
+object UnsubmittedReturn {
+  given format: OFormat[UnsubmittedReturn] = Json.format[UnsubmittedReturn]
 }
