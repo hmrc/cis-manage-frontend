@@ -42,7 +42,7 @@ case class UnsubmittedMonthlyReturn(
 }
 
 object UnsubmittedMonthlyReturn {
-  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
+  given instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
-  implicit val format: OFormat[UnsubmittedMonthlyReturn] = Json.format[UnsubmittedMonthlyReturn]
+  given format: OFormat[UnsubmittedMonthlyReturn] = Json.format[UnsubmittedMonthlyReturn]
 }
