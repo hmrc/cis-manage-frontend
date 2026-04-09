@@ -20,10 +20,12 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import itutil.ApplicationWithWiremock
 import models.Scheme
 import models.agent.AgentClientData
+import models.requests.DeleteUnsubmittedMonthlyReturnRequest
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpException, UpstreamErrorResponse}
 
 class ConstructionIndustrySchemeConnectorSpec
@@ -689,4 +691,45 @@ class ConstructionIndustrySchemeConnectorSpec
     }
   }
 
+  "deleteUnsubmittedMonthlyReturn" should {
+
+    "return Unit on 204" in {
+
+      val req = DeleteUnsubmittedMonthlyReturnRequest(
+        instanceId = "1",
+        taxYear = 2025,
+        taxMonth = 1,
+        amendment = "N"
+      )
+
+      stubFor(
+        post(urlPathEqualTo("/cis/monthly-returns/unsubmitted/delete"))
+          .withHeader("Content-Type", equalTo("application/json"))
+          .withRequestBody(equalToJson(Json.toJson(req).toString(), true, true))
+          .willReturn(aResponse().withStatus(NO_CONTENT))
+      )
+
+      connector.deleteUnsubmittedMonthlyReturn(req).futureValue mustBe ((): Unit)
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+
+      val req = DeleteUnsubmittedMonthlyReturnRequest(
+        instanceId = "1",
+        taxYear = 2025,
+        taxMonth = 1,
+        amendment = "N"
+      )
+
+      stubFor(
+        post(urlPathEqualTo("/cis/monthly-returns/unsubmitted/delete"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = intercept[Exception] {
+        connector.deleteUnsubmittedMonthlyReturn(req).futureValue
+      }
+      ex.getMessage must include("boom")
+    }
+  }
 }

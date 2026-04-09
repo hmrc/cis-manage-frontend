@@ -19,6 +19,7 @@ package services
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
+import models.requests.DeleteUnsubmittedMonthlyReturnRequest
 import models.{CisTaxpayer, CisTaxpayerSearchResult, UnsubmittedMonthlyReturn, UnsubmittedMonthlyReturnsResponse, UnsubmittedMonthlyReturnsRow, UserAnswers}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -33,7 +34,7 @@ import viewmodels.agent.AgentLandingViewModel
 
 import java.time.temporal.ChronoUnit
 import java.time.{Clock, Instant, ZoneId}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Failure
@@ -531,4 +532,76 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
     }
   }
 
+  "deleteUnsubmittedMonthlyReturn" should {
+
+    "delegate to connector and return response (happy path)" in {
+      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
+      val instanceId                                                         = "900063"
+      val now: Instant                                                       = Instant.parse("2026-04-09T12:34:56.789Z")
+
+      val dataModel = UnsubmittedMonthlyReturn(
+        instanceId = instanceId,
+        monthlyReturnId = 3000L,
+        taxYear = 2026,
+        taxMonth = 4,
+        returnType = "Nil",
+        status = "In Progress",
+        amendment = Some("Y"),
+        deletable = true,
+        lastUpdated = now
+      )
+
+      val expectedRequest = DeleteUnsubmittedMonthlyReturnRequest(
+        instanceId = instanceId,
+        taxYear = 2026,
+        taxMonth = 4,
+        amendment = "Y"
+      )
+
+      when(connector.deleteUnsubmittedMonthlyReturn(eqTo(expectedRequest))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(()))
+
+      service.deleteUnsubmittedMonthlyReturn(dataModel).futureValue mustBe ()
+
+      verify(connector).deleteUnsubmittedMonthlyReturn(eqTo(expectedRequest))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+      verifyNoInteractions(unsubmittedMonthlyReturnRepo)
+    }
+
+    "propagate failure from connector" in {
+      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
+      val instanceId                                                         = "900063"
+      val boom                                                               = new RuntimeException("Backend error")
+      val now: Instant                                                       = Instant.parse("2026-04-09T12:34:56.789Z")
+
+      val dataModel = UnsubmittedMonthlyReturn(
+        instanceId = instanceId,
+        monthlyReturnId = 3000L,
+        taxYear = 2026,
+        taxMonth = 4,
+        returnType = "Nil",
+        status = "In Progress",
+        amendment = Some("Y"),
+        deletable = true,
+        lastUpdated = now
+      )
+
+      val expectedRequest = DeleteUnsubmittedMonthlyReturnRequest(
+        instanceId = instanceId,
+        taxYear = 2026,
+        taxMonth = 4,
+        amendment = "Y"
+      )
+
+      when(connector.deleteUnsubmittedMonthlyReturn(eqTo(expectedRequest))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(boom))
+
+      val ex = service.deleteUnsubmittedMonthlyReturn(dataModel).failed.futureValue
+      ex mustBe boom
+
+      verify(connector).deleteUnsubmittedMonthlyReturn(eqTo(expectedRequest))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+      verifyNoInteractions(unsubmittedMonthlyReturnRepo)
+    }
+  }
 }
