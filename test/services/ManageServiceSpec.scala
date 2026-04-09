@@ -33,7 +33,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.agent.AgentLandingViewModel
 
 import java.time.temporal.ChronoUnit
-import java.time.{Clock, Instant, ZoneId}
+import java.time.{Clock, Instant, LocalDateTime, ZoneId}
 import scala.jdk.CollectionConverters.*
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -441,6 +441,9 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       val fixedInstant = Instant.now(clock)
 
+      val fixedDateTime =
+        LocalDateTime.ofInstant(fixedInstant, ZoneId.systemDefault())
+
       when(appConfig.fileStandardReturnUrl(any[String])).thenReturn("/standard")
       when(appConfig.fileNilReturnUrl(any[String])).thenReturn("/nil")
 
@@ -452,7 +455,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       val mockResponse = UnsubmittedMonthlyReturnsResponse(
         unsubmittedCisReturns = Seq(
           UnsubmittedMonthlyReturnsRow(3000L, 2025, 1, "Nil", "PENDING", None, Some("Y"), true),
-          UnsubmittedMonthlyReturnsRow(3001L, 2025, 2, "Nil", "STARTED", None, Some("Y"), true)
+          UnsubmittedMonthlyReturnsRow(3001L, 2025, 2, "Nil", "STARTED", Some(fixedDateTime), Some("Y"), true)
         )
       )
 
