@@ -101,9 +101,9 @@ class ReturnsLandingController @Inject() (
     case ("Nil", Some("N"))      => controllers.delete.routes.DeleteNilMonthlyReturnController.onPageLoad()
     case ("Standard", Some("Y")) => controllers.delete.routes.DeleteAmendedMonthlyReturnController.onPageLoad()
     case ("Standard", Some("N")) => controllers.delete.routes.DeleteMonthlyReturnController.onPageLoad()
-//    case _                       =>
-//      logger.warn(s"[ReturnsLandingController] No delete route mapping for monthlyReturnId=${record.monthlyReturnId}")
-//      controllers.routes.JourneyRecoveryController.onPageLoad()
+    case _                       =>
+      logger.warn(s"[ReturnsLandingController] No delete route mapping for monthlyReturnId=${record.monthlyReturnId}")
+      controllers.routes.JourneyRecoveryController.onPageLoad()
   }
 
 //  def onDeleteRedirect(monthlyReturnId: Long): Action[AnyContent] =

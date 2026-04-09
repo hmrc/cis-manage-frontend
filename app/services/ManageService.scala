@@ -24,13 +24,12 @@ import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, Unsub
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
-import play.api.mvc.Call
 import repositories.{SessionRepository, UnsubmittedReturnRepository}
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ReturnLandingViewModel, ReturnsLandingContext}
 import viewmodels.agent.AgentLandingViewModel
 
-import java.time.LocalDateTime
+import java.time.{Instant, LocalDateTime}
 import java.time.format.{DateTimeFormatter, TextStyle}
 import java.util.Locale
 import javax.inject.{Inject, Singleton}
@@ -178,13 +177,14 @@ class ManageService @Inject() (
               taxMonth = r.taxMonth,
               returnType = r.returnType,
               status = r.status,
+              lastUpdated = Instant.now(),
               amendment = r.amendment,
               deletable = r.deletable
             )
           }
 
           Future
-            .sequence(unsubmittedReturnsToPersist.map(unsubmittedReturnRepository.set))
+            .sequence(unsubmittedReturnsToPersist.map(unsubmittedReturnRepository.upsert))
             .map { _ =>
               Some(ReturnsLandingContext(name, standardLink, nilLink, returnsList))
             }

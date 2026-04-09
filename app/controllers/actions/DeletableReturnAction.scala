@@ -19,7 +19,6 @@ package controllers.actions
 import javax.inject.Inject
 import models.requests.DataRequest
 import models.{UnsubmittedReturn, UserAnswers}
-import pages.CisIdPage
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result, WrappedRequest}
 import play.api.Logging

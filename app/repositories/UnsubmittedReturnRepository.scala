@@ -21,7 +21,6 @@ import models.UnsubmittedReturn
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.*
 import play.api.libs.json.Format
-import uk.gov.hmrc.mdc.Mdc
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
@@ -58,8 +57,8 @@ class UnsubmittedReturnRepository @Inject() (
   def get(monthlyReturnId: Long): Future[Option[UnsubmittedReturn]] =
     collection.find(byMonthlyReturnId(monthlyReturnId)).headOption()
 
-  def set(returnItem: UnsubmittedReturn): Future[Unit] = {
-    val updated = returnItem.copy(updatedAt = Instant.now(clock))
+  def upsert(returnItem: UnsubmittedReturn): Future[Unit] = {
+    val updated = returnItem.copy(lastUpdated = Instant.now(clock))
 
     collection
       .replaceOne(

@@ -16,12 +16,13 @@
 
 package models
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Format, Json, OFormat}
 
-import java.time.{Instant, LocalDateTime}
+import java.time.Instant
 import java.util.Locale
-import play.api.i18n.{I18nSupport, Lang, MessagesApi}
+import play.api.i18n.Lang
 import utils.Utils.monthName
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 case class UnsubmittedReturn(
   instanceId: String,
@@ -32,7 +33,7 @@ case class UnsubmittedReturn(
   status: String,
   amendment: Option[String],
   deletable: Boolean,
-  updatedAt: Instant = Instant.now
+  lastUpdated: Instant
 ) {
   def monthYear(langCode: String): String = {
     val locale: Locale = Lang.get(langCode).map(_.locale).getOrElse(Locale.UK)
@@ -41,5 +42,7 @@ case class UnsubmittedReturn(
 }
 
 object UnsubmittedReturn {
-  given format: OFormat[UnsubmittedReturn] = Json.format[UnsubmittedReturn]
+  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
+
+  implicit val format: OFormat[UnsubmittedReturn] = Json.format[UnsubmittedReturn]
 }
