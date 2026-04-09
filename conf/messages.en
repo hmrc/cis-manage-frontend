@@ -15,6 +15,7 @@ site.pagination.landmark = Pagination
 site.pagination.previous = Previous
 site.pagination.next = Next
 site.delete = Delete
+site.or = or
 
 date.day = Day
 date.month = Month
@@ -395,6 +396,29 @@ manageNoticesStatements.searchResults.viewAll = View all notices
 addContractorDetails.title = Add contractor details
 addContractorDetails.heading = Add contractor details
 addContractorDetails.p1 = This is a placeholder page for adding contractor details.
+
+delete.deleteMonthlyReturn.title = Are you sure you want to delete the monthly return for {0}?
+delete.deleteMonthlyReturn.heading = Are you sure you want to delete the monthly return for {0}?
+delete.deleteMonthlyReturn.error.required = Select ‘Yes’ to delete the return.
+
+delete.deleteNilMonthlyReturn.title = Are you sure you want to delete the nil monthly return for {0}?
+delete.deleteNilMonthlyReturn.heading = Are you sure you want to delete the nil monthly return for {0}?
+delete.deleteNilMonthlyReturn.error.required = Select yes to delete this nil monthly return
+
+delete.deleteAmendedMonthlyReturn.title = Are you sure you want to delete the amended monthly return for {0}?
+delete.deleteAmendedMonthlyReturn.heading = Are you sure you want to delete the amended monthly return for {0}?
+delete.deleteAmendedMonthlyReturn.error.required = Select yes to delete this amended monthly return
+
+delete.deleteAmendedNilMonthlyReturn.title = Are you sure you want to delete the amended nil monthly return for {0}?
+delete.deleteAmendedNilMonthlyReturn.heading = Are you sure you want to delete the amended nil monthly return for {0}?
+delete.deleteAmendedNilMonthlyReturn.error.required = Select yes to delete this amended nil monthly return.
+
+history.submittedReturnsChooseTaxYear.title = Which tax year do you want to view?
+history.submittedReturnsChooseTaxYear.heading = Which tax year do you want to view?
+history.submittedReturnsChooseTaxYear.caption = Submitted returns
+history.submittedReturnsChooseTaxYear.viewAll = View all tax years
+history.submittedReturnsChooseTaxYear.error.required = Select a tax year or all tax years
+
 
 returnHistory.allYears.title = Monthly return history for all tax years
 returnHistory.allYears.heading = Monthly return history for all tax years

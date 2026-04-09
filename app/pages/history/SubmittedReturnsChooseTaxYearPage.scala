@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package generators
+package pages.history
 
-import org.scalacheck.{Arbitrary, Gen}
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-trait ModelGenerators {
+case object SubmittedReturnsChooseTaxYearPage extends QuestionPage[String] {
 
-  implicit def arbitrarySubmittedReturnsChooseTaxYear(implicit taxYears: Seq[String]): Arbitrary[String] =
-    Arbitrary(Gen.oneOf(taxYears :+ "all"))
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "submittedReturnsChooseTaxYear"
 }

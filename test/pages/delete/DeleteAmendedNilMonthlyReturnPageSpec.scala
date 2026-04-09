@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package generators
+package pages.delete
 
-import org.scalacheck.{Arbitrary, Gen}
+import base.SpecBase
+import play.api.libs.json.JsPath
 
-trait ModelGenerators {
+class DeleteAmendedNilMonthlyReturnPageSpec extends SpecBase {
+  "DeleteAmendedNilMonthlyReturnPage" - {
+    "have the correct path" in {
+      DeleteAmendedNilMonthlyReturnPage.path mustBe (JsPath \ "deleteAmendedNilMonthlyReturn")
+    }
 
-  implicit def arbitrarySubmittedReturnsChooseTaxYear(implicit taxYears: Seq[String]): Arbitrary[String] =
-    Arbitrary(Gen.oneOf(taxYears :+ "all"))
+    "have the correct toString" in {
+      DeleteAmendedNilMonthlyReturnPage.toString mustBe "deleteAmendedNilMonthlyReturn"
+    }
+  }
 }

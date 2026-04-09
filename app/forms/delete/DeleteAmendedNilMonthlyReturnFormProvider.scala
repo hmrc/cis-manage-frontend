@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package generators
+package forms.delete
 
-import org.scalacheck.{Arbitrary, Gen}
+import forms.mappings.Mappings
+import play.api.data.Form
 
-trait ModelGenerators {
+import javax.inject.Inject
 
-  implicit def arbitrarySubmittedReturnsChooseTaxYear(implicit taxYears: Seq[String]): Arbitrary[String] =
-    Arbitrary(Gen.oneOf(taxYears :+ "all"))
+class DeleteAmendedNilMonthlyReturnFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("delete.deleteAmendedNilMonthlyReturn.error.required")
+    )
 }
