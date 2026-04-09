@@ -33,8 +33,15 @@
 }
 
 /* Return history table width */
+
+.return-history-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
 .return-history-table {
   width: 100%;
+  min-width: 640px;
 }
 
 .return-history-table .rh-col-period {width : 22%;}
