@@ -20,11 +20,11 @@ import config.FrontendAppConfig
 import controllers.actions.*
 import play.api.Logging
 import javax.inject.Inject
-import models.UnsubmittedReturn
+import models.UnsubmittedMonthlyReturn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import queries.delete.UnsubmittedReturnToDeleteQuery
-import repositories.{SessionRepository, UnsubmittedReturnRepository}
+import repositories.{SessionRepository, UnsubmittedMonthlyReturnRepository}
 import services.ManageService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -43,7 +43,7 @@ class ReturnsLandingController @Inject() (
   view: ReturnsLandingView,
   service: ManageService,
   sessionRepository: SessionRepository,
-  unsubmittedReturnRepository: UnsubmittedReturnRepository
+  unsubmittedReturnRepository: UnsubmittedMonthlyReturnRepository
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -96,7 +96,7 @@ class ReturnsLandingController @Inject() (
       }
     }
 
-  private def resolveDeleteRoute(record: UnsubmittedReturn): Call = (record.returnType, record.amendment) match {
+  private def resolveDeleteRoute(record: UnsubmittedMonthlyReturn): Call = (record.returnType, record.amendment) match {
     case ("Nil", Some("Y"))      => controllers.delete.routes.DeleteAmendedNilMonthlyReturnController.onPageLoad()
     case ("Nil", Some("N"))      => controllers.delete.routes.DeleteNilMonthlyReturnController.onPageLoad()
     case ("Standard", Some("Y")) => controllers.delete.routes.DeleteAmendedMonthlyReturnController.onPageLoad()

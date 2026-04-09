@@ -16,11 +16,13 @@
 
 package queries.delete
 
-import models.UnsubmittedReturn
+import models.UnsubmittedMonthlyReturn
 import play.api.libs.json.JsPath
 import queries.{Gettable, Settable}
 
-case object UnsubmittedReturnToDeleteQuery extends Gettable[UnsubmittedReturn] with Settable[UnsubmittedReturn] {
+case object UnsubmittedReturnToDeleteQuery
+    extends Gettable[UnsubmittedMonthlyReturn]
+    with Settable[UnsubmittedMonthlyReturn] {
 
   override def path: JsPath = JsPath \ "unsubmittedReturnToDelete"
 }

@@ -20,11 +20,11 @@ import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
 import models.requests.DeleteUnsubmittedMonthlyReturnRequest
-import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, UnsubmittedReturn, UserAnswers}
+import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturn, UnsubmittedMonthlyReturnsResponse, UserAnswers}
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
-import repositories.{SessionRepository, UnsubmittedReturnRepository}
+import repositories.{SessionRepository, UnsubmittedMonthlyReturnRepository}
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ReturnLandingViewModel, ReturnsLandingContext}
 import viewmodels.agent.AgentLandingViewModel
@@ -39,7 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ManageService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector,
   sessionRepository: SessionRepository,
-  unsubmittedReturnRepository: UnsubmittedReturnRepository
+  unsubmittedReturnRepository: UnsubmittedMonthlyReturnRepository
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends Logging {
 
@@ -170,7 +170,7 @@ class ManageService @Inject() (
             }
 
           val unsubmittedReturnsToPersist = response.unsubmittedCisReturns.map { r =>
-            UnsubmittedReturn(
+            UnsubmittedMonthlyReturn(
               instanceId = instanceId,
               monthlyReturnId = r.monthlyReturnId,
               taxYear = r.taxYear,
@@ -195,7 +195,9 @@ class ManageService @Inject() (
     }
   }
 
-  def deleteUnsubmittedMonthlyReturn(returnToDelete: UnsubmittedReturn)(implicit hc: HeaderCarrier): Future[Unit] =
+  def deleteUnsubmittedMonthlyReturn(returnToDelete: UnsubmittedMonthlyReturn)(implicit
+    hc: HeaderCarrier
+  ): Future[Unit] =
     cisConnector.deleteUnsubmittedMonthlyReturn(
       DeleteUnsubmittedMonthlyReturnRequest(
         instanceId = returnToDelete.instanceId,

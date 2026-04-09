@@ -18,7 +18,7 @@ package controllers.actions
 
 import javax.inject.Inject
 import models.requests.DataRequest
-import models.{UnsubmittedReturn, UserAnswers}
+import models.{UnsubmittedMonthlyReturn, UserAnswers}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result, WrappedRequest}
 import play.api.Logging
@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class DeletableReturnRequest[A](
   request: DataRequest[A],
-  returnToDelete: UnsubmittedReturn
+  returnToDelete: UnsubmittedMonthlyReturn
 ) extends WrappedRequest[A](request) {
   def userAnswers: UserAnswers = request.userAnswers
 }

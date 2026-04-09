@@ -17,7 +17,7 @@
 package repositories
 
 import config.FrontendAppConfig
-import models.UnsubmittedReturn
+import models.UnsubmittedMonthlyReturn
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.*
 import play.api.libs.json.Format
@@ -31,15 +31,15 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class UnsubmittedReturnRepository @Inject() (
+class UnsubmittedMonthlyReturnRepository @Inject() (
   mongoComponent: MongoComponent,
   appConfig: FrontendAppConfig,
   clock: Clock
 )(implicit ec: ExecutionContext)
-    extends PlayMongoRepository[UnsubmittedReturn](
-      collectionName = "unsubmitted-returns",
+    extends PlayMongoRepository[UnsubmittedMonthlyReturn](
+      collectionName = "unsubmitted-monthly-returns",
       mongoComponent = mongoComponent,
-      domainFormat = UnsubmittedReturn.format,
+      domainFormat = UnsubmittedMonthlyReturn.format,
       indexes = Seq(
         IndexModel(
           Indexes.ascending("lastUpdated"),
@@ -54,10 +54,10 @@ class UnsubmittedReturnRepository @Inject() (
 
   private def byMonthlyReturnId(id: Long): Bson = Filters.eq("_id", id)
 
-  def get(monthlyReturnId: Long): Future[Option[UnsubmittedReturn]] =
+  def get(monthlyReturnId: Long): Future[Option[UnsubmittedMonthlyReturn]] =
     collection.find(byMonthlyReturnId(monthlyReturnId)).headOption()
 
-  def upsert(returnItem: UnsubmittedReturn): Future[Unit] = {
+  def upsert(returnItem: UnsubmittedMonthlyReturn): Future[Unit] = {
     val updated = returnItem.copy(lastUpdated = Instant.now(clock))
 
     collection

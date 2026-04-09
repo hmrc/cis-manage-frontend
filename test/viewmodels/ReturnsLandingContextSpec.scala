@@ -25,7 +25,7 @@ class ReturnsLandingContextSpec extends AnyWordSpec with Matchers {
 
     "hold the values passed to it" in {
       val returns = Seq(
-        ReturnLandingViewModel("August 2025", "Standard", "19 September 2025", "Accepted")
+        ReturnLandingViewModel(3000L, "August 2025", "Standard", "19 September 2025", "Accepted", Some("Y"))
       )
 
       val context = ReturnsLandingContext(

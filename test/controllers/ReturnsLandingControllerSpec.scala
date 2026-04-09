@@ -38,8 +38,8 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
     standardReturnLink = "/standard-link",
     nilReturnLink = "/nil-link",
     returnsList = Seq(
-      ReturnLandingViewModel("August 2025", "Standard", "19 September 2025", "In progress"),
-      ReturnLandingViewModel("July 2025", "Nil", "19 August 2025", "In progress")
+      ReturnLandingViewModel(3000L, "August 2025", "Standard", "19 September 2025", "In progress", Some("Y")),
+      ReturnLandingViewModel(3001L, "July 2025", "Nil", "19 August 2025", "In progress", Some("Y"))
     )
   )
 
@@ -59,7 +59,6 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
       val app =
         applicationBuilder(
           userAnswers = Some(userAnswersWithCisId),
-          isAgent = false,
           additionalBindings = Seq(bind[ManageService].toInstance(mockManageService))
         ).build()
 

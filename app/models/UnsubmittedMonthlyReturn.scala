@@ -24,7 +24,7 @@ import play.api.i18n.Lang
 import utils.Utils.monthName
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
-case class UnsubmittedReturn(
+case class UnsubmittedMonthlyReturn(
   instanceId: String,
   monthlyReturnId: Long,
   taxYear: Int,
@@ -41,8 +41,8 @@ case class UnsubmittedReturn(
   }
 }
 
-object UnsubmittedReturn {
+object UnsubmittedMonthlyReturn {
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
-  implicit val format: OFormat[UnsubmittedReturn] = Json.format[UnsubmittedReturn]
+  implicit val format: OFormat[UnsubmittedMonthlyReturn] = Json.format[UnsubmittedMonthlyReturn]
 }

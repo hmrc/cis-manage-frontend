@@ -19,7 +19,6 @@ package controllers.delete
 import controllers.actions.*
 import forms.delete.DeleteAmendedNilMonthlyReturnFormProvider
 import models.Mode
-import navigation.Navigator
 import pages.delete.DeleteAmendedNilMonthlyReturnPage
 import play.api.Logging
 import play.api.data.Form
@@ -37,7 +36,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class DeleteAmendedNilMonthlyReturnController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
-  navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
