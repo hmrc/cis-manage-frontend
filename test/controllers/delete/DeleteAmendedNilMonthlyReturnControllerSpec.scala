@@ -46,7 +46,7 @@ class DeleteAmendedNilMonthlyReturnControllerSpec extends SpecBase with MockitoS
   val baseUa: UserAnswers = userAnswersWithCisId
     .set(
       UnsubmittedMonthlyReturnToDeleteQuery,
-      UnsubmittedMonthlyReturn("1", 3000L, 2026, 4, "Nil", "In Progress", Some("N"), true, Instant.now())
+      UnsubmittedMonthlyReturn("1", 3000L, 2026, 4, "Nil", "In Progress", Some("Y"), true, Instant.now())
     )
     .success
     .value
@@ -94,7 +94,7 @@ class DeleteAmendedNilMonthlyReturnControllerSpec extends SpecBase with MockitoS
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the ReturnsLandingController after calling api when user answered yes" in {
 
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -122,6 +122,35 @@ class DeleteAmendedNilMonthlyReturnControllerSpec extends SpecBase with MockitoS
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.ReturnsLandingController.onPageLoad("1").url
+      }
+    }
+
+    "must redirect to the ReturnsLandingController when user answered no" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val mockManageService = mock[ManageService]
+
+      val application =
+        applicationBuilder(userAnswers = Some(baseUa))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[ManageService].toInstance(mockManageService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, deleteAmendedNilMonthlyReturnRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.ReturnsLandingController.onPageLoad("1").url
+
+        verifyNoInteractions(mockManageService)
       }
     }
 

@@ -19,13 +19,14 @@ package controllers.delete
 import controllers.actions.*
 import forms.delete.DeleteAmendedMonthlyReturnFormProvider
 import models.Mode
-import navigation.Navigator
 import pages.delete.DeleteAmendedMonthlyReturnPage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.delete.UnsubmittedMonthlyReturnToDeleteQuery
 import repositories.SessionRepository
+import services.ManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.delete.DeleteAmendedMonthlyReturnView
 
@@ -35,10 +36,11 @@ import javax.inject.Inject
 class DeleteAmendedMonthlyReturnController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
-  navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  deletableReturnAction: DeletableReturnAction,
+  service: ManageService,
   formProvider: DeleteAmendedMonthlyReturnFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: DeleteAmendedMonthlyReturnView
@@ -49,42 +51,55 @@ class DeleteAmendedMonthlyReturnController @Inject() (
 
   val form: Form[Boolean] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    getPeriodEnd match {
-      case Some(monthYear) =>
-        val preparedForm = request.userAnswers.get(DeleteAmendedMonthlyReturnPage) match {
-          case None        => form
-          case Some(value) => form.fill(value)
-        }
-        Ok(view(preparedForm, monthYear, mode))
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen deletableReturnAction) { implicit request =>
 
-      case None =>
-        logger.error("[DeleteAmendedMonthlyReturn] dateConfirmPayments missing")
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-    }
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      getPeriodEnd match {
-        case Some(monthYear) =>
-          form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, monthYear, mode))),
-              value =>
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(DeleteAmendedMonthlyReturnPage, value))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(navigator.nextPage(DeleteAmendedMonthlyReturnPage, mode, updatedAnswers))
-            )
-
-        case None =>
-          logger.error("[DeleteAmendedMonthlyReturn] dateConfirmPayments missing")
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      val preparedForm = request.userAnswers.get(DeleteAmendedMonthlyReturnPage) match {
+        case None        => form
+        case Some(value) => form.fill(value)
       }
-  }
 
-  private def getPeriodEnd: Option[String] =
-    Some("March 2026")
+      val langCode  = messagesApi.preferred(request).lang.code
+      val monthYear = request.returnToDelete.monthYear(langCode)
+
+      Ok(view(preparedForm, monthYear, mode))
+    }
+
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen deletableReturnAction).async { implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => {
+            val langCode  = messagesApi.preferred(request).lang.code
+            val monthYear = request.returnToDelete.monthYear(langCode)
+            Future.successful(BadRequest(view(formWithErrors, monthYear, mode)))
+          },
+          value =>
+            if (value) {
+              val result = for {
+                _              <- service.deleteUnsubmittedMonthlyReturn(request.returnToDelete)
+                updatedAnswers <- Future.fromTry(request.userAnswers.remove(UnsubmittedMonthlyReturnToDeleteQuery))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(
+                controllers.routes.ReturnsLandingController.onPageLoad(request.returnToDelete.instanceId)
+              )
+
+              result.recover { case ex =>
+                logger.error(
+                  s"[DeleteAmendedMonthlyReturnController] Failed to delete returnId=${request.returnToDelete.monthlyReturnId}: ${ex.getMessage}",
+                  ex
+                )
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              }
+            } else {
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.remove(UnsubmittedMonthlyReturnToDeleteQuery))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(
+                controllers.routes.ReturnsLandingController.onPageLoad(request.returnToDelete.instanceId)
+              )
+            }
+        )
+    }
 }

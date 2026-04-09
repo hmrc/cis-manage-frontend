@@ -74,21 +74,31 @@ class DeleteAmendedNilMonthlyReturnController @Inject() (
             val monthYear = request.returnToDelete.monthYear(langCode)
             Future.successful(BadRequest(view(formWithErrors, monthYear, mode)))
           },
-          value => {
-            val result = for {
-              _              <- service.deleteUnsubmittedMonthlyReturn(request.returnToDelete)
-              updatedAnswers <- Future.fromTry(request.userAnswers.remove(UnsubmittedMonthlyReturnToDeleteQuery))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(controllers.routes.ReturnsLandingController.onPageLoad(request.returnToDelete.instanceId))
-
-            result.recover { case ex =>
-              logger.error(
-                s"[DeleteAmendedNilMonthlyReturnController] Failed to delete returnId=${request.returnToDelete.monthlyReturnId}: ${ex.getMessage}",
-                ex
+          value =>
+            if (value) {
+              val result = for {
+                _              <- service.deleteUnsubmittedMonthlyReturn(request.returnToDelete)
+                updatedAnswers <- Future.fromTry(request.userAnswers.remove(UnsubmittedMonthlyReturnToDeleteQuery))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(
+                controllers.routes.ReturnsLandingController.onPageLoad(request.returnToDelete.instanceId)
               )
-              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+              result.recover { case ex =>
+                logger.error(
+                  s"[DeleteAmendedNilMonthlyReturnController] Failed to delete returnId=${request.returnToDelete.monthlyReturnId}: ${ex.getMessage}",
+                  ex
+                )
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              }
+            } else {
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.remove(UnsubmittedMonthlyReturnToDeleteQuery))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(
+                controllers.routes.ReturnsLandingController.onPageLoad(request.returnToDelete.instanceId)
+              )
             }
-          }
         )
     }
 }
