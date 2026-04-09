@@ -29,7 +29,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ReturnLandingViewModel, ReturnsLandingContext}
 import viewmodels.agent.AgentLandingViewModel
 
-import java.time.{Instant, LocalDateTime}
+import java.time.{Clock, Instant, LocalDateTime}
 import java.time.format.{DateTimeFormatter, TextStyle}
 import java.util.Locale
 import javax.inject.{Inject, Singleton}
@@ -39,7 +39,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class ManageService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector,
   sessionRepository: SessionRepository,
-  unsubmittedReturnRepository: UnsubmittedMonthlyReturnRepository
+  unsubmittedReturnRepository: UnsubmittedMonthlyReturnRepository,
+  clock: Clock
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends Logging {
 
@@ -177,17 +178,15 @@ class ManageService @Inject() (
               taxMonth = r.taxMonth,
               returnType = r.returnType,
               status = r.status,
-              lastUpdated = Instant.now(),
+              lastUpdated = Instant.now(clock),
               amendment = r.amendment,
               deletable = r.deletable
             )
           }
 
-          Future
-            .sequence(unsubmittedReturnsToPersist.map(unsubmittedReturnRepository.upsert))
-            .map { _ =>
-              Some(ReturnsLandingContext(name, standardLink, nilLink, returnsList))
-            }
+          for {
+            _ <- Future.traverse(unsubmittedReturnsToPersist)(unsubmittedReturnRepository.upsert)
+          } yield Some(ReturnsLandingContext(name, standardLink, nilLink, returnsList))
         }
 
       case _ =>
@@ -206,28 +205,6 @@ class ManageService @Inject() (
         amendment = returnToDelete.amendment.getOrElse("N")
       )
     )
-
-  //  def getDeleteRoute(monthlyReturnId: Long): Future[Call] =
-//    unsubmittedReturnRepository.get(monthlyReturnId).map {
-//      case Some(record) =>
-//        (record.returnType, record.amendment) match {
-//          case ("Nil", Some("Y"))      =>
-//            controllers.delete.routes.DeleteAmendedNilMonthlyReturnController.onPageLoad()
-//          case ("Nil", Some("N"))      =>
-//            controllers.delete.routes.DeleteNilMonthlyReturnController.onPageLoad()
-//          case ("Standard", Some("Y")) =>
-//            controllers.delete.routes.DeleteAmendedMonthlyReturnController.onPageLoad()
-//          case ("Standard", Some("N")) =>
-//            controllers.delete.routes.DeleteMonthlyReturnController.onPageLoad()
-//          case _                       =>
-//            controllers.routes.JourneyRecoveryController.onPageLoad()
-//        }
-//      case None         =>
-//        logger.warn(
-//          s"[getDeleteRoute] missing monthlyReturnId: $monthlyReturnId"
-//        )
-//        controllers.routes.JourneyRecoveryController.onPageLoad()
-//    }
 
   private def formatPeriod(taxMonth: Int, taxYear: Int): String = {
     val monthName = java.time.Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)
