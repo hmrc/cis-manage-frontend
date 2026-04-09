@@ -74,17 +74,10 @@ class ReturnsLandingController @Inject() (
     (identify andThen getData andThen requireData).async { implicit request =>
       unsubmittedReturnRepository.get(monthlyReturnId).flatMap {
         case Some(record) if record.deletable =>
-          (for {
+          for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(UnsubmittedMonthlyReturnToDeleteQuery, record))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(resolveDeleteRoute(record)))
-            .recover { case ex =>
-              logger.error(
-                s"[ReturnsLandingController] Failed to save record to session for monthlyReturnId=$monthlyReturnId",
-                ex
-              )
-              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            }
+          } yield Redirect(resolveDeleteRoute(record))
 
         case Some(record) =>
           logger.warn(s"[ReturnsLandingController] Record not deletable for monthlyReturnId=$monthlyReturnId")
@@ -105,27 +98,4 @@ class ReturnsLandingController @Inject() (
       logger.warn(s"[ReturnsLandingController] No delete route mapping for monthlyReturnId=${record.monthlyReturnId}")
       controllers.routes.JourneyRecoveryController.onPageLoad()
   }
-
-//  def onDeleteRedirect(monthlyReturnId: Long): Action[AnyContent] =
-//    (identify andThen getData).async { implicit request =>
-//      unsubmittedReturnRepository.get(monthlyReturnId).map {
-//        case Some(record) if record.deletable =>
-//          val deleteRoute = (record.returnType, record.amendment) match {
-//            case ("Nil", Some("Y")) => controllers.delete.routes.DeleteAmendedNilMonthlyReturnController.onPageLoad()
-//            case ("Nil", Some("N")) => controllers.delete.routes.DeleteNilMonthlyReturnController.onPageLoad()
-//            case ("Standard", Some("Y")) => controllers.delete.routes.DeleteAmendedMonthlyReturnController.onPageLoad()
-//            case ("Standard", Some("N")) => controllers.delete.routes.DeleteMonthlyReturnController.onPageLoad()
-//            case _ =>
-//              logger.warn(s"[ReturnsLandingController] No unsubmitted return for monthlyReturnId=$monthlyReturnId")
-//              controllers.routes.JourneyRecoveryController.onPageLoad()
-//          }
-//          Redirect(deleteRoute)
-//        case Some(record) =>
-//          logger.warn(s"[ReturnsLandingController] return is not deletable for monthlyReturnId=$monthlyReturnId")
-//          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-//        case None =>
-//          logger.warn(s"[ReturnsLandingController] failed for monthlyReturnId: $monthlyReturnId")
-//          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-//      }
-//    }
 }
