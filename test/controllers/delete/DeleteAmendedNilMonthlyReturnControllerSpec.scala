@@ -28,7 +28,7 @@ import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.delete.UnsubmittedReturnToDeleteQuery
+import queries.delete.UnsubmittedMonthlyReturnToDeleteQuery
 import repositories.SessionRepository
 import services.ManageService
 import views.html.delete.DeleteAmendedNilMonthlyReturnView
@@ -45,7 +45,7 @@ class DeleteAmendedNilMonthlyReturnControllerSpec extends SpecBase with MockitoS
 
   val baseUa: UserAnswers = userAnswersWithCisId
     .set(
-      UnsubmittedReturnToDeleteQuery,
+      UnsubmittedMonthlyReturnToDeleteQuery,
       UnsubmittedMonthlyReturn("1", 3000L, 2026, 4, "Nil", "In Progress", Some("N"), true, Instant.now())
     )
     .success

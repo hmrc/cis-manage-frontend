@@ -24,7 +24,7 @@ import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import queries.delete.UnsubmittedReturnToDeleteQuery
+import queries.delete.UnsubmittedMonthlyReturnToDeleteQuery
 import repositories.SessionRepository
 import services.ManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -77,7 +77,7 @@ class DeleteAmendedNilMonthlyReturnController @Inject() (
           value => {
             val result = for {
               _              <- service.deleteUnsubmittedMonthlyReturn(request.returnToDelete)
-              updatedAnswers <- Future.fromTry(request.userAnswers.remove(UnsubmittedReturnToDeleteQuery))
+              updatedAnswers <- Future.fromTry(request.userAnswers.remove(UnsubmittedMonthlyReturnToDeleteQuery))
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(controllers.routes.ReturnsLandingController.onPageLoad(request.returnToDelete.instanceId))
 

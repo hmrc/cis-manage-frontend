@@ -20,9 +20,9 @@ import models.UnsubmittedMonthlyReturn
 import play.api.libs.json.JsPath
 import queries.{Gettable, Settable}
 
-case object UnsubmittedReturnToDeleteQuery
+case object UnsubmittedMonthlyReturnToDeleteQuery
     extends Gettable[UnsubmittedMonthlyReturn]
     with Settable[UnsubmittedMonthlyReturn] {
 
-  override def path: JsPath = JsPath \ "unsubmittedReturnToDelete"
+  override def path: JsPath = JsPath \ "unsubmittedMonthlyReturnToDelete"
 }

@@ -23,7 +23,7 @@ import javax.inject.Inject
 import models.UnsubmittedMonthlyReturn
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
-import queries.delete.UnsubmittedReturnToDeleteQuery
+import queries.delete.UnsubmittedMonthlyReturnToDeleteQuery
 import repositories.{SessionRepository, UnsubmittedMonthlyReturnRepository}
 import services.ManageService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -75,7 +75,7 @@ class ReturnsLandingController @Inject() (
       unsubmittedReturnRepository.get(monthlyReturnId).flatMap {
         case Some(record) if record.deletable =>
           (for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(UnsubmittedReturnToDeleteQuery, record))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(UnsubmittedMonthlyReturnToDeleteQuery, record))
             _              <- sessionRepository.set(updatedAnswers)
           } yield Redirect(resolveDeleteRoute(record)))
             .recover { case ex =>

@@ -22,7 +22,7 @@ import models.{UnsubmittedMonthlyReturn, UserAnswers}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result, WrappedRequest}
 import play.api.Logging
-import queries.delete.UnsubmittedReturnToDeleteQuery
+import queries.delete.UnsubmittedMonthlyReturnToDeleteQuery
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,7 +40,7 @@ class DeletableReturnActionImpl @Inject() (implicit val executionContext: Execut
     with Logging {
 
   override protected def refine[A](request: DataRequest[A]): Future[Either[Result, DeletableReturnRequest[A]]] =
-    request.userAnswers.get(UnsubmittedReturnToDeleteQuery) match {
+    request.userAnswers.get(UnsubmittedMonthlyReturnToDeleteQuery) match {
       case Some(returnToDelete) if returnToDelete.deletable =>
         Future.successful(Right(DeletableReturnRequest(request, returnToDelete)))
 
