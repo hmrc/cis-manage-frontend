@@ -234,5 +234,19 @@ class DeleteAmendedMonthlyReturnControllerSpec extends SpecBase with MockitoSuga
 
       verifyNoInteractions(mockSessionRepository)
     }
+
+    "must redirect to Journey Recovery for a GET if UnsubmittedReturnToDeleteQuery is missing" in {
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, deleteAmendedMonthlyReturnRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
   }
 }
