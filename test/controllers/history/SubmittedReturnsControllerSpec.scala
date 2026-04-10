@@ -37,10 +37,11 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         taxYearCaption = "2023 to 2024",
         rows = Seq(
           SubmittedReturnsRowViewModel(
-            returnPeriodEnd = "31 March 2024",
-            dateSubmitted = "1 April 2024",
+            returnPeriodEnd = "Mar 2024",
+            returnType = "Nil",
+            dateSubmitted = "1 Apr 2024",
             monthlyReturn = LinkViewModel("View return", "/return/1", "for March 2024"),
-            submissionReceipt = LinkViewModel("View receipt", "/receipt/1", "for March 2024"),
+            submissionReceipt = StatusViewModel.Text("View"),
             status = StatusViewModel.Text("Submitted")
           )
         )

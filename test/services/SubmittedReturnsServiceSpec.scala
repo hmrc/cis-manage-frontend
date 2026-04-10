@@ -19,9 +19,10 @@ package services
 import base.SpecBase
 
 import java.time.Instant
-import models.*
+import models.history.*
 import org.scalatest.matchers.should.Matchers.*
-import pages.SubmittedReturnsDataPage
+import pages.history.SubmittedReturnsDataPage
+import viewmodels.StatusViewModel
 import viewmodels.StatusViewModel.Text
 
 class SubmittedReturnsServiceSpec extends SpecBase {
@@ -85,11 +86,14 @@ class SubmittedReturnsServiceSpec extends SpecBase {
       )
 
       val firstRow = result.value.taxYears.head.rows.head
-      firstRow.returnPeriodEnd        shouldBe "March 2023"
-      firstRow.dateSubmitted          shouldBe "1 April 2024"
-      firstRow.monthlyReturn.text     shouldBe "Print"
-      firstRow.submissionReceipt.text shouldBe "View"
-      firstRow.status                 shouldBe Text("Amend")
+      firstRow.returnPeriodEnd          shouldBe "Mar 2023"
+      firstRow.returnType               shouldBe "Nil"
+      firstRow.dateSubmitted            shouldBe "1 Apr 2024"
+      firstRow.monthlyReturn.text       shouldBe "View"
+      firstRow.monthlyReturn.url        shouldBe "#"
+      firstRow.monthlyReturn.hiddenText shouldBe "monthly return for Mar 2023"
+      firstRow.submissionReceipt        shouldBe StatusViewModel.Text("View")
+      firstRow.status                   shouldBe Text("Amend")
     }
 
     "buildSingleYearViewModel must return only the selected tax year" in {
@@ -97,7 +101,7 @@ class SubmittedReturnsServiceSpec extends SpecBase {
 
       result.value.selectedTaxYear                         shouldBe Some("2023")
       result.value.taxYears.map(_.taxYearCaption)          shouldBe Seq("Tax year 2023 to 2024")
-      result.value.taxYears.head.rows.head.returnPeriodEnd shouldBe "March 2023"
+      result.value.taxYears.head.rows.head.returnPeriodEnd shouldBe "Mar 2023"
     }
 
     "return None when SubmittedReturnsDataPage is missing" in {

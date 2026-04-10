@@ -17,7 +17,7 @@
 package controllers.history
 
 import controllers.actions.*
-import pages.SubmittedReturnsDataPage
+import pages.history.SubmittedReturnsDataPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{StubSubmittedReturnsData, SubmittedReturnsService}

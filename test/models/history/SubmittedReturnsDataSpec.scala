@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package models
+package models.history
 
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
 
 import java.time.Instant

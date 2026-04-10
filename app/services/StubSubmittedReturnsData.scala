@@ -17,8 +17,8 @@
 package services
 
 import models.UserAnswers
-import models.{SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSchemeData, SubmittedSubmissionData}
-import pages.SubmittedReturnsDataPage
+import models.history.{SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSchemeData, SubmittedSubmissionData}
+import pages.history.SubmittedReturnsDataPage
 
 import java.time.Instant
 

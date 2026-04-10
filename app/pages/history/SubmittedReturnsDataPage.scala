@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package pages
+package pages.history
 
-import models.SubmittedReturnsData
+import models.history.SubmittedReturnsData
+import pages.QuestionPage
 import play.api.libs.json.JsPath
 
 case object SubmittedReturnsDataPage extends QuestionPage[SubmittedReturnsData] {

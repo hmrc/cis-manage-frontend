@@ -29,17 +29,12 @@ class SubmittedReturnsViewModelsSpec extends AnyWordSpec with Matchers {
         hiddenText = "for March 2024"
       )
 
-      val submissionReceiptLink = LinkViewModel(
-        text = "View receipt",
-        url = "/receipt/1",
-        hiddenText = "for March 2024"
-      )
-
       val row = SubmittedReturnsRowViewModel(
         returnPeriodEnd = "31 March 2024",
+        returnType = "Nil",
         dateSubmitted = "1 April 2024",
         monthlyReturn = monthlyReturnLink,
-        submissionReceipt = submissionReceiptLink,
+        submissionReceipt = StatusViewModel.Text("View"),
         status = StatusViewModel.Text("Submitted")
       )
 

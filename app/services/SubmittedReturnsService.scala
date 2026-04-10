@@ -17,21 +17,21 @@
 package services
 
 import models.UserAnswers
-import models.{SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSubmissionData}
-import pages.SubmittedReturnsDataPage
-import viewmodels.{LinkViewModel, SubmittedReturnsPageViewModel, SubmittedReturnsRowViewModel, TaxYearHistoryViewModel}
+import models.history.{SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSubmissionData}
+import pages.history.SubmittedReturnsDataPage
+import viewmodels.{LinkViewModel, StatusViewModel, SubmittedReturnsPageViewModel, SubmittedReturnsRowViewModel, TaxYearHistoryViewModel}
 import viewmodels.StatusViewModel.Text
 
-import java.time.format.{DateTimeFormatter, TextStyle}
-import java.time.{Month, ZoneId}
-import java.util.Locale
+import java.time.format.DateTimeFormatter
+import java.time.{YearMonth, ZoneId}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
 class SubmittedReturnsService @Inject() {
 
-  private val ukTimezone: ZoneId                      = ZoneId.of("Europe/London")
-  private val displayDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
+  private val ukTimezone: ZoneId                         = ZoneId.of("Europe/London")
+  private val displayDateFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("d MMM yyyy")
+  private val shortMonthYearFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM yyyy")
 
   def buildAllYearsViewModel(userAnswers: UserAnswers): Option[SubmittedReturnsPageViewModel] =
     userAnswers.get(SubmittedReturnsDataPage).map { data =>
@@ -78,37 +78,70 @@ class SubmittedReturnsService @Inject() {
     submissionOpt: Option[SubmittedSubmissionData]
   ): SubmittedReturnsRowViewModel = {
     val periodEndText     = buildReturnPeriodEnd(monthlyReturn)
-    val dateSubmittedText = submissionOpt
-      .flatMap(_.acceptedTime)
-      .map { instant =>
-        instant.atZone(ukTimezone).toLocalDate.format(displayDateFormatter)
-      }
-      .getOrElse("")
+    val returnType        = buildReturnType(monthlyReturn)
+    val dateSubmittedText = buildDateSubmittedText(submissionOpt)
 
     SubmittedReturnsRowViewModel(
       returnPeriodEnd = periodEndText,
+      returnType = returnType,
       dateSubmitted = dateSubmittedText,
       monthlyReturn = LinkViewModel(
-        text = "Print",
+        text = "View",
         url = "#", // TODO: F2 and F3 - replace with real route of page sr-04 Print monthly return
         hiddenText = s"monthly return for $periodEndText"
       ),
-      submissionReceipt = LinkViewModel(
-        text = "View",
-        url = "#", // TODO: F2 and F3 - replace with real route of page SR-02-f View/save submitted return
-        hiddenText = s"submission receipt for $periodEndText"
-      ),
+      submissionReceipt = buildSubmissionReceipt(submissionOpt, periodEndText),
       status = Text(
         buildStatusText(monthlyReturn)
       )
     )
   }
 
-  private def buildReturnPeriodEnd(monthlyReturn: SubmittedMonthlyReturnData): String = {
-    // TODO: implement F2 return period ended format
-    val monthName = Month.of(monthlyReturn.taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)
-    s"$monthName ${monthlyReturn.taxYear}"
-  }
+  private def buildReturnPeriodEnd(monthlyReturn: SubmittedMonthlyReturnData): String =
+    YearMonth
+      .of(monthlyReturn.taxYear, monthlyReturn.taxMonth)
+      .format(shortMonthYearFormatter)
+
+  private def buildReturnType(monthlyReturn: SubmittedMonthlyReturnData): String =
+    monthlyReturn.nilReturnIndicator match {
+      case "Y" => "Standard"
+      case "N" => "Nil"
+      case _   => ""
+    }
+
+  private def buildDateSubmittedText(submissionOpt: Option[SubmittedSubmissionData]): String =
+    submissionOpt
+      .flatMap(_.acceptedTime)
+      .map { instant =>
+        instant.atZone(ukTimezone).toLocalDate.format(displayDateFormatter)
+      }
+      .getOrElse("")
+
+  private def buildSubmissionReceipt(
+    submissionOpt: Option[SubmittedSubmissionData],
+    periodEndText: String
+  ): StatusViewModel =
+    if (isSubmissionReceiptAvailable(submissionOpt)) {
+      StatusViewModel.Link(
+        LinkViewModel(
+          text = "View",
+          url = "#", // TODO: F2 and F3 - replace with real route of page SR-02-f View/save submitted return
+          hiddenText = s"submission receipt for $periodEndText"
+        )
+      )
+    } else {
+      StatusViewModel.Text("View")
+    }
+
+  private def isSubmissionReceiptAvailable(submissionOpt: Option[SubmittedSubmissionData]): Boolean =
+    submissionOpt.exists { submission =>
+      val irMarkSent     = submission.hmrcMarkGenerated
+      val irMarkReceived = submission.hmrcMarkGgis
+
+      irMarkSent.isDefined &&
+      irMarkReceived.isDefined &&
+      irMarkSent == irMarkReceived
+    }
 
   private def buildStatusText(
     monthlyReturn: SubmittedMonthlyReturnData

@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package models
+package models.history
 
 import play.api.libs.json.{Json, OFormat}
+
 import java.time.Instant
 
 case class SubmittedReturnsData(

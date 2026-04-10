@@ -28,9 +28,10 @@ case class TaxYearHistoryViewModel(
 
 case class SubmittedReturnsRowViewModel(
   returnPeriodEnd: String,
+  returnType: String,
   dateSubmitted: String,
   monthlyReturn: LinkViewModel,
-  submissionReceipt: LinkViewModel,
+  submissionReceipt: StatusViewModel,
   status: StatusViewModel
 )
 
