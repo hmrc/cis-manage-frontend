@@ -28,8 +28,7 @@
     suffixTextKey: String = emptyString,
     extraClasses: String = emptyString,
     bold: Boolean = false,
-    visuallyHiddenText: Option[String] = None,
-    isRawText: Boolean = false
+    visuallyHiddenText: Option[String] = None
 )(implicit messages: Messages)
 
 @defining {
@@ -39,7 +38,7 @@
 
     <a href="@linkUrl"
        class="govuk-link @if(bold){govuk-!-font-weight-bold}"
-       @if(isNewTab){rel="noreferrer noopener" target="_blank"}>@if(isRawText) {@linkTextKey} else {@{Html(messages(linkTextKey))}}@visuallyHiddenText.map { hidden =><span class="govuk-visually-hidden">@hidden</span>}</a>@if(hasFullStop){.}
+       @if(isNewTab){rel="noreferrer noopener" target="_blank"}>@{Html(messages(linkTextKey))}@visuallyHiddenText.map { hidden =><span class="govuk-visually-hidden">@hidden</span>}</a>@if(hasFullStop){.}
 
     @if(suffixTextKey.nonEmpty) {
         @{Html(messages(suffixTextKey))}

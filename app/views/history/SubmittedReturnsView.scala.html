@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import viewmodels.{SubmittedReturnsPageViewModel, StatusViewModel}
+@import viewmodels.{SubmittedReturnsPageViewModel, StatusViewModel, ReturnTypeViewModel}
 @import views.html.components.*
 
 @this(
@@ -42,6 +42,14 @@
     }
 }
 
+@renderReturnType(returnType: ReturnTypeViewModel) = @{
+    returnType match {
+        case ReturnTypeViewModel.Standard => messages("history.returnHistory.returnType.standard")
+        case ReturnTypeViewModel.Nil      => messages("history.returnHistory.returnType.nil")
+        case ReturnTypeViewModel.Unknown  => ""
+    }
+}
+
 @layout(
     pageTitle = titleNoForm(pageTitleText),
     useFullWidth = true
@@ -64,7 +72,7 @@
                     <div class="return-history-table-wrapper">
                         @govukTable(
                             Table(
-                                caption = Some(taxYear.taxYearCaption),
+                                caption = Some(messages("history.returnHistory.taxYear.caption", taxYear.fromYear.toString, taxYear.toYear.toString)),
                                 captionClasses = "govuk-table__caption govuk-table__caption--m",
                                 classes = "govuk-!-margin-bottom-8 return-history-table",
                                 firstCellIsHeader = true,
@@ -85,7 +93,7 @@
                                             classes = "rh-col-period govuk-table__header",
                                         ),
                                         TableRow(
-                                            content = Text(row.returnType),
+                                            content = Text(renderReturnType(row.returnType)),
                                             classes = "rh-col-type",
                                         ),
                                         TableRow(
@@ -95,29 +103,26 @@
                                         TableRow(
                                             content = HtmlContent(
                                                 link(
-                                                    linkTextKey = row.monthlyReturn.text,
+                                                    linkTextKey = "site.view",
                                                     linkUrl = row.monthlyReturn.url,
                                                     paragraphWrapped = false,
-                                                    hasFullStop = true,
-                                                    isRawText = true,
-                                                    visuallyHiddenText = Some(row.monthlyReturn.hiddenText)
+                                                    visuallyHiddenText = Some(messages("history.returnHistory.hidden.monthlyReturn", row.monthlyReturn.hiddenText))
                                                 ).body
                                             ),
                                             classes = "rh-col-return",
                                         ),
                                         TableRow(
                                             content = row.submissionReceipt match {
-                                                case StatusViewModel.Text(value) =>
-                                                    Text(value)
+                                                case StatusViewModel.Text(messageKey) =>
+                                                    Text(messages(messageKey))
 
-                                                case StatusViewModel.Link(linkValue) =>
+                                                case StatusViewModel.Link(linkValue, textKey, hiddenTextKey) =>
                                                         HtmlContent(
                                                             link(
-                                                                linkTextKey = linkValue.text,
+                                                                linkTextKey = textKey,
                                                                 linkUrl = linkValue.url,
                                                                 paragraphWrapped = false,
-                                                                isRawText = true,
-                                                                visuallyHiddenText = Some(linkValue.hiddenText)
+                                                                visuallyHiddenText = Some(messages(hiddenTextKey, linkValue.hiddenText))
                                                             ).body
                                                         )
                                             },
@@ -125,17 +130,16 @@
                                         ),
                                         TableRow(
                                             content = row.status match {
-                                                case StatusViewModel.Text(value) =>
-                                                    Text(value)
+                                                case StatusViewModel.Text(messageKey) =>
+                                                    Text(messages(messageKey))
 
-                                                case StatusViewModel.Link(linkValue) =>
+                                                case StatusViewModel.Link(linkValue, textKey, hiddenTextKey) =>
                                                     HtmlContent(
                                                         link(
-                                                            linkTextKey = linkValue.text,
+                                                            linkTextKey = textKey,
                                                             linkUrl = linkValue.url,
                                                             paragraphWrapped = false,
-                                                            isRawText = true,
-                                                            visuallyHiddenText = Some(linkValue.hiddenText)
+                                                            visuallyHiddenText = Some(messages(hiddenTextKey, linkValue.hiddenText))
                                                         ).body
                                                     )
                                             },

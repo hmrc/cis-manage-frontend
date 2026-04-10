@@ -18,7 +18,6 @@ package pages.history
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import pages.history.SubmittedReturnsDataPage
 import play.api.libs.json.JsPath
 
 class SubmittedReturnsDataPageSpec extends AnyWordSpec with Matchers {

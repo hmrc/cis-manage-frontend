@@ -17,15 +17,19 @@
 package controllers.history
 
 import base.SpecBase
+import models.history.{SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSchemeData, SubmittedSubmissionData}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
+import pages.history.SubmittedReturnsDataPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.SubmittedReturnsService
 import viewmodels.*
 import views.html.history.SubmittedReturnsView
+
+import java.time.Instant
 
 class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
 
@@ -34,20 +38,53 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
   private val viewModel = SubmittedReturnsPageViewModel(
     taxYears = Seq(
       TaxYearHistoryViewModel(
-        taxYearCaption = "2023 to 2024",
+        fromYear = 2023,
+        toYear = 2024,
         rows = Seq(
           SubmittedReturnsRowViewModel(
             returnPeriodEnd = "Mar 2024",
-            returnType = "Nil",
+            returnType = ReturnTypeViewModel.Nil,
             dateSubmitted = "1 Apr 2024",
-            monthlyReturn = LinkViewModel("View return", "/return/1", "for March 2024"),
-            submissionReceipt = StatusViewModel.Text("View"),
-            status = StatusViewModel.Text("Submitted")
+            monthlyReturn = LinkViewModel("/return/1", "Mar 2024"),
+            submissionReceipt = StatusViewModel.Text("site.view"),
+            status = StatusViewModel.Text("history.returnHistory.status.amend")
           )
         )
       )
     ),
     selectedTaxYear = Some("2024")
+  )
+
+  private val submittedReturnsData = SubmittedReturnsData(
+    scheme = SubmittedSchemeData(
+      name = "Test Scheme",
+      taxOfficeNumber = "123",
+      taxOfficeReference = "AB456"
+    ),
+    monthlyReturn = Seq(
+      SubmittedMonthlyReturnData(
+        monthlyReturnId = 1L,
+        taxYear = 2024,
+        taxMonth = 3,
+        nilReturnIndicator = "Y",
+        status = "Submitted",
+        supersededBy = None,
+        amendmentStatus = None,
+        monthlyReturnItems = None
+      )
+    ),
+    submissions = Seq(
+      SubmittedSubmissionData(
+        submissionId = 1L,
+        submissionType = Some("MONTHLY_RETURN"),
+        activeObjectId = 1L,
+        status = "Submitted",
+        hmrcMarkGenerated = Some("123"),
+        hmrcMarkGgis = Some("123"),
+        emailRecipient = Some("test@example.com"),
+        acceptedTime = Some(Instant.parse("2024-04-01T12:00:00Z"))
+      )
+    )
   )
 
   "SubmittedReturnsController" - {
@@ -119,6 +156,46 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "onPageLoadSingleYear must use existing SubmittedReturnsDataPage when already present" in {
+      val userAnswersWithSubmittedReturnsData =
+        emptyUserAnswers.set(SubmittedReturnsDataPage, submittedReturnsData).success.value
+
+      when(mockService.buildSingleYearViewModel(any(), any[String]))
+        .thenReturn(Some(viewModel))
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithSubmittedReturnsData))
+        .overrides(bind[SubmittedReturnsService].toInstance(mockService))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadSingleYear("2024").url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+        verify(mockService).buildSingleYearViewModel(userAnswersWithSubmittedReturnsData, "2024")
+      }
+    }
+
+    "onPageLoadAllYears must use existing SubmittedReturnsDataPage when already present" in {
+      val userAnswersWithSubmittedReturnsData =
+        emptyUserAnswers.set(SubmittedReturnsDataPage, submittedReturnsData).success.value
+
+      when(mockService.buildAllYearsViewModel(any()))
+        .thenReturn(Some(viewModel))
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithSubmittedReturnsData))
+        .overrides(bind[SubmittedReturnsService].toInstance(mockService))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadAllYears().url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+        verify(mockService).buildAllYearsViewModel(userAnswersWithSubmittedReturnsData)
       }
     }
   }

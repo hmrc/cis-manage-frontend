@@ -22,7 +22,7 @@ import java.time.Instant
 import models.history.*
 import org.scalatest.matchers.should.Matchers.*
 import pages.history.SubmittedReturnsDataPage
-import viewmodels.StatusViewModel
+import viewmodels.{ReturnTypeViewModel, StatusViewModel}
 import viewmodels.StatusViewModel.Text
 
 class SubmittedReturnsServiceSpec extends SpecBase {
@@ -79,34 +79,63 @@ class SubmittedReturnsServiceSpec extends SpecBase {
     "buildAllYearsViewModel must return a view model when data exists" in {
       val result = service.buildAllYearsViewModel(userAnswers)
 
-      result.value.selectedTaxYear                shouldBe None
-      result.value.taxYears.map(_.taxYearCaption) shouldBe Seq(
-        "Tax year 2023 to 2024",
-        "Tax year 2022 to 2023"
+      result.value.selectedTaxYear                                             shouldBe None
+      result.value.taxYears.map(taxYear => (taxYear.fromYear, taxYear.toYear)) shouldBe Seq(
+        2023 -> 2024,
+        2022 -> 2023
       )
 
       val firstRow = result.value.taxYears.head.rows.head
       firstRow.returnPeriodEnd          shouldBe "Mar 2023"
-      firstRow.returnType               shouldBe "Nil"
+      firstRow.returnType               shouldBe ReturnTypeViewModel.Nil
       firstRow.dateSubmitted            shouldBe "1 Apr 2024"
-      firstRow.monthlyReturn.text       shouldBe "View"
       firstRow.monthlyReturn.url        shouldBe "#"
-      firstRow.monthlyReturn.hiddenText shouldBe "monthly return for Mar 2023"
-      firstRow.submissionReceipt        shouldBe StatusViewModel.Text("View")
-      firstRow.status                   shouldBe Text("Amend")
+      firstRow.monthlyReturn.hiddenText shouldBe "Mar 2023"
+      firstRow.submissionReceipt        shouldBe StatusViewModel.Text("site.view")
+      firstRow.status                   shouldBe StatusViewModel.Text("history.returnHistory.status.amend")
     }
 
     "buildSingleYearViewModel must return only the selected tax year" in {
       val result = service.buildSingleYearViewModel(userAnswers, "2023")
 
-      result.value.selectedTaxYear                         shouldBe Some("2023")
-      result.value.taxYears.map(_.taxYearCaption)          shouldBe Seq("Tax year 2023 to 2024")
-      result.value.taxYears.head.rows.head.returnPeriodEnd shouldBe "Mar 2023"
+      result.value.selectedTaxYear                                             shouldBe Some("2023")
+      result.value.taxYears.map(taxYear => (taxYear.fromYear, taxYear.toYear)) shouldBe Seq(
+        2023 -> 2024
+      )
+      result.value.taxYears.head.rows.head.returnPeriodEnd                     shouldBe "Mar 2023"
     }
 
     "return None when SubmittedReturnsDataPage is missing" in {
       service.buildAllYearsViewModel(emptyUserAnswers)           shouldBe None
       service.buildSingleYearViewModel(emptyUserAnswers, "2023") shouldBe None
+    }
+
+    "buildAllYearsViewModel must use the raw status text for unhandled statuses" in {
+      val submittedReturnsDataWithOtherStatus = submittedReturnsData.copy(
+        monthlyReturn = submittedReturnsData.monthlyReturn :+ SubmittedMonthlyReturnData(
+          monthlyReturnId = 3L,
+          taxYear = 2021,
+          taxMonth = 6,
+          nilReturnIndicator = "N",
+          status = "IN_PROGRESS",
+          supersededBy = None,
+          amendmentStatus = None,
+          monthlyReturnItems = None
+        )
+      )
+
+      val userAnswersWithOtherStatus =
+        emptyUserAnswers.set(SubmittedReturnsDataPage, submittedReturnsDataWithOtherStatus).success.value
+
+      val result = service.buildAllYearsViewModel(userAnswersWithOtherStatus)
+
+      val row = result.value.taxYears
+        .find(t => t.fromYear == 2021 && t.toYear == 2022)
+        .value
+        .rows
+        .head
+
+      row.status shouldBe StatusViewModel.Text("IN_PROGRESS")
     }
   }
 }

@@ -19,7 +19,7 @@ package services
 import models.UserAnswers
 import models.history.{SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSubmissionData}
 import pages.history.SubmittedReturnsDataPage
-import viewmodels.{LinkViewModel, StatusViewModel, SubmittedReturnsPageViewModel, SubmittedReturnsRowViewModel, TaxYearHistoryViewModel}
+import viewmodels.{LinkViewModel, ReturnTypeViewModel, StatusViewModel, SubmittedReturnsPageViewModel, SubmittedReturnsRowViewModel, TaxYearHistoryViewModel}
 import viewmodels.StatusViewModel.Text
 
 import java.time.format.DateTimeFormatter
@@ -43,10 +43,8 @@ class SubmittedReturnsService @Inject() {
 
   def buildSingleYearViewModel(userAnswers: UserAnswers, taxYear: String): Option[SubmittedReturnsPageViewModel] =
     userAnswers.get(SubmittedReturnsDataPage).map { data =>
-      val allSections = buildTaxYearSections(data)
-
       SubmittedReturnsPageViewModel(
-        taxYears = allSections.filter(_.taxYearCaption == s"Tax year $taxYear to ${taxYear.toInt + 1}"),
+        taxYears = buildTaxYearSections(data).filter(_.fromYear == taxYear.toInt),
         selectedTaxYear = Some(taxYear)
       )
     }
@@ -56,18 +54,18 @@ class SubmittedReturnsService @Inject() {
       data.monthlyReturn
         .sortBy(mr => (mr.taxYear, mr.taxMonth))(Ordering.Tuple2(Ordering.Int, Ordering.Int).reverse)
         .map { monthlyReturn =>
-          val submission   = data.submissions.find(_.activeObjectId == monthlyReturn.monthlyReturnId)
-          val taxYearLabel = s"${monthlyReturn.taxYear} to ${monthlyReturn.taxYear + 1}"
-          taxYearLabel -> toRowViewModel(monthlyReturn, submission)
+          val submission = data.submissions.find(_.activeObjectId == monthlyReturn.monthlyReturnId)
+          monthlyReturn.taxYear -> toRowViewModel(monthlyReturn, submission)
         }
 
     rowsWithTaxYear
       .groupBy(_._1)
       .toSeq
-      .sortBy(_._1)(Ordering.String.reverse)
-      .map { case (taxYearLabel, rows) =>
+      .sortBy(_._1)(Ordering.Int.reverse)
+      .map { case (fromYear, rows) =>
         TaxYearHistoryViewModel(
-          taxYearCaption = s"Tax year $taxYearLabel",
+          fromYear = fromYear,
+          toYear = fromYear + 1,
           rows = rows.map(_._2)
         )
       }
@@ -86,14 +84,11 @@ class SubmittedReturnsService @Inject() {
       returnType = returnType,
       dateSubmitted = dateSubmittedText,
       monthlyReturn = LinkViewModel(
-        text = "View",
         url = "#", // TODO: F2 and F3 - replace with real route of page sr-04 Print monthly return
-        hiddenText = s"monthly return for $periodEndText"
+        hiddenText = periodEndText
       ),
       submissionReceipt = buildSubmissionReceipt(submissionOpt, periodEndText),
-      status = Text(
-        buildStatusText(monthlyReturn)
-      )
+      status = buildStatus(monthlyReturn)
     )
   }
 
@@ -102,11 +97,11 @@ class SubmittedReturnsService @Inject() {
       .of(monthlyReturn.taxYear, monthlyReturn.taxMonth)
       .format(shortMonthYearFormatter)
 
-  private def buildReturnType(monthlyReturn: SubmittedMonthlyReturnData): String =
+  private def buildReturnType(monthlyReturn: SubmittedMonthlyReturnData): ReturnTypeViewModel =
     monthlyReturn.nilReturnIndicator match {
-      case "Y" => "Standard"
-      case "N" => "Nil"
-      case _   => ""
+      case "Y" => ReturnTypeViewModel.Standard
+      case "N" => ReturnTypeViewModel.Nil
+      case _   => ReturnTypeViewModel.Unknown
     }
 
   private def buildDateSubmittedText(submissionOpt: Option[SubmittedSubmissionData]): String =
@@ -123,14 +118,15 @@ class SubmittedReturnsService @Inject() {
   ): StatusViewModel =
     if (isSubmissionReceiptAvailable(submissionOpt)) {
       StatusViewModel.Link(
-        LinkViewModel(
-          text = "View",
+        link = LinkViewModel(
           url = "#", // TODO: F2 and F3 - replace with real route of page SR-02-f View/save submitted return
           hiddenText = s"submission receipt for $periodEndText"
-        )
+        ),
+        textKey = "site.view",
+        hiddenTextKey = "history.returnHistory.hidden.submissionReceipt"
       )
     } else {
-      StatusViewModel.Text("View")
+      Text("site.view")
     }
 
   private def isSubmissionReceiptAvailable(submissionOpt: Option[SubmittedSubmissionData]): Boolean =
@@ -143,15 +139,15 @@ class SubmittedReturnsService @Inject() {
       irMarkSent == irMarkReceived
     }
 
-  private def buildStatusText(
+  private def buildStatus(
     monthlyReturn: SubmittedMonthlyReturnData
     // TODO add submissionOpt: Option[SubmittedSubmissionData]
-  ): String =
+  ): StatusViewModel =
     // TODO: implement F4 and F5 status mapping rules
     monthlyReturn.status match {
-      case "SUBMITTED_NO_RECEIPT" => "Awaiting confirmation"
-      case "SUBMITTED"            => "Amend"
-      case other                  => other
+      case "SUBMITTED_NO_RECEIPT" => Text("history.returnHistory.status.awaitingConfirmation")
+      case "SUBMITTED"            => Text("history.returnHistory.status.amend")
+      case other                  => Text(other)
     }
 
 }

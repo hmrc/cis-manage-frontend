@@ -16,6 +16,7 @@ site.pagination.previous = Previous
 site.pagination.next = Next
 site.delete = Delete
 site.or = or
+site.view = View
 
 date.day = Day
 date.month = Month
@@ -426,10 +427,16 @@ history.returnHistory.singleYear.title = Monthly return history for tax year {0}
 history.returnHistory.singleYear.heading = Monthly return history for tax year {0} to {1}
 history.returnHistory.caption = Submitted returns
 history.returnHistory.noSubmittedReturns = You have not submitted any monthly returns. // TODO: confirm if this message is needed
+history.returnHistory.taxYear.caption = Tax year {0} to {1}
 history.returnHistory.table.returnPeriodEnd = Return period ended
 history.returnHistory.table.returnType = Type
 history.returnHistory.table.dateSubmitted = Date submitted
 history.returnHistory.table.monthlyReturn = Monthly return
 history.returnHistory.table.submissionReceipt = Submission receipt
 history.returnHistory.table.status = Status
+history.returnHistory.returnType.standard = Standard
+history.returnHistory.returnType.nil = Nil
 history.returnHistory.backLink = Return to View tax year
+history.returnHistory.status.awaitingConfirmation = Awaiting confirmation
+history.returnHistory.status.amend = Amend
+

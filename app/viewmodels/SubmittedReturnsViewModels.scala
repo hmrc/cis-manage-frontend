@@ -22,13 +22,14 @@ case class SubmittedReturnsPageViewModel(
 )
 
 case class TaxYearHistoryViewModel(
-  taxYearCaption: String,
+  fromYear: Int,
+  toYear: Int,
   rows: Seq[SubmittedReturnsRowViewModel]
 )
 
 case class SubmittedReturnsRowViewModel(
   returnPeriodEnd: String,
-  returnType: String,
+  returnType: ReturnTypeViewModel,
   dateSubmitted: String,
   monthlyReturn: LinkViewModel,
   submissionReceipt: StatusViewModel,
@@ -36,14 +37,21 @@ case class SubmittedReturnsRowViewModel(
 )
 
 case class LinkViewModel(
-  text: String,
   url: String,
   hiddenText: String
 )
 
+sealed trait ReturnTypeViewModel
+
+object ReturnTypeViewModel {
+  case object Nil extends ReturnTypeViewModel
+  case object Standard extends ReturnTypeViewModel
+  case object Unknown extends ReturnTypeViewModel
+}
+
 sealed trait StatusViewModel
 
 object StatusViewModel {
-  case class Text(value: String) extends StatusViewModel
-  case class Link(value: LinkViewModel) extends StatusViewModel
+  case class Text(messageKey: String) extends StatusViewModel
+  case class Link(link: LinkViewModel, textKey: String, hiddenTextKey: String) extends StatusViewModel
 }
