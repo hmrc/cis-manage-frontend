@@ -418,3 +418,6 @@ history.submittedReturnsChooseTaxYear.heading = Which tax year do you want to vi
 history.submittedReturnsChooseTaxYear.caption = Submitted returns
 history.submittedReturnsChooseTaxYear.viewAll = View all tax years
 history.submittedReturnsChooseTaxYear.error.required = Select a tax year or all tax years
+
+printSubmissionDetails.title = printSubmissionDetails
+printSubmissionDetails.heading = printSubmissionDetails
