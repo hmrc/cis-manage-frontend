@@ -78,7 +78,7 @@ class SubmittedReturnsViewModelsSpec extends AnyWordSpec with Matchers {
         status = StatusViewModel.Text("history.returnHistory.status.awaitingConfirmation")
       )
 
-      row.returnType shouldBe ReturnTypeViewModel.Standard
+      row.returnType        shouldBe ReturnTypeViewModel.Standard
       row.submissionReceipt shouldBe StatusViewModel.Link(
         link = receiptLink,
         textKey = "site.view",
@@ -100,7 +100,7 @@ class SubmittedReturnsViewModelsSpec extends AnyWordSpec with Matchers {
       )
 
       row.returnType shouldBe ReturnTypeViewModel.Unknown
-      row.status shouldBe StatusViewModel.Text("UNKNOWN_STATUS")
+      row.status     shouldBe StatusViewModel.Text("UNKNOWN_STATUS")
     }
 
     "allow no selected tax year and no tax years" in {
@@ -109,7 +109,7 @@ class SubmittedReturnsViewModelsSpec extends AnyWordSpec with Matchers {
         selectedTaxYear = None
       )
 
-      viewModel.taxYears shouldBe Seq.empty
+      viewModel.taxYears        shouldBe Seq.empty
       viewModel.selectedTaxYear shouldBe None
     }
   }

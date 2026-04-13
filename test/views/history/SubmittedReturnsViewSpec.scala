@@ -68,18 +68,59 @@ class SubmittedReturnsViewSpec extends SpecBase {
         messages(app)("history.returnHistory.singleYear.heading", "2023", "2024")
     }
 
-    "render the submitted returns table and row content" in {
+    "render the tax year heading" in {
       val doc = render(populatedViewModel)
 
-      doc.text() should include("Tax year 2023 to 2024")
-      doc.text() should include("Mar 2024")
-      doc.text() should include(messages(app)("history.returnHistory.returnType.standard"))
-      doc.text() should include("1 Apr 2024")
-      doc.text() should include(messages(app)("site.view"))
-      doc.text() should include(messages(app)("history.returnHistory.status.amend"))
+      doc.select("h2.govuk-heading-m").eachText() should contain(
+        messages(app)("history.returnHistory.taxYear.caption", "2023", "2024")
+      )
+    }
 
-      doc.select("a[href=/return/1]").text()            should include(messages(app)("site.view"))
-      doc.select("a[href=/receipt/1]").text().isEmpty shouldBe true
+    "render the desktop table version" in {
+      val doc = render(populatedViewModel)
+
+      val desktop = doc.selectFirst(".return-history-desktop")
+      desktop should not be null
+
+      desktop.text() should include("Mar 2024")
+      desktop.text() should include(messages(app)("history.returnHistory.returnType.standard"))
+      desktop.text() should include("1 Apr 2024")
+      desktop.text() should include(messages(app)("site.view"))
+      desktop.text() should include(messages(app)("history.returnHistory.status.amend"))
+
+      desktop.select("table").size()      shouldBe 1
+      desktop.select("thead th").eachText() should contain allOf (
+        messages(app)("history.returnHistory.table.returnPeriodEnd"),
+        messages(app)("history.returnHistory.table.returnType"),
+        messages(app)("history.returnHistory.table.dateSubmitted"),
+        messages(app)("history.returnHistory.table.monthlyReturn"),
+        messages(app)("history.returnHistory.table.submissionReceipt"),
+        messages(app)("history.returnHistory.table.status")
+      )
+
+      desktop.select("a[href=/return/1]").text()            should include(messages(app)("site.view"))
+      desktop.select("a[href=/receipt/1]").text().isEmpty shouldBe true
+    }
+
+    "render the mobile stacked version" in {
+      val doc = render(populatedViewModel)
+
+      val mobile = doc.selectFirst(".return-history-mobile")
+      mobile should not be null
+
+      mobile.text() should include("Mar 2024")
+      mobile.text() should include(messages(app)("history.returnHistory.table.returnType"))
+      mobile.text() should include(messages(app)("history.returnHistory.returnType.standard"))
+      mobile.text() should include(messages(app)("history.returnHistory.table.dateSubmitted"))
+      mobile.text() should include("1 Apr 2024")
+      mobile.text() should include(messages(app)("history.returnHistory.table.monthlyReturn"))
+      mobile.text() should include(messages(app)("history.returnHistory.table.submissionReceipt"))
+      mobile.text() should include(messages(app)("history.returnHistory.table.status"))
+      mobile.text() should include(messages(app)("history.returnHistory.status.amend"))
+
+      mobile.select(".govuk-summary-list").size()        shouldBe 1
+      mobile.select("a[href=/return/1]").text()            should include(messages(app)("site.view"))
+      mobile.select("a[href=/receipt/1]").text().isEmpty shouldBe true
     }
 
     "render the empty state when there are no submitted returns" in {
@@ -88,7 +129,9 @@ class SubmittedReturnsViewSpec extends SpecBase {
       doc.selectFirst("h1").text() shouldBe
         messages(app)("history.returnHistory.allYears.heading")
 
-      doc.text() should include(messages(app)("history.returnHistory.noSubmittedReturns"))
+      doc.text()                                      should include(messages(app)("history.returnHistory.noSubmittedReturns"))
+      doc.select(".return-history-desktop").isEmpty shouldBe true
+      doc.select(".return-history-mobile").isEmpty  shouldBe true
     }
   }
 

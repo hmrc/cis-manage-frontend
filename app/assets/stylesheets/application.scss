@@ -34,9 +34,16 @@
 
 /* Return history table width */
 
+.return-history-desktop {
+    display: block;
+}
+
+.return-history-mobile {
+    display: none;
+}
+
 .return-history-table-wrapper {
   width: 100%;
-  overflow-x: auto;
 }
 
 /* Narrow table width to match prototype alignment */
@@ -45,15 +52,18 @@
   table-layout: fixed;
 }
 
-@media (max-width: 800px){
-  .return-history-table {
-    min-width: 800px;
-  }
-}
-
 .return-history-table .rh-col-period {width : 16%;}
 .return-history-table .rh-col-type {width : 16%;}
 .return-history-table .rh-col-date {width : 14%;}
 .return-history-table .rh-col-return {width : 16%;}
 .return-history-table .rh-col-receipt {width : 16%;}
 .return-history-table .rh-col-status {width : 22%;}
+
+@media (max-width: 799px) {
+    .return-history-desktop {
+        display: none;
+    }
+    .return-history-mobile {
+        display: block;
+    }
+}
