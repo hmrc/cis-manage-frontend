@@ -87,7 +87,7 @@ class SubmittedReturnsServiceSpec extends SpecBase {
 
       val firstRow = result.value.taxYears.head.rows.head
       firstRow.returnPeriodEnd          shouldBe "Mar 2023"
-      firstRow.returnType               shouldBe ReturnTypeViewModel.Nil
+      firstRow.returnType               shouldBe ReturnTypeViewModel.Standard
       firstRow.dateSubmitted            shouldBe "1 Apr 2024"
       firstRow.monthlyReturn.url        shouldBe "#"
       firstRow.monthlyReturn.hiddenText shouldBe "Mar 2023"

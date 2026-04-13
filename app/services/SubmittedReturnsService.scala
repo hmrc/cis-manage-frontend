@@ -99,8 +99,8 @@ class SubmittedReturnsService @Inject() {
 
   private def buildReturnType(monthlyReturn: SubmittedMonthlyReturnData): ReturnTypeViewModel =
     monthlyReturn.nilReturnIndicator match {
-      case "Y" => ReturnTypeViewModel.Standard
-      case "N" => ReturnTypeViewModel.Nil
+      case "Y" => ReturnTypeViewModel.Nil
+      case "N" => ReturnTypeViewModel.Standard
       case _   => ReturnTypeViewModel.Unknown
     }
 
