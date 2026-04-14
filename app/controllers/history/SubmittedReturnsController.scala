@@ -73,8 +73,8 @@ class SubmittedReturnsController @Inject() (
 
       resolveSubmittedReturnsData
         .map {
-          case Some(vm) =>
-            submittedReturnsService.buildAllYearsViewModel(vm) match {
+          case Some(data) =>
+            submittedReturnsService.buildAllYearsViewModel(data) match {
               case Some(vm) => Ok(view(vm))
               case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
             }
