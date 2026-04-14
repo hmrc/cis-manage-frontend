@@ -83,3 +83,5 @@ POST       /delete/delete-amended-nil-monthly-return            controllers.dele
 
 GET        /history/view-tax-year-submission-history                controllers.history.SubmittedReturnsChooseTaxYearController.onPageLoad()
 POST       /history/view-tax-year-submission-history                controllers.history.SubmittedReturnsChooseTaxYearController.onSubmit()
+
+GET        /history/monthly-return-submission-details               controllers.history.PrintSubmissionDetailsController.onPageLoad()

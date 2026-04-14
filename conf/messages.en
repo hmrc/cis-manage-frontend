@@ -418,3 +418,25 @@ history.submittedReturnsChooseTaxYear.heading = Which tax year do you want to vi
 history.submittedReturnsChooseTaxYear.caption = Submitted returns
 history.submittedReturnsChooseTaxYear.viewAll = View all tax years
 history.submittedReturnsChooseTaxYear.error.required = Select a tax year or all tax years
+
+history.printSubmissionDetails.title = Monthly return for period ending {0}
+history.printSubmissionDetails.heading = Monthly return for period ending {0}
+history.printSubmissionDetails.submissionDetails.heading = Submission details
+history.printSubmissionDetails.submissionDetails.p = Submitted at {0} on {1}.
+history.printSubmissionDetails.submissionDetails.referenceNumber = Receipt reference number
+history.printSubmissionDetails.submissionDetails.submissionType = Submission type
+history.printSubmissionDetails.submissionDetails.contractorName = Contractor name
+history.printSubmissionDetails.submissionDetails.payeReference = PAYE reference
+history.printSubmissionDetails.paymentDetails.heading = Payment details
+history.printSubmissionDetails.paymentDetails.numberOfSubcontractorAdded = Number of subcontractors added
+history.printSubmissionDetails.paymentDetails.totalPaymentsMade = Total payments made
+history.printSubmissionDetails.paymentDetails.totalCostOfMaterials = Total cost of materials
+history.printSubmissionDetails.paymentDetails.totalTaxDeducted = Total tax deducted
+history.printSubmissionDetails.paymentsMadeToSubcontractors.heading = Payments made to subcontractors
+history.printSubmissionDetails.paymentsMadeToSubcontractors.subcontractor = Subcontractor
+history.printSubmissionDetails.paymentsMadeToSubcontractors.paymentsMade = Payments made
+history.printSubmissionDetails.paymentsMadeToSubcontractors.costOfMaterials = Cost of materials
+history.printSubmissionDetails.paymentsMadeToSubcontractors.taxDeducted = Tax deducted
+history.printSubmissionDetails.printThisPage.link = Print this page
+history.printSubmissionDetails.monthlyReturnHistory.link = Return to Monthly return history
+
