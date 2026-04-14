@@ -128,7 +128,7 @@ class SubmittedReturnsService @Inject() {
         hiddenTextKey = "history.returnHistory.hidden.submissionReceipt"
       )
     } else {
-      Text("site.view")
+      Text("")
     }
 
   private def isSubmissionReceiptAvailable(submissionOpt: Option[SubmittedSubmissionData]): Boolean =
