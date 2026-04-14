@@ -21,7 +21,7 @@ import viewmodels.{LinkViewModel, ReturnTypeViewModel, StatusViewModel, Submitte
 import viewmodels.StatusViewModel.Text
 
 import java.time.format.DateTimeFormatter
-import java.time.{YearMonth, ZoneId}
+import java.time.{Instant, YearMonth, ZoneId, ZoneOffset, ZonedDateTime}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
@@ -30,6 +30,7 @@ class SubmittedReturnsService @Inject() {
   private val ukTimezone: ZoneId                         = ZoneId.of("Europe/London")
   private val displayDateFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("d MMM yyyy")
   private val shortMonthYearFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM yyyy")
+  private val amendmentCutOffInstant: Instant            = ZonedDateTime.of(2016, 2, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant
 
   def buildAllYearsViewModel(data: SubmittedReturnsData): Option[SubmittedReturnsPageViewModel] =
     Some(
@@ -89,7 +90,7 @@ class SubmittedReturnsService @Inject() {
         hiddenText = periodEndText
       ),
       submissionReceipt = buildSubmissionReceipt(submissionOpt, periodEndText),
-      status = buildStatus(monthlyReturn)
+      status = buildStatus(monthlyReturn, submissionOpt)
     )
   }
 
@@ -141,14 +142,49 @@ class SubmittedReturnsService @Inject() {
     }
 
   private def buildStatus(
-    monthlyReturn: SubmittedMonthlyReturnData
-    // TODO add submissionOpt: Option[SubmittedSubmissionData]
-  ): StatusViewModel =
-    // TODO: implement F4 and F5 status mapping rules
-    monthlyReturn.status match {
-      case "SUBMITTED_NO_RECEIPT" => Text("history.returnHistory.status.awaitingConfirmation")
-      case "SUBMITTED"            => Text("history.returnHistory.status.amend")
-      case other                  => Text(other)
+    monthlyReturn: SubmittedMonthlyReturnData,
+    submissionOpt: Option[SubmittedSubmissionData]
+  ): StatusViewModel = {
+    val acceptedTimeOpt = submissionOpt.flatMap(_.acceptedTime)
+
+    acceptedTimeOpt match {
+      case None =>
+        StatusViewModel.Text("history.returnHistory.status.notAvailable")
+
+      case Some(acceptedTime) =>
+        monthlyReturn.status match {
+          case "SUBMITTED" =>
+            if (isSuperseded(monthlyReturn)) {
+              buildAmendmentStatus(monthlyReturn)
+            } else if (!acceptedTime.isBefore(amendmentCutOffInstant)) {
+              StatusViewModel.Text("history.returnHistory.status.amend")
+            } else {
+              StatusViewModel.Text("history.returnHistory.status.notAvailable")
+            }
+
+          case "SUBMITTED_NO_RECEIPT" =>
+            StatusViewModel.Text("history.returnHistory.status.awaitingConfirmation")
+
+          case _ =>
+            StatusViewModel.Text("")
+        }
     }
+  }
+
+  private def buildAmendmentStatus(monthlyReturn: SubmittedMonthlyReturnData): StatusViewModel =
+    monthlyReturn.amendmentStatus match {
+      case Some("STARTED") | Some("VALIDATED")                               =>
+        StatusViewModel.Text("history.returnHistory.status.inProgress")
+      case Some("PENDING") | Some("ACCEPTED") | Some("SUBMITTED_NO_RECEIPT") =>
+        StatusViewModel.Text("history.returnHistory.status.awaitingConfirmation")
+      case Some("SUBMITTED")                                                 =>
+        StatusViewModel.Text("history.returnHistory.status.amend")
+      case Some("DEPARTMENTAL_ERROR") | Some("FATAL_ERROR")                  =>
+        StatusViewModel.Text("history.returnHistory.status.notAvailable")
+      case _                                                                 => StatusViewModel.Text("")
+    }
+
+  private def isSuperseded(monthlyReturn: SubmittedMonthlyReturnData): Boolean =
+    monthlyReturn.supersededBy.exists(_ > 0)
 
 }

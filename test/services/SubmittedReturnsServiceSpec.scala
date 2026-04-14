@@ -21,154 +21,265 @@ import base.SpecBase
 import java.time.Instant
 import models.history.*
 import org.scalatest.matchers.should.Matchers.*
-import viewmodels.{ReturnTypeViewModel, StatusViewModel}
+import viewmodels.{ReturnTypeViewModel, StatusViewModel, SubmittedReturnsRowViewModel}
 import viewmodels.StatusViewModel.Text
 
 class SubmittedReturnsServiceSpec extends SpecBase {
 
   private val service = new SubmittedReturnsService()
 
-  private val submittedReturnsData = SubmittedReturnsData(
-    scheme = SubmittedSchemeData(
-      name = "Test Scheme",
-      taxOfficeNumber = "123",
-      taxOfficeReference = "ABC123"
-    ),
-    monthlyReturns = Seq(
-      SubmittedMonthlyReturnData(
-        monthlyReturnId = 1L,
-        taxYear = 2023,
-        taxMonth = 3,
-        nilReturnIndicator = "Standard",
-        status = "SUBMITTED",
-        supersededBy = None,
-        amendmentStatus = None,
-        monthlyReturnItems = None
-      ),
-      SubmittedMonthlyReturnData(
-        monthlyReturnId = 2L,
-        taxYear = 2022,
-        taxMonth = 12,
-        nilReturnIndicator = "Standard",
-        status = "SUBMITTED_NO_RECEIPT",
-        supersededBy = None,
-        amendmentStatus = None,
-        monthlyReturnItems = None
-      )
-    ),
-    submissions = Seq(
-      SubmittedSubmissionData(
-        submissionId = 11L,
-        submissionType = Some("Original"),
-        activeObjectId = Some(1L),
-        status = "Accepted",
-        hmrcMarkGenerated = None,
-        hmrcMarkGgis = None,
-        emailRecipient = None,
-        acceptedTime = Some(Instant.parse("2024-04-01T10:15:30Z"))
-      )
-    )
+  private val baseScheme = SubmittedSchemeData(
+    name = "Test Scheme",
+    taxOfficeNumber = "123",
+    taxOfficeReference = "ABC123"
   )
+
+  private def monthlyReturn(
+    id: Long = 1L,
+    taxYear: Int = 2023,
+    taxMonth: Int = 3,
+    nilReturnIndicator: String = "Standard",
+    status: String = "SUBMITTED",
+    supersededBy: Option[Long] = None,
+    amendmentStatus: Option[String] = None,
+    monthlyReturnItems: Option[String] = None
+  ): SubmittedMonthlyReturnData =
+    SubmittedMonthlyReturnData(
+      monthlyReturnId = id,
+      taxYear = taxYear,
+      taxMonth = taxMonth,
+      nilReturnIndicator = nilReturnIndicator,
+      status = status,
+      supersededBy = supersededBy,
+      amendmentStatus = amendmentStatus,
+      monthlyReturnItems = monthlyReturnItems
+    )
+
+  private def submission(
+    submissionId: Long = 11L,
+    activeObjectId: Option[Long] = Some(1L),
+    acceptedTime: Option[Instant] = Some(Instant.parse("2024-04-01T10:15:30Z"))
+  ): SubmittedSubmissionData =
+    SubmittedSubmissionData(
+      submissionId = submissionId,
+      submissionType = Some("Original"),
+      activeObjectId = activeObjectId,
+      status = "Accepted",
+      hmrcMarkGenerated = None,
+      hmrcMarkGgis = None,
+      emailRecipient = None,
+      acceptedTime = acceptedTime
+    )
+
+  private def data(
+    monthlyReturns: Seq[SubmittedMonthlyReturnData],
+    submissions: Seq[SubmittedSubmissionData]
+  ): SubmittedReturnsData =
+    SubmittedReturnsData(
+      scheme = baseScheme,
+      monthlyReturns = monthlyReturns,
+      submissions = submissions
+    )
+
+  private def singleRow(testData: SubmittedReturnsData): SubmittedReturnsRowViewModel =
+    service.buildAllYearsViewModel(testData).value.taxYears.head.rows.head
 
   "SubmittedReturnsService" - {
 
-    "buildAllYearsViewModel must return a view model when data exists" in {
-      val result = service.buildAllYearsViewModel(submittedReturnsData)
-
-      result.value.selectedTaxYear                                             shouldBe None
-      result.value.taxYears.map(taxYear => (taxYear.fromYear, taxYear.toYear)) shouldBe Seq(
-        2023 -> 2024
+    "buildAllYearsViewModel returns expected row for happy path" in {
+      val row = singleRow(
+        data(
+          monthlyReturns = Seq(monthlyReturn()),
+          submissions = Seq(submission())
+        )
       )
 
-      val firstRow = result.value.taxYears.head.rows.head
-      firstRow.returnPeriodEnd          shouldBe "Mar 2023"
-      firstRow.returnType               shouldBe ReturnTypeViewModel.Standard
-      firstRow.dateSubmitted            shouldBe "1 Apr 2024"
-      firstRow.monthlyReturn.url        shouldBe "#"
-      firstRow.monthlyReturn.hiddenText shouldBe "Mar 2023"
+      row.returnPeriodEnd          shouldBe "Mar 2023"
+      row.returnType               shouldBe ReturnTypeViewModel.Standard
+      row.dateSubmitted            shouldBe "1 Apr 2024"
+      row.monthlyReturn.url        shouldBe "#"
+      row.monthlyReturn.hiddenText shouldBe "Mar 2023"
+      row.status                   shouldBe StatusViewModel.Text("history.returnHistory.status.amend")
     }
 
-    "buildSingleYearViewModel must return only the selected tax year" in {
-      val result = service.buildSingleYearViewModel(submittedReturnsData, "2023")
-
-      result.value.selectedTaxYear                                             shouldBe Some("2023")
-      result.value.taxYears.map(taxYear => (taxYear.fromYear, taxYear.toYear)) shouldBe Seq(
-        2023 -> 2024
+    "buildSingleYearViewModel returns only the selected tax year" in {
+      val testData = data(
+        monthlyReturns = Seq(monthlyReturn()),
+        submissions = Seq(submission())
       )
-      result.value.taxYears.head.rows.head.returnPeriodEnd                     shouldBe "Mar 2023"
+
+      val result = service.buildSingleYearViewModel(testData, "2023")
+
+      result.value.selectedTaxYear                           shouldBe Some("2023")
+      result.value.taxYears.map(t => (t.fromYear, t.toYear)) shouldBe Seq(2023 -> 2024)
     }
 
-    "buildSingleYearViewModel must return None for invalid tax year" in {
-      service.buildSingleYearViewModel(submittedReturnsData, "abc") shouldBe None
+    "buildSingleYearViewModel returns None for invalid tax year" in {
+      val testData = data(
+        monthlyReturns = Seq(monthlyReturn()),
+        submissions = Seq(submission())
+      )
+
+      service.buildSingleYearViewModel(testData, "abc") shouldBe None
     }
 
-    "buildAllYearsViewModel must use Unknown return type for unhandled nilReturnIndicator" in {
-      val dataWithUnknownReturnType = submittedReturnsData.copy(
-        monthlyReturns = Seq(
-          SubmittedMonthlyReturnData(
-            monthlyReturnId = 3L,
-            taxYear = 2021,
-            taxMonth = 6,
-            nilReturnIndicator = "N",
-            status = "SUBMITTED",
-            supersededBy = None,
-            amendmentStatus = None,
-            monthlyReturnItems = None
-          )
-        ),
-        submissions = Seq(
-          SubmittedSubmissionData(
-            submissionId = 12L,
-            submissionType = Some("Original"),
-            activeObjectId = Some(3L),
-            status = "Accepted",
-            hmrcMarkGenerated = None,
-            hmrcMarkGgis = None,
-            emailRecipient = None,
-            acceptedTime = Some(Instant.parse("2024-04-01T10:15:30Z"))
+    "uses Unknown return type for unhandled nilReturnIndicator" in {
+      val row = singleRow(
+        data(
+          monthlyReturns = Seq(
+            monthlyReturn(id = 2L, nilReturnIndicator = "N")
+          ),
+          submissions = Seq(
+            submission(submissionId = 12L, activeObjectId = Some(2L))
           )
         )
       )
 
-      val result = service.buildAllYearsViewModel(dataWithUnknownReturnType)
-
-      val row = result.value.taxYears.head.rows.head
       row.returnType shouldBe ReturnTypeViewModel.Unknown
     }
 
-    "buildAllYearsViewModel must use the raw status text for unhandled statuses" in {
-      val submittedReturnsDataWithOtherStatus = SubmittedReturnsData(
-        scheme = submittedReturnsData.scheme,
-        monthlyReturns = Seq(
-          SubmittedMonthlyReturnData(
-            monthlyReturnId = 3L,
-            taxYear = 2021,
-            taxMonth = 6,
-            nilReturnIndicator = "Standard",
-            status = "IN_PROGRESS",
-            supersededBy = None,
-            amendmentStatus = None,
-            monthlyReturnItems = None
-          )
-        ),
-        submissions = Seq(
-          SubmittedSubmissionData(
-            submissionId = 13L,
-            submissionType = Some("Original"),
-            activeObjectId = Some(3L),
-            status = "Accepted",
-            hmrcMarkGenerated = None,
-            hmrcMarkGgis = None,
-            emailRecipient = None,
-            acceptedTime = Some(Instant.parse("2024-04-01T10:15:30Z"))
+    "returns notAvailable when acceptedTime is missing" in {
+      val row = singleRow(
+        data(
+          monthlyReturns = Seq(
+            monthlyReturn(id = 3L, status = "SUBMITTED")
+          ),
+          submissions = Seq(
+            submission(submissionId = 13L, activeObjectId = Some(3L), acceptedTime = None)
           )
         )
       )
 
-      val result = service.buildAllYearsViewModel(submittedReturnsDataWithOtherStatus)
+      row.status shouldBe StatusViewModel.Text("history.returnHistory.status.notAvailable")
+    }
 
-      val row = result.value.taxYears.head.rows.head
-      row.status shouldBe StatusViewModel.Text("IN_PROGRESS")
+    "returns awaitingConfirmation for SUBMITTED_NO_RECEIPT" in {
+      val row = singleRow(
+        data(
+          monthlyReturns = Seq(
+            monthlyReturn(id = 4L, status = "SUBMITTED_NO_RECEIPT")
+          ),
+          submissions = Seq(
+            submission(submissionId = 14L, activeObjectId = Some(4L))
+          )
+        )
+      )
+
+      row.status shouldBe StatusViewModel.Text("history.returnHistory.status.awaitingConfirmation")
+    }
+
+    "returns notAvailable for SUBMITTED before amendment cutoff" in {
+      val row = singleRow(
+        data(
+          monthlyReturns = Seq(
+            monthlyReturn(id = 5L, status = "SUBMITTED")
+          ),
+          submissions = Seq(
+            submission(
+              submissionId = 15L,
+              activeObjectId = Some(5L),
+              acceptedTime = Some(Instant.parse("2013-01-01T00:00:00Z"))
+            )
+          )
+        )
+      )
+
+      row.status shouldBe StatusViewModel.Text("history.returnHistory.status.notAvailable")
+    }
+
+    "returns inProgress for superseded return with amendment status STARTED" in {
+      val row = singleRow(
+        data(
+          monthlyReturns = Seq(
+            monthlyReturn(
+              id = 6L,
+              status = "SUBMITTED",
+              supersededBy = Some(99L),
+              amendmentStatus = Some("STARTED")
+            )
+          ),
+          submissions = Seq(
+            submission(submissionId = 16L, activeObjectId = Some(6L))
+          )
+        )
+      )
+
+      row.status shouldBe StatusViewModel.Text("history.returnHistory.status.inProgress")
+    }
+
+    "returns awaitingConfirmation for superseded return with amendment status PENDING" in {
+      val row = singleRow(
+        data(
+          monthlyReturns = Seq(
+            monthlyReturn(
+              id = 7L,
+              status = "SUBMITTED",
+              supersededBy = Some(99L),
+              amendmentStatus = Some("PENDING")
+            )
+          ),
+          submissions = Seq(
+            submission(submissionId = 17L, activeObjectId = Some(7L))
+          )
+        )
+      )
+
+      row.status shouldBe StatusViewModel.Text("history.returnHistory.status.awaitingConfirmation")
+    }
+
+    "returns amend for superseded return with amendment status SUBMITTED" in {
+      val row = singleRow(
+        data(
+          monthlyReturns = Seq(
+            monthlyReturn(
+              id = 8L,
+              status = "SUBMITTED",
+              supersededBy = Some(99L),
+              amendmentStatus = Some("SUBMITTED")
+            )
+          ),
+          submissions = Seq(
+            submission(submissionId = 18L, activeObjectId = Some(8L))
+          )
+        )
+      )
+
+      row.status shouldBe StatusViewModel.Text("history.returnHistory.status.amend")
+    }
+
+    "returns notAvailable for superseded return with amendment status FATAL_ERROR" in {
+      val row = singleRow(
+        data(
+          monthlyReturns = Seq(
+            monthlyReturn(
+              id = 9L,
+              status = "SUBMITTED",
+              supersededBy = Some(99L),
+              amendmentStatus = Some("FATAL_ERROR")
+            )
+          ),
+          submissions = Seq(
+            submission(submissionId = 19L, activeObjectId = Some(9L))
+          )
+        )
+      )
+
+      row.status shouldBe StatusViewModel.Text("history.returnHistory.status.notAvailable")
+    }
+
+    "returns empty text for unhandled monthly return status" in {
+      val row = singleRow(
+        data(
+          monthlyReturns = Seq(
+            monthlyReturn(id = 10L, status = "IN_PROGRESS")
+          ),
+          submissions = Seq(
+            submission(submissionId = 20L, activeObjectId = Some(10L))
+          )
+        )
+      )
+
+      row.status shouldBe StatusViewModel.Text("")
     }
   }
 }

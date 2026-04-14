@@ -439,4 +439,6 @@ history.returnHistory.returnType.nil = Nil
 history.returnHistory.backLink = Return to View tax year
 history.returnHistory.status.awaitingConfirmation = Awaiting confirmation
 history.returnHistory.status.amend = Amend
+history.returnHistory.status.notAvailable = Not available
+history.returnHistory.status.awaitingConfirmation = Awaiting confirmation
 
