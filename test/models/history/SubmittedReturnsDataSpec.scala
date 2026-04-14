@@ -32,7 +32,7 @@ class SubmittedReturnsDataSpec extends AnyWordSpec with Matchers {
           taxOfficeNumber = "123",
           taxOfficeReference = "AB456"
         ),
-        monthlyReturn = Seq(
+        monthlyReturns = Seq(
           SubmittedMonthlyReturnData(
             monthlyReturnId = 1L,
             taxYear = 2024,
@@ -48,7 +48,7 @@ class SubmittedReturnsDataSpec extends AnyWordSpec with Matchers {
           SubmittedSubmissionData(
             submissionId = 10L,
             submissionType = Some("Original"),
-            activeObjectId = 20L,
+            activeObjectId = Some(20L),
             status = "Accepted",
             hmrcMarkGenerated = Some("mark1"),
             hmrcMarkGgis = Some("ggis1"),

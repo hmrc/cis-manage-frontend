@@ -22,7 +22,7 @@ import java.time.Instant
 
 case class SubmittedReturnsData(
   scheme: SubmittedSchemeData,
-  monthlyReturn: Seq[SubmittedMonthlyReturnData],
+  monthlyReturns: Seq[SubmittedMonthlyReturnData],
   submissions: Seq[SubmittedSubmissionData]
 )
 
@@ -58,7 +58,7 @@ object SubmittedMonthlyReturnData {
 case class SubmittedSubmissionData(
   submissionId: Long,
   submissionType: Option[String],
-  activeObjectId: Long,
+  activeObjectId: Option[Long],
   status: String,
   hmrcMarkGenerated: Option[String],
   hmrcMarkGgis: Option[String],

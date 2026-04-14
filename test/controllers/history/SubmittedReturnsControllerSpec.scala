@@ -17,23 +17,26 @@
 package controllers.history
 
 import base.SpecBase
+import models.UserAnswers
 import models.history.{SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSchemeData, SubmittedSubmissionData}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
+import pages.CisIdPage
 import pages.history.SubmittedReturnsDataPage
+import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import services.SubmittedReturnsService
+import services.{ManageService, SubmittedReturnsService}
+import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.*
 import views.html.history.SubmittedReturnsView
 
 import java.time.Instant
+import scala.concurrent.Future
 
 class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
-
-  private val mockService = mock[SubmittedReturnsService]
 
   private val viewModel = SubmittedReturnsPageViewModel(
     taxYears = Seq(
@@ -61,12 +64,12 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
       taxOfficeNumber = "123",
       taxOfficeReference = "AB456"
     ),
-    monthlyReturn = Seq(
+    monthlyReturns = Seq(
       SubmittedMonthlyReturnData(
         monthlyReturnId = 1L,
         taxYear = 2024,
         taxMonth = 3,
-        nilReturnIndicator = "Y",
+        nilReturnIndicator = "Nil",
         status = "Submitted",
         supersededBy = None,
         amendmentStatus = None,
@@ -77,7 +80,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
       SubmittedSubmissionData(
         submissionId = 1L,
         submissionType = Some("MONTHLY_RETURN"),
-        activeObjectId = 1L,
+        activeObjectId = Some(1L),
         status = "Submitted",
         hmrcMarkGenerated = Some("123"),
         hmrcMarkGgis = Some("123"),
@@ -87,115 +90,124 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
     )
   )
 
+  trait Setup {
+    val mockSubmittedReturnsService: SubmittedReturnsService = mock[SubmittedReturnsService]
+    val mockManageService: ManageService                     = mock[ManageService]
+
+    def application(userAnswers: UserAnswers): Application =
+      applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(
+          bind[SubmittedReturnsService].toInstance(mockSubmittedReturnsService),
+          bind[ManageService].toInstance(mockManageService)
+        )
+        .build()
+  }
+
   "SubmittedReturnsController" - {
 
-    "onPageLoadSingleYear must return OK and the correct view when the service returns a view model" in {
-      when(mockService.buildSingleYearViewModel(any(), any[String]))
+    "onPageLoadSingleYear must return OK using SubmittedReturnsDataPage when present" in new Setup {
+      val userAnswers =
+        emptyUserAnswers.set(SubmittedReturnsDataPage, submittedReturnsData).success.value
+
+      when(mockSubmittedReturnsService.buildSingleYearViewModel(submittedReturnsData, "2024"))
         .thenReturn(Some(viewModel))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[SubmittedReturnsService].toInstance(mockService))
-        .build()
+      val app = application(userAnswers)
 
-      running(application) {
+      running(app) {
         val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadSingleYear("2024").url)
-        val result  = route(application, request).value
-        val view    = application.injector.instanceOf[SubmittedReturnsView]
+        val result  = route(app, request).value
+        val view    = app.injector.instanceOf[SubmittedReturnsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
+        verify(mockSubmittedReturnsService).buildSingleYearViewModel(submittedReturnsData, "2024")
       }
     }
 
-    "onPageLoadSingleYear must redirect to JourneyRecovery when the service returns None" in {
-      when(mockService.buildSingleYearViewModel(any(), any[String]))
-        .thenReturn(None)
+    "onPageLoadAllYears must return OK using SubmittedReturnsDataPage when present" in new Setup {
+      val userAnswers =
+        emptyUserAnswers.set(SubmittedReturnsDataPage, submittedReturnsData).success.value
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[SubmittedReturnsService].toInstance(mockService))
-        .build()
+      when(mockSubmittedReturnsService.buildAllYearsViewModel(submittedReturnsData))
+        .thenReturn(Some(viewModel))
 
-      running(application) {
+      val app = application(userAnswers)
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadAllYears().url)
+        val result  = route(app, request).value
+        val view    = app.injector.instanceOf[SubmittedReturnsView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
+        verify(mockSubmittedReturnsService).buildAllYearsViewModel(submittedReturnsData)
+      }
+    }
+
+    "onPageLoadSingleYear must fetch data from manageService when SubmittedReturnsDataPage is missing and CisIdPage exists" in new Setup {
+      val userAnswers =
+        emptyUserAnswers.set(CisIdPage, "900063").success.value
+
+      when(mockManageService.getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(submittedReturnsData))
+      when(mockSubmittedReturnsService.buildSingleYearViewModel(any[SubmittedReturnsData], any[String]))
+        .thenReturn(Some(viewModel))
+
+      val app = application(userAnswers)
+
+      running(app) {
         val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadSingleYear("2024").url)
-        val result  = route(application, request).value
+        val result  = route(app, request).value
+
+        status(result) mustEqual OK
+        verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
+        verify(mockSubmittedReturnsService).buildSingleYearViewModel(any[SubmittedReturnsData], any[String])
+      }
+    }
+
+    "onPageLoadAllYears must fetch data from manageService when SubmittedReturnsDataPage is missing and CisIdPage exists" in new Setup {
+      val userAnswers =
+        emptyUserAnswers.set(CisIdPage, "900063").success.value
+
+      when(mockManageService.getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(submittedReturnsData))
+      when(mockSubmittedReturnsService.buildAllYearsViewModel(any[SubmittedReturnsData]))
+        .thenReturn(Some(viewModel))
+
+      val app = application(userAnswers)
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadAllYears().url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual OK
+        verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
+        verify(mockSubmittedReturnsService).buildAllYearsViewModel(any[SubmittedReturnsData])
+      }
+    }
+
+    "onPageLoadSingleYear must redirect to JourneyRecovery when no data can be resolved" in new Setup {
+      val app = application(emptyUserAnswers)
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadSingleYear("2024").url)
+        val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "onPageLoadAllYears must return OK and the correct view when the service returns a view model" in {
-      when(mockService.buildAllYearsViewModel(any()))
-        .thenReturn(Some(viewModel))
+    "onPageLoadAllYears must redirect to JourneyRecovery when no data can be resolved" in new Setup {
+      val app = application(emptyUserAnswers)
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[SubmittedReturnsService].toInstance(mockService))
-        .build()
-
-      running(application) {
+      running(app) {
         val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadAllYears().url)
-        val result  = route(application, request).value
-        val view    = application.injector.instanceOf[SubmittedReturnsView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
-      }
-    }
-
-    "onPageLoadAllYears must redirect to JourneyRecovery when the service returns None" in {
-      when(mockService.buildAllYearsViewModel(any()))
-        .thenReturn(None)
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[SubmittedReturnsService].toInstance(mockService))
-        .build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadAllYears().url)
-        val result  = route(application, request).value
+        val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "onPageLoadSingleYear must use existing SubmittedReturnsDataPage when already present" in {
-      val userAnswersWithSubmittedReturnsData =
-        emptyUserAnswers.set(SubmittedReturnsDataPage, submittedReturnsData).success.value
-
-      when(mockService.buildSingleYearViewModel(any(), any[String]))
-        .thenReturn(Some(viewModel))
-
-      val application = applicationBuilder(userAnswers = Some(userAnswersWithSubmittedReturnsData))
-        .overrides(bind[SubmittedReturnsService].toInstance(mockService))
-        .build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadSingleYear("2024").url)
-        val result  = route(application, request).value
-
-        status(result) mustEqual OK
-        verify(mockService).buildSingleYearViewModel(userAnswersWithSubmittedReturnsData, "2024")
-      }
-    }
-
-    "onPageLoadAllYears must use existing SubmittedReturnsDataPage when already present" in {
-      val userAnswersWithSubmittedReturnsData =
-        emptyUserAnswers.set(SubmittedReturnsDataPage, submittedReturnsData).success.value
-
-      when(mockService.buildAllYearsViewModel(any()))
-        .thenReturn(Some(viewModel))
-
-      val application = applicationBuilder(userAnswers = Some(userAnswersWithSubmittedReturnsData))
-        .overrides(bind[SubmittedReturnsService].toInstance(mockService))
-        .build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadAllYears().url)
-        val result  = route(application, request).value
-
-        status(result) mustEqual OK
-        verify(mockService).buildAllYearsViewModel(userAnswersWithSubmittedReturnsData)
       }
     }
   }

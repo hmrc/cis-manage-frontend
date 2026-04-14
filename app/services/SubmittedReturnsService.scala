@@ -16,9 +16,7 @@
 
 package services
 
-import models.UserAnswers
 import models.history.{SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSubmissionData}
-import pages.history.SubmittedReturnsDataPage
 import viewmodels.{LinkViewModel, ReturnTypeViewModel, StatusViewModel, SubmittedReturnsPageViewModel, SubmittedReturnsRowViewModel, TaxYearHistoryViewModel}
 import viewmodels.StatusViewModel.Text
 
@@ -33,29 +31,32 @@ class SubmittedReturnsService @Inject() {
   private val displayDateFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("d MMM yyyy")
   private val shortMonthYearFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM yyyy")
 
-  def buildAllYearsViewModel(userAnswers: UserAnswers): Option[SubmittedReturnsPageViewModel] =
-    userAnswers.get(SubmittedReturnsDataPage).map { data =>
+  def buildAllYearsViewModel(data: SubmittedReturnsData): Option[SubmittedReturnsPageViewModel] =
+    Some(
       SubmittedReturnsPageViewModel(
         taxYears = buildTaxYearSections(data),
         selectedTaxYear = None
       )
-    }
+    )
 
-  def buildSingleYearViewModel(userAnswers: UserAnswers, taxYear: String): Option[SubmittedReturnsPageViewModel] =
-    userAnswers.get(SubmittedReturnsDataPage).map { data =>
+  def buildSingleYearViewModel(data: SubmittedReturnsData, taxYear: String): Option[SubmittedReturnsPageViewModel] =
+    taxYear.toIntOption.map { taxYearInt =>
       SubmittedReturnsPageViewModel(
-        taxYears = buildTaxYearSections(data).filter(_.fromYear == taxYear.toInt),
+        taxYears = buildTaxYearSections(data).filter(_.fromYear == taxYearInt),
         selectedTaxYear = Some(taxYear)
       )
     }
 
   private def buildTaxYearSections(data: SubmittedReturnsData): Seq[TaxYearHistoryViewModel] = {
     val rowsWithTaxYear =
-      data.monthlyReturn
+      data.monthlyReturns
         .sortBy(mr => (mr.taxYear, mr.taxMonth))(Ordering.Tuple2(Ordering.Int, Ordering.Int).reverse)
-        .map { monthlyReturn =>
-          val submission = data.submissions.find(_.activeObjectId == monthlyReturn.monthlyReturnId)
-          monthlyReturn.taxYear -> toRowViewModel(monthlyReturn, submission)
+        .flatMap { monthlyReturn =>
+          data.submissions
+            .find(_.activeObjectId.contains(monthlyReturn.monthlyReturnId))
+            .map { submission =>
+              monthlyReturn.taxYear -> toRowViewModel(monthlyReturn, Some(submission))
+            }
         }
 
     rowsWithTaxYear
@@ -99,9 +100,9 @@ class SubmittedReturnsService @Inject() {
 
   private def buildReturnType(monthlyReturn: SubmittedMonthlyReturnData): ReturnTypeViewModel =
     monthlyReturn.nilReturnIndicator match {
-      case "Y" => ReturnTypeViewModel.Nil
-      case "N" => ReturnTypeViewModel.Standard
-      case _   => ReturnTypeViewModel.Unknown
+      case "Nil"      => ReturnTypeViewModel.Nil
+      case "Standard" => ReturnTypeViewModel.Standard
+      case _          => ReturnTypeViewModel.Unknown
     }
 
   private def buildDateSubmittedText(submissionOpt: Option[SubmittedSubmissionData]): String =

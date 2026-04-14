@@ -17,6 +17,7 @@
 package connectors
 
 import models.agent.AgentClientData
+import models.history.SubmittedReturnsData
 import models.{CisTaxpayer, CisTaxpayerSearchResult, GetClientListStatusResponse, Scheme, UnsubmittedMonthlyReturnsResponse}
 import play.api.Logging
 import play.api.http.Status.OK
@@ -130,6 +131,13 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
     http
       .get(url"$cisBaseUrl/monthly-returns/unsubmitted/$instanceId")
       .execute[UnsubmittedMonthlyReturnsResponse]
+
+  def getSubmittedMonthlyReturns(
+    instanceId: String
+  )(implicit hc: HeaderCarrier): Future[SubmittedReturnsData] =
+    http
+      .get(url"$cisBaseUrl/monthly-returns/submitted/$instanceId")
+      .execute[SubmittedReturnsData]
 
   def saveAgentClient(userId: String, agentClientData: AgentClientData)(implicit
     hc: HeaderCarrier

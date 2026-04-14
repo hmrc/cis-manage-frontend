@@ -19,6 +19,7 @@ package services
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
+import models.history.SubmittedReturnsData
 import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, UserAnswers}
 import pages.*
 import play.api.Logging
@@ -121,6 +122,11 @@ class ManageService @Inject() (
     hc: HeaderCarrier
   ): Future[UnsubmittedMonthlyReturnsResponse] =
     cisConnector.getUnsubmittedMonthlyReturns(instanceId)
+
+  def getSubmittedMonthlyReturns(instanceId: String)(implicit
+    hc: HeaderCarrier
+  ): Future[SubmittedReturnsData] =
+    cisConnector.getSubmittedMonthlyReturns(instanceId)
 
   def buildReturnsLandingContext(
     instanceId: String,
