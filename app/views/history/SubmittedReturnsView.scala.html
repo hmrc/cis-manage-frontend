@@ -125,7 +125,7 @@
                                     ),
                                     rows = taxYear.rows.map { row =>
                                         Seq(
-                                            TableRow(content = Text(row.returnPeriodEnd), classes = "rh-col-period govuk-table__header"),
+                                            TableRow(content = Text(row.returnPeriodEnd), classes = "rh-col-period"),
                                             TableRow(content = Text(renderReturnType(row.returnType)), classes = "rh-col-type"),
                                             TableRow(content = Text(row.dateSubmitted), classes = "rh-col-date"),
                                             TableRow(content = HtmlContent(renderMonthlyReturn(row)), classes = "rh-col-return"),
