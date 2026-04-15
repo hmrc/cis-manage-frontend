@@ -19,7 +19,8 @@ package controllers.history
 import base.SpecBase
 import controllers.routes
 import forms.history.SubmittedReturnsChooseTaxYearFormProvider
-import models.UserAnswers
+import models.{TaxYearSelection, UserAnswers}
+import models.TaxYearSelection.TaxYear
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -43,6 +44,8 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
     controllers.history.routes.SubmittedReturnsChooseTaxYearController.onPageLoad().url
   val taxYears: Seq[String]                           =
     Seq("2021 to 2022", "2022 to 2023", "2023 to 2024", "2024 to 2025")
+  val taxYearSelections: Seq[TaxYearSelection]        =
+    Seq(TaxYear(2021, 2022), TaxYear(2022, 2023), TaxYear(2023, 2024), TaxYear(2024, 2025))
 
   val formProvider       = new SubmittedReturnsChooseTaxYearFormProvider()
   val form: Form[String] = formProvider(taxYears)
@@ -68,7 +71,7 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val userAnswers = UserAnswers(userAnswersId)
-        .set(SubmittedReturnsChooseTaxYearPage, taxYears.head)
+        .set(SubmittedReturnsChooseTaxYearPage, taxYearSelections.head)
         .success
         .value
 
@@ -118,7 +121,7 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val userAnswers = emptyUserAnswers
-        .set(SubmittedReturnsChooseTaxYearPage, taxYears.head)
+        .set(SubmittedReturnsChooseTaxYearPage, taxYearSelections.head)
         .success
         .value
 

@@ -18,7 +18,7 @@ package connectors
 
 import models.agent.AgentClientData
 import models.history.SubmittedReturnsData
-import models.{CisTaxpayer, CisTaxpayerSearchResult, GetClientListStatusResponse, Scheme, UnsubmittedMonthlyReturnsResponse}
+import models.*
 import models.requests.DeleteUnsubmittedMonthlyReturnRequest
 import play.api.Logging
 import play.api.http.Status.{NO_CONTENT, OK}

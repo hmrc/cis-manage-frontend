@@ -30,6 +30,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ReturnLandingViewModel, ReturnsLandingContext}
 import viewmodels.agent.AgentLandingViewModel
 
+import java.time.{LocalDate, LocalDateTime}
 import java.time.LocalDateTime
 import java.time.format.{DateTimeFormatter, TextStyle}
 import java.util.Locale
@@ -123,6 +124,21 @@ class ManageService @Inject() (
     hc: HeaderCarrier
   ): Future[UnsubmittedMonthlyReturnsResponse] =
     cisConnector.getUnsubmittedMonthlyReturns(instanceId)
+
+  def getSubmittedTaxYears(instanceId: String)(implicit
+    hc: HeaderCarrier
+  ): Future[Seq[(Int, Int)]] = cisConnector.getSubmittedMonthlyReturns(instanceId).map { response =>
+    (for {
+      monthlyReturn <- response.monthlyReturns
+      taxDate        = LocalDate.of(monthlyReturn.taxYear, monthlyReturn.taxMonth, 5)
+      taxYearStart   = if (taxDate.isBefore(LocalDate.of(monthlyReturn.taxYear, 4, 6)))
+                         LocalDate.of(monthlyReturn.taxYear - 1, 4, 6)
+                       else
+                         LocalDate.of(monthlyReturn.taxYear, 4, 6)
+      taxYearEnd     = taxYearStart.plusYears(1)
+      taxYearString  = s"${taxYearStart.getYear} to ${taxYearEnd.getYear}"
+    } yield (taxYearStart.getYear, taxYearEnd.getYear)).distinct.sorted
+  }
 
   def getSubmittedMonthlyReturns(instanceId: String)(implicit
     hc: HeaderCarrier

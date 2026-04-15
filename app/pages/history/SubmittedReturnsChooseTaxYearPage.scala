@@ -16,10 +16,11 @@
 
 package pages.history
 
+import models.TaxYearSelection
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object SubmittedReturnsChooseTaxYearPage extends QuestionPage[String] {
+case object SubmittedReturnsChooseTaxYearPage extends QuestionPage[TaxYearSelection] {
 
   override def path: JsPath = JsPath \ toString
 
