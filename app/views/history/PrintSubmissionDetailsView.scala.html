@@ -1,0 +1,125 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import models.history.SubcontractorPayment
+
+@this(
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    govukSummaryList: GovukSummaryList,
+    govukTable: GovukTable,
+    h1: components.H1,
+    h2: components.H2,
+    paragraph: components.Paragraph,
+    printLink: components.PrintLink,
+    link: components.Link
+)
+
+@(
+    monthYear: String,
+    submittedTime: String,
+    submittedDate: String,
+    receiptReferenceNumber: String,
+    submissionType: String,
+    contractorName: String,
+    payeReference: String,
+    totalPaymentsMade: String,
+    totalCostOfMaterials: String,
+    totalTaxDeducted: String,
+    subcontractors: Seq[SubcontractorPayment]
+)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("history.printSubmissionDetails.title", monthYear))) {
+
+    @h1(messages("history.printSubmissionDetails.heading", monthYear))
+
+    @h2(messages("history.printSubmissionDetails.submissionDetails.heading"))
+    @paragraph(
+        message = "history.printSubmissionDetails.submissionDetails.p",
+        args    = Seq(submittedTime, submittedDate)
+    )
+
+    @govukSummaryList(
+        SummaryListViewModel(Seq(
+            SummaryListRowViewModel(
+                key   = KeyViewModel(Text(messages("history.printSubmissionDetails.submissionDetails.referenceNumber"))),
+                value = ValueViewModel(Text(receiptReferenceNumber))
+            ),
+            SummaryListRowViewModel(
+                key   = KeyViewModel(Text(messages("history.printSubmissionDetails.submissionDetails.submissionType"))),
+                value = ValueViewModel(Text(messages(submissionType)))
+            ),
+            SummaryListRowViewModel(
+                key   = KeyViewModel(Text(messages("history.printSubmissionDetails.submissionDetails.contractorName"))),
+                value = ValueViewModel(Text(contractorName))
+            ),
+            SummaryListRowViewModel(
+                key   = KeyViewModel(Text(messages("history.printSubmissionDetails.submissionDetails.payeReference"))),
+                value = ValueViewModel(Text(payeReference))
+            )
+        ))
+    )
+
+    @h2(messages("history.printSubmissionDetails.paymentDetails.heading"))
+    @govukSummaryList(
+        SummaryListViewModel(Seq(
+            SummaryListRowViewModel(
+                key   = KeyViewModel(Text(messages("history.printSubmissionDetails.paymentDetails.numberOfSubcontractorAdded"))),
+                value = ValueViewModel(Text(subcontractors.size.toString))
+            ),
+            SummaryListRowViewModel(
+                key   = KeyViewModel(Text(messages("history.printSubmissionDetails.paymentDetails.totalPaymentsMade"))),
+                value = ValueViewModel(Text(messages(totalPaymentsMade)))
+            ),
+            SummaryListRowViewModel(
+                key   = KeyViewModel(Text(messages("history.printSubmissionDetails.paymentDetails.totalCostOfMaterials"))),
+                value = ValueViewModel(Text(totalCostOfMaterials))
+            ),
+            SummaryListRowViewModel(
+                key   = KeyViewModel(Text(messages("history.printSubmissionDetails.paymentDetails.totalTaxDeducted"))),
+                value = ValueViewModel(Text(totalTaxDeducted))
+            )
+        ))
+    )
+
+    @h2(messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.heading"))
+    @govukTable(
+        Table(
+            firstCellIsHeader = true,
+            head = Some(
+                Seq(
+                    messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.subcontractor"),
+                    messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.paymentsMade"),
+                    messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.costOfMaterials"),
+                    messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.taxDeducted")
+                ).map { heading =>
+                        HeadCell(content = Text(heading))
+                    }
+                ),
+            rows =  subcontractors.map { subcontractor =>
+                Seq(
+                    TableRow(Text(subcontractor.name)),
+                    TableRow(Text(subcontractor.paymentsMade)),
+                    TableRow(Text(subcontractor.costOfMaterials)),
+                    TableRow(Text(subcontractor.taxDeducted))
+                )
+            }
+        )
+    )
+
+    @printLink(messages("history.printSubmissionDetails.printThisPage.link"))
+    @link("history.printSubmissionDetails.monthlyReturnHistory.link","#")
+}
