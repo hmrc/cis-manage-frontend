@@ -34,9 +34,11 @@ import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.agent.AgentLandingViewModel
 
-import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import java.time.{Clock, Instant, LocalDateTime, ZoneId}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
+import scala.jdk.CollectionConverters.*
 import scala.util.Failure
 
 class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
@@ -790,8 +792,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
   "getSubmittedTaxYears" should {
 
     "return sorted distinct tax years from submitted monthly returns" in {
-      val (service, connector, _) = newService()
-      val instanceId              = "CIS-123"
+      val (service, connector, _, _, _) = newService()
+      val instanceId                    = "CIS-123"
 
       val monthlyReturns = Seq(
         MonthlyReturnData(1L, 2024, 4, "N", "SUBMITTED", None, None, None), // April 2024 -> 2024-04-05 -> 2023 to 2024
@@ -815,9 +817,9 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
     }
 
     "propagate failure from connector" in {
-      val (service, connector, _) = newService()
-      val instanceId              = "CIS-123"
-      val boom                    = new RuntimeException("Backend error")
+      val (service, connector, _, _, _) = newService()
+      val instanceId                    = "CIS-123"
+      val boom                          = new RuntimeException("Backend error")
 
       when(connector.getSubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
         .thenReturn(Future.failed(boom))

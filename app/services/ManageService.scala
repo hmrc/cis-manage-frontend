@@ -27,12 +27,12 @@ import play.api.Logging
 import play.api.libs.json.Json
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.{ReturnLandingViewModel, ReturnsLandingContext}
 import viewmodels.agent.AgentLandingViewModel
+import viewmodels.{ReturnLandingViewModel, ReturnsLandingContext}
 
-import java.time.{LocalDate, LocalDateTime}
 import java.time.LocalDateTime
 import java.time.format.{DateTimeFormatter, TextStyle}
+import java.time.{Clock, Instant, LocalDate, LocalDateTime}
 import java.util.Locale
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}

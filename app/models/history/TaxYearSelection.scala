@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models
+package models.history
 
 import play.api.libs.json.*
 
@@ -27,10 +27,30 @@ object TaxYearSelection {
   case object AllTaxYears extends TaxYearSelection:
     override def toString: String = "all"
 
-  given OFormat[TaxYearSelection] = Json.format[TaxYearSelection]
-  given OFormat[TaxYear]          = Json.format[TaxYear]
+  given OFormat[TaxYear] = Json.format[TaxYear]
+
   given OFormat[AllTaxYears.type] = new OFormat[AllTaxYears.type] {
-    override def reads(json: JsValue): JsResult[AllTaxYears.type] = (json \ "all").validate
-    override def writes(o: AllTaxYears.type): JsObject            = JsObject(Seq("all" -> JsBoolean(true)))
+    override def reads(json: JsValue): JsResult[AllTaxYears.type] =
+      (json \ "all").validate[Boolean].collect(JsonValidationError("all must be true")) { case true =>
+        AllTaxYears
+      }
+
+    override def writes(o: AllTaxYears.type): JsObject =
+      Json.obj("all" -> true)
+  }
+
+  given OFormat[TaxYearSelection] = new OFormat[TaxYearSelection] {
+    override def reads(json: JsValue): JsResult[TaxYearSelection] =
+      // decide which subtype based on fields present
+      (json \ "all").validateOpt[Boolean].flatMap {
+        case Some(true)  => JsSuccess(AllTaxYears)
+        case Some(false) => JsError("all must be true when present")
+        case None        => json.validate[TaxYear]
+      }
+
+    override def writes(o: TaxYearSelection): JsObject =
+      o match
+        case t: TaxYear  => Json.toJsObject(t)
+        case AllTaxYears => Json.toJsObject(AllTaxYears)
   }
 }

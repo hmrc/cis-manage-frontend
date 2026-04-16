@@ -18,9 +18,10 @@ package controllers.history
 
 import controllers.actions.*
 import forms.history.SubmittedReturnsChooseTaxYearFormProvider
-import models.TaxYearSelection
-import models.TaxYearSelection.{AllTaxYears, TaxYear}
+import models.history.TaxYearSelection.{AllTaxYears, TaxYear}
+import models.history.TaxYearSelection
 import pages.history.SubmittedReturnsChooseTaxYearPage
+import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -50,17 +51,32 @@ class SubmittedReturnsChooseTaxYearController @Inject() (
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData andThen requireCisId).async {
     implicit request =>
-      manageService.getSubmittedTaxYears(request.cisId).map { taxYears =>
-        val taxYearStrings = taxYears.map((start, end) => s"$start to $end")
-        val form           = formProvider(taxYearStrings)
+      manageService
+        .getSubmittedTaxYears(request.cisId)
+        .map { taxYears =>
+          if (taxYears.isEmpty)
+            logger.info(
+              "[SubmittedReturnsChooseTaxYearController] Error trying to retrieve submitted tax years"
+            )
+            Redirect(controllers.routes.SystemErrorController.onPageLoad())
+          else
+            val taxYearStrings = taxYears.map((start, end) => s"$start to $end")
 
-        val preparedForm = request.userAnswers.get(SubmittedReturnsChooseTaxYearPage) match {
-          case None        => form
-          case Some(value) => form.fill(value.toString)
+            val form = formProvider(taxYearStrings)
+
+            val preparedForm = request.userAnswers.get(SubmittedReturnsChooseTaxYearPage) match {
+              case None        => form
+              case Some(value) => form.fill(value.toString)
+            }
+
+            Ok(view(preparedForm, taxYearStrings))
         }
-
-        Ok(view(preparedForm, taxYearStrings))
-      }
+        .recover { err =>
+          logger.info(
+            "[SubmittedReturnsChooseTaxYearController] Error trying to retrieve submitted tax years"
+          )
+          Redirect(controllers.routes.SystemErrorController.onPageLoad())
+        }
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData andThen requireCisId).async {

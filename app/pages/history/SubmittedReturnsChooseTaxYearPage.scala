@@ -16,7 +16,7 @@
 
 package pages.history
 
-import models.TaxYearSelection
+import models.history.TaxYearSelection
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
