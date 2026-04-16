@@ -159,7 +159,7 @@
                         TableRow(content =
                             if (item.status.trim.equalsIgnoreCase("In progress")) {
                                 HtmlContent(
-                                    s"""<a href="#" class="govuk-link">Delete</a>"""
+                                    s"""<a href="${controllers.routes.ReturnsLandingController.onDeleteRedirect(item.monthlyReturnId).url}" class="govuk-link">Delete</a>"""
                                 )
                             } else {
                                 HtmlContent("")

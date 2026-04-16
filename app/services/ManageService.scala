@@ -19,16 +19,17 @@ package services
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
-import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, UserAnswers}
+import models.requests.DeleteUnsubmittedMonthlyReturnRequest
+import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturn, UnsubmittedMonthlyReturnsResponse, UserAnswers}
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
-import repositories.SessionRepository
+import repositories.{SessionRepository, UnsubmittedMonthlyReturnRepository}
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ReturnLandingViewModel, ReturnsLandingContext}
 import viewmodels.agent.AgentLandingViewModel
 
-import java.time.LocalDateTime
+import java.time.{Clock, Instant, LocalDateTime}
 import java.time.format.{DateTimeFormatter, TextStyle}
 import java.util.Locale
 import javax.inject.{Inject, Singleton}
@@ -37,7 +38,9 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ManageService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector,
-  sessionRepository: SessionRepository
+  sessionRepository: SessionRepository,
+  unsubmittedReturnRepository: UnsubmittedMonthlyReturnRepository,
+  clock: Clock
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends Logging {
 
@@ -153,24 +156,55 @@ class ManageService @Inject() (
 
     (contractorNameOpt, linksOpt) match {
       case (Some(name), Some((standardLink, nilLink))) =>
-        getUnsubmittedMonthlyReturns(instanceId).map { response =>
+        getUnsubmittedMonthlyReturns(instanceId).flatMap { response =>
+
           val returnsList =
             response.unsubmittedCisReturns.map { r =>
               ReturnLandingViewModel(
+                monthlyReturnId = r.monthlyReturnId,
                 taxMonth = formatPeriod(r.taxMonth, r.taxYear),
                 returnType = r.returnType,
                 dateSubmitted = formatLastUpdate(r.lastUpdate),
-                status = r.status
+                status = r.status,
+                amendment = r.amendment
               )
             }
 
-          Some(ReturnsLandingContext(name, standardLink, nilLink, returnsList))
+          val unsubmittedReturnsToPersist = response.unsubmittedCisReturns.map { r =>
+            UnsubmittedMonthlyReturn(
+              instanceId = instanceId,
+              monthlyReturnId = r.monthlyReturnId,
+              taxYear = r.taxYear,
+              taxMonth = r.taxMonth,
+              returnType = r.returnType,
+              status = r.status,
+              lastUpdated = Instant.now(clock),
+              amendment = r.amendment,
+              deletable = r.deletable
+            )
+          }
+
+          for {
+            _ <- Future.traverse(unsubmittedReturnsToPersist)(unsubmittedReturnRepository.upsert)
+          } yield Some(ReturnsLandingContext(name, standardLink, nilLink, returnsList))
         }
 
       case _ =>
         Future.successful(None)
     }
   }
+
+  def deleteUnsubmittedMonthlyReturn(returnToDelete: UnsubmittedMonthlyReturn)(implicit
+    hc: HeaderCarrier
+  ): Future[Unit] =
+    cisConnector.deleteUnsubmittedMonthlyReturn(
+      DeleteUnsubmittedMonthlyReturnRequest(
+        instanceId = returnToDelete.instanceId,
+        taxYear = returnToDelete.taxYear,
+        taxMonth = returnToDelete.taxMonth,
+        amendment = returnToDelete.amendment.getOrElse("N")
+      )
+    )
 
   private def formatPeriod(taxMonth: Int, taxYear: Int): String = {
     val monthName = java.time.Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)

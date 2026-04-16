@@ -41,6 +41,7 @@ class Module extends AbstractModule {
       .annotatedWith(Names.named("AgentIdentifier"))
       .to(classOf[AgentIdentifierAction])
       .asEagerSingleton()
+    bind(classOf[DeletableReturnAction]).to(classOf[DeletableReturnActionImpl]).asEagerSingleton()
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC))
   }
 }

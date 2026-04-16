@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package utils
+package models.requests
 
-import java.time.Month
-import java.time.format.TextStyle
-import java.util.Locale
+import play.api.libs.json.{Json, OFormat}
 
-object Utils {
-  val emptyString: String = ""
+case class DeleteUnsubmittedMonthlyReturnRequest(
+  instanceId: String,
+  taxYear: Int,
+  taxMonth: Int,
+  amendment: String
+)
 
-  def monthName(taxMonth: Int, locale: Locale): String =
-    Month.of(taxMonth).getDisplayName(TextStyle.FULL, locale)
+object DeleteUnsubmittedMonthlyReturnRequest {
+  given format: OFormat[DeleteUnsubmittedMonthlyReturnRequest] = Json.format[DeleteUnsubmittedMonthlyReturnRequest]
 }
