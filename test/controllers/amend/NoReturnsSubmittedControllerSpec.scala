@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.amend
 
 import base.SpecBase
+import controllers.routes
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import views.html.NoReturnsSubmittedView
 
 class NoReturnsSubmittedControllerSpec extends SpecBase {
