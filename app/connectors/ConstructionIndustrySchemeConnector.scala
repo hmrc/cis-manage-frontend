@@ -19,8 +19,9 @@ package connectors
 import models.agent.AgentClientData
 import models.history.SubmittedReturnsData
 import models.{CisTaxpayer, CisTaxpayerSearchResult, GetClientListStatusResponse, Scheme, UnsubmittedMonthlyReturnsResponse}
+import models.requests.DeleteUnsubmittedMonthlyReturnRequest
 import play.api.Logging
-import play.api.http.Status.OK
+import play.api.http.Status.{NO_CONTENT, OK}
 import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -150,6 +151,20 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         response.status match {
           case OK => ()
           case _  => throw new HttpException(response.body, response.status)
+        }
+      }
+
+  def deleteUnsubmittedMonthlyReturn(request: DeleteUnsubmittedMonthlyReturnRequest)(implicit
+    hc: HeaderCarrier
+  ): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/monthly-returns/unsubmitted/delete")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { response =>
+        response.status match {
+          case NO_CONTENT => Future.unit
+          case status     => Future.failed(UpstreamErrorResponse(response.body, status, status))
         }
       }
 

@@ -16,4 +16,11 @@
 
 package viewmodels
 
-case class ReturnLandingViewModel(taxMonth: String, returnType: String, dateSubmitted: String, status: String)
+case class ReturnLandingViewModel(
+  monthlyReturnId: Long,
+  taxMonth: String,
+  returnType: String,
+  dateSubmitted: String,
+  status: String,
+  amendment: Option[String]
+)

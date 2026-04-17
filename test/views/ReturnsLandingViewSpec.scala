@@ -83,9 +83,9 @@ class ReturnsLandingViewSpec extends SpecBase {
       app.injector.instanceOf[FrontendAppConfig]
     val contractorName                            = "ABC Ltd..."
     val returnsList                               = Seq(
-      ReturnLandingViewModel("August 2025", "Standard", "19 September 2025", "Accepted"),
-      ReturnLandingViewModel("July 2025", "Nil", "19 August 2025", "Accepted"),
-      ReturnLandingViewModel("June 2025", "Standard", "18 July 2025", "Accepted")
+      ReturnLandingViewModel(3000L, "August 2025", "Standard", "19 September 2025", "Accepted", Some("Y")),
+      ReturnLandingViewModel(3001L, "July 2025", "Nil", "19 August 2025", "Accepted", Some("Y")),
+      ReturnLandingViewModel(3002L, "June 2025", "Standard", "18 July 2025", "Accepted", Some("Y"))
     )
     val standardReturnLink: String                = appConfig.fileStandardReturnUrl
     val nilReturnLink: String                     = appConfig.fileNilReturnUrl

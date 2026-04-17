@@ -20,17 +20,20 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import itutil.ApplicationWithWiremock
 import models.Scheme
 import models.agent.AgentClientData
+import models.requests.DeleteUnsubmittedMonthlyReturnRequest
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpException, UpstreamErrorResponse}
 
-class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
-  with Matchers
-  with ScalaFutures
-  with IntegrationPatience
-  with ApplicationWithWiremock {
+class ConstructionIndustrySchemeConnectorSpec
+    extends AnyWordSpec
+    with Matchers
+    with ScalaFutures
+    with IntegrationPatience
+    with ApplicationWithWiremock {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -363,7 +366,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
 
     "return CisTaxpayer when BE returns 200 with valid JSON" in {
       val taxOfficeNumber = "111"
-      val taxOfficeRef = "test111"
+      val taxOfficeRef    = "test111"
 
       stubFor(
         get(urlPathEqualTo(s"/cis/agent/client-taxpayer/$taxOfficeNumber/$taxOfficeRef"))
@@ -381,7 +384,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
           )
       )
 
-      val result = connector.getAgentClientTaxpayer(taxOfficeNumber,taxOfficeRef).futureValue
+      val result = connector.getAgentClientTaxpayer(taxOfficeNumber, taxOfficeRef).futureValue
 
       result.uniqueId mustBe "123"
       result.taxOfficeNumber mustBe "111"
@@ -391,7 +394,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
 
     "fail when BE returns 200 with invalid JSON" in {
       val taxOfficeNumber = "111"
-      val taxOfficeRef = "test111"
+      val taxOfficeRef    = "test111"
 
       stubFor(
         get(urlPathEqualTo(s"/cis/agent/client-taxpayer/$taxOfficeNumber/$taxOfficeRef"))
@@ -403,7 +406,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
       )
 
       val ex = intercept[Exception] {
-        connector.getAgentClientTaxpayer(taxOfficeNumber,taxOfficeRef).futureValue
+        connector.getAgentClientTaxpayer(taxOfficeNumber, taxOfficeRef).futureValue
       }
 
       ex.getMessage.toLowerCase must include("uniqueid")
@@ -411,7 +414,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
 
     "propagate an upstream error when BE returns 500" in {
       val taxOfficeNumber = "111"
-      val taxOfficeRef = "test111"
+      val taxOfficeRef    = "test111"
 
       stubFor(
         get(urlPathEqualTo(s"/cis/agent/client-taxpayer/$taxOfficeNumber/$taxOfficeRef"))
@@ -423,7 +426,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
       )
 
       val ex = intercept[Exception] {
-        connector.getAgentClientTaxpayer(taxOfficeNumber,taxOfficeRef).futureValue
+        connector.getAgentClientTaxpayer(taxOfficeNumber, taxOfficeRef).futureValue
       }
 
       ex.getMessage must include("returned 500")
@@ -433,9 +436,9 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
   "prepopulateContractorKnownFacts" should {
 
     "return successfully when BE returns 2xx" in {
-      val instanceId = "900063"
+      val instanceId      = "900063"
       val taxOfficeNumber = "163"
-      val taxOfficeRef = "AB0063"
+      val taxOfficeRef    = "AB0063"
 
       stubFor(
         post(urlPathEqualTo(s"/cis/contractor-known-facts/prepopulate/$taxOfficeNumber/$taxOfficeRef/$instanceId"))
@@ -445,7 +448,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
           )
       )
 
-      val result = connector
+      val result: Unit = connector
         .prepopulateContractorKnownFacts(instanceId, taxOfficeNumber, taxOfficeRef)
         .futureValue
 
@@ -454,9 +457,9 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
     }
 
     "propagate an upstream error when BE returns 500" in {
-      val instanceId = "900063"
+      val instanceId      = "900063"
       val taxOfficeNumber = "163"
-      val taxOfficeRef = "AB0063"
+      val taxOfficeRef    = "AB0063"
 
       stubFor(
         post(urlPathEqualTo(s"/cis/contractor-known-facts/prepopulate/$taxOfficeNumber/$taxOfficeRef/$instanceId"))
@@ -475,9 +478,9 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
     }
 
     "propagate an upstream error when BE returns PRECONDITION_FAILED" in {
-      val instanceId = "900063"
+      val instanceId      = "900063"
       val taxOfficeNumber = "163"
-      val taxOfficeRef = "AB0063"
+      val taxOfficeRef    = "AB0063"
 
       stubFor(
         post(urlPathEqualTo(s"/cis/contractor-known-facts/prepopulate/$taxOfficeNumber/$taxOfficeRef/$instanceId"))
@@ -499,9 +502,9 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
   "prepopulateContractorAndSubcontractors" should {
 
     "return successfully when BE returns 204" in {
-      val taxOfficeNumber = "163"
+      val taxOfficeNumber    = "163"
       val taxOfficeReference = "AB0063"
-      val instanceId = "900063"
+      val instanceId         = "900063"
 
       stubFor(
         post(urlPathEqualTo(s"/cis/scheme/prepopulate/$taxOfficeNumber/$taxOfficeReference/$instanceId"))
@@ -513,11 +516,10 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
         .futureValue mustBe ()
     }
 
-
     "fail when BE returns non-204" in {
-      val taxOfficeNumber = "163"
+      val taxOfficeNumber    = "163"
       val taxOfficeReference = "AB0063"
-      val instanceId = "900063"
+      val instanceId         = "900063"
 
       stubFor(
         post(urlPathEqualTo(s"/cis/scheme/prepopulate/$taxOfficeNumber/$taxOfficeReference/$instanceId"))
@@ -534,7 +536,6 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
       ex.getMessage must include("boom")
     }
   }
-
 
   "getScheme" should {
 
@@ -602,11 +603,14 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
                 """{
                   |  "unsubmittedCisReturns": [
                   |    {
+                  |      "monthlyReturnId": 3000,
                   |      "taxYear": 2025,
                   |      "taxMonth": 1,
                   |      "returnType": "Nil",
                   |      "status": "PENDING",
-                  |      "lastUpdate": null
+                  |      "lastUpdate": null,
+                  |      "amendment": "Y",
+                  |      "deletable": true
                   |    }
                   |  ]
                   |}""".stripMargin
@@ -616,11 +620,14 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
 
       val result = connector.getUnsubmittedMonthlyReturns(instanceId).futureValue
       result.unsubmittedCisReturns.length mustBe 1
+      result.unsubmittedCisReturns.head.monthlyReturnId mustBe 3000
       result.unsubmittedCisReturns.head.taxYear mustBe 2025
       result.unsubmittedCisReturns.head.taxMonth mustBe 1
       result.unsubmittedCisReturns.head.returnType mustBe "Nil"
       result.unsubmittedCisReturns.head.status mustBe "PENDING"
       result.unsubmittedCisReturns.head.lastUpdate mustBe None
+      result.unsubmittedCisReturns.head.amendment mustBe Some("Y")
+      result.unsubmittedCisReturns.head.deletable mustBe true
     }
 
     "propagate an upstream error when BE returns 500" in {
@@ -701,7 +708,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
 
   "Save" should {
 
-    val userId = "900063"
+    val userId                           = "900063"
     val agentClientData: AgentClientData = AgentClientData(
       uniqueId = "1",
       taxOfficeNumber = "123",
@@ -715,7 +722,7 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
         post(urlPathEqualTo(s"/cis/user-cache/agent-client/$userId"))
           .willReturn(
             aResponse()
-            .withStatus(OK)
+              .withStatus(OK)
           )
       )
 
@@ -745,4 +752,45 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
     }
   }
 
+  "deleteUnsubmittedMonthlyReturn" should {
+
+    "return Unit on 204" in {
+
+      val req = DeleteUnsubmittedMonthlyReturnRequest(
+        instanceId = "1",
+        taxYear = 2025,
+        taxMonth = 1,
+        amendment = "N"
+      )
+
+      stubFor(
+        post(urlPathEqualTo("/cis/monthly-returns/unsubmitted/delete"))
+          .withHeader("Content-Type", equalTo("application/json"))
+          .withRequestBody(equalToJson(Json.toJson(req).toString(), true, true))
+          .willReturn(aResponse().withStatus(NO_CONTENT))
+      )
+
+      connector.deleteUnsubmittedMonthlyReturn(req).futureValue mustBe ((): Unit)
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+
+      val req = DeleteUnsubmittedMonthlyReturnRequest(
+        instanceId = "1",
+        taxYear = 2025,
+        taxMonth = 1,
+        amendment = "N"
+      )
+
+      stubFor(
+        post(urlPathEqualTo("/cis/monthly-returns/unsubmitted/delete"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = intercept[Exception] {
+        connector.deleteUnsubmittedMonthlyReturn(req).futureValue
+      }
+      ex.getMessage must include("boom")
+    }
+  }
 }

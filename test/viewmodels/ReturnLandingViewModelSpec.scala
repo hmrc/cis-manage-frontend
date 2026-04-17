@@ -23,10 +23,12 @@ class ReturnLandingViewModelSpec extends SpecBase {
   "ReturnLandingViewModel" - {
     "should create a return landing view model with all required fields" in {
       val returnLandingViewModel = ReturnLandingViewModel(
+        monthlyReturnId = 3000L,
         taxMonth = "August 2025",
         returnType = "Standard",
         dateSubmitted = "19 September 2025",
-        status = "Accepted"
+        status = "Accepted",
+        amendment = Some("Y")
       )
 
       returnLandingViewModel.taxMonth mustEqual "August 2025"
@@ -37,10 +39,12 @@ class ReturnLandingViewModelSpec extends SpecBase {
 
     "should support case class copy" in {
       val original = ReturnLandingViewModel(
+        monthlyReturnId = 3000L,
         taxMonth = "August 2025",
         returnType = "Standard",
         dateSubmitted = "19 September 2025",
-        status = "Accepted"
+        status = "Accepted",
+        amendment = Some("Y")
       )
 
       val modified = original.copy(taxMonth = "September 2005", dateSubmitted = "20 October 2025")
