@@ -440,3 +440,6 @@ history.printSubmissionDetails.paymentsMadeToSubcontractors.taxDeducted = Tax de
 history.printSubmissionDetails.printThisPage.link = Print this page
 history.printSubmissionDetails.monthlyReturnHistory.link = Return to Monthly return history
 
+
+noReturnsSubmitted.title = noReturnsSubmitted
+noReturnsSubmitted.heading = noReturnsSubmitted

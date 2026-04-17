@@ -86,3 +86,5 @@ GET        /history/view-tax-year-submission-history                controllers.
 POST       /history/view-tax-year-submission-history                controllers.history.SubmittedReturnsChooseTaxYearController.onSubmit()
 
 GET        /history/monthly-return-submission-details               controllers.history.PrintSubmissionDetailsController.onPageLoad()
+
+GET        /noReturnsSubmitted                       controllers.NoReturnsSubmittedController.onPageLoad()
