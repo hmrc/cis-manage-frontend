@@ -19,7 +19,8 @@ package services
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
-import models.requests.DeleteUnsubmittedMonthlyReturnRequest
+import models.requests.{DeleteUnsubmittedMonthlyReturnRequest, GetSubmittedMonthlyReturnsRequest}
+import models.response.GetSubmittedMonthlyReturnResponse
 import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturn, UnsubmittedMonthlyReturnsResponse, UserAnswers}
 import pages.*
 import play.api.Logging
@@ -205,6 +206,11 @@ class ManageService @Inject() (
         amendment = returnToDelete.amendment.getOrElse("N")
       )
     )
+
+  def getSubmittedMonthlyReturns(instanceId: String, taxYear: Int, taxMonth: Int, amendment: String)(implicit
+    hc: HeaderCarrier
+  ): Future[GetSubmittedMonthlyReturnResponse] =
+    cisConnector.getSubmittedMonthlyReturn(GetSubmittedMonthlyReturnsRequest(instanceId, taxYear, taxMonth, amendment))
 
   private def formatPeriod(taxMonth: Int, taxYear: Int): String = {
     val monthName = java.time.Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)

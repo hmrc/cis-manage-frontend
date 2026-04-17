@@ -60,7 +60,7 @@
             ),
             SummaryListRowViewModel(
                 key   = KeyViewModel(Text(messages("history.printSubmissionDetails.submissionDetails.submissionType"))),
-                value = ValueViewModel(Text(messages(submissionType)))
+                value = ValueViewModel(Text(messages(s"history.printSubmissionDetails.submissionDetails.submissionType.${submissionType}")))
             ),
             SummaryListRowViewModel(
                 key   = KeyViewModel(Text(messages("history.printSubmissionDetails.submissionDetails.contractorName"))),

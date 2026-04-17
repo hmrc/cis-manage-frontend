@@ -18,7 +18,8 @@ package connectors
 
 import models.agent.AgentClientData
 import models.{CisTaxpayer, CisTaxpayerSearchResult, GetClientListStatusResponse, Scheme, UnsubmittedMonthlyReturnsResponse}
-import models.requests.DeleteUnsubmittedMonthlyReturnRequest
+import models.requests.{DeleteUnsubmittedMonthlyReturnRequest, GetSubmittedMonthlyReturnsRequest}
+import models.response.GetSubmittedMonthlyReturnResponse
 import play.api.Logging
 import play.api.http.Status.{NO_CONTENT, OK}
 import play.api.libs.json.{JsObject, JsValue, Json}
@@ -160,4 +161,11 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         }
       }
 
+  def getSubmittedMonthlyReturn(
+    request: GetSubmittedMonthlyReturnsRequest
+  )(implicit hc: HeaderCarrier): Future[GetSubmittedMonthlyReturnResponse] =
+    http
+      .post(url"$cisBaseUrl/monthly-returns/submitted")
+      .withBody(Json.toJson(request))
+      .execute[GetSubmittedMonthlyReturnResponse]
 }
