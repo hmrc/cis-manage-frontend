@@ -210,5 +210,81 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+
+    "onPageLoadSingleYear must redirect to JourneyRecovery when buildSingleYearViewModel returns None" in new Setup {
+      val userAnswers =
+        emptyUserAnswers.set(SubmittedReturnsDataPage, submittedReturnsData).success.value
+
+      when(mockSubmittedReturnsService.buildSingleYearViewModel(submittedReturnsData, "2024"))
+        .thenReturn(None)
+
+      val app = application(userAnswers)
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadSingleYear("2024").url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        verify(mockSubmittedReturnsService).buildSingleYearViewModel(submittedReturnsData, "2024")
+      }
+    }
+
+    "onPageLoadSingleYear must redirect to JourneyRecovery when resolveSubmittedReturnsData fails" in new Setup {
+      val userAnswers =
+        emptyUserAnswers.set(CisIdPage, "900063").success.value
+
+      when(mockManageService.getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val app = application(userAnswers)
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadSingleYear("2024").url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
+      }
+    }
+
+    "onPageLoadAllYears must redirect to JourneyRecovery when buildAllYearsViewModel returns None" in new Setup {
+      val userAnswers =
+        emptyUserAnswers.set(SubmittedReturnsDataPage, submittedReturnsData).success.value
+
+      when(mockSubmittedReturnsService.buildAllYearsViewModel(submittedReturnsData))
+        .thenReturn(None)
+
+      val app = application(userAnswers)
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadAllYears().url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        verify(mockSubmittedReturnsService).buildAllYearsViewModel(submittedReturnsData)
+      }
+    }
+
+    "onPageLoadAllYears must redirect to JourneyRecovery when resolveSubmittedReturnsData fails" in new Setup {
+      val userAnswers =
+        emptyUserAnswers.set(CisIdPage, "900063").success.value
+
+      when(mockManageService.getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val app = application(userAnswers)
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadAllYears().url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
+      }
+    }
   }
 }
