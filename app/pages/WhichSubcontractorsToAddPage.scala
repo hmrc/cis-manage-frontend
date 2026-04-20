@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package generators
+package pages
 
-import org.scalacheck.{Arbitrary, Gen}
+import models.WhichSubcontractorsToAdd
+import play.api.libs.json.JsPath
 
-trait ModelGenerators {
+case object WhichSubcontractorsToAddPage extends QuestionPage[Set[WhichSubcontractorsToAdd]] {
 
-  implicit lazy val arbitraryWhichSubcontractorsToAdd: Arbitrary[WhichSubcontractorsToAdd] =
-    Arbitrary {
-      Gen.oneOf(WhichSubcontractorsToAdd.values)
-    }
+  override def path: JsPath = JsPath \ toString
 
-  implicit def arbitrarySubmittedReturnsChooseTaxYear(implicit taxYears: Seq[String]): Arbitrary[String] =
-    Arbitrary(Gen.oneOf(taxYears :+ "all"))
+  override def toString: String = "whichSubcontractorsToAdd"
 }

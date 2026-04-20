@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package generators
+package forms
 
-import org.scalacheck.{Arbitrary, Gen}
+import javax.inject.Inject
 
-trait ModelGenerators {
+import forms.mappings.Mappings
+import play.api.data.Form
+import play.api.data.Forms.set
+import models.WhichSubcontractorsToAdd
 
-  implicit lazy val arbitraryWhichSubcontractorsToAdd: Arbitrary[WhichSubcontractorsToAdd] =
-    Arbitrary {
-      Gen.oneOf(WhichSubcontractorsToAdd.values)
-    }
+class WhichSubcontractorsToAddFormProvider @Inject() extends Mappings {
 
-  implicit def arbitrarySubmittedReturnsChooseTaxYear(implicit taxYears: Seq[String]): Arbitrary[String] =
-    Arbitrary(Gen.oneOf(taxYears :+ "all"))
+  def apply(): Form[Set[WhichSubcontractorsToAdd]] =
+    Form(
+      "value" -> set(enumerable[WhichSubcontractorsToAdd]("whichSubcontractorsToAdd.error.required")).verifying(nonEmptySet("whichSubcontractorsToAdd.error.required"))
+    )
 }
