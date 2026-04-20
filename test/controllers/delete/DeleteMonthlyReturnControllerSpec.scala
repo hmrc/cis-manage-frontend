@@ -18,7 +18,7 @@ package controllers.delete
 
 import base.SpecBase
 import forms.delete.DeleteMonthlyReturnFormProvider
-import models.{NormalMode, UnsubmittedMonthlyReturn, UserAnswers}
+import models.{NormalMode, UnsubmittedMonthlyReturnsRow, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -45,7 +45,7 @@ class DeleteMonthlyReturnControllerSpec extends SpecBase with MockitoSugar {
   val baseUa: UserAnswers = userAnswersWithCisId
     .set(
       UnsubmittedMonthlyReturnToDeleteQuery,
-      UnsubmittedMonthlyReturn("1", 3000L, 2026, 4, "Standard", "In Progress", Some("N"), true, Instant.now())
+      UnsubmittedMonthlyReturnsRow(3000L, 2026, 4, "Standard", "In Progress", None, Some("N"), true)
     )
     .success
     .value
@@ -100,7 +100,7 @@ class DeleteMonthlyReturnControllerSpec extends SpecBase with MockitoSugar {
       val mockManageService = mock[ManageService]
       when(
         mockManageService
-          .deleteUnsubmittedMonthlyReturn(any[UnsubmittedMonthlyReturn])(any())
+          .deleteUnsubmittedMonthlyReturn(any[UserAnswers], any[UnsubmittedMonthlyReturnsRow])(any())
       ).thenReturn(Future.successful(()))
 
       val application =
@@ -211,7 +211,7 @@ class DeleteMonthlyReturnControllerSpec extends SpecBase with MockitoSugar {
     val mockManageService     = mock[ManageService]
     when(
       mockManageService
-        .deleteUnsubmittedMonthlyReturn(any[UnsubmittedMonthlyReturn])(any())
+        .deleteUnsubmittedMonthlyReturn(any[UserAnswers], any[UnsubmittedMonthlyReturnsRow])(any())
     ).thenReturn(Future.failed(new RuntimeException("boom")))
 
     val application =

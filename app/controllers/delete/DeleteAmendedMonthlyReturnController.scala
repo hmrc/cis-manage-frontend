@@ -18,7 +18,8 @@ package controllers.delete
 
 import controllers.actions.*
 import forms.delete.DeleteAmendedMonthlyReturnFormProvider
-import models.Mode
+import models.{Deletable, Mode}
+import pages.CisIdPage
 import pages.delete.DeleteAmendedMonthlyReturnPage
 import play.api.Logging
 import play.api.data.Form
@@ -67,6 +68,11 @@ class DeleteAmendedMonthlyReturnController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen deletableReturnAction).async { implicit request =>
+      val instanceId  = request.userAnswers.get(CisIdPage).getOrElse {
+        logger.error("[DeleteAmendedMonthlyReturnController] cisId missing from userAnswers")
+        throw new IllegalStateException("cisId missing from userAnswers")
+      }
+      val userAnswers = request.userAnswers
       form
         .bindFromRequest()
         .fold(
@@ -77,13 +83,23 @@ class DeleteAmendedMonthlyReturnController @Inject() (
           },
           value =>
             if (value) {
-              val result = for {
-                _              <- service.deleteUnsubmittedMonthlyReturn(request.returnToDelete)
-                updatedAnswers <- Future.fromTry(request.userAnswers.remove(UnsubmittedMonthlyReturnToDeleteQuery))
-                _              <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(
-                controllers.routes.ReturnsLandingController.onPageLoad(request.returnToDelete.instanceId)
-              )
+              val result =
+                for {
+                  deletionStatus <- service.checkUnsubmittedMonthlyReturnDeletion(
+                                      request.userAnswers,
+                                      request.returnToDelete.monthlyReturnId
+                                    )
+                  _              <- deletionStatus match {
+                                      case Deletable(record) =>
+                                        service.deleteUnsubmittedMonthlyReturn(userAnswers, record)
+                                      case _                 =>
+                                        Future.failed(new IllegalStateException("Record is not deletable"))
+                                    }
+                  updatedAnswers <- Future.fromTry(userAnswers.remove(UnsubmittedMonthlyReturnToDeleteQuery))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(
+                  controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
+                )
 
               result.recover { case ex =>
                 logger.error(
@@ -97,7 +113,7 @@ class DeleteAmendedMonthlyReturnController @Inject() (
                 updatedAnswers <- Future.fromTry(request.userAnswers.remove(UnsubmittedMonthlyReturnToDeleteQuery))
                 _              <- sessionRepository.set(updatedAnswers)
               } yield Redirect(
-                controllers.routes.ReturnsLandingController.onPageLoad(request.returnToDelete.instanceId)
+                controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
               )
             }
         )

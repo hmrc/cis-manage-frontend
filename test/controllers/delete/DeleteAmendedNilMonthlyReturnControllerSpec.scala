@@ -19,7 +19,7 @@ package controllers.delete
 import base.SpecBase
 import controllers.routes
 import forms.delete.DeleteAmendedNilMonthlyReturnFormProvider
-import models.{NormalMode, UnsubmittedMonthlyReturn, UserAnswers}
+import models.{NormalMode, UnsubmittedMonthlyReturnsRow, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -46,7 +46,7 @@ class DeleteAmendedNilMonthlyReturnControllerSpec extends SpecBase with MockitoS
   val baseUa: UserAnswers = userAnswersWithCisId
     .set(
       UnsubmittedMonthlyReturnToDeleteQuery,
-      UnsubmittedMonthlyReturn("1", 3000L, 2026, 4, "Nil", "In Progress", Some("Y"), true, Instant.now())
+      UnsubmittedMonthlyReturnsRow(3000L, 2026, 4, "Nil", "In Progress", None, Some("Y"), true)
     )
     .success
     .value
@@ -102,7 +102,7 @@ class DeleteAmendedNilMonthlyReturnControllerSpec extends SpecBase with MockitoS
       val mockManageService = mock[ManageService]
       when(
         mockManageService
-          .deleteUnsubmittedMonthlyReturn(any[UnsubmittedMonthlyReturn])(any())
+          .deleteUnsubmittedMonthlyReturn(any[UserAnswers], any[UnsubmittedMonthlyReturnsRow])(any())
       ).thenReturn(Future.successful(()))
 
       val application =
@@ -212,7 +212,7 @@ class DeleteAmendedNilMonthlyReturnControllerSpec extends SpecBase with MockitoS
       val mockManageService     = mock[ManageService]
       when(
         mockManageService
-          .deleteUnsubmittedMonthlyReturn(any[UnsubmittedMonthlyReturn])(any())
+          .deleteUnsubmittedMonthlyReturn(any[UserAnswers], any[UnsubmittedMonthlyReturnsRow])(any())
       ).thenReturn(Future.failed(new RuntimeException("boom")))
 
       val application =

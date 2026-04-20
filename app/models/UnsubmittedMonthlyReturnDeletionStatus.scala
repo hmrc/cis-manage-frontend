@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package queries.delete
+package models
 
-import models.UnsubmittedMonthlyReturnsRow
-import play.api.libs.json.JsPath
-import queries.{Gettable, Settable}
+sealed trait UnsubmittedMonthlyReturnDeletionStatus
 
-case object UnsubmittedMonthlyReturnToDeleteQuery
-    extends Gettable[UnsubmittedMonthlyReturnsRow]
-    with Settable[UnsubmittedMonthlyReturnsRow] {
-
-  override def path: JsPath = JsPath \ "unsubmittedMonthlyReturnToDelete"
-}
+case class Deletable(record: UnsubmittedMonthlyReturnsRow) extends UnsubmittedMonthlyReturnDeletionStatus
+case object NotDeletable extends UnsubmittedMonthlyReturnDeletionStatus
+//case object NotFound extends UnsubmittedMonthlyReturnDeletionStatus
