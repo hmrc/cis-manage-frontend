@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package pages
+package forms.amend
 
-import models.WhichSubcontractorsToAdd
-import play.api.libs.json.JsPath
+import javax.inject.Inject
 
-case object WhichSubcontractorsToAddPage extends QuestionPage[Set[WhichSubcontractorsToAdd]] {
+import forms.mappings.Mappings
+import play.api.data.Form
+import play.api.data.Forms.set
+import models.amend.WhichSubcontractorsToAdd
 
-  override def path: JsPath = JsPath \ toString
+class WhichSubcontractorsToAddFormProvider @Inject() extends Mappings {
 
-  override def toString: String = "whichSubcontractorsToAdd"
+  def apply(): Form[Set[WhichSubcontractorsToAdd]] =
+    Form(
+      "value" -> set(enumerable[WhichSubcontractorsToAdd]("whichSubcontractorsToAdd.error.required"))
+        .verifying(nonEmptySet("whichSubcontractorsToAdd.error.required"))
+    )
 }

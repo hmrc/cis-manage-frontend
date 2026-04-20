@@ -1,19 +1,20 @@
-package controllers
+package controllers.amend
 
 import base.SpecBase
-import forms.WhichSubcontractorsToAddFormProvider
-import models.{NormalMode, WhichSubcontractorsToAdd, UserAnswers}
+import forms.amend.WhichSubcontractorsToAddFormProvider
+import models.{NormalMode, UserAnswers}
+import models.amend.WhichSubcontractorsToAdd
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.WhichSubcontractorsToAddPage
+import pages.amend.WhichSubcontractorsToAddPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import views.html.WhichSubcontractorsToAddView
+import views.html.amend.WhichSubcontractorsToAddView
 
 import scala.concurrent.Future
 
@@ -24,7 +25,7 @@ class WhichSubcontractorsToAddControllerSpec extends SpecBase with MockitoSugar 
   lazy val whichSubcontractorsToAddRoute = routes.WhichSubcontractorsToAddController.onPageLoad(NormalMode).url
 
   val formProvider = new WhichSubcontractorsToAddFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   "WhichSubcontractorsToAdd Controller" - {
 
@@ -47,7 +48,10 @@ class WhichSubcontractorsToAddControllerSpec extends SpecBase with MockitoSugar 
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(WhichSubcontractorsToAddPage, WhichSubcontractorsToAdd.values.toSet).success.value
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(WhichSubcontractorsToAddPage, WhichSubcontractorsToAdd.values.toSet)
+        .success
+        .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -59,7 +63,10 @@ class WhichSubcontractorsToAddControllerSpec extends SpecBase with MockitoSugar 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(WhichSubcontractorsToAdd.values.toSet), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(WhichSubcontractorsToAdd.values.toSet), NormalMode)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -119,7 +126,7 @@ class WhichSubcontractorsToAddControllerSpec extends SpecBase with MockitoSugar 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -135,7 +142,7 @@ class WhichSubcontractorsToAddControllerSpec extends SpecBase with MockitoSugar 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

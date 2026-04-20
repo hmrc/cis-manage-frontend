@@ -16,6 +16,7 @@
 
 package generators
 
+import models.amend.WhichSubcontractorsToAdd
 import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {

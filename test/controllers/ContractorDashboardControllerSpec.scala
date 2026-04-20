@@ -21,7 +21,10 @@ class ContractorDashboardControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[ContractorDashboardView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(ContractorDashboardController.viewModel())(request, messages(application)).toString
+        contentAsString(result) mustEqual view(ContractorDashboardController.viewModel())(
+          request,
+          messages(application)
+        ).toString
       }
     }
   }

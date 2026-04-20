@@ -1,7 +1,7 @@
-package forms
+package forms.amend
 
 import forms.behaviours.CheckboxFieldBehaviours
-import models.WhichSubcontractorsToAdd
+import models.amend.WhichSubcontractorsToAdd
 import play.api.data.FormError
 
 class WhichSubcontractorsToAddFormProviderSpec extends CheckboxFieldBehaviours {
@@ -10,13 +10,13 @@ class WhichSubcontractorsToAddFormProviderSpec extends CheckboxFieldBehaviours {
 
   ".value" - {
 
-    val fieldName = "value"
+    val fieldName   = "value"
     val requiredKey = "whichSubcontractorsToAdd.error.required"
 
     behave like checkboxField[WhichSubcontractorsToAdd](
       form,
       fieldName,
-      validValues  = WhichSubcontractorsToAdd.values,
+      validValues = WhichSubcontractorsToAdd.values,
       invalidError = FormError(s"$fieldName[0]", "error.invalid")
     )
 

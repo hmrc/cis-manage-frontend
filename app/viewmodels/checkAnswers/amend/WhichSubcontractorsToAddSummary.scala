@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.amend
 
-import controllers.routes
+import controllers.amend.routes
 import models.{CheckMode, UserAnswers}
-import pages.WhichSubcontractorsToAddPage
+import pages.amend.WhichSubcontractorsToAddPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -26,28 +26,28 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist._
 import viewmodels.implicits._
 
-object WhichSubcontractorsToAddSummary  {
+object WhichSubcontractorsToAddSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(WhichSubcontractorsToAddPage).map {
-      answers =>
+    answers.get(WhichSubcontractorsToAddPage).map { answers =>
 
-        val value = ValueViewModel(
-          HtmlContent(
-            answers.map {
-              answer => HtmlFormat.escape(messages(s"whichSubcontractorsToAdd.$answer")).toString
+      val value = ValueViewModel(
+        HtmlContent(
+          answers
+            .map { answer =>
+              HtmlFormat.escape(messages(s"whichSubcontractorsToAdd.$answer")).toString
             }
             .mkString(",<br>")
-          )
         )
+      )
 
-        SummaryListRowViewModel(
-          key     = "whichSubcontractorsToAdd.checkYourAnswersLabel",
-          value   = value,
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.WhichSubcontractorsToAddController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("whichSubcontractorsToAdd.change.hidden"))
-          )
+      SummaryListRowViewModel(
+        key = "whichSubcontractorsToAdd.checkYourAnswersLabel",
+        value = value,
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.WhichSubcontractorsToAddController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("whichSubcontractorsToAdd.change.hidden"))
         )
+      )
     }
 }
