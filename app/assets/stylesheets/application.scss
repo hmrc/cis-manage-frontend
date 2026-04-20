@@ -31,3 +31,22 @@
     z-index: 0;
     pointer-events: none;
 }
+
+/* Incomplete returns table */
+
+.incomplete-returns-desktop {
+    display: block;
+}
+
+.incomplete-returns-mobile {
+    display: none;
+}
+
+@media (max-width: 799px) {
+    .incomplete-returns-desktop {
+        display: none;
+    }
+    .incomplete-returns-mobile {
+        display: block;
+    }
+}

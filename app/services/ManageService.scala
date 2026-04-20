@@ -19,16 +19,16 @@ package services
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
-import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, UserAnswers}
+import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, UnsubmittedMonthlyReturnsRow, UserAnswers}
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.{ReturnLandingViewModel, ReturnsLandingContext}
+import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel, ReturnLandingViewModel, ReturnsLandingContext}
 import viewmodels.agent.AgentLandingViewModel
 
-import java.time.LocalDateTime
+import java.time.{LocalDateTime, YearMonth}
 import java.time.format.{DateTimeFormatter, TextStyle}
 import java.util.Locale
 import javax.inject.{Inject, Singleton}
@@ -40,6 +40,9 @@ class ManageService @Inject() (
   sessionRepository: SessionRepository
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends Logging {
+
+  private val shortMonthYearFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM yyyy", Locale.UK)
+  private val lastUpdateFormatter: DateTimeFormatter     = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.UK)
 
   def resolveAndStoreCisId(ua: UserAnswers)(implicit hc: HeaderCarrier): Future[(String, UserAnswers)] =
     ua.get(CisIdPage) match {
@@ -119,8 +122,22 @@ class ManageService @Inject() (
 
   def getUnsubmittedMonthlyReturns(instanceId: String)(implicit
     hc: HeaderCarrier
-  ): Future[UnsubmittedMonthlyReturnsResponse] =
-    cisConnector.getUnsubmittedMonthlyReturns(instanceId)
+  ): Future[Seq[IncompleteReturnsRowViewModel]] =
+    cisConnector.getUnsubmittedMonthlyReturns(instanceId).map { response =>
+      response.unsubmittedCisReturns
+        .sortBy(r => (r.taxYear, r.taxMonth))
+        .reverse
+        .map { r =>
+          IncompleteReturnsRowViewModel(
+            returnPeriodEnd = buildReturnPeriodEnd(r.taxMonth, r.taxYear),
+            returnType = r.returnType,
+            lastUpdate = formatLastUpdate(r.lastUpdate),
+            status = r.status,
+            action = buildActions(instanceId, r),
+            amendment = r.amendment
+          )
+        }
+    }
 
   def buildReturnsLandingContext(
     instanceId: String,
@@ -153,34 +170,75 @@ class ManageService @Inject() (
 
     (contractorNameOpt, linksOpt) match {
       case (Some(name), Some((standardLink, nilLink))) =>
-        getUnsubmittedMonthlyReturns(instanceId).map { response =>
-          val returnsList =
-            response.unsubmittedCisReturns.map { r =>
-              ReturnLandingViewModel(
-                taxMonth = formatPeriod(r.taxMonth, r.taxYear),
-                returnType = r.returnType,
-                dateSubmitted = formatLastUpdate(r.lastUpdate),
-                status = r.status
-              )
-            }
-
-          Some(ReturnsLandingContext(name, standardLink, nilLink, returnsList))
-        }
+        Future.successful(Some(ReturnsLandingContext(name, standardLink, nilLink)))
 
       case _ =>
         Future.successful(None)
     }
   }
 
-  private def formatPeriod(taxMonth: Int, taxYear: Int): String = {
-    val monthName = java.time.Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)
-    s"$monthName $taxYear"
-  }
+  private def buildReturnPeriodEnd(taxMonth: Int, taxYear: Int): String =
+    YearMonth.of(taxYear, taxMonth).format(shortMonthYearFormatter)
 
   private def formatLastUpdate(lastUpdate: Option[LocalDateTime]): String =
     lastUpdate match {
-      case Some(dateTime) =>
-        dateTime.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK))
+      case Some(dateTime) => dateTime.toLocalDate.format(lastUpdateFormatter)
       case None           => ""
     }
+
+  private def buildActions(instanceId: String, row: UnsubmittedMonthlyReturnsRow): Seq[ActionLinkViewModel] = {
+    val isNilReturn      = row.returnType.equalsIgnoreCase("Nil")
+    val isStandardReturn = row.returnType.equalsIgnoreCase("Standard")
+    val isAmendment      = row.amendment.exists(_.equalsIgnoreCase("Y"))
+
+    row.status match {
+      case "In progress" =>
+        Seq(
+          ActionLinkViewModel(
+            textKey = "incompleteReturns.action.continue",
+            href = if (isAmendment) {
+              controllers.routes.JourneyRecoveryController.onPageLoad().url
+            } else if (isNilReturn) {
+              appConfig
+                .continueReturnJourneyUrl(instanceId, row.taxYear.toString, row.taxMonth.toString)
+            } else {
+              appConfig
+                .continueReturnJourneyUrl(instanceId, row.taxYear.toString, row.taxMonth.toString)
+            },
+            hiddenTextKey = Some("incompleteReturns.action.continue")
+          ),
+          ActionLinkViewModel(
+            textKey = "incompleteReturns.action.delete",
+            href = controllers.routes.JourneyRecoveryController.onPageLoad().url, // TODO: delete route
+            hiddenTextKey = Some("incompleteReturns.action.delete")
+          )
+        )
+
+      case "Awaiting confirmation" =>
+        Seq(
+          ActionLinkViewModel(
+            textKey = "incompleteReturns.action.view",
+            href = controllers.routes.JourneyRecoveryController.onPageLoad().url, // TODO: MR05c
+            hiddenTextKey = Some("incompleteReturns.action.view")
+          )
+        )
+
+      case "Unsuccessful" =>
+        Seq(
+          ActionLinkViewModel(
+            textKey = "incompleteReturns.action.view",
+            href = if (isAmendment || isStandardReturn) {
+              controllers.routes.JourneyRecoveryController.onPageLoad().url // TODO: MR05a cannot resubmit
+            } else {
+              controllers.routes.JourneyRecoveryController.onPageLoad().url // TODO: MR05a can resubmit
+            },
+            hiddenTextKey = Some("incompleteReturns.action.view")
+          )
+        )
+
+      case _ =>
+        Seq.empty
+    }
+  }
+
 }

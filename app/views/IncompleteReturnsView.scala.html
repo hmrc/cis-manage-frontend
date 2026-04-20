@@ -1,0 +1,117 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import viewmodels.{IncompleteReturnsRowViewModel, ActionLinkViewModel}
+@import views.html.components.*
+
+@this(
+    layout: templates.Layout,
+    govukTable: GovukTable,
+    govukSummaryList: GovukSummaryList,
+    caption: Caption,
+    h1: H1,
+    paragraph: Paragraph,
+    link: Link
+)
+
+@(viewModel: Seq[IncompleteReturnsRowViewModel])(implicit request: Request[_], messages: Messages)
+
+@renderActions(actions: Seq[ActionLinkViewModel]) = {
+    @for((action, index) <- actions.zipWithIndex) {
+        @link(
+            linkTextKey = action.textKey,
+            linkUrl = action.href,
+            paragraphWrapped = false
+        )
+        @if(index < actions.size -1) {
+            <span aria-hidden="true"> | </span>
+        }
+    }
+}
+
+@layout(
+    pageTitle = titleNoForm(messages("incompleteReturns.title")),
+    useFullWidth = true
+) {
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            @h1(messages("incompleteReturns.heading"))
+            @paragraph(messages("incompleteReturns.message"))
+        </div>
+    </div>
+
+    <div class="govuk-grid-row govuk-!-margin-top-5">
+        <div class="govuk-grid-column-full">
+            <div class="incomplete-returns-desktop">
+                @govukTable(
+                    Table(
+                        classes = "govuk-!-margin-bottom-8",
+                        firstCellIsHeader = true,
+                        head = Some(
+                            Seq(
+                                HeadCell(content = Text(messages("incompleteReturns.table.returnPeriodEnd"))),
+                                HeadCell(content = Text(messages("incompleteReturns.table.returnType"))),
+                                HeadCell(content = Text(messages("incompleteReturns.table.lastUpdate"))),
+                                HeadCell(content = Text(messages("incompleteReturns.table.status"))),
+                                HeadCell(content = Text(messages("incompleteReturns.table.action")))
+                            )
+                        ),
+                        rows = viewModel.map { row =>
+                            Seq(
+                                TableRow(content = Text(row.returnPeriodEnd)),
+                                TableRow(content = Text(row.returnType)),
+                                TableRow(content = Text(row.lastUpdate)),
+                                TableRow(content = Text(row.status)),
+                                TableRow(content = HtmlContent(renderActions(row.action)))
+                            )
+                        }
+                    )
+                )
+            </div>
+            
+            <div class="incomplete-returns-mobile govuk-!-margin-bottom-8">
+                @for(row <- viewModel) {
+                    @govukSummaryList(
+                        SummaryList(
+                            classes = "govuk-!-margin-bottom-4",
+                            card = Some(Card(title = Some(CardTitle(content = Text(row.returnPeriodEnd))))
+                            ),
+                            rows = Seq(
+                                SummaryListRow(
+                                    key = Key(content = Text(messages("incompleteReturns.table.returnType"))),
+                                    value = Value(content = Text(row.returnType)),
+                                ),
+                                SummaryListRow(
+                                    key = Key(content = Text(messages("incompleteReturns.table.lastUpdate"))),
+                                    value = Value(content = Text(row.lastUpdate)),
+                                ),
+                                SummaryListRow(
+                                    key = Key(content = Text(messages("incompleteReturns.table.status"))),
+                                    value = Value(content = Text(row.status)),
+                                ),
+                                SummaryListRow(
+                                    key = Key(content = Text(messages("incompleteReturns.table.action"))),
+                                    value = Value(content = HtmlContent(renderActions(row.action)))
+                                )
+                            )
+                        )
+                    )
+                }
+            </div>
+        </div>
+    </div>
+}

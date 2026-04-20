@@ -440,3 +440,15 @@ history.printSubmissionDetails.paymentsMadeToSubcontractors.taxDeducted = Tax de
 history.printSubmissionDetails.printThisPage.link = Print this page
 history.printSubmissionDetails.monthlyReturnHistory.link = Return to Monthly return history
 
+
+incompleteReturns.title = Incomplete returns
+incompleteReturns.heading = Incomplete returns
+incompleteReturns.message = A tax month cannot be changed if it is incorrect and the return is in progress. You must delete it and file a new return with the correct tax month.
+incompleteReturns.table.returnPeriodEnd = Return period ended
+incompleteReturns.table.returnType = Type
+incompleteReturns.table.lastUpdate = Last updated
+incompleteReturns.table.status = Status
+incompleteReturns.table.action = Action
+incompleteReturns.action.continue = Continue
+incompleteReturns.action.delete = Delete
+incompleteReturns.action.view = View

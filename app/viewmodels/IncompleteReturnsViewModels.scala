@@ -14,31 +14,19 @@
  * limitations under the License.
  */
 
-package models
+package viewmodels
 
-import play.api.libs.json.{Json, OFormat}
-
-import java.time.LocalDateTime
-
-case class UnsubmittedMonthlyReturnsRow(
-  taxYear: Int,
-  taxMonth: Int,
+case class IncompleteReturnsRowViewModel(
+  returnPeriodEnd: String,
   returnType: String,
+  lastUpdate: String,
   status: String,
-  monthlyReturnId: Long,
-  action: Seq[String],
-  lastUpdate: Option[LocalDateTime],
+  action: Seq[ActionLinkViewModel],
   amendment: Option[String]
 )
 
-object UnsubmittedMonthlyReturnsRow {
-  given format: OFormat[UnsubmittedMonthlyReturnsRow] = Json.format[UnsubmittedMonthlyReturnsRow]
-}
-
-case class UnsubmittedMonthlyReturnsResponse(
-  unsubmittedCisReturns: Seq[UnsubmittedMonthlyReturnsRow]
+case class ActionLinkViewModel(
+  textKey: String,
+  href: String,
+  hiddenTextKey: Option[String] = None
 )
-
-object UnsubmittedMonthlyReturnsResponse {
-  given format: OFormat[UnsubmittedMonthlyReturnsResponse] = Json.format[UnsubmittedMonthlyReturnsResponse]
-}

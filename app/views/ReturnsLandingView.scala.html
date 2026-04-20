@@ -41,7 +41,7 @@
     tableRowTagColour: TableRowTagColour
 )
 
-@(contractorName: String, returnsList: Seq[ReturnLandingViewModel], standardReturnLink: String, nilReturnLink: String)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
+@(contractorName: String, standardReturnLink: String, nilReturnLink: String)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
 
 @sidebar = {
     @aside("returnsLanding.aside.h2", nav(Seq(
@@ -105,71 +105,6 @@
             paragraph("returnsLanding.noticeAndStatements.p1")
         ))
     )
-
-    @sectionBreak()
-
-    @h2(messages("returnsLanding.recentCisReturns.h2"))
-
-    @if(returnsList.isEmpty) {
-        @paragraph(messages("returnsLanding.noUnsubmittedReturns"))
-    } else  {
-        @govukTable(
-            Table(
-                head = Some(
-                    Seq(
-                        "returnsLanding.taxMonth.th",
-                        "returnsLanding.type.th",
-                        "returnsLanding.status.th",
-                        "returnsLanding.lastUpdated.th",
-                        "site.delete"
-                    ).map { key =>
-                        HeadCell(content = Text(messages(key)))
-                    }
-                ),
-                rows = returnsList.map { item =>
-                    val isFailed = item.status.trim.equalsIgnoreCase("Failed")
-
-                    Seq(
-                        TableRow(
-                            content =
-                                if (!isFailed) HtmlContent(s"""<a href="#" class="govuk-link">${item.taxMonth}</a>""")
-                                else Text(item.taxMonth),
-                            classes = "govuk-table__header"
-                        ),
-                        TableRow(content = Text(item.returnType)),
-                        TableRow(
-                            content = {
-                                val tag = tableRowTagColour(
-                                    text = item.status,
-                                    colour = item.status.trim.toUpperCase match {
-                                        case "IN PROGRESS" => "govuk-tag--light-blue"
-                                        case "AWAITING CONFIRMATION" => "govuk-tag--blue"
-                                        case "FAILED" => "govuk-tag--red"
-                                        case _ => "govuk-tag--light-blue"
-                                    }
-                                )
-
-                                if (isFailed)
-                                    HtmlContent(s"""<a href="#" class="govuk-link">$tag</a>""")
-                                else
-                                    HtmlContent(tag)
-                            }
-                        ),
-                        TableRow(content = Text(item.dateSubmitted)),
-                        TableRow(content =
-                            if (item.status.trim.equalsIgnoreCase("In progress")) {
-                                HtmlContent(
-                                    s"""<a href="#" class="govuk-link">Delete</a>"""
-                                )
-                            } else {
-                                HtmlContent("")
-                            }
-                        )
-                    )
-                }
-            )
-        )
-    }
 
     @link(linkTextKey = "returnsLanding.viewReturnsHistory.link", linkUrl = config.viewReturnsHistoryUrl)
 }

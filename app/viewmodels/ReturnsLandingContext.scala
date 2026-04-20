@@ -19,6 +19,5 @@ package viewmodels
 case class ReturnsLandingContext(
   contractorName: String,
   standardReturnLink: String,
-  nilReturnLink: String,
-  returnsList: Seq[ReturnLandingViewModel]
+  nilReturnLink: String
 )

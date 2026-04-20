@@ -83,9 +83,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val contractorLandingGuidanceUrl: String  = configuration.get[String]("urls.contractorLandingGuidanceUrl")
   lazy val contractorLandingPenaltiesUrl: String = configuration.get[String]("urls.contractorLandingPenaltiesUrl")
 
-  private lazy val cisFrontendBaseUrl: String     = configuration.get[String]("cis-frontend.host")
-  private lazy val fileStandardReturnPath: String = configuration.get[String]("urls.fileStandardReturn")
-  private lazy val fileNilReturnPath: String      = configuration.get[String]("urls.fileNilReturn")
+  private lazy val cisFrontendBaseUrl: String        = configuration.get[String]("cis-frontend.host")
+  private lazy val fileStandardReturnPath: String    = configuration.get[String]("urls.fileStandardReturn")
+  private lazy val fileNilReturnPath: String         = configuration.get[String]("urls.fileNilReturn")
+  private lazy val continueReturnJourneyPath: String = configuration.get[String]("urls.continueReturnJourney")
 
   def fileStandardReturnUrl: String = s"$cisFrontendBaseUrl$fileStandardReturnPath"
 
@@ -102,6 +103,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     s"$cisFrontendBaseUrl$fileNilReturnPath" +
       s"?instanceId=${encode(instanceId)}"
   }
+
+  def continueReturnJourneyUrl(instanceId: String, taxYear: String, taxMonth: String): String =
+    s"$cisFrontendBaseUrl$continueReturnJourneyPath" +
+      s"?instanceId=$instanceId&taxYear=$taxYear&taxMonth=$taxMonth"
 
   lazy val cisTypeOfSubcontractorUrl: String = configuration.get[String]("urls.cis-contractor-frontend")
 }

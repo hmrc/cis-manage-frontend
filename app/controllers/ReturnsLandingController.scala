@@ -19,6 +19,7 @@ package controllers
 import config.FrontendAppConfig
 import controllers.actions.*
 import play.api.Logging
+
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -28,7 +29,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.ReturnsLandingView
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 class ReturnsLandingController @Inject() (
@@ -52,7 +53,7 @@ class ReturnsLandingController @Inject() (
         .buildReturnsLandingContext(instanceId, request.userAnswers, request.isAgent)
         .map {
           case Some(context) =>
-            Ok(view(context.contractorName, context.returnsList, context.standardReturnLink, context.nilReturnLink))
+            Ok(view(context.contractorName, context.standardReturnLink, context.nilReturnLink))
           case None          =>
             logger.warn(
               s"[ReturnsLandingController] missing context (isAgent=${request.isAgent}, instanceId=$instanceId)"
