@@ -447,3 +447,9 @@ amend.noReturnsSubmitted.p2 = You can do this in
 amend.noReturnsSubmitted.p2.link = Manage your CIS return
 amend.noReturnsSubmitted.p3 = Find out more about
 amend.noReturnsSubmitted.p3.link = what you must do as a CIS contractor
+
+amend.whichSubcontractorsToAdd.title = Which subcontractor do you want to add to this return?
+amend.whichSubcontractorsToAdd.heading = Which subcontractor do you want to add to this return?
+amend.whichSubcontractorsToAdd.checkYourAnswersLabel = Which subcontractor do you want to add to this return?
+amend.whichSubcontractorsToAdd.error.required = Select a subcontractor
+amend.whichSubcontractorsToAdd.change.hidden = Which subcontractor do you want to add to this return?

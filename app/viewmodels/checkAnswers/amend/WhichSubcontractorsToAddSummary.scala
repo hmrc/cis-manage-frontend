@@ -42,11 +42,11 @@ object WhichSubcontractorsToAddSummary {
       )
 
       SummaryListRowViewModel(
-        key = "whichSubcontractorsToAdd.checkYourAnswersLabel",
+        key = "amend.whichSubcontractorsToAdd.checkYourAnswersLabel",
         value = value,
         actions = Seq(
           ActionItemViewModel("site.change", routes.WhichSubcontractorsToAddController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("whichSubcontractorsToAdd.change.hidden"))
+            .withVisuallyHiddenText(messages("amend.whichSubcontractorsToAdd.change.hidden"))
         )
       )
     }

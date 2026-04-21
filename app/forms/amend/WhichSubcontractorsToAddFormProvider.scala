@@ -33,7 +33,7 @@ class WhichSubcontractorsToAddFormProvider @Inject() extends Mappings {
         data.get(key).filter(_.nonEmpty) match {
           case Some(value) if validIds.contains(value) => Right(value)
           case Some(_)                                 => Left(Seq(play.api.data.FormError(key, "error.invalid")))
-          case None                                    => Left(Seq(play.api.data.FormError(key, "whichSubcontractorsToAdd.error.required")))
+          case None                                    => Left(Seq(play.api.data.FormError(key, "amend.whichSubcontractorsToAdd.error.required")))
         }
 
       override def unbind(key: String, value: String): Map[String, String] =
@@ -42,7 +42,7 @@ class WhichSubcontractorsToAddFormProvider @Inject() extends Mappings {
 
     Form(
       "value" -> set(subcontractorIdMapping)
-        .verifying(nonEmptySet("whichSubcontractorsToAdd.error.required"))
+        .verifying(nonEmptySet("amend.whichSubcontractorsToAdd.error.required"))
     )
   }
 }

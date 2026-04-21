@@ -24,7 +24,7 @@
 
 @(form: Form[_], mode: Mode, checkboxItems: Seq[uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("whichSubcontractorsToAdd.title"))) {
+@layout(pageTitle = title(form, messages("amend.whichSubcontractorsToAdd.title"))) {
 
     @formHelper(action = controllers.amend.routes.WhichSubcontractorsToAddController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
@@ -36,7 +36,7 @@
             CheckboxesViewModel(
                 form   = form,
                 name   = "value",
-                legend = LegendViewModel(messages("whichSubcontractorsToAdd.heading")).asPageHeading(),
+                legend = LegendViewModel(messages("amend.whichSubcontractorsToAdd.heading")).asPageHeading(),
                 items  = checkboxItems
             )
         )
