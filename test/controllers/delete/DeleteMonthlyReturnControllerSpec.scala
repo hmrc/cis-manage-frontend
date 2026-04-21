@@ -18,9 +18,9 @@ package controllers.delete
 
 import base.SpecBase
 import forms.delete.DeleteMonthlyReturnFormProvider
-import models.{Deletable, NormalMode, UnsubmittedMonthlyReturnsRow, UserAnswers}
+import models.{Deletable, NormalMode, NotDeletable, UnsubmittedMonthlyReturnsRow, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verifyNoInteractions, when}
+import org.mockito.Mockito.{never, verify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.delete.DeleteMonthlyReturnPage
 import play.api.data.Form
@@ -210,7 +210,10 @@ class DeleteMonthlyReturnControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a POST if CisId missing in user answers" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val userAnswers: UserAnswers =
+        emptyUserAnswers.set(UnsubmittedMonthlyReturnToDeleteQuery, deletableRow).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request =
@@ -224,12 +227,12 @@ class DeleteMonthlyReturnControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a POST if api failed" in {
+    "must redirect to Journey Recovery for a POST if record is not deletable" in {
       val mockSessionRepository = mock[SessionRepository]
       val mockManageService     = mock[ManageService]
 
       when(mockManageService.checkUnsubmittedMonthlyReturnDeletion(any[UserAnswers], any[Long])(any()))
-        .thenReturn(Future.failed(new RuntimeException("boom")))
+        .thenReturn(Future.successful(NotDeletable))
 
       val application =
         applicationBuilder(userAnswers = Some(baseUa))
@@ -251,6 +254,7 @@ class DeleteMonthlyReturnControllerSpec extends SpecBase with MockitoSugar {
       }
 
       verifyNoInteractions(mockSessionRepository)
+      verify(mockManageService, never()).deleteUnsubmittedMonthlyReturn(any(), any())(any())
     }
 
     "must redirect to Journey Recovery for a GET if UnsubmittedReturnToDeleteQuery is missing" in {
