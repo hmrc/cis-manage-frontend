@@ -88,3 +88,5 @@ POST       /history/view-tax-year-submission-history                controllers.
 GET        /history/monthly-return-submission-details               controllers.history.PrintSubmissionDetailsController.onPageLoad()
 
 GET        /manage-your-cis-return/incomplete-returns               controllers.IncompleteReturnsController.onPageLoad()
+
+GET        /amend-monthly-return/no-return-submitted                controllers.amend.NoReturnsSubmittedController.onPageLoad()
