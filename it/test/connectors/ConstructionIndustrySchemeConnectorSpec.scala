@@ -606,7 +606,10 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
                   |      "taxMonth": 1,
                   |      "returnType": "Nil",
                   |      "status": "PENDING",
-                  |      "lastUpdate": null
+                  |      "monthlyReturnId": 12345,
+                  |      "action": [],
+                  |      "lastUpdate": null,
+                  |      "amendment": "N"
                   |    }
                   |  ]
                   |}""".stripMargin
@@ -620,7 +623,10 @@ class ConstructionIndustrySchemeConnectorSpec extends AnyWordSpec
       result.unsubmittedCisReturns.head.taxMonth mustBe 1
       result.unsubmittedCisReturns.head.returnType mustBe "Nil"
       result.unsubmittedCisReturns.head.status mustBe "PENDING"
+      result.unsubmittedCisReturns.head.monthlyReturnId mustBe 12345
+      result.unsubmittedCisReturns.head.action mustBe Seq.empty
       result.unsubmittedCisReturns.head.lastUpdate mustBe None
+      result.unsubmittedCisReturns.head.amendment mustBe Some("N")
     }
 
     "propagate an upstream error when BE returns 500" in {

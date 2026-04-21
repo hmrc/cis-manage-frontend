@@ -29,8 +29,10 @@ import org.scalatest.wordspec.AnyWordSpec
 import pages.*
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
+import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel}
 import viewmodels.agent.AgentLandingViewModel
 
+import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Failure
@@ -363,9 +365,16 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
   "getUnsubmittedMonthlyReturns" should {
 
-    "delegate to connector and return response (happy path)" in {
+    "delegate to connector and return mapped view models (happy path)" in {
       val (service, connector, sessionRepo) = newService()
       val instanceId                        = "900063"
+
+      when(appConfig.continueReturnJourneyUrl(any[String], any[String], any[String]))
+        .thenReturn("/continue")
+      when(appConfig.submissionInProgressUrl(any[String]))
+        .thenReturn("/submission-in-progress")
+      when(appConfig.submissionUnsuccessfulCannotResubmitUrl(any[String]))
+        .thenReturn("/submission-unsuccessful")
 
       val resp = UnsubmittedMonthlyReturnsResponse(
         unsubmittedCisReturns = Seq(
@@ -373,18 +382,41 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             taxYear = 2025,
             taxMonth = 1,
             returnType = "Nil",
-            status = "PENDING",
-            lastUpdate = None
+            status = "In progress",
+            monthlyReturnId = 123L,
+            action = Seq.empty,
+            lastUpdate = Some(LocalDateTime.parse("2025-01-01T00:00:00")),
+            amendment = Some("N")
           )
         )
       )
 
-      when(connector.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
+      when(connector.getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(resp))
 
-      service.getUnsubmittedMonthlyReturns(instanceId).futureValue mustBe resp
+      service.getUnsubmittedMonthlyReturns(instanceId).futureValue mustBe Seq(
+        IncompleteReturnsRowViewModel(
+          returnPeriodEnd = "Jan 2025",
+          returnType = "Nil",
+          lastUpdate = "01 Jan 2025",
+          status = "In progress",
+          action = Seq(
+            ActionLinkViewModel(
+              textKey = "incompleteReturns.action.continue",
+              href = "/continue",
+              hiddenTextKey = Some("incompleteReturns.action.continue")
+            ),
+            ActionLinkViewModel(
+              textKey = "incompleteReturns.action.delete",
+              href = controllers.delete.routes.DeleteNilMonthlyReturnController.onPageLoad().url,
+              hiddenTextKey = Some("incompleteReturns.action.delete")
+            )
+          ),
+          amendment = Some("N")
+        )
+      )
 
-      verify(connector).getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier])
+      verify(connector).getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
       verifyNoInteractions(sessionRepo)
     }
 
@@ -393,20 +425,20 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       val instanceId                        = "900063"
       val boom                              = new RuntimeException("Backend error")
 
-      when(connector.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
+      when(connector.getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
         .thenReturn(Future.failed(boom))
 
       val ex = service.getUnsubmittedMonthlyReturns(instanceId).failed.futureValue
       ex mustBe boom
 
-      verify(connector).getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier])
+      verify(connector).getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
       verifyNoInteractions(sessionRepo)
     }
   }
 
   "buildReturnsLandingContext" should {
 
-    "return Some(context) for agent when name + client exist and connector returns returns" in {
+    "return Some(context) for agent when name + client exist" in {
       val (service, connector, sessionRepo) = newService()
 
       when(appConfig.fileStandardReturnUrl(any[String])).thenReturn("/standard")
@@ -417,10 +449,6 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       val ua = UserAnswers("test-user").set(AgentClientsPage, List(client)).get
 
-      val resp = UnsubmittedMonthlyReturnsResponse(Nil)
-      when(connector.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(resp))
-
       val context = service.buildReturnsLandingContext(instanceId, ua, isAgent = true).futureValue
 
       context.isDefined mustBe true
@@ -428,7 +456,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       context.get.standardReturnLink mustBe "/standard"
       context.get.nilReturnLink mustBe "/nil"
 
-      verify(connector).getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier])
+      verifyNoInteractions(connector)
       verifyNoInteractions(sessionRepo)
     }
 
@@ -452,10 +480,6 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       val ua = UserAnswers("test-user").set(ContractorNamePage, "Org Ltd").get
 
-      val resp = UnsubmittedMonthlyReturnsResponse(Nil)
-      when(connector.getUnsubmittedMonthlyReturns(eqTo("CIS-123"))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(resp))
-
       val context = service.buildReturnsLandingContext("CIS-123", ua, isAgent = false).futureValue
 
       context.isDefined mustBe true
@@ -463,7 +487,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       context.get.standardReturnLink mustBe "/standard-org"
       context.get.nilReturnLink mustBe "/nil-org"
 
-      verify(connector).getUnsubmittedMonthlyReturns(eqTo("CIS-123"))(any[HeaderCarrier])
+      verifyNoInteractions(connector)
       verifyNoInteractions(sessionRepo)
     }
 

@@ -31,7 +31,7 @@ class ReturnsLandingViewSpec extends SpecBase {
 
   "ReturnsLandingView" - {
     "must render the page with the correct html elements" in new Setup {
-      val html: HtmlFormat.Appendable = view(contractorName, returnsList, standardReturnLink, nilReturnLink)
+      val html: HtmlFormat.Appendable = view(contractorName, standardReturnLink, nilReturnLink)
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.title                                 must include(messages("returnsLanding.title"))
@@ -52,13 +52,6 @@ class ReturnsLandingViewSpec extends SpecBase {
       doc.select("p").text                      must include(messages("returnsLanding.paymentsAndDeductions.p1"))
       doc.getElementsByClass("govuk-link").text must include(messages("returnsLanding.noticesAndStatements.h3.link"))
       doc.select("p").text                      must include(messages("returnsLanding.noticeAndStatements.p1"))
-
-      doc.select("h2").text must include(messages("returnsLanding.recentCisReturns.h2"))
-      doc.select("th").text must include(messages("returnsLanding.taxMonth.th"))
-      doc.select("th").text must include(messages("returnsLanding.type.th"))
-      doc.select("th").text must include(messages("returnsLanding.lastUpdated.th"))
-      doc.select("th").text must include(messages("returnsLanding.status.th"))
-      doc.select("th").text must include(messages("site.delete"))
 
       doc.getElementsByClass("govuk-link").text must include(messages("returnsLanding.viewReturnsHistory.link"))
 
@@ -82,11 +75,6 @@ class ReturnsLandingViewSpec extends SpecBase {
     implicit val appConfig: FrontendAppConfig     =
       app.injector.instanceOf[FrontendAppConfig]
     val contractorName                            = "ABC Ltd..."
-    val returnsList                               = Seq(
-      ReturnLandingViewModel("August 2025", "Standard", "19 September 2025", "Accepted"),
-      ReturnLandingViewModel("July 2025", "Nil", "19 August 2025", "Accepted"),
-      ReturnLandingViewModel("June 2025", "Standard", "18 July 2025", "Accepted")
-    )
     val standardReturnLink: String                = appConfig.fileStandardReturnUrl
     val nilReturnLink: String                     = appConfig.fileNilReturnUrl
   }

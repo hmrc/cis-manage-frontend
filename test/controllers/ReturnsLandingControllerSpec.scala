@@ -36,11 +36,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
   private val context = ReturnsLandingContext(
     contractorName = "ABC Construction Ltd",
     standardReturnLink = "/standard-link",
-    nilReturnLink = "/nil-link",
-    returnsList = Seq(
-      ReturnLandingViewModel("August 2025", "Standard", "19 September 2025", "In progress"),
-      ReturnLandingViewModel("July 2025", "Nil", "19 August 2025", "In progress")
-    )
+    nilReturnLink = "/nil-link"
   )
 
   "ReturnsLandingController.onPageLoad" - {

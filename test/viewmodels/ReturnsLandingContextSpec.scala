@@ -31,22 +31,19 @@ class ReturnsLandingContextSpec extends AnyWordSpec with Matchers {
       val context = ReturnsLandingContext(
         contractorName = "ABC Construction Ltd",
         standardReturnLink = "/standard",
-        nilReturnLink = "/nil",
-        returnsList = returns
+        nilReturnLink = "/nil"
       )
 
       context.contractorName mustBe "ABC Construction Ltd"
       context.standardReturnLink mustBe "/standard"
       context.nilReturnLink mustBe "/nil"
-      context.returnsList mustBe returns
     }
 
     "support copy with updated fields" in {
       val context = ReturnsLandingContext(
         contractorName = "ABC",
         standardReturnLink = "/standard",
-        nilReturnLink = "/nil",
-        returnsList = Seq.empty
+        nilReturnLink = "/nil"
       )
 
       val updated = context.copy(contractorName = "NEW")
@@ -54,7 +51,6 @@ class ReturnsLandingContextSpec extends AnyWordSpec with Matchers {
       updated.contractorName mustBe "NEW"
       updated.standardReturnLink mustBe "/standard"
       updated.nilReturnLink mustBe "/nil"
-      updated.returnsList mustBe Seq.empty
     }
   }
 }
