@@ -26,28 +26,29 @@ import services.ManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IncompleteReturnsView
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 
-class IncompleteReturnsController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: IncompleteReturnsView,
-                                       service: ManageService
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class IncompleteReturnsController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: IncompleteReturnsView,
+  service: ManageService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      request.userAnswers.get(CisIdPage) match {
-        case Some(instanceId) =>
-          service.getUnsubmittedMonthlyReturns(instanceId).map { vm =>
-            Ok(view(vm))
-          }
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+    request.userAnswers.get(CisIdPage) match {
+      case Some(instanceId) =>
+        service.getUnsubmittedMonthlyReturns(instanceId).map { vm =>
+          Ok(view(vm))
+        }
 
-        case None             =>
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      }
+      case None =>
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
   }
 }

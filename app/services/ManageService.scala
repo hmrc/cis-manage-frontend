@@ -19,17 +19,17 @@ package services
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
-import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, UnsubmittedMonthlyReturnsRow, UserAnswers}
+import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsRow, UserAnswers}
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel, ReturnLandingViewModel, ReturnsLandingContext}
+import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel, ReturnsLandingContext}
 import viewmodels.agent.AgentLandingViewModel
 
 import java.time.{LocalDateTime, YearMonth}
-import java.time.format.{DateTimeFormatter, TextStyle}
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -187,9 +187,9 @@ class ManageService @Inject() (
     }
 
   private def buildActions(instanceId: String, row: UnsubmittedMonthlyReturnsRow): Seq[ActionLinkViewModel] = {
-    val isNilReturn      = row.returnType.equalsIgnoreCase("Nil")
-    val isStandardReturn = row.returnType.equalsIgnoreCase("Standard")
-    val isAmendment      = row.amendment.exists(_.equalsIgnoreCase("Y"))
+    val returnType  = row.returnType
+    val isNilReturn = row.returnType.equals("Nil")
+    val isAmendment = row.amendment.exists(_.equals("Y"))
 
     row.status match {
       case "In progress" =>
@@ -209,7 +209,7 @@ class ManageService @Inject() (
           ),
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.delete",
-            href = controllers.routes.JourneyRecoveryController.onPageLoad().url, // TODO: delete route
+            href = deleteReturnUrl(isAmendment, returnType),
             hiddenTextKey = Some("incompleteReturns.action.delete")
           )
         )
@@ -218,7 +218,7 @@ class ManageService @Inject() (
         Seq(
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.view",
-            href = controllers.routes.JourneyRecoveryController.onPageLoad().url, // TODO: MR05c
+            href = appConfig.submissionInProgressUrl(instanceId),
             hiddenTextKey = Some("incompleteReturns.action.view")
           )
         )
@@ -227,11 +227,7 @@ class ManageService @Inject() (
         Seq(
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.view",
-            href = if (isAmendment || isStandardReturn) {
-              controllers.routes.JourneyRecoveryController.onPageLoad().url // TODO: MR05a cannot resubmit
-            } else {
-              controllers.routes.JourneyRecoveryController.onPageLoad().url // TODO: MR05a can resubmit
-            },
+            href = appConfig.submissionUnsuccessfulCannotResubmitUrl(instanceId),
             hiddenTextKey = Some("incompleteReturns.action.view")
           )
         )
@@ -240,5 +236,14 @@ class ManageService @Inject() (
         Seq.empty
     }
   }
+
+  private def deleteReturnUrl(isAmendment: Boolean, returnType: String): String =
+    (isAmendment, returnType) match {
+      case (false, "Standard") => controllers.delete.routes.DeleteMonthlyReturnController.onPageLoad().url
+      case (false, "Nil")      => controllers.delete.routes.DeleteNilMonthlyReturnController.onPageLoad().url
+      case (true, "Standard")  => controllers.delete.routes.DeleteAmendedMonthlyReturnController.onPageLoad().url
+      case (true, "Nil")       => controllers.delete.routes.DeleteAmendedNilMonthlyReturnController.onPageLoad().url
+      case (_, _)              => controllers.routes.JourneyRecoveryController.onPageLoad().url
+    }
 
 }

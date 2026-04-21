@@ -56,27 +56,27 @@
 
     <div class="govuk-grid-row govuk-!-margin-top-5">
         <div class="govuk-grid-column-full">
-            <div class="incomplete-returns-desktop">
+            <div class="incomplete-returns-desktop incomplete-returns-table-wrapper">
                 @govukTable(
                     Table(
-                        classes = "govuk-!-margin-bottom-8",
+                        classes = "govuk-!-margin-bottom-8 incomplete-returns-table",
                         firstCellIsHeader = true,
                         head = Some(
                             Seq(
-                                HeadCell(content = Text(messages("incompleteReturns.table.returnPeriodEnd"))),
-                                HeadCell(content = Text(messages("incompleteReturns.table.returnType"))),
-                                HeadCell(content = Text(messages("incompleteReturns.table.lastUpdate"))),
-                                HeadCell(content = Text(messages("incompleteReturns.table.status"))),
-                                HeadCell(content = Text(messages("incompleteReturns.table.action")))
+                                HeadCell(content = Text(messages("incompleteReturns.table.returnPeriodEnd")), classes = "ir-col-period"),
+                                HeadCell(content = Text(messages("incompleteReturns.table.returnType")), classes = "ir-col-type"),
+                                HeadCell(content = Text(messages("incompleteReturns.table.lastUpdate")), classes = "ir-col-date"),
+                                HeadCell(content = Text(messages("incompleteReturns.table.status")), classes = "ir-col-status"),
+                                HeadCell(content = Text(messages("incompleteReturns.table.action")), classes = "ir-col-action")
                             )
                         ),
                         rows = viewModel.map { row =>
                             Seq(
-                                TableRow(content = Text(row.returnPeriodEnd)),
-                                TableRow(content = Text(row.returnType)),
-                                TableRow(content = Text(row.lastUpdate)),
-                                TableRow(content = Text(row.status)),
-                                TableRow(content = HtmlContent(renderActions(row.action)))
+                                TableRow(content = Text(row.returnPeriodEnd), classes = "ir-col-period"),
+                                TableRow(content = Text(row.returnType), classes = "ir-col-type"),
+                                TableRow(content = Text(row.lastUpdate), classes = "ir-col-date"),
+                                TableRow(content = Text(row.status), classes = "ir-col-status"),
+                                TableRow(content = HtmlContent(renderActions(row.action)), classes = "ir-col-action")
                             )
                         }
                     )
