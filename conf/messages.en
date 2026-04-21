@@ -440,3 +440,10 @@ history.printSubmissionDetails.paymentsMadeToSubcontractors.taxDeducted = Tax de
 history.printSubmissionDetails.printThisPage.link = Print this page
 history.printSubmissionDetails.monthlyReturnHistory.link = Return to Monthly return history
 
+amend.noReturnsSubmitted.title = You have not submitted any returns
+amend.noReturnsSubmitted.heading = You have not submitted any returns
+amend.noReturnsSubmitted.p1 = To view a monthly return, or make any amendments, you must file one first.
+amend.noReturnsSubmitted.p2 = You can do this in
+amend.noReturnsSubmitted.p2.link = Manage your CIS return
+amend.noReturnsSubmitted.p3 = Find out more about
+amend.noReturnsSubmitted.p3.link = what you must do as a CIS contractor
