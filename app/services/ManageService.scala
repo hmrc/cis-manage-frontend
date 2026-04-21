@@ -202,6 +202,7 @@ class ManageService @Inject() (
 
   private def buildActions(instanceId: String, row: UnsubmittedMonthlyReturnsRow): Seq[ActionLinkViewModel] = {
     val returnType  = row.returnType
+    val isDeletable = row.deletable
     val isNilReturn = row.returnType.equals("Nil")
     val isAmendment = row.amendment.exists(_.equals("Y"))
 
@@ -223,7 +224,11 @@ class ManageService @Inject() (
           ),
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.delete",
-            href = deleteReturnUrl(isAmendment, returnType),
+            href = if (isDeletable) {
+              deleteReturnUrl(isAmendment, returnType)
+            } else {
+              controllers.routes.JourneyRecoveryController.onPageLoad().url
+            },
             hiddenTextKey = Some("incompleteReturns.action.delete")
           )
         )
