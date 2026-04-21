@@ -19,7 +19,7 @@ package controllers.delete
 import base.SpecBase
 import controllers.routes
 import forms.delete.DeleteAmendedNilMonthlyReturnFormProvider
-import models.{NormalMode, UnsubmittedMonthlyReturnsRow, UserAnswers}
+import models.{Deletable, NormalMode, UnsubmittedMonthlyReturnsRow, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -31,9 +31,9 @@ import play.api.test.Helpers.*
 import queries.delete.UnsubmittedMonthlyReturnToDeleteQuery
 import repositories.SessionRepository
 import services.ManageService
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.delete.DeleteAmendedNilMonthlyReturnView
 
-import java.time.Instant
 import scala.concurrent.Future
 
 class DeleteAmendedNilMonthlyReturnControllerSpec extends SpecBase with MockitoSugar {
@@ -43,11 +43,9 @@ class DeleteAmendedNilMonthlyReturnControllerSpec extends SpecBase with MockitoS
 
   private val monthYear: String = "April 2026"
 
+  val deletableRow        = UnsubmittedMonthlyReturnsRow(3000L, 2026, 4, "Nil", "In Progress", None, Some("Y"), true)
   val baseUa: UserAnswers = userAnswersWithCisId
-    .set(
-      UnsubmittedMonthlyReturnToDeleteQuery,
-      UnsubmittedMonthlyReturnsRow(3000L, 2026, 4, "Nil", "In Progress", None, Some("Y"), true)
-    )
+    .set(UnsubmittedMonthlyReturnToDeleteQuery, deletableRow)
     .success
     .value
 
@@ -100,6 +98,11 @@ class DeleteAmendedNilMonthlyReturnControllerSpec extends SpecBase with MockitoS
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val mockManageService = mock[ManageService]
+
+      when(
+        mockManageService.checkUnsubmittedMonthlyReturnDeletion(any[UserAnswers], any[Long])(any[HeaderCarrier])
+      ).thenReturn(Future.successful(Deletable(deletableRow)))
+
       when(
         mockManageService
           .deleteUnsubmittedMonthlyReturn(any[UserAnswers], any[UnsubmittedMonthlyReturnsRow])(any())
@@ -207,13 +210,28 @@ class DeleteAmendedNilMonthlyReturnControllerSpec extends SpecBase with MockitoS
       }
     }
 
-    "must redirect to Journey Recovery for a POST if delete api failed" in {
+    "must redirect to Journey Recovery for a POST if CisId missing in user answers" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, deleteAmendedNilMonthlyReturnRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if api failed" in {
       val mockSessionRepository = mock[SessionRepository]
       val mockManageService     = mock[ManageService]
-      when(
-        mockManageService
-          .deleteUnsubmittedMonthlyReturn(any[UserAnswers], any[UnsubmittedMonthlyReturnsRow])(any())
-      ).thenReturn(Future.failed(new RuntimeException("boom")))
+
+      when(mockManageService.checkUnsubmittedMonthlyReturnDeletion(any[UserAnswers], any[Long])(any()))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val application =
         applicationBuilder(userAnswers = Some(baseUa))

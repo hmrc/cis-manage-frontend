@@ -18,7 +18,7 @@ package controllers.delete
 
 import base.SpecBase
 import forms.delete.DeleteMonthlyReturnFormProvider
-import models.{NormalMode, UnsubmittedMonthlyReturnsRow, UserAnswers}
+import models.{Deletable, NormalMode, UnsubmittedMonthlyReturnsRow, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -30,9 +30,9 @@ import play.api.test.Helpers.*
 import queries.delete.UnsubmittedMonthlyReturnToDeleteQuery
 import repositories.SessionRepository
 import services.ManageService
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.delete.DeleteMonthlyReturnView
 
-import java.time.Instant
 import scala.concurrent.Future
 
 class DeleteMonthlyReturnControllerSpec extends SpecBase with MockitoSugar {
@@ -42,11 +42,9 @@ class DeleteMonthlyReturnControllerSpec extends SpecBase with MockitoSugar {
 
   private val monthYear: String = "April 2026"
 
+  val deletableRow        = UnsubmittedMonthlyReturnsRow(3000L, 2026, 4, "Standard", "In Progress", None, Some("N"), true)
   val baseUa: UserAnswers = userAnswersWithCisId
-    .set(
-      UnsubmittedMonthlyReturnToDeleteQuery,
-      UnsubmittedMonthlyReturnsRow(3000L, 2026, 4, "Standard", "In Progress", None, Some("N"), true)
-    )
+    .set(UnsubmittedMonthlyReturnToDeleteQuery, deletableRow)
     .success
     .value
 
@@ -98,6 +96,11 @@ class DeleteMonthlyReturnControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val mockManageService = mock[ManageService]
+
+      when(
+        mockManageService.checkUnsubmittedMonthlyReturnDeletion(any[UserAnswers], any[Long])(any[HeaderCarrier])
+      ).thenReturn(Future.successful(Deletable(deletableRow)))
+
       when(
         mockManageService
           .deleteUnsubmittedMonthlyReturn(any[UserAnswers], any[UnsubmittedMonthlyReturnsRow])(any())
@@ -204,49 +207,64 @@ class DeleteMonthlyReturnControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
-  }
 
-  "must redirect to Journey Recovery for a POST if delete api failed" in {
-    val mockSessionRepository = mock[SessionRepository]
-    val mockManageService     = mock[ManageService]
-    when(
-      mockManageService
-        .deleteUnsubmittedMonthlyReturn(any[UserAnswers], any[UnsubmittedMonthlyReturnsRow])(any())
-    ).thenReturn(Future.failed(new RuntimeException("boom")))
+    "must redirect to Journey Recovery for a POST if CisId missing in user answers" in {
 
-    val application =
-      applicationBuilder(userAnswers = Some(baseUa))
-        .overrides(
-          bind[SessionRepository].toInstance(mockSessionRepository),
-          bind[ManageService].toInstance(mockManageService)
-        )
-        .build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
-    running(application) {
-      val request =
-        FakeRequest(POST, deleteMonthlyReturnRoute)
-          .withFormUrlEncodedBody(("value", "true"))
+      running(application) {
+        val request =
+          FakeRequest(POST, deleteMonthlyReturnRoute)
+            .withFormUrlEncodedBody(("value", "true"))
 
-      val result = route(application, request).value
+        val result = route(application, request).value
 
-      status(result) mustEqual SEE_OTHER
-      redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
     }
 
-    verifyNoInteractions(mockSessionRepository)
-  }
+    "must redirect to Journey Recovery for a POST if api failed" in {
+      val mockSessionRepository = mock[SessionRepository]
+      val mockManageService     = mock[ManageService]
 
-  "must redirect to Journey Recovery for a GET if UnsubmittedReturnToDeleteQuery is missing" in {
+      when(mockManageService.checkUnsubmittedMonthlyReturnDeletion(any[UserAnswers], any[Long])(any()))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
 
-    val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(baseUa))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[ManageService].toInstance(mockManageService)
+          )
+          .build()
 
-    running(application) {
-      val request = FakeRequest(GET, deleteMonthlyReturnRoute)
+      running(application) {
+        val request =
+          FakeRequest(POST, deleteMonthlyReturnRoute)
+            .withFormUrlEncodedBody(("value", "true"))
 
-      val result = route(application, request).value
+        val result = route(application, request).value
 
-      status(result) mustEqual SEE_OTHER
-      redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      verifyNoInteractions(mockSessionRepository)
+    }
+
+    "must redirect to Journey Recovery for a GET if UnsubmittedReturnToDeleteQuery is missing" in {
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, deleteMonthlyReturnRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
     }
   }
 }

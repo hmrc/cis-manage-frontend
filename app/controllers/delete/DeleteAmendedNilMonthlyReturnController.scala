@@ -67,54 +67,57 @@ class DeleteAmendedNilMonthlyReturnController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen deletableReturnAction).async { implicit request =>
-      val instanceId  = request.userAnswers.get(CisIdPage).getOrElse {
-        logger.error("[DeleteAmendedNilMonthlyReturnController] cisId missing from userAnswers")
-        throw new IllegalStateException("cisId missing from userAnswers")
-      }
       val userAnswers = request.userAnswers
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => {
-            val langCode  = messagesApi.preferred(request).lang.code
-            val monthYear = request.returnToDelete.monthYear(langCode)
-            Future.successful(BadRequest(view(formWithErrors, monthYear, mode)))
-          },
-          value =>
-            if (value) {
-              val result =
-                for {
-                  deletionStatus <- service.checkUnsubmittedMonthlyReturnDeletion(
-                                      request.userAnswers,
-                                      request.returnToDelete.monthlyReturnId
-                                    )
-                  _              <- deletionStatus match {
-                                      case Deletable(record) =>
-                                        service.deleteUnsubmittedMonthlyReturn(userAnswers, record)
-                                      case _                 =>
-                                        Future.failed(new IllegalStateException("Record is not deletable"))
-                                    }
-                  updatedAnswers <- Future.fromTry(request.userAnswers.remove(UnsubmittedMonthlyReturnToDeleteQuery))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(
-                  controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
-                )
+      userAnswers.get(CisIdPage) match {
+        case Some(instanceId) =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => {
+                val langCode  = messagesApi.preferred(request).lang.code
+                val monthYear = request.returnToDelete.monthYear(langCode)
+                Future.successful(BadRequest(view(formWithErrors, monthYear, mode)))
+              },
+              value =>
+                if (value) {
+                  val result =
+                    for {
+                      deletionStatus <- service.checkUnsubmittedMonthlyReturnDeletion(
+                                          request.userAnswers,
+                                          request.returnToDelete.monthlyReturnId
+                                        )
+                      _              <- deletionStatus match {
+                                          case Deletable(record) =>
+                                            service.deleteUnsubmittedMonthlyReturn(userAnswers, record)
+                                          case _                 =>
+                                            Future.failed(new IllegalStateException("Record is not deletable"))
+                                        }
+                      updatedAnswers <-
+                        Future.fromTry(request.userAnswers.remove(UnsubmittedMonthlyReturnToDeleteQuery))
+                      _              <- sessionRepository.set(updatedAnswers)
+                    } yield Redirect(
+                      controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
+                    )
 
-              result.recover { case ex =>
-                logger.error(
-                  s"[DeleteAmendedNilMonthlyReturnController] Failed to delete returnId=${request.returnToDelete.monthlyReturnId}: ${ex.getMessage}",
-                  ex
-                )
-                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-              }
-            } else {
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.remove(UnsubmittedMonthlyReturnToDeleteQuery))
-                _              <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(
-                controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
-              )
-            }
-        )
+                  result.recover { case ex =>
+                    logger.error(
+                      s"[DeleteAmendedNilMonthlyReturnController] Failed to delete returnId=${request.returnToDelete.monthlyReturnId}: ${ex.getMessage}",
+                      ex
+                    )
+                    Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                  }
+                } else {
+                  for {
+                    updatedAnswers <- Future.fromTry(request.userAnswers.remove(UnsubmittedMonthlyReturnToDeleteQuery))
+                    _              <- sessionRepository.set(updatedAnswers)
+                  } yield Redirect(
+                    controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
+                  )
+                }
+            )
+        case _                =>
+          logger.error(s"[DeleteAmendedMonthlyReturnController] Missing instanceId in user answers")
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
     }
 }
