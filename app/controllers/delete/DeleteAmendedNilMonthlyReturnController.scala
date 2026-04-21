@@ -116,7 +116,7 @@ class DeleteAmendedNilMonthlyReturnController @Inject() (
                 }
             )
         case _                =>
-          logger.error(s"[DeleteAmendedMonthlyReturnController] Missing instanceId in user answers")
+          logger.error(s"[DeleteAmendedNilMonthlyReturnController] Missing instanceId in user answers")
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
     }
