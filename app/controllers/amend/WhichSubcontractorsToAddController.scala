@@ -20,6 +20,7 @@ import controllers.actions._
 import forms.amend.WhichSubcontractorsToAddFormProvider
 import javax.inject.Inject
 import models.Mode
+import models.amend.WhichSubcontractorsToAdd
 import navigation.Navigator
 import pages.amend.WhichSubcontractorsToAddPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -44,16 +45,17 @@ class WhichSubcontractorsToAddController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  private val subcontractors = WhichSubcontractorsToAdd.mockSubcontractors
+  private val checkboxItems  = WhichSubcontractorsToAdd.checkboxItems(subcontractors)
+  val form                   = formProvider(subcontractors)
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-
     val preparedForm = request.userAnswers.get(WhichSubcontractorsToAddPage) match {
       case None        => form
       case Some(value) => form.fill(value)
     }
 
-    Ok(view(preparedForm, mode))
+    Ok(view(preparedForm, mode, checkboxItems))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -61,7 +63,7 @@ class WhichSubcontractorsToAddController @Inject() (
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, checkboxItems))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(WhichSubcontractorsToAddPage, value))

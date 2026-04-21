@@ -16,15 +16,9 @@
 
 package generators
 
-import models.amend.WhichSubcontractorsToAdd
 import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {
-
-  implicit lazy val arbitraryWhichSubcontractorsToAdd: Arbitrary[WhichSubcontractorsToAdd] =
-    Arbitrary {
-      Gen.oneOf(WhichSubcontractorsToAdd.values)
-    }
 
   implicit def arbitrarySubmittedReturnsChooseTaxYear(implicit taxYears: Seq[String]): Arbitrary[String] =
     Arbitrary(Gen.oneOf(taxYears :+ "all"))

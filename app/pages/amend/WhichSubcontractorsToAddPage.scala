@@ -16,11 +16,10 @@
 
 package pages.amend
 
-import models.amend.WhichSubcontractorsToAdd
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object WhichSubcontractorsToAddPage extends QuestionPage[Set[WhichSubcontractorsToAdd]] {
+case object WhichSubcontractorsToAddPage extends QuestionPage[Set[String]] {
 
   override def path: JsPath = JsPath \ toString
 

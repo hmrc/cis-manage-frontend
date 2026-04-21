@@ -6,17 +6,18 @@ import play.api.data.FormError
 
 class WhichSubcontractorsToAddFormProviderSpec extends CheckboxFieldBehaviours {
 
-  val form = new WhichSubcontractorsToAddFormProvider()()
+  private val subcontractors = WhichSubcontractorsToAdd.mockSubcontractors
+  val form                   = new WhichSubcontractorsToAddFormProvider()(subcontractors)
 
   ".value" - {
 
     val fieldName   = "value"
     val requiredKey = "whichSubcontractorsToAdd.error.required"
 
-    behave like checkboxField[WhichSubcontractorsToAdd](
+    behave like checkboxField[String](
       form,
       fieldName,
-      validValues = WhichSubcontractorsToAdd.values,
+      validValues = subcontractors.map(_.id),
       invalidError = FormError(s"$fieldName[0]", "error.invalid")
     )
 

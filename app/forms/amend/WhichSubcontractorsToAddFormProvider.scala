@@ -17,17 +17,32 @@
 package forms.amend
 
 import javax.inject.Inject
-
 import forms.mappings.Mappings
-import play.api.data.Form
-import play.api.data.Forms.set
-import models.amend.WhichSubcontractorsToAdd
+import models.amend.Subcontractor
+import play.api.data.{Form, Mapping}
+import play.api.data.Forms.{of, set}
+import play.api.data.format.Formatter
 
 class WhichSubcontractorsToAddFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Set[WhichSubcontractorsToAdd]] =
+  def apply(subcontractors: Seq[Subcontractor]): Form[Set[String]] = {
+    val validIds = subcontractors.map(_.id).toSet
+
+    val subcontractorIdMapping: Mapping[String] = of(new Formatter[String] {
+      override def bind(key: String, data: Map[String, String]): Either[Seq[play.api.data.FormError], String] =
+        data.get(key).filter(_.nonEmpty) match {
+          case Some(value) if validIds.contains(value) => Right(value)
+          case Some(_)                                 => Left(Seq(play.api.data.FormError(key, "error.invalid")))
+          case None                                    => Left(Seq(play.api.data.FormError(key, "whichSubcontractorsToAdd.error.required")))
+        }
+
+      override def unbind(key: String, value: String): Map[String, String] =
+        Map(key -> value)
+    })
+
     Form(
-      "value" -> set(enumerable[WhichSubcontractorsToAdd]("whichSubcontractorsToAdd.error.required"))
+      "value" -> set(subcontractorIdMapping)
         .verifying(nonEmptySet("whichSubcontractorsToAdd.error.required"))
     )
+  }
 }

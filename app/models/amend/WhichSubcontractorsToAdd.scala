@@ -16,34 +16,45 @@
 
 package models.amend
 
-import models.{Enumerable, WithName}
-import play.api.i18n.Messages
+import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import viewmodels.govuk.checkbox._
 
-sealed trait WhichSubcontractorsToAdd
+case class Subcontractor(id: String, name: String)
 
-object WhichSubcontractorsToAdd extends Enumerable.Implicits {
+object Subcontractor {
+  implicit val format: OFormat[Subcontractor] = Json.format[Subcontractor]
+}
 
-  case object Option1 extends WithName("option1") with WhichSubcontractorsToAdd
-  case object Option2 extends WithName("option2") with WhichSubcontractorsToAdd
+object WhichSubcontractorsToAdd {
 
-  val values: Seq[WhichSubcontractorsToAdd] = Seq(
-    Option1,
-    Option2
+  // TODO: Replace with real data from backend
+  val mockSubcontractors: Seq[Subcontractor] = Seq(
+    Subcontractor("1", "Alice, A"),
+    Subcontractor("2", "Apex Construction Solutions"),
+    Subcontractor("3", "Bob, B"),
+    Subcontractor("4", "Bloggs, Joe"),
+    Subcontractor("5", "Bloggs, Joseph"),
+    Subcontractor("6", "Build Right Construction"),
+    Subcontractor("7", "Charles, C"),
+    Subcontractor("8", "Dave, D"),
+    Subcontractor("9", "Draft Services Ltd"),
+    Subcontractor("10", "Elise, E"),
+    Subcontractor("11", "Frank, F"),
+    Subcontractor("12", "Northern Trades Ltd"),
+    Subcontractor("13", "Pro-Build Subcontractors"),
+    Subcontractor("14", "Tynewear Ltd"),
+    Subcontractor("15", "SubbyCo Ltd")
   )
 
-  def checkboxItems(implicit messages: Messages): Seq[CheckboxItem] =
-    values.zipWithIndex.map { case (value, index) =>
+  def checkboxItems(subcontractors: Seq[Subcontractor]): Seq[CheckboxItem] =
+    subcontractors.zipWithIndex.map { case (sub, index) =>
       CheckboxItemViewModel(
-        content = Text(messages(s"whichSubcontractorsToAdd.${value.toString}")),
+        content = Text(sub.name),
         fieldId = "value",
         index = index,
-        value = value.toString
+        value = sub.id
       )
     }
-
-  implicit val enumerable: Enumerable[WhichSubcontractorsToAdd] =
-    Enumerable(values.map(v => v.toString -> v): _*)
 }

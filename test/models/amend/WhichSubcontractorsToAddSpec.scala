@@ -1,50 +1,42 @@
 package models.amend
 
-import generators.ModelGenerators
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.OptionValues
-import play.api.libs.json.{JsError, JsString, Json}
+import play.api.libs.json.Json
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 
-class WhichSubcontractorsToAddSpec
-    extends AnyFreeSpec
-    with Matchers
-    with ScalaCheckPropertyChecks
-    with OptionValues
-    with ModelGenerators {
+class WhichSubcontractorsToAddSpec extends AnyFreeSpec with Matchers with OptionValues {
+
+  "Subcontractor" - {
+
+    "must serialise and deserialise" in {
+      val sub  = Subcontractor("1", "Alice, A")
+      val json = Json.toJson(sub)
+      json.as[Subcontractor] mustEqual sub
+    }
+  }
 
   "WhichSubcontractorsToAdd" - {
 
-    "must deserialise valid values" in {
-
-      val gen = arbitrary[WhichSubcontractorsToAdd]
-
-      forAll(gen) { whichSubcontractorsToAdd =>
-        JsString(whichSubcontractorsToAdd.toString)
-          .validate[WhichSubcontractorsToAdd]
-          .asOpt
-          .value mustEqual whichSubcontractorsToAdd
-      }
+    "mockSubcontractors must not be empty" in {
+      WhichSubcontractorsToAdd.mockSubcontractors must not be empty
     }
 
-    "must fail to deserialise invalid values" in {
+    "checkboxItems must return one item per subcontractor" in {
+      val subs  = Seq(Subcontractor("1", "Alice, A"), Subcontractor("2", "Bob, B"))
+      val items = WhichSubcontractorsToAdd.checkboxItems(subs)
 
-      val gen = arbitrary[String] suchThat (!WhichSubcontractorsToAdd.values.map(_.toString).contains(_))
-
-      forAll(gen) { invalidValue =>
-        JsString(invalidValue).validate[WhichSubcontractorsToAdd] mustEqual JsError("error.invalid")
-      }
+      items.length mustEqual 2
+      items.head.value mustEqual "1"
+      items(1).value mustEqual "2"
     }
 
-    "must serialise" in {
+    "checkboxItems must return items of type CheckboxItem" in {
+      val subs  = WhichSubcontractorsToAdd.mockSubcontractors
+      val items = WhichSubcontractorsToAdd.checkboxItems(subs)
 
-      val gen = arbitrary[WhichSubcontractorsToAdd]
-
-      forAll(gen) { whichSubcontractorsToAdd =>
-        Json.toJson(whichSubcontractorsToAdd) mustEqual JsString(whichSubcontractorsToAdd.toString)
-      }
+      items.foreach(_ mustBe a[CheckboxItem])
     }
   }
 }

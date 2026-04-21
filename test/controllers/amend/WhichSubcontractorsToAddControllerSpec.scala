@@ -24,8 +24,10 @@ class WhichSubcontractorsToAddControllerSpec extends SpecBase with MockitoSugar 
 
   lazy val whichSubcontractorsToAddRoute = routes.WhichSubcontractorsToAddController.onPageLoad(NormalMode).url
 
-  val formProvider = new WhichSubcontractorsToAddFormProvider()
-  val form         = formProvider()
+  private val subcontractors = WhichSubcontractorsToAdd.mockSubcontractors
+  private val checkboxItems  = WhichSubcontractorsToAdd.checkboxItems(subcontractors)
+  val formProvider           = new WhichSubcontractorsToAddFormProvider()
+  val form                   = formProvider(subcontractors)
 
   "WhichSubcontractorsToAdd Controller" - {
 
@@ -42,14 +44,16 @@ class WhichSubcontractorsToAddControllerSpec extends SpecBase with MockitoSugar 
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, checkboxItems)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
+      val selectedIds = Set(subcontractors.head.id)
+
       val userAnswers = UserAnswers(userAnswersId)
-        .set(WhichSubcontractorsToAddPage, WhichSubcontractorsToAdd.values.toSet)
+        .set(WhichSubcontractorsToAddPage, selectedIds)
         .success
         .value
 
@@ -63,7 +67,7 @@ class WhichSubcontractorsToAddControllerSpec extends SpecBase with MockitoSugar 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(WhichSubcontractorsToAdd.values.toSet), NormalMode)(
+        contentAsString(result) mustEqual view(form.fill(selectedIds), NormalMode, checkboxItems)(
           request,
           messages(application)
         ).toString
@@ -87,7 +91,7 @@ class WhichSubcontractorsToAddControllerSpec extends SpecBase with MockitoSugar 
       running(application) {
         val request =
           FakeRequest(POST, whichSubcontractorsToAddRoute)
-            .withFormUrlEncodedBody(("value[0]", WhichSubcontractorsToAdd.values.head.toString))
+            .withFormUrlEncodedBody(("value[0]", subcontractors.head.id))
 
         val result = route(application, request).value
 
@@ -103,16 +107,19 @@ class WhichSubcontractorsToAddControllerSpec extends SpecBase with MockitoSugar 
       running(application) {
         val request =
           FakeRequest(POST, whichSubcontractorsToAddRoute)
-            .withFormUrlEncodedBody(("value", "invalid value"))
+            .withFormUrlEncodedBody(("value", ""))
 
-        val boundForm = form.bind(Map("value" -> "invalid value"))
+        val boundForm = form.bind(Map("value" -> ""))
 
         val view = application.injector.instanceOf[WhichSubcontractorsToAddView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, checkboxItems)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -137,7 +144,7 @@ class WhichSubcontractorsToAddControllerSpec extends SpecBase with MockitoSugar 
       running(application) {
         val request =
           FakeRequest(POST, whichSubcontractorsToAddRoute)
-            .withFormUrlEncodedBody(("value[0]", WhichSubcontractorsToAdd.values.head.toString))
+            .withFormUrlEncodedBody(("value[0]", subcontractors.head.id))
 
         val result = route(application, request).value
 
