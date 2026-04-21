@@ -399,7 +399,7 @@ addContractorDetails.p1 = This is a placeholder page for adding contractor detai
 
 delete.deleteMonthlyReturn.title = Are you sure you want to delete the monthly return for {0}?
 delete.deleteMonthlyReturn.heading = Are you sure you want to delete the monthly return for {0}?
-delete.deleteMonthlyReturn.error.required = Select ‘Yes’ to delete the return.
+delete.deleteMonthlyReturn.error.required = Select yes to delete this return
 
 delete.deleteNilMonthlyReturn.title = Are you sure you want to delete the nil monthly return for {0}?
 delete.deleteNilMonthlyReturn.heading = Are you sure you want to delete the nil monthly return for {0}?
@@ -411,7 +411,7 @@ delete.deleteAmendedMonthlyReturn.error.required = Select yes to delete this ame
 
 delete.deleteAmendedNilMonthlyReturn.title = Are you sure you want to delete the amended nil monthly return for {0}?
 delete.deleteAmendedNilMonthlyReturn.heading = Are you sure you want to delete the amended nil monthly return for {0}?
-delete.deleteAmendedNilMonthlyReturn.error.required = Select yes to delete this amended nil monthly return.
+delete.deleteAmendedNilMonthlyReturn.error.required = Select yes to delete this amended nil monthly return
 
 history.submittedReturnsChooseTaxYear.title = Which tax year do you want to view?
 history.submittedReturnsChooseTaxYear.heading = Which tax year do you want to view?

@@ -19,7 +19,8 @@ package services
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
-import models.{CisTaxpayer, CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsResponse, UnsubmittedMonthlyReturnsRow, UserAnswers}
+import models.requests.DeleteUnsubmittedMonthlyReturnRequest
+import models.{CisTaxpayer, CisTaxpayerSearchResult, UnsubmittedMonthlyReturn, UnsubmittedMonthlyReturnsResponse, UnsubmittedMonthlyReturnsRow, UserAnswers}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
@@ -27,12 +28,14 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import pages.*
-import repositories.SessionRepository
+import repositories.{SessionRepository, UnsubmittedMonthlyReturnRepository}
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel}
 import viewmodels.agent.AgentLandingViewModel
 
-import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import java.time.{Clock, Instant, LocalDateTime, ZoneId}
+import scala.jdk.CollectionConverters.*
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Failure
@@ -43,11 +46,20 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
   implicit val ec: ExecutionContext         = global
   implicit val appConfig: FrontendAppConfig = mock(classOf[FrontendAppConfig])
 
-  private def newService(): (ManageService, ConstructionIndustrySchemeConnector, SessionRepository) = {
-    val connector   = mock(classOf[ConstructionIndustrySchemeConnector])
-    val sessionRepo = mock(classOf[SessionRepository])
-    val service     = new ManageService(connector, sessionRepo)
-    (service, connector, sessionRepo)
+  private def newService(): (
+    ManageService,
+    ConstructionIndustrySchemeConnector,
+    SessionRepository,
+    UnsubmittedMonthlyReturnRepository,
+    Clock
+  ) = {
+    val connector                    = mock(classOf[ConstructionIndustrySchemeConnector])
+    val sessionRepo                  = mock(classOf[SessionRepository])
+    val unsubmittedMonthlyReturnRepo = mock(classOf[UnsubmittedMonthlyReturnRepository])
+    val instant                      = Instant.now.truncatedTo(ChronoUnit.MILLIS)
+    val stubClock: Clock             = Clock.fixed(instant, ZoneId.systemDefault)
+    val service                      = new ManageService(connector, sessionRepo, unsubmittedMonthlyReturnRepo, stubClock)
+    (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, stubClock)
   }
 
   private def createTaxpayer(
@@ -80,7 +92,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
   "resolveAndStoreCisId" should {
 
     "return existing cisId from UserAnswers without calling BE" in {
-      val (service, connector, sessionRepo) = newService()
+      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
 
       val existing    = "CIS-001"
       val emptyUa     = UserAnswers("test-user")
@@ -92,10 +104,11 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       verifyNoInteractions(connector)
       verifyNoInteractions(sessionRepo)
+      verifyNoInteractions(unsubmittedMonthlyReturnRepo)
     }
 
     "fetch taxpayer when missing, store cisId in session, and return updated UA" in {
-      val (service, connector, sessionRepo) = newService()
+      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
 
       val emptyUa  = UserAnswers("test-user")
       val taxpayer = createTaxpayer()
@@ -124,11 +137,12 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       verify(connector).getCisTaxpayer()(any[HeaderCarrier])
       verifyNoMoreInteractions(connector)
+      verifyNoInteractions(unsubmittedMonthlyReturnRepo)
     }
 
     "fail when BE returns empty uniqueId" in {
-      val (service, connector, sessionRepo) = newService()
-      val emptyUa                           = UserAnswers("test-user")
+      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
+      val emptyUa                                                            = UserAnswers("test-user")
 
       val emptyTaxpayer = createTaxpayer(id = " ", name1 = None)
 
@@ -142,10 +156,11 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       verify(connector).getCisTaxpayer()(any[HeaderCarrier])
       verifyNoInteractions(sessionRepo)
+      verifyNoInteractions(unsubmittedMonthlyReturnRepo)
     }
 
     "fail when adding cisId to UserAnswers returns an error" in {
-      val (service, connector, sessionRepo) = newService()
+      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
 
       val taxpayer = createTaxpayer()
       when(connector.getCisTaxpayer()(any[HeaderCarrier]))
@@ -164,6 +179,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       verifyNoInteractions(sessionRepo)
       verify(connector).getCisTaxpayer()(any[HeaderCarrier])
       verifyNoMoreInteractions(connector)
+      verifyNoInteractions(unsubmittedMonthlyReturnRepo)
     }
   }
 
@@ -185,7 +201,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
   "resolveAndStoreAgentClients" should {
 
     "return existing clients from UserAnswers without calling BE" in {
-      val (service, connector, sessionRepo) = newService()
+      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
 
       val existingClients = List(createClient("CLIENT-001"), createClient("CLIENT-002"))
       val emptyUa         = UserAnswers("test-user")
@@ -197,10 +213,11 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       verifyNoInteractions(connector)
       verifyNoInteractions(sessionRepo)
+      verifyNoInteractions(unsubmittedMonthlyReturnRepo)
     }
 
     "fetch clients when missing, store in session, and return updated UA" in {
-      val (service, connector, sessionRepo) = newService()
+      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
 
       val emptyUa       = UserAnswers("test-user")
       val clientsFromBe = List(createClient("CLIENT-001"), createClient("CLIENT-002"))
@@ -221,10 +238,11 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       verify(connector).getAllClients(any[HeaderCarrier])
       verifyNoMoreInteractions(connector)
+      verifyNoInteractions(unsubmittedMonthlyReturnRepo)
     }
 
     "return empty list when BE returns no clients" in {
-      val (service, connector, sessionRepo) = newService()
+      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
 
       val emptyUa      = UserAnswers("test-user")
       val emptyClients = List.empty[CisTaxpayerSearchResult]
@@ -241,10 +259,11 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       verify(connector).getAllClients(any[HeaderCarrier])
       verify(sessionRepo).set(any[UserAnswers])
+      verifyNoInteractions(unsubmittedMonthlyReturnRepo)
     }
 
     "fail when BE call fails" in {
-      val (service, connector, sessionRepo) = newService()
+      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
 
       val emptyUa = UserAnswers("test-user")
 
@@ -258,10 +277,11 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       verify(connector).getAllClients(any[HeaderCarrier])
       verifyNoInteractions(sessionRepo)
+      verifyNoInteractions(unsubmittedMonthlyReturnRepo)
     }
 
     "fail when session repository fails to save" in {
-      val (service, connector, sessionRepo) = newService()
+      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
 
       val emptyUa       = UserAnswers("test-user")
       val clientsFromBe = List(createClient())
@@ -278,6 +298,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       verify(connector).getAllClients(any[HeaderCarrier])
       verify(sessionRepo).set(any[UserAnswers])
+      verifyNoInteractions(unsubmittedMonthlyReturnRepo)
     }
   }
 
@@ -286,8 +307,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
     val userId = "some-user-id"
 
     "fail when AgentClientsPage is missing from UserAnswers" in {
-      val (service, connector, sessionRepo) = newService()
-      val ua                                = UserAnswers("test-user")
+      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
+      val ua                                                                 = UserAnswers("test-user")
 
       val ex = intercept[RuntimeException] {
         service.getAgentLandingData("CLIENT-001", ua, userId).futureValue
@@ -296,10 +317,11 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       ex.getMessage must include("AgentClientsPage missing in UserAnswers")
       verifyNoInteractions(connector)
       verifyNoInteractions(sessionRepo)
+      verifyNoInteractions(unsubmittedMonthlyReturnRepo)
     }
 
     "fail when the client with given uniqueId is not present in AgentClientsPage" in {
-      val (service, connector, sessionRepo) = newService()
+      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
 
       val clients      = List(createClient("CLIENT-001"), createClient("CLIENT-002"))
       val uaWithClient = UserAnswers("test-user").set(AgentClientsPage, clients).get
@@ -311,14 +333,15 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       ex.getMessage must include("Client with uniqueId=OTHER-ID not found in AgentClientsPage")
       verifyNoInteractions(connector)
       verifyNoInteractions(sessionRepo)
+      verifyNoInteractions(unsubmittedMonthlyReturnRepo)
     }
 
     "fetch taxpayer, update client UTR in session, and return AgentLandingViewModel" in {
-      val (service, connector, sessionRepo) = newService()
-      val uniqueId                          = "CLIENT-123"
-      val baseClient                        = createClient(id = uniqueId, utr = None)
+      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
+      val uniqueId                                                           = "CLIENT-123"
+      val baseClient                                                         = createClient(id = uniqueId, utr = None)
         .copy(schemeName = Some("ABC Construction Ltd"))
-      val otherClient                       = createClient(id = "CLIENT-999")
+      val otherClient                                                        = createClient(id = "CLIENT-999")
 
       val clients  = List(baseClient, otherClient)
       val ua       = UserAnswers("test-user").set(AgentClientsPage, clients).get
@@ -360,6 +383,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       verify(connector).getAgentClientTaxpayer("111", "test111")(hc)
       verify(connector).saveAgentClient("some-user-id", agentClientData)(hc)
       verifyNoMoreInteractions(connector)
+      verifyNoInteractions(unsubmittedMonthlyReturnRepo)
     }
   }
 
@@ -386,7 +410,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             monthlyReturnId = 123L,
             action = Seq.empty,
             lastUpdate = Some(LocalDateTime.parse("2025-01-01T00:00:00")),
-            amendment = Some("N")
+            amendment = Some("N"),
+            deletable = true
           )
         )
       )
@@ -504,4 +529,76 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
     }
   }
 
+  "deleteUnsubmittedMonthlyReturn" should {
+
+    "delegate to connector and return response (happy path)" in {
+      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
+      val instanceId                                                         = "900063"
+      val now: Instant                                                       = Instant.parse("2026-04-09T12:34:56.789Z")
+
+      val dataModel = UnsubmittedMonthlyReturn(
+        instanceId = instanceId,
+        monthlyReturnId = 3000L,
+        taxYear = 2026,
+        taxMonth = 4,
+        returnType = "Nil",
+        status = "In Progress",
+        amendment = Some("Y"),
+        deletable = true,
+        lastUpdated = now
+      )
+
+      val expectedRequest = DeleteUnsubmittedMonthlyReturnRequest(
+        instanceId = instanceId,
+        taxYear = 2026,
+        taxMonth = 4,
+        amendment = "Y"
+      )
+
+      when(connector.deleteUnsubmittedMonthlyReturn(eqTo(expectedRequest))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(()))
+
+      service.deleteUnsubmittedMonthlyReturn(dataModel).futureValue mustBe ()
+
+      verify(connector).deleteUnsubmittedMonthlyReturn(eqTo(expectedRequest))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+      verifyNoInteractions(unsubmittedMonthlyReturnRepo)
+    }
+
+    "propagate failure from connector" in {
+      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
+      val instanceId                                                         = "900063"
+      val boom                                                               = new RuntimeException("Backend error")
+      val now: Instant                                                       = Instant.parse("2026-04-09T12:34:56.789Z")
+
+      val dataModel = UnsubmittedMonthlyReturn(
+        instanceId = instanceId,
+        monthlyReturnId = 3000L,
+        taxYear = 2026,
+        taxMonth = 4,
+        returnType = "Nil",
+        status = "In Progress",
+        amendment = Some("Y"),
+        deletable = true,
+        lastUpdated = now
+      )
+
+      val expectedRequest = DeleteUnsubmittedMonthlyReturnRequest(
+        instanceId = instanceId,
+        taxYear = 2026,
+        taxMonth = 4,
+        amendment = "Y"
+      )
+
+      when(connector.deleteUnsubmittedMonthlyReturn(eqTo(expectedRequest))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(boom))
+
+      val ex = service.deleteUnsubmittedMonthlyReturn(dataModel).failed.futureValue
+      ex mustBe boom
+
+      verify(connector).deleteUnsubmittedMonthlyReturn(eqTo(expectedRequest))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+      verifyNoInteractions(unsubmittedMonthlyReturnRepo)
+    }
+  }
 }

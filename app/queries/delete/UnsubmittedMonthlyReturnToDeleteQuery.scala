@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package utils
+package queries.delete
 
-import java.time.Month
-import java.time.format.TextStyle
-import java.util.Locale
+import models.UnsubmittedMonthlyReturn
+import play.api.libs.json.JsPath
+import queries.{Gettable, Settable}
 
-object Utils {
-  val emptyString: String = ""
+case object UnsubmittedMonthlyReturnToDeleteQuery
+    extends Gettable[UnsubmittedMonthlyReturn]
+    with Settable[UnsubmittedMonthlyReturn] {
 
-  def monthName(taxMonth: Int, locale: Locale): String =
-    Month.of(taxMonth).getDisplayName(TextStyle.FULL, locale)
+  override def path: JsPath = JsPath \ "unsubmittedMonthlyReturnToDelete"
 }

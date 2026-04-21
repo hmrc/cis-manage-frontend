@@ -19,17 +19,18 @@ package services
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
-import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturnsRow, UserAnswers}
+import models.requests.DeleteUnsubmittedMonthlyReturnRequest
+import models.*
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
-import repositories.SessionRepository
+import repositories.{SessionRepository, UnsubmittedMonthlyReturnRepository}
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel, ReturnsLandingContext}
 import viewmodels.agent.AgentLandingViewModel
 
-import java.time.{LocalDateTime, YearMonth}
-import java.time.format.DateTimeFormatter
+import java.time.*
+import java.time.format.{DateTimeFormatter, TextStyle}
 import java.util.Locale
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,7 +38,9 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ManageService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector,
-  sessionRepository: SessionRepository
+  sessionRepository: SessionRepository,
+  unsubmittedReturnRepository: UnsubmittedMonthlyReturnRepository,
+  clock: Clock
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends Logging {
 
@@ -179,6 +182,17 @@ class ManageService @Inject() (
 
   private def buildReturnPeriodEnd(taxMonth: Int, taxYear: Int): String =
     YearMonth.of(taxYear, taxMonth).format(shortMonthYearFormatter)
+  def deleteUnsubmittedMonthlyReturn(returnToDelete: UnsubmittedMonthlyReturn)(implicit
+    hc: HeaderCarrier
+  ): Future[Unit] =
+    cisConnector.deleteUnsubmittedMonthlyReturn(
+      DeleteUnsubmittedMonthlyReturnRequest(
+        instanceId = returnToDelete.instanceId,
+        taxYear = returnToDelete.taxYear,
+        taxMonth = returnToDelete.taxMonth,
+        amendment = returnToDelete.amendment.getOrElse("N")
+      )
+    )
 
   private def formatLastUpdate(lastUpdate: Option[LocalDateTime]): String =
     lastUpdate match {

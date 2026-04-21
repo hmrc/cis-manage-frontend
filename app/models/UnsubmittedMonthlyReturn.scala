@@ -16,30 +16,33 @@
 
 package models
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Format, Json, OFormat}
 
-import java.time.LocalDateTime
+import java.time.Instant
+import java.util.Locale
+import play.api.i18n.Lang
+import utils.Utils.monthName
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
-case class UnsubmittedMonthlyReturnsRow(
+case class UnsubmittedMonthlyReturn(
+  instanceId: String,
+  monthlyReturnId: Long,
   taxYear: Int,
   taxMonth: Int,
   returnType: String,
   status: String,
-  monthlyReturnId: Long,
-  action: Seq[String],
-  lastUpdate: Option[LocalDateTime],
   amendment: Option[String],
-  deletable: Boolean
-)
-
-object UnsubmittedMonthlyReturnsRow {
-  given format: OFormat[UnsubmittedMonthlyReturnsRow] = Json.format[UnsubmittedMonthlyReturnsRow]
+  deletable: Boolean,
+  lastUpdated: Instant
+) {
+  def monthYear(langCode: String): String = {
+    val locale: Locale = Lang.get(langCode).map(_.locale).getOrElse(Locale.UK)
+    s"${monthName(taxMonth, locale)} $taxYear"
+  }
 }
 
-case class UnsubmittedMonthlyReturnsResponse(
-  unsubmittedCisReturns: Seq[UnsubmittedMonthlyReturnsRow]
-)
+object UnsubmittedMonthlyReturn {
+  given instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
-object UnsubmittedMonthlyReturnsResponse {
-  given format: OFormat[UnsubmittedMonthlyReturnsResponse] = Json.format[UnsubmittedMonthlyReturnsResponse]
+  given format: OFormat[UnsubmittedMonthlyReturn] = Json.format[UnsubmittedMonthlyReturn]
 }
