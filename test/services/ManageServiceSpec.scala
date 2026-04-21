@@ -20,7 +20,7 @@ import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
 import models.requests.DeleteUnsubmittedMonthlyReturnRequest
-import models.{CisTaxpayer, CisTaxpayerSearchResult, Deletable, UnsubmittedMonthlyReturnsResponse, UnsubmittedMonthlyReturnsRow, UserAnswers}
+import models.{CisTaxpayer, CisTaxpayerSearchResult, Deletable, NotDeletable, UnsubmittedMonthlyReturnsResponse, UnsubmittedMonthlyReturnsRow, UserAnswers}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
@@ -498,7 +498,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
   "checkUnsubmittedMonthlyReturnDeletion" should {
 
-    "delegate to connector and return response (happy path)" in {
+    "delegate to connector and return Deletable record" in {
       val (service, connector, sessionRepo) = newService()
       val instanceId                        = "900063"
       val monthlyReturnId                   = 3000L
@@ -523,6 +523,36 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       val out = service.checkUnsubmittedMonthlyReturnDeletion(userAnswersWithCisId, monthlyReturnId).futureValue
       out mustBe Deletable(mockDataRow)
+
+      verify(connector).getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+
+    "delegate to connector and return NotDeletable record" in {
+      val (service, connector, sessionRepo) = newService()
+      val instanceId                        = "900063"
+      val monthlyReturnId                   = 3000L
+
+      val userAnswersWithCisId: UserAnswers = UserAnswers("userId").set(CisIdPage, instanceId).success.value
+
+      val mockDataRow = UnsubmittedMonthlyReturnsRow(
+        monthlyReturnId = monthlyReturnId,
+        taxYear = 2025,
+        taxMonth = 1,
+        returnType = "Nil",
+        status = "PENDING",
+        lastUpdate = None,
+        amendment = Some("Y"),
+        deletable = false
+      )
+
+      val resp = UnsubmittedMonthlyReturnsResponse(unsubmittedCisReturns = Seq(mockDataRow))
+
+      when(connector.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(resp))
+
+      val out = service.checkUnsubmittedMonthlyReturnDeletion(userAnswersWithCisId, monthlyReturnId).futureValue
+      out mustBe NotDeletable
 
       verify(connector).getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier])
       verifyNoInteractions(sessionRepo)
