@@ -11,7 +11,7 @@ import views.html.amend.NoReturnsSubmittedView
 
 class NoReturnsSubmittedViewSpec extends SpecBase {
 
-  trait Setup {
+  "NoReturnsSubmittedView" - {
 
     "must render the page with the correct content" in new Setup {
       val html: HtmlFormat.Appendable = view(cisId = "1")
@@ -25,9 +25,11 @@ class NoReturnsSubmittedViewSpec extends SpecBase {
       doc.select("p.govuk-body").text must include(messages("amend.noReturnsSubmitted.p2"))
       doc.select("a.govuk-link").text must include(messages("amend.noReturnsSubmitted.p2.link"))
       doc.select("p.govuk-body").text must include(messages("amend.noReturnsSubmitted.p3"))
-      doc.select("a.govuk-link").text must include(messages("amend.noReturnsSubmitted.p3.links"))
+      doc.select("a.govuk-link").text must include(messages("amend.noReturnsSubmitted.p3.link"))
     }
+  }
 
+  trait Setup {
     val app: Application             = applicationBuilder().build()
     val view: NoReturnsSubmittedView = app.injector.instanceOf[NoReturnsSubmittedView]
 
