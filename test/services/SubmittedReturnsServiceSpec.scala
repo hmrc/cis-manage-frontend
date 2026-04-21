@@ -281,5 +281,220 @@ class SubmittedReturnsServiceSpec extends SpecBase {
 
       row.status shouldBe StatusViewModel.Text("")
     }
+
+    "getMonthlyReturnComplete must build a SubmissionReceiptViewModel from connector response" in {
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+
+      val response = MonthlyReturnCompleteResponse(
+        scheme = Seq(CompleteSchemeData(1, "INST001", "123P", "123", "ABC456", None, Some("Test Contractor"), None)),
+        monthlyReturn =
+          Seq(CompleteMonthlyReturnData(100L, 2024, 6, Some("N"), None, None, Some("SUBMITTED"), None, None, None)),
+        subcontractors = Seq.empty,
+        monthlyReturnItems = Seq(
+          CompleteMonthlyReturnItemData(
+            100L,
+            301L,
+            Some("5000.00"),
+            Some("1000.00"),
+            Some("800.00"),
+            Some(200L),
+            Some("John Smith"),
+            None
+          )
+        ),
+        submission = Seq(
+          CompleteSubmissionData(
+            400L,
+            "Original",
+            Some(100L),
+            Some("SUBMITTED"),
+            Some("HMRC-123-ABC"),
+            Some("HMRC-123-ABC"),
+            Some("user@example.com"),
+            Some("2024-07-01T10:30:00")
+          )
+        )
+      )
+
+      when(mockConnector.getMonthlyReturnComplete(eqTo("INST001"), eqTo(2024), eqTo(6), eqTo("N"))(any()))
+        .thenReturn(Future.successful(response))
+
+      val result = service.getMonthlyReturnComplete("INST001", 2024, 6, "N").futureValue
+
+      result shouldBe a[Right[_, _]]
+      val vm = result.toOption.get
+      vm.contractorName  shouldBe "Test Contractor"
+      vm.payeReference   shouldBe "123/ABC456"
+      vm.taxYear         shouldBe 2024
+      vm.taxMonth        shouldBe 6
+      vm.returnPeriodEnd shouldBe "June 2024"
+      vm.returnType      shouldBe "Monthly"
+      vm.submissionType  shouldBe "Original"
+      vm.hmrcMark        shouldBe Some("HMRC-123-ABC")
+      vm.submittedAt.value should include("July 2024")
+      vm.emailRecipient  shouldBe Some("user@example.com")
+      vm.instanceId      shouldBe "INST001"
+      vm.items.size      shouldBe 1
+
+      val item = vm.items.head
+      item.subcontractorName shouldBe "John Smith"
+      item.totalPayments     shouldBe "5000.00"
+      item.costOfMaterials   shouldBe "1000.00"
+      item.totalDeducted     shouldBe "800.00"
+    }
+
+    "getMonthlyReturnComplete must identify nil returns correctly" in {
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+
+      val response = MonthlyReturnCompleteResponse(
+        scheme = Seq(CompleteSchemeData(1, "INST001", "123P", "123", "ABC456", None, Some("Nil Co"), None)),
+        monthlyReturn =
+          Seq(CompleteMonthlyReturnData(100L, 2024, 3, Some("Y"), None, None, Some("SUBMITTED"), None, None, None)),
+        subcontractors = Seq.empty,
+        monthlyReturnItems = Seq.empty,
+        submission = Seq(
+          CompleteSubmissionData(
+            400L,
+            "Original",
+            Some(100L),
+            Some("SUBMITTED"),
+            Some("MARK-ABC"),
+            Some("MARK-ABC"),
+            None,
+            None
+          )
+        )
+      )
+
+      when(mockConnector.getMonthlyReturnComplete(any(), any(), any(), any())(any()))
+        .thenReturn(Future.successful(response))
+
+      val result = service.getMonthlyReturnComplete("INST001", 2024, 3, "N").futureValue
+
+      result shouldBe a[Right[_, _]]
+      val vm = result.toOption.get
+      vm.returnType     shouldBe "Nil"
+      vm.contractorName shouldBe "Nil Co"
+      vm.items          shouldBe empty
+      vm.submittedAt    shouldBe None
+    }
+
+    "getMonthlyReturnComplete must fail guard when status is not SUBMITTED and amendment is not Y" in {
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+
+      val response = MonthlyReturnCompleteResponse(
+        scheme = Seq(CompleteSchemeData(1, "INST001", "123P", "123", "ABC456", None, Some("Test Co"), None)),
+        monthlyReturn =
+          Seq(CompleteMonthlyReturnData(100L, 2024, 6, Some("N"), None, None, Some("SUBMITTED"), None, None, None)),
+        subcontractors = Seq.empty,
+        monthlyReturnItems = Seq.empty,
+        submission = Seq(
+          CompleteSubmissionData(
+            400L,
+            "Original",
+            Some(100L),
+            Some("Accepted"),
+            Some("MARK-A"),
+            Some("MARK-A"),
+            None,
+            None
+          )
+        )
+      )
+
+      when(mockConnector.getMonthlyReturnComplete(any(), any(), any(), any())(any()))
+        .thenReturn(Future.successful(response))
+
+      val result = service.getMonthlyReturnComplete("INST001", 2024, 6, "N").futureValue
+
+      result                 shouldBe a[Left[_, _]]
+      result.left.toOption.get should include("guard failed")
+    }
+
+    "getMonthlyReturnComplete must pass guard when amendment is Y even if status is not SUBMITTED" in {
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+
+      val response = MonthlyReturnCompleteResponse(
+        scheme = Seq(CompleteSchemeData(1, "INST001", "123P", "123", "ABC456", None, Some("Test Co"), None)),
+        monthlyReturn =
+          Seq(CompleteMonthlyReturnData(100L, 2024, 6, Some("N"), None, None, Some("SUBMITTED"), None, None, None)),
+        subcontractors = Seq.empty,
+        monthlyReturnItems = Seq.empty,
+        submission = Seq(
+          CompleteSubmissionData(
+            400L,
+            "Original",
+            Some(100L),
+            Some("Accepted"),
+            Some("MARK-A"),
+            Some("MARK-A"),
+            None,
+            None
+          )
+        )
+      )
+
+      when(mockConnector.getMonthlyReturnComplete(any(), any(), any(), any())(any()))
+        .thenReturn(Future.successful(response))
+
+      val result = service.getMonthlyReturnComplete("INST001", 2024, 6, "Y").futureValue
+
+      result shouldBe a[Right[_, _]]
+    }
+
+    "getMonthlyReturnComplete must fail guard when IRMarks do not match" in {
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+
+      val response = MonthlyReturnCompleteResponse(
+        scheme = Seq(CompleteSchemeData(1, "INST001", "123P", "123", "ABC456", None, Some("Test Co"), None)),
+        monthlyReturn =
+          Seq(CompleteMonthlyReturnData(100L, 2024, 6, Some("N"), None, None, Some("SUBMITTED"), None, None, None)),
+        subcontractors = Seq.empty,
+        monthlyReturnItems = Seq.empty,
+        submission = Seq(
+          CompleteSubmissionData(
+            400L,
+            "Original",
+            Some(100L),
+            Some("SUBMITTED"),
+            Some("MARK-A"),
+            Some("MARK-B"),
+            None,
+            None
+          )
+        )
+      )
+
+      when(mockConnector.getMonthlyReturnComplete(any(), any(), any(), any())(any()))
+        .thenReturn(Future.successful(response))
+
+      val result = service.getMonthlyReturnComplete("INST001", 2024, 6, "N").futureValue
+
+      result                 shouldBe a[Left[_, _]]
+      result.left.toOption.get should include("IRMark")
+    }
+
+    "getMonthlyReturnComplete must fail guard when IRMark is null" in {
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+
+      val response = MonthlyReturnCompleteResponse(
+        scheme = Seq(CompleteSchemeData(1, "INST001", "123P", "123", "ABC456", None, Some("Test Co"), None)),
+        monthlyReturn =
+          Seq(CompleteMonthlyReturnData(100L, 2024, 6, Some("N"), None, None, Some("SUBMITTED"), None, None, None)),
+        subcontractors = Seq.empty,
+        monthlyReturnItems = Seq.empty,
+        submission = Seq(
+          CompleteSubmissionData(400L, "Original", Some(100L), Some("SUBMITTED"), None, None, None, None)
+        )
+      )
+
+      when(mockConnector.getMonthlyReturnComplete(any(), any(), any(), any())(any()))
+        .thenReturn(Future.successful(response))
+
+      val result = service.getMonthlyReturnComplete("INST001", 2024, 6, "N").futureValue
+
+      result                 shouldBe a[Left[_, _]]
+      result.left.toOption.get should include("IRMark")
+    }
   }
 }

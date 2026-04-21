@@ -706,6 +706,83 @@ class ConstructionIndustrySchemeConnectorSpec
     }
   }
 
+  "getMonthlyReturnComplete" should {
+
+    "return MonthlyReturnCompleteResponse and post the expected request body" in {
+      stubFor(
+        post(urlPathEqualTo("/cis/monthly-returns-complete"))
+          .withRequestBody(equalToJson("""{
+                                       |  "instanceId": "900063",
+                                       |  "taxYear": 2024,
+                                       |  "taxMonth": 2,
+                                       |  "amendment": "N"
+                                       |}""".stripMargin))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                """{
+                  |  "scheme": [
+                  |    {
+                  |      "schemeId": 123,
+                  |      "instanceId": "900063",
+                  |      "accountsOfficeReference": "123P",
+                  |      "taxOfficeNumber": "123",
+                  |      "taxOfficeReference": "ABC456",
+                  |      "name": "Test Contractor"
+                  |    }
+                  |  ],
+                  |  "monthlyReturn": [
+                  |    {
+                  |      "monthlyReturnId": 100,
+                  |      "taxYear": 2024,
+                  |      "taxMonth": 2,
+                  |      "nilReturnIndicator": "Y",
+                  |      "status": "SUBMITTED",
+                  |      "amendment": "N"
+                  |    }
+                  |  ],
+                  |  "subcontractors": [],
+                  |  "monthlyReturnItems": [],
+                  |  "submission": [
+                  |    {
+                  |      "submissionId": 400,
+                  |      "submissionType": "Nil return",
+                  |      "activeObjectId": 100,
+                  |      "status": "SUBMITTED",
+                  |      "hmrcMarkGenerated": "ABC",
+                  |      "hmrcMarkGgis": "ABC"
+                  |    }
+                  |  ]
+                  |}""".stripMargin
+              )
+          )
+      )
+
+      val result = connector.getMonthlyReturnComplete("900063", 2024, 2, "N").futureValue
+
+      result.scheme.head.instanceId                 mustBe "900063"
+      result.monthlyReturn.head.nilReturnIndicator  mustBe Some("Y")
+      result.submission.head.submissionType         mustBe "Nil return"
+      result.submission.head.hmrcMarkGenerated      mustBe Some("ABC")
+      result.monthlyReturnItems                     mustBe empty
+      result.subcontractors                         mustBe empty
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      stubFor(
+        post(urlPathEqualTo("/cis/monthly-returns-complete"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = intercept[Exception] {
+        connector.getMonthlyReturnComplete("900063", 2024, 2, "N").futureValue
+      }
+
+      ex.getMessage must include("returned 500")
+    }
+  }
+
   "Save" should {
 
     val userId                           = "900063"

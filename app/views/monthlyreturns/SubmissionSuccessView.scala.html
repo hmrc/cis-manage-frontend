@@ -1,0 +1,116 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import viewmodels.SubmissionReceiptViewModel
+@import views.html.components.*
+
+@this(
+    layout: templates.Layout,
+    govukPanel: GovukPanel,
+    govukSummaryList: GovukSummaryList,
+    govukInsetText: GovukInsetText,
+    h2: H2,
+    paragraph: Paragraph,
+    link: Link,
+    printLinkButton: PrintLinkButton
+)
+
+@(viewModel: SubmissionReceiptViewModel)(implicit request: Request[_], messages: Messages)
+
+@layout(
+    pageTitle = titleNoForm(messages("submissionConfirmation.title", viewModel.returnType)),
+    showBackLink = false
+) {
+
+    @defining(viewModel.hmrcMark.getOrElse("")) { reference =>
+    @defining(HtmlFormat.escape(reference).body.grouped(22).mkString("<br>")) { formattedReference =>
+
+    @govukPanel(Panel(
+        title = Text(messages("submissionConfirmation.panel.heading", viewModel.returnType)),
+        content = HtmlContent(
+            HtmlFormat.raw(
+                messages("submissionConfirmation.panel.referenceLabel") +
+                "<br><strong>" +
+                formattedReference +
+                "</strong>"
+            )
+        )
+    ))
+
+    }
+    }
+
+    @h2(messages("submissionConfirmation.details.heading"))
+
+    @govukSummaryList(SummaryList(
+        rows = Seq(
+            viewModel.submittedAt.map { time =>
+                SummaryListRow(
+                    key = Key(content = Text(messages("submissionConfirmation.submittedOn"))),
+                    value = Value(content = Text(time))
+                )
+            },
+            Some(SummaryListRow(
+                key = Key(content = Text(messages("submissionConfirmation.contractorName"))),
+                value = Value(content = Text(viewModel.contractorName))
+            )),
+            Some(SummaryListRow(
+                key = Key(content = Text(messages("submissionConfirmation.payeReference"))),
+                value = Value(content = Text(viewModel.payeReference))
+            )),
+            Some(SummaryListRow(
+                key = Key(content = Text(messages("submissionConfirmation.returnPeriod"))),
+                value = Value(content = Text(viewModel.returnPeriodEnd))
+            )),
+            viewModel.emailRecipient.map { email =>
+                SummaryListRow(
+                    key = Key(content = Text(messages("submissionConfirmation.email"))),
+                    value = Value(content = Text(email))
+                )
+            }
+        ).flatten
+    ))
+
+    @h2(messages("submissionConfirmation.whatYouCanDo.heading"))
+
+    @if(viewModel.emailRecipient.isEmpty) {
+        <p class="govuk-body">@messages("submissionConfirmation.noEmail")</p>
+    }
+
+    @govukInsetText(InsetText(
+        content = HtmlContent(
+            messages("submissionConfirmation.inset") +
+            """<br><br><a href="#" class="govuk-link" data-module="hmrc-print-link">""" +
+            messages("submissionConfirmation.print") +
+            "</a>"
+        )
+    ))
+
+    <p class="govuk-body">
+        <a href="@{controllers.routes.ReturnsLandingController.onPageLoad(viewModel.instanceId).url}" class="govuk-link">
+            @messages("submissionConfirmation.backToManage")
+        </a>
+    </p>
+
+    @h2(messages("submissionConfirmation.needHelp.heading"))
+
+    <p class="govuk-body">
+        @messages("submissionConfirmation.needHelp.p1")
+        <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/construction-industry-scheme" class="govuk-link" rel="noreferrer noopener" target="_blank">
+            @messages("submissionConfirmation.needHelp.link")
+        </a>
+    </p>
+}

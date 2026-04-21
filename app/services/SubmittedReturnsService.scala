@@ -23,6 +23,7 @@ import viewmodels.StatusViewModel.Text
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, YearMonth, ZoneId, ZoneOffset, ZonedDateTime}
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SubmittedReturnsService @Inject() {
@@ -187,4 +188,94 @@ class SubmittedReturnsService @Inject() {
   private def isSuperseded(monthlyReturn: SubmittedMonthlyReturnData): Boolean =
     monthlyReturn.supersededBy.exists(_ > 0)
 
+  def getMonthlyReturnComplete(
+    instanceId: String,
+    taxYear: Int,
+    taxMonth: Int,
+    amendment: String
+  )(implicit hc: HeaderCarrier): Future[Either[String, SubmissionReceiptViewModel]] =
+    connector.getMonthlyReturnComplete(instanceId, taxYear, taxMonth, amendment).map { response =>
+      val submission = response.submission.headOption
+
+      submission match {
+        case Some(sub) if !isSubmissionValid(sub, amendment) =>
+          Left(s"Submission guard failed: status=${sub.status.getOrElse("None")}, amendment=$amendment")
+        case Some(sub) if !hasValidIrMark(sub)               =>
+          Left("Submission guard failed: IRMark sent/received is null or does not match")
+        case _                                               =>
+          Right(buildReceiptViewModel(response, instanceId, taxYear, taxMonth))
+      }
+    }
+
+  private def isSubmissionValid(sub: models.history.CompleteSubmissionData, amendment: String): Boolean =
+    sub.status.contains("SUBMITTED") || amendment.equalsIgnoreCase("Y")
+
+  private def hasValidIrMark(sub: models.history.CompleteSubmissionData): Boolean =
+    (sub.hmrcMarkGenerated, sub.hmrcMarkGgis) match {
+      case (Some(sent), Some(received)) if sent.nonEmpty && received.nonEmpty => sent == received
+      case _                                                                  => false
+    }
+
+  private def buildReceiptViewModel(
+    response: MonthlyReturnCompleteResponse,
+    instanceId: String,
+    taxYear: Int,
+    taxMonth: Int
+  ): SubmissionReceiptViewModel = {
+    val scheme     = response.scheme.headOption
+    val mr         = response.monthlyReturn.headOption
+    val submission = response.submission.headOption
+
+    val monthName = Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)
+
+    val returnType = mr.flatMap(_.nilReturnIndicator) match {
+      case Some(n) if n.trim.equalsIgnoreCase("Y") => "Nil"
+      case _                                       => "Monthly"
+    }
+
+    val submissionType = submission.map(_.submissionType).getOrElse("Monthly return")
+
+    val payeReference = scheme
+      .map { s =>
+        s"${s.taxOfficeNumber}/${s.taxOfficeReference}"
+      }
+      .getOrElse("")
+
+    val submittedAt = submission
+      .flatMap(_.acceptedTime)
+      .flatMap { ts =>
+        scala.util.Try {
+          val dateTime = LocalDateTime.parse(ts.take(19)).atZone(ukTimezone)
+          val time     = dateTime.format(displayTimeFormatter)
+          val date     = dateTime.toLocalDate.format(displayDateFormatter)
+          s"$time on $date"
+        }.toOption
+      }
+
+    val items = response.monthlyReturnItems.map { item =>
+      SubmissionReceiptItemViewModel(
+        subcontractorName = item.subcontractorName.getOrElse("Unknown"),
+        totalPayments = item.totalPayments.getOrElse("0.00"),
+        costOfMaterials = item.costOfMaterials.getOrElse("0.00"),
+        totalDeducted = item.totalDeducted.getOrElse("0.00")
+      )
+    }
+
+    SubmissionReceiptViewModel(
+      contractorName = scheme.flatMap(_.name).getOrElse(""),
+      payeReference = payeReference,
+      taxYear = taxYear,
+      taxMonth = taxMonth,
+      returnPeriodEnd = s"$monthName $taxYear",
+      returnType = returnType,
+      submissionType = submissionType,
+      hmrcMark = submission.flatMap(_.hmrcMarkGenerated).map { mark =>
+        scala.util.Try(utils.IrMarkReferenceGenerator.fromBase64(mark)).getOrElse(mark)
+      },
+      submittedAt = submittedAt,
+      emailRecipient = submission.flatMap(_.emailRecipient),
+      instanceId = instanceId,
+      items = items
+    )
+  }
 }
