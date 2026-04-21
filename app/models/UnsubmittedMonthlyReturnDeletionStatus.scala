@@ -20,4 +20,3 @@ sealed trait UnsubmittedMonthlyReturnDeletionStatus
 
 case class Deletable(record: UnsubmittedMonthlyReturnsRow) extends UnsubmittedMonthlyReturnDeletionStatus
 case object NotDeletable extends UnsubmittedMonthlyReturnDeletionStatus
-//case object NotFound extends UnsubmittedMonthlyReturnDeletionStatus
