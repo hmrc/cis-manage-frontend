@@ -102,7 +102,7 @@ class SubmissionSuccessViewSpec extends SpecBase {
         s"${messages(app)("submissionConfirmation.title", "Monthly")} - ${messages(app)("service.name")} - GOV.UK"
 
       doc.select(".govuk-panel__title").text() shouldBe messages(app)("submissionConfirmation.panel.heading", "Monthly")
-      doc.select(".govuk-panel__body").text() should include("HMRC-123-ABC")
+      doc.select(".govuk-panel__body").text()    should include("HMRC-123-ABC")
     }
 
     "render dynamic title for Nil return" in {
@@ -157,7 +157,7 @@ class SubmissionSuccessViewSpec extends SpecBase {
     "render inset text with print link" in {
       val doc = render(viewModelWithEmail)
 
-      doc.select(".govuk-inset-text").size() shouldBe 1
+      doc.select(".govuk-inset-text").size()             shouldBe 1
       doc.select("[data-module=hmrc-print-link]").size() shouldBe 1
     }
 

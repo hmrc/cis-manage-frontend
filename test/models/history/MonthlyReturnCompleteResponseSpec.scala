@@ -121,11 +121,48 @@ class MonthlyReturnCompleteResponseSpec extends AnyWordSpec with Matchers {
   "MonthlyReturnCompleteResponse" should {
     "round-trip to/from JSON" in {
       val model = MonthlyReturnCompleteResponse(
-        scheme = Seq(CompleteSchemeData(1, "INST001", "123P", "123", "ABC456", Some("1234567890"), Some("Test Co"), None)),
-        monthlyReturn = Seq(CompleteMonthlyReturnData(100L, 2024, 6, Some("N"), None, None, Some("SUBMITTED"), None, None, None)),
-        subcontractors = Seq(CompleteSubcontractorData(200L, Some("2345678901"), Some("John"), Some("Smith"), None, None, None, None, None, None)),
-        monthlyReturnItems = Seq(CompleteMonthlyReturnItemData(100L, 300L, Some("5000.00"), Some("1000.00"), Some("800.00"), Some(200L), Some("John Smith"), None)),
-        submission = Seq(CompleteSubmissionData(400L, "Original", Some(100L), Some("Accepted"), Some("HMRC-123"), None, None, Some("2024-07-01T10:30:00")))
+        scheme =
+          Seq(CompleteSchemeData(1, "INST001", "123P", "123", "ABC456", Some("1234567890"), Some("Test Co"), None)),
+        monthlyReturn =
+          Seq(CompleteMonthlyReturnData(100L, 2024, 6, Some("N"), None, None, Some("SUBMITTED"), None, None, None)),
+        subcontractors = Seq(
+          CompleteSubcontractorData(
+            200L,
+            Some("2345678901"),
+            Some("John"),
+            Some("Smith"),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None
+          )
+        ),
+        monthlyReturnItems = Seq(
+          CompleteMonthlyReturnItemData(
+            100L,
+            300L,
+            Some("5000.00"),
+            Some("1000.00"),
+            Some("800.00"),
+            Some(200L),
+            Some("John Smith"),
+            None
+          )
+        ),
+        submission = Seq(
+          CompleteSubmissionData(
+            400L,
+            "Original",
+            Some(100L),
+            Some("Accepted"),
+            Some("HMRC-123"),
+            None,
+            None,
+            Some("2024-07-01T10:30:00")
+          )
+        )
       )
       Json.toJson(model).as[MonthlyReturnCompleteResponse] mustBe model
     }
