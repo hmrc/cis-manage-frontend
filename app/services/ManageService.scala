@@ -30,7 +30,7 @@ import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel, ReturnsLa
 import viewmodels.agent.AgentLandingViewModel
 
 import java.time.*
-import java.time.format.{DateTimeFormatter, TextStyle}
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}

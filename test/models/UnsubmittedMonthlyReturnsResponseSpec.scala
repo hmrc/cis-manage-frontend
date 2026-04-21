@@ -34,7 +34,8 @@ class UnsubmittedMonthlyReturnsResponseSpec extends AnyWordSpec with Matchers {
         monthlyReturnId = 12345L,
         action = Seq("Continue", "Delete"),
         lastUpdate = Some(LocalDateTime.parse("2025-01-01T00:00:00")),
-        amendment = Some("N")
+        amendment = Some("N"),
+        deletable = true
       )
 
       Json.toJson(model).as[UnsubmittedMonthlyReturnsRow] mustBe model
@@ -53,7 +54,8 @@ class UnsubmittedMonthlyReturnsResponseSpec extends AnyWordSpec with Matchers {
             monthlyReturnId = 12345L,
             action = Seq("Continue"),
             lastUpdate = Some(LocalDateTime.parse("2025-01-01T00:00:00")),
-            amendment = Some("N")
+            amendment = Some("N"),
+            deletable = true
           )
         )
       )

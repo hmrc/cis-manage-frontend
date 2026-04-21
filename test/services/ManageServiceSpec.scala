@@ -390,8 +390,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
   "getUnsubmittedMonthlyReturns" should {
 
     "delegate to connector and return mapped view models (happy path)" in {
-      val (service, connector, sessionRepo) = newService()
-      val instanceId                        = "900063"
+      val (service, connector, sessionRepo, _, _) = newService()
+      val instanceId                              = "900063"
 
       when(appConfig.continueReturnJourneyUrl(any[String], any[String], any[String]))
         .thenReturn("/continue")
@@ -446,9 +446,9 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
     }
 
     "propagate failure from connector" in {
-      val (service, connector, sessionRepo) = newService()
-      val instanceId                        = "900063"
-      val boom                              = new RuntimeException("Backend error")
+      val (service, connector, sessionRepo, _, _) = newService()
+      val instanceId                              = "900063"
+      val boom                                    = new RuntimeException("Backend error")
 
       when(connector.getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
         .thenReturn(Future.failed(boom))
@@ -464,7 +464,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
   "buildReturnsLandingContext" should {
 
     "return Some(context) for agent when name + client exist" in {
-      val (service, connector, sessionRepo) = newService()
+      val (service, connector, sessionRepo, _, _) = newService()
 
       when(appConfig.fileStandardReturnUrl(any[String])).thenReturn("/standard")
       when(appConfig.fileNilReturnUrl(any[String])).thenReturn("/nil")
@@ -486,7 +486,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
     }
 
     "return None for agent when client missing" in {
-      val (service, connector, sessionRepo) = newService()
+      val (service, connector, sessionRepo, _, _) = newService()
 
       val ua = UserAnswers("test-user").set(AgentClientsPage, List(createClient("OTHER"))).get
 
@@ -498,7 +498,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
     }
 
     "return Some(context) for org when ContractorNamePage exists" in {
-      val (service, connector, sessionRepo) = newService()
+      val (service, connector, sessionRepo, _, _) = newService()
 
       when(appConfig.fileStandardReturnUrl).thenReturn("/standard-org")
       when(appConfig.fileNilReturnUrl).thenReturn("/nil-org")
@@ -517,7 +517,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
     }
 
     "return None for org when ContractorNamePage missing" in {
-      val (service, connector, sessionRepo) = newService()
+      val (service, connector, sessionRepo, _, _) = newService()
 
       val ua = UserAnswers("test-user")
 
