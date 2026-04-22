@@ -19,16 +19,20 @@ package services
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
+import models.history.SubmittedReturnsData
 import models.requests.DeleteUnsubmittedMonthlyReturnRequest
-import models.{CisTaxpayerSearchResult, UnsubmittedMonthlyReturn, UnsubmittedMonthlyReturnsResponse, UserAnswers}
+import models.*
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
-import repositories.{SessionRepository, UnsubmittedMonthlyReturnRepository}
+import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.ReturnsLandingContext
+import viewmodels.{ReturnLandingViewModel, ReturnsLandingContext}
 import viewmodels.agent.AgentLandingViewModel
 
+import java.time.LocalDateTime
+import java.time.format.{DateTimeFormatter, TextStyle}
+import java.util.Locale
 import java.time.{Clock, Instant}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,9 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ManageService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector,
-  sessionRepository: SessionRepository,
-  unsubmittedReturnRepository: UnsubmittedMonthlyReturnRepository,
-  clock: Clock
+  sessionRepository: SessionRepository
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends Logging {
 
@@ -123,6 +125,11 @@ class ManageService @Inject() (
   ): Future[UnsubmittedMonthlyReturnsResponse] =
     cisConnector.getUnsubmittedMonthlyReturns(instanceId)
 
+  def getSubmittedMonthlyReturns(instanceId: String)(implicit
+    hc: HeaderCarrier
+  ): Future[SubmittedReturnsData] =
+    cisConnector.getSubmittedMonthlyReturns(instanceId)
+
   def buildReturnsLandingContext(
     instanceId: String,
     userAnswers: UserAnswers,
@@ -146,7 +153,7 @@ class ManageService @Inject() (
           client  <- clients.find(_.uniqueId == instanceId)
         } yield (
           appConfig.fileStandardReturnUrl(instanceId),
-          appConfig.fileNilReturnUrl(instanceId),
+          appConfig.fileNilReturnUrl(instanceId)
         )
       } else {
         Some((appConfig.fileStandardReturnUrl, appConfig.fileNilReturnUrl))
@@ -154,27 +161,19 @@ class ManageService @Inject() (
 
     (contractorNameOpt, linksOpt) match {
       case (Some(name), Some((standardLink, nilLink))) =>
-        getUnsubmittedMonthlyReturns(instanceId).flatMap { response =>
-
-          val unsubmittedReturnsToPersist = response.unsubmittedCisReturns.map { r =>
-            UnsubmittedMonthlyReturn(
-              instanceId = instanceId,
-              monthlyReturnId = r.monthlyReturnId,
-              taxYear = r.taxYear,
-              taxMonth = r.taxMonth,
-              returnType = r.returnType,
-              status = r.status,
-              lastUpdated = Instant.now(clock),
-              amendment = r.amendment,
-              deletable = r.deletable
-            )
-          }
-
-          for {
-            _ <- Future.traverse(unsubmittedReturnsToPersist)(unsubmittedReturnRepository.upsert)
-          } yield Some(
-            ReturnsLandingContext(name, standardLink, nilLink)
-          )
+        getUnsubmittedMonthlyReturns(instanceId).map { response =>
+          val returnsList =
+            response.unsubmittedCisReturns.map { r =>
+              ReturnLandingViewModel(
+                monthlyReturnId = r.monthlyReturnId,
+                taxMonth = formatPeriod(r.taxMonth, r.taxYear),
+                returnType = r.returnType,
+                dateSubmitted = formatLastUpdate(r.lastUpdate),
+                status = r.status,
+                amendment = r.amendment
+              )
+            }
+          Some(ReturnsLandingContext(name, standardLink, nilLink, returnsList))
         }
 
       case _ =>
@@ -182,15 +181,50 @@ class ManageService @Inject() (
     }
   }
 
-  def deleteUnsubmittedMonthlyReturn(returnToDelete: UnsubmittedMonthlyReturn)(implicit
+  def checkUnsubmittedMonthlyReturnDeletion(ua: UserAnswers, monthlyReturnId: Long)(implicit
+    hc: HeaderCarrier
+  ): Future[UnsubmittedMonthlyReturnDeletionStatus] =
+    ua.get(CisIdPage) match {
+      case Some(instanceId) =>
+        getUnsubmittedMonthlyReturns(instanceId).map { response =>
+          response.unsubmittedCisReturns
+            .find(_.monthlyReturnId == monthlyReturnId) match {
+            case Some(record) if record.deletable => Deletable(record)
+            case _                                => NotDeletable
+          }
+        }
+      case _                =>
+        logger.error(s"[checkUnsubmittedMonthlyReturnDeletion] missing instanceId in user answers")
+        Future.failed(new RuntimeException("Missing instanceId in user answers"))
+    }
+
+  def deleteUnsubmittedMonthlyReturn(ua: UserAnswers, returnToDelete: UnsubmittedMonthlyReturnsRow)(implicit
     hc: HeaderCarrier
   ): Future[Unit] =
-    cisConnector.deleteUnsubmittedMonthlyReturn(
-      DeleteUnsubmittedMonthlyReturnRequest(
-        instanceId = returnToDelete.instanceId,
-        taxYear = returnToDelete.taxYear,
-        taxMonth = returnToDelete.taxMonth,
-        amendment = returnToDelete.amendment.getOrElse("N")
-      )
-    )
+    ua.get(CisIdPage) match {
+      case Some(instanceId) =>
+        cisConnector.deleteUnsubmittedMonthlyReturn(
+          DeleteUnsubmittedMonthlyReturnRequest(
+            instanceId = instanceId,
+            taxYear = returnToDelete.taxYear,
+            taxMonth = returnToDelete.taxMonth,
+            amendment = returnToDelete.amendment.getOrElse("N")
+          )
+        )
+      case _                =>
+        logger.error(s"[deleteUnsubmittedMonthlyReturn] missing instanceId in user answers")
+        Future.failed(new RuntimeException("Missing instanceId in user answers"))
+    }
+
+  private def formatPeriod(taxMonth: Int, taxYear: Int): String = {
+    val monthName = java.time.Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)
+    s"$monthName $taxYear"
+  }
+
+  private def formatLastUpdate(lastUpdate: Option[LocalDateTime]): String =
+    lastUpdate match {
+      case Some(dateTime) =>
+        dateTime.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK))
+      case None           => ""
+    }
 }

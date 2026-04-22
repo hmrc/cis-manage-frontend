@@ -21,12 +21,13 @@ import config.FrontendAppConfig
 import models.{CisTaxpayerSearchResult, Target}
 import models.Target.*
 import models.requests.DataRequest
-import pages.AgentClientsPage
+import pages.{AgentClientsPage, CisIdPage}
 import play.api.Logging
 
 import javax.inject.{Inject, Named}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
+import repositories.SessionRepository
 import services.{ManageService, PrepopService}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -43,6 +44,7 @@ class AgentLandingController @Inject() (
   requireData: DataRequiredAction,
   manageService: ManageService,
   prepopService: PrepopService,
+  sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: AgentLandingView,
   appConfig: FrontendAppConfig
@@ -56,28 +58,27 @@ class AgentLandingController @Inject() (
       implicit val config: FrontendAppConfig = appConfig
       implicit val hc: HeaderCarrier         = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-      manageService
-        .getAgentLandingData(uniqueId, request.userAnswers, request.userId)
-        .map { viewModel =>
-          Ok(
-            view(
-              uniqueId = uniqueId,
-              clientName = viewModel.clientName,
-              employerRef = viewModel.employerRef,
-              utr = viewModel.utr.getOrElse(""),
-              // still hard-coded, mocked for now
-              returnsDueCount = 1,
-              returnsDueBy = java.time.LocalDate.of(2025, 10, 19),
-              newNoticesCount = 2,
-              lastSubmittedDate = java.time.LocalDate.of(2025, 9, 19),
-              lastSubmittedTaxMonth = java.time.YearMonth.of(2025, 8)
-            )
-          )
-        }
-        .recover { case e =>
-          logger.error(s"[AgentLandingController][onPageLoad] Failed for uniqueId=$uniqueId", e)
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
+      (for {
+        updatedUserAnswers <- Future.fromTry(request.userAnswers.set(CisIdPage, uniqueId))
+        _                  <- sessionRepository.set(updatedUserAnswers)
+        viewModel          <- manageService.getAgentLandingData(uniqueId, updatedUserAnswers, request.userId)
+      } yield Ok(
+        view(
+          uniqueId = uniqueId,
+          clientName = viewModel.clientName,
+          employerRef = viewModel.employerRef,
+          utr = viewModel.utr.getOrElse(""),
+          // still hard-coded, mocked for now
+          returnsDueCount = 1,
+          returnsDueBy = java.time.LocalDate.of(2025, 10, 19),
+          newNoticesCount = 2,
+          lastSubmittedDate = java.time.LocalDate.of(2025, 9, 19),
+          lastSubmittedTaxMonth = java.time.YearMonth.of(2025, 8)
+        )
+      )).recover { case e =>
+        logger.error(s"[AgentLandingController][onPageLoad] Failed for uniqueId=$uniqueId", e)
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
     }
 
   def onTargetClick(uniqueId: String, targetKey: String): Action[AnyContent] =

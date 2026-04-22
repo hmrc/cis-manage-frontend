@@ -1,0 +1,183 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import viewmodels.{SubmittedReturnsPageViewModel, SubmittedReturnsRowViewModel, StatusViewModel, ReturnTypeViewModel}
+@import views.html.components.*
+
+@this(
+    layout: templates.Layout,
+    govukTable: GovukTable,
+    govukSummaryList: GovukSummaryList,
+    caption: Caption,
+    h1: H1,
+    paragraph: Paragraph,
+    link: Link
+)
+
+@(viewModel: SubmittedReturnsPageViewModel)(implicit request: Request[_], messages: Messages)
+
+@pageHeading = @{
+    viewModel.selectedTaxYear match {
+        case Some(taxYear) => messages("history.returnHistory.singleYear.heading", taxYear, (taxYear.toInt + 1).toString)
+        case None          => messages("history.returnHistory.allYears.heading")
+    }
+}
+
+@pageTitleText = @{
+    viewModel.selectedTaxYear match {
+        case Some(taxYear) => messages("history.returnHistory.singleYear.title", taxYear, (taxYear.toInt + 1).toString)
+        case None          => messages("history.returnHistory.allYears.title")
+    }
+}
+
+@renderReturnType(returnType: ReturnTypeViewModel) = @{
+    returnType match {
+        case ReturnTypeViewModel.Standard => messages("history.returnHistory.returnType.standard")
+        case ReturnTypeViewModel.Nil      => messages("history.returnHistory.returnType.nil")
+        case ReturnTypeViewModel.Unknown  => ""
+    }
+}
+
+@renderStatus(status: StatusViewModel) = @{
+    status match {
+        case StatusViewModel.Text(messageKey) =>
+            Html(messages(messageKey))
+
+        case StatusViewModel.Link(linkValue, textKey, hiddenTextKey) =>
+            Html(
+                link(
+                    linkTextKey = textKey,
+                    linkUrl = linkValue.url,
+                    paragraphWrapped = false,
+                    visuallyHiddenText = Some(messages(hiddenTextKey, linkValue.hiddenText))
+                ).body
+            )
+    }
+}
+
+@renderMonthlyReturn(row: SubmittedReturnsRowViewModel) = @{
+    Html(
+        link(
+            linkTextKey = "site.view",
+            linkUrl = row.monthlyReturn.url,
+            paragraphWrapped = false,
+            visuallyHiddenText = Some(messages("history.returnHistory.hidden.monthlyReturn", row.monthlyReturn.hiddenText))
+        ).body
+    )
+}
+
+@layout(
+    pageTitle = titleNoForm(pageTitleText),
+    useFullWidth = true
+) {
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            @caption(messages("history.returnHistory.caption"))
+            @h1(pageHeading)
+
+            @if(viewModel.taxYears.isEmpty) {
+                @paragraph(messages("history.returnHistory.noSubmittedReturns"))
+            }
+        </div>
+    </div>
+
+    @if(viewModel.taxYears.nonEmpty) {
+        <div class="govuk-grid-row govuk-!-margin-top-5">
+            <div class="govuk-grid-column-full">
+                @for(taxYear <- viewModel.taxYears) {
+
+                    <h2 class="govuk-heading-m govuk-!-margin-bottom-4">
+                        @messages(
+                            "history.returnHistory.taxYear.caption",
+                            taxYear.fromYear.toString,
+                            taxYear.toYear.toString
+                        )
+                    </h2>
+
+                    <div class="return-history-desktop">
+                        <div class="return-history-table-wrapper">
+                            @govukTable(
+                                Table(
+                                    classes = "govuk-!-margin-bottom-8 return-history-table",
+                                    firstCellIsHeader = true,
+                                    head = Some(
+                                        Seq(
+                                            HeadCell(content = Text(messages("history.returnHistory.table.returnPeriodEnd")), classes = "rh-col-period"),
+                                            HeadCell(content = Text(messages("history.returnHistory.table.returnType")), classes = "rh-col-type"),
+                                            HeadCell(content = Text(messages("history.returnHistory.table.dateSubmitted")), classes = "rh-col-date"),
+                                            HeadCell(content = Text(messages("history.returnHistory.table.monthlyReturn")), classes = "rh-col-return"),
+                                            HeadCell(content = Text(messages("history.returnHistory.table.submissionReceipt")), classes = "rh-col-receipt"),
+                                            HeadCell(content = Text(messages("history.returnHistory.table.status")), classes = "rh-col-status")
+                                        )
+                                    ),
+                                    rows = taxYear.rows.map { row =>
+                                        Seq(
+                                            TableRow(content = Text(row.returnPeriodEnd), classes = "rh-col-period"),
+                                            TableRow(content = Text(renderReturnType(row.returnType)), classes = "rh-col-type"),
+                                            TableRow(content = Text(row.dateSubmitted), classes = "rh-col-date"),
+                                            TableRow(content = HtmlContent(renderMonthlyReturn(row)), classes = "rh-col-return"),
+                                            TableRow(content = HtmlContent(renderStatus(row.submissionReceipt)), classes = "rh-col-receipt"),
+                                            TableRow(content = HtmlContent(renderStatus(row.status)), classes = "rh-col-status")
+                                        )
+                                    }
+                                )
+                            )
+                        </div>
+                    </div>
+
+                    <div class="return-history-mobile govuk-!-margin-bottom-8">
+                        @for(row <- taxYear.rows) {
+                            @govukSummaryList(
+                                SummaryList(
+                                    classes = "govuk-!-margin-bottom-4",
+                                    card = Some(Card(title = Some(CardTitle(content = Text(row.returnPeriodEnd))))
+                                    ),
+                                    rows = Seq(
+                                        SummaryListRow(
+                                            key = Key(content = Text(messages("history.returnHistory.table.returnType"))),
+                                            value = Value(content = Text(renderReturnType(row.returnType))),
+                                        ),
+                                        SummaryListRow(
+                                            key = Key(content = Text(messages("history.returnHistory.table.dateSubmitted"))),
+                                            value = Value(content = Text(row.dateSubmitted)),
+                                        ),
+                                        SummaryListRow(
+                                            key = Key(content = Text(messages("history.returnHistory.table.monthlyReturn"))),
+                                            value = Value(content = HtmlContent(renderMonthlyReturn(row))),
+                                        ),
+                                        SummaryListRow(
+                                            key = Key(content = Text(messages("history.returnHistory.table.submissionReceipt"))),
+                                            value = Value(content = HtmlContent(renderStatus(row.submissionReceipt))),
+                                        ),
+                                        SummaryListRow(
+                                            key = Key(content = Text(messages("history.returnHistory.table.status"))),
+                                            value = Value(content = HtmlContent(renderStatus(row.status)))
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    </div>
+                }
+
+                @link(
+                    linkTextKey = "history.returnHistory.backLink",
+                    linkUrl = "#"
+                )
+            </div>
+        </div>
+    }
+}
