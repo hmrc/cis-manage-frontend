@@ -17,9 +17,11 @@
 package connectors
 
 import models.agent.AgentClientData
+import models.history.{MonthlyReturnCompleteResponse, SubmittedReturnsData}
+import models.requests.DeleteUnsubmittedMonthlyReturnRequest
 import models.{CisTaxpayer, CisTaxpayerSearchResult, GetClientListStatusResponse, Scheme, UnsubmittedMonthlyReturnsResponse}
 import play.api.Logging
-import play.api.http.Status.OK
+import play.api.http.Status.{NO_CONTENT, OK}
 import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2

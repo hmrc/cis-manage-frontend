@@ -16,22 +16,28 @@
 
 package services
 
-import models.history.{SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSubmissionData}
-import viewmodels.{LinkViewModel, ReturnTypeViewModel, StatusViewModel, SubmittedReturnsPageViewModel, SubmittedReturnsRowViewModel, TaxYearHistoryViewModel}
+import connectors.ConstructionIndustrySchemeConnector
+import models.history.{MonthlyReturnCompleteResponse, SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSubmissionData}
+import uk.gov.hmrc.http.HeaderCarrier
+import viewmodels.{LinkViewModel, ReturnTypeViewModel, StatusViewModel, SubmissionReceiptItemViewModel, SubmissionReceiptViewModel, SubmittedReturnsPageViewModel, SubmittedReturnsRowViewModel, TaxYearHistoryViewModel}
 import viewmodels.StatusViewModel.Text
 
-import java.time.format.DateTimeFormatter
-import java.time.{Instant, YearMonth, ZoneId, ZoneOffset, ZonedDateTime}
+import java.time.format.{DateTimeFormatter, TextStyle}
+import java.time.{Instant, LocalDateTime, Month, YearMonth, ZoneId, ZoneOffset, ZonedDateTime}
+import java.util.Locale
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmittedReturnsService @Inject() {
+class SubmittedReturnsService @Inject() (
+  connector: ConstructionIndustrySchemeConnector
+)(implicit ec: ExecutionContext) {
 
   private val ukTimezone: ZoneId                         = ZoneId.of("Europe/London")
-  private val displayDateFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("d MMM yyyy")
+  private val displayDateFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.UK)
   private val shortMonthYearFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM yyyy")
   private val amendmentCutOffInstant: Instant            = ZonedDateTime.of(2016, 2, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant
+  private val displayTimeFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("h:mma", Locale.UK)
 
   def buildAllYearsViewModel(data: SubmittedReturnsData): Option[SubmittedReturnsPageViewModel] =
     Some(
@@ -81,6 +87,7 @@ class SubmittedReturnsService @Inject() {
     val periodEndText     = buildReturnPeriodEnd(monthlyReturn)
     val returnType        = buildReturnType(monthlyReturn)
     val dateSubmittedText = buildDateSubmittedText(submissionOpt)
+    val amendment         = if (monthlyReturn.supersededBy.isDefined) "Y" else "N"
 
     SubmittedReturnsRowViewModel(
       returnPeriodEnd = periodEndText,
@@ -90,7 +97,8 @@ class SubmittedReturnsService @Inject() {
         url = "#", // TODO: F2 and F3 - replace with real route of page sr-04 Print monthly return
         hiddenText = periodEndText
       ),
-      submissionReceipt = buildSubmissionReceipt(submissionOpt, periodEndText),
+      submissionReceipt =
+        buildSubmissionReceipt(submissionOpt, periodEndText, monthlyReturn.taxYear, monthlyReturn.taxMonth, amendment),
       status = buildStatus(monthlyReturn, submissionOpt)
     )
   }
@@ -117,12 +125,17 @@ class SubmittedReturnsService @Inject() {
 
   private def buildSubmissionReceipt(
     submissionOpt: Option[SubmittedSubmissionData],
-    periodEndText: String
+    periodEndText: String,
+    taxYear: Int,
+    taxMonth: Int,
+    amendment: String
   ): StatusViewModel =
     if (isSubmissionReceiptAvailable(submissionOpt)) {
+
       StatusViewModel.Link(
         link = LinkViewModel(
-          url = "#", // TODO: F2 and F3 - replace with real route of page SR-02-f View/save submitted return
+          url =
+            s"/construction-industry-scheme/management/monthly-return/confirmation-history?taxYear=$taxYear&taxMonth=$taxMonth&amendment=$amendment",
           hiddenText = s"submission receipt for $periodEndText"
         ),
         textKey = "site.view",
@@ -247,7 +260,7 @@ class SubmittedReturnsService @Inject() {
         scala.util.Try {
           val dateTime = LocalDateTime.parse(ts.take(19)).atZone(ukTimezone)
           val time     = dateTime.format(displayTimeFormatter)
-          val date     = dateTime.toLocalDate.format(displayDateFormatter)
+          val date     = dateTime.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK))
           s"$time on $date"
         }.toOption
       }

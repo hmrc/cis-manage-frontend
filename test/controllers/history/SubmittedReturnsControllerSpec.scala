@@ -19,15 +19,12 @@ package controllers.history
 import base.SpecBase
 import models.UserAnswers
 import models.history.{SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSchemeData, SubmittedSubmissionData}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CisIdPage
 import pages.history.SubmittedReturnsDataPage
 import play.api.Application
-import pages.CisIdPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -36,8 +33,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.*
 import views.html.history.SubmittedReturnsView
 import views.html.monthlyreturns.SubmissionSuccessView
-
-import scala.concurrent.Future
 
 import java.time.Instant
 import scala.concurrent.Future
@@ -95,6 +90,8 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
       )
     )
   )
+
+  private val mockService: SubmittedReturnsService = mock[SubmittedReturnsService]
 
   trait Setup {
     val mockSubmittedReturnsService: SubmittedReturnsService = mock[SubmittedReturnsService]

@@ -21,13 +21,10 @@ import models.history.SubmittedReturnsData
 import models.requests.DataRequest
 import pages.CisIdPage
 import pages.history.SubmittedReturnsDataPage
-import pages.{CisIdPage, SubmittedReturnsDataPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{ManageService, SubmittedReturnsService}
-import uk.gov.hmrc.http.HeaderCarrier
-import services.{StubSubmittedReturnsData, SubmittedReturnsService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
@@ -117,7 +114,7 @@ class SubmittedReturnsController @Inject() (
 
       request.userAnswers.get(CisIdPage) match {
         case Some(instanceId) =>
-          service
+          submittedReturnsService
             .getMonthlyReturnComplete(instanceId, taxYear, taxMonth, amendment)
             .map {
               case Right(vm)    => Ok(confirmationView(vm))

@@ -17,16 +17,25 @@
 package services
 
 import base.SpecBase
+import connectors.ConstructionIndustrySchemeConnector
 
 import java.time.Instant
 import models.history.*
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.*
 import org.scalatest.matchers.should.Matchers.*
+import org.scalatestplus.mockito.MockitoSugar
+import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ReturnTypeViewModel, StatusViewModel, SubmittedReturnsRowViewModel}
 import viewmodels.StatusViewModel.Text
 
-class SubmittedReturnsServiceSpec extends SpecBase {
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-  private val service = new SubmittedReturnsService()
+class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
+
+  private val mockConnector = mock[ConstructionIndustrySchemeConnector]
+  private val service       = new SubmittedReturnsService(mockConnector)
 
   private val baseScheme = SubmittedSchemeData(
     name = "Test Scheme",
