@@ -19,8 +19,9 @@ package services
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
+import models.history.{SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSchemeData, SubmittedSubmissionData}
 import models.requests.DeleteUnsubmittedMonthlyReturnRequest
-import models.{CisTaxpayer, CisTaxpayerSearchResult, Deletable, NotDeletable, UnsubmittedMonthlyReturnsResponse, UnsubmittedMonthlyReturnsRow, UserAnswers}
+import models.*
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
@@ -410,6 +411,69 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       ex mustBe boom
 
       verify(connector).getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+  }
+
+  "getSubmittedMonthlyReturns" should {
+
+    "delegate to connector and return response (happy path)" in {
+      val (service, connector, sessionRepo) = newService()
+      val instanceId                        = "900063"
+
+      val resp = SubmittedReturnsData(
+        scheme = SubmittedSchemeData(
+          name = "ABC Construction Ltd",
+          taxOfficeNumber = "123",
+          taxOfficeReference = "AB456"
+        ),
+        monthlyReturns = Seq(
+          SubmittedMonthlyReturnData(
+            monthlyReturnId = 1L,
+            taxYear = 2025,
+            taxMonth = 1,
+            nilReturnIndicator = "Y",
+            status = "SUBMITTED",
+            supersededBy = None,
+            amendmentStatus = None,
+            monthlyReturnItems = None
+          )
+        ),
+        submissions = Seq(
+          SubmittedSubmissionData(
+            submissionId = 100L,
+            submissionType = Some("MONTHLY_RETURN"),
+            activeObjectId = Some(1L),
+            status = "ACCEPTED",
+            hmrcMarkGenerated = None,
+            hmrcMarkGgis = None,
+            emailRecipient = Some("test@test.com"),
+            acceptedTime = None
+          )
+        )
+      )
+
+      when(connector.getSubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(resp))
+
+      service.getSubmittedMonthlyReturns(instanceId).futureValue mustBe resp
+
+      verify(connector).getSubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+
+    "propagate failure from connector" in {
+      val (service, connector, sessionRepo) = newService()
+      val instanceId                        = "900063"
+      val boom                              = new RuntimeException("Backend error")
+
+      when(connector.getSubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(boom))
+
+      val ex = service.getSubmittedMonthlyReturns(instanceId).failed.futureValue
+      ex mustBe boom
+
+      verify(connector).getSubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier])
       verifyNoInteractions(sessionRepo)
     }
   }

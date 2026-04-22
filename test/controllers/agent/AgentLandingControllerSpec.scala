@@ -20,13 +20,15 @@ import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.ArgumentCaptor
 import models.{CisTaxpayerSearchResult, Scheme, UserAnswers}
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
-import pages.AgentClientsPage
+import pages.{AgentClientsPage, CisIdPage}
 import play.api.Application
 import play.api.inject.bind
 import play.api.mvc.Call
+import repositories.SessionRepository
 import services.{ManageService, PrepopService}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import viewmodels.agent.AgentLandingViewModel
@@ -62,7 +64,8 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
   "AgentLandingController.onPageLoad" - {
 
     "must return OK and render the page when the service succeeds" in {
-      val mockManageService = mock[ManageService]
+      val mockManageService     = mock[ManageService]
+      val mockSessionRepository = mock[SessionRepository]
 
       when(
         mockManageService.getAgentLandingData(
@@ -72,11 +75,15 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
         )(using any[HeaderCarrier])
       ).thenReturn(Future.successful(landingViewModel))
 
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
       val application: Application =
         applicationBuilder(
           userAnswers = Some(userAnswersWithCisId),
           additionalBindings = Seq(
-            bind[ManageService].toInstance(mockManageService)
+            bind[ManageService].toInstance(mockManageService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
           ),
           isAgent = true
         ).build()
@@ -91,6 +98,10 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
         body must include("Test Client")
         body must include("123/AB456")
         body must include("1234567890")
+
+        val savedAnswersCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockSessionRepository).set(savedAnswersCaptor.capture())
+        savedAnswersCaptor.getValue.get(CisIdPage) mustBe Some(uniqueId)
 
         verify(mockManageService)
           .getAgentLandingData(eqTo(uniqueId), any[UserAnswers], eqTo(userId))(using any[HeaderCarrier])
