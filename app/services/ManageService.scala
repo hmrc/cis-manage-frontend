@@ -161,22 +161,8 @@ class ManageService @Inject() (
 
     (contractorNameOpt, linksOpt) match {
       case (Some(name), Some((standardLink, nilLink))) =>
-        getUnsubmittedMonthlyReturns(instanceId).map { response =>
-          val returnsList =
-            response.unsubmittedCisReturns.map { r =>
-              ReturnLandingViewModel(
-                monthlyReturnId = r.monthlyReturnId,
-                taxMonth = formatPeriod(r.taxMonth, r.taxYear),
-                returnType = r.returnType,
-                dateSubmitted = formatLastUpdate(r.lastUpdate),
-                status = r.status,
-                amendment = r.amendment
-              )
-            }
-          Some(ReturnsLandingContext(name, standardLink, nilLink, returnsList))
-        }
-
-      case _ =>
+        Future.successful(Some(ReturnsLandingContext(name, standardLink, nilLink)))
+      case _                                           =>
         Future.successful(None)
     }
   }

@@ -480,7 +480,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
   "buildReturnsLandingContext" should {
 
-    "return Some(context) for agent when name + client exist and connector returns returns" in {
+    "return Some(context) for agent when name + client exist" in {
       val (service, connector, sessionRepo) = newService()
 
       when(appConfig.fileStandardReturnUrl(any[String])).thenReturn("/standard")
@@ -491,24 +491,12 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       val ua = UserAnswers("test-user").set(AgentClientsPage, List(client)).get
 
-      val mockResponse = UnsubmittedMonthlyReturnsResponse(
-        unsubmittedCisReturns = Seq(
-          UnsubmittedMonthlyReturnsRow(3000L, 2025, 1, "Nil", "In Progress", None, Some("Y"), true),
-          UnsubmittedMonthlyReturnsRow(3001L, 2025, 2, "Nil", "In Progress", Some(LocalDateTime.now()), Some("Y"), true)
-        )
-      )
-
-      when(connector.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(mockResponse))
-
       val context = service.buildReturnsLandingContext(instanceId, ua, isAgent = true).futureValue
 
       context.isDefined mustBe true
       context.get.contractorName mustBe "Client Ltd"
       context.get.standardReturnLink mustBe "/standard"
       context.get.nilReturnLink mustBe "/nil"
-
-      verify(connector).getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier])
       verifyNoInteractions(sessionRepo)
     }
 
@@ -532,18 +520,12 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       val ua = UserAnswers("test-user").set(ContractorNamePage, "Org Ltd").get
 
-      val resp = UnsubmittedMonthlyReturnsResponse(Nil)
-      when(connector.getUnsubmittedMonthlyReturns(eqTo("CIS-123"))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(resp))
-
       val context = service.buildReturnsLandingContext("CIS-123", ua, isAgent = false).futureValue
 
       context.isDefined mustBe true
       context.get.contractorName mustBe "Org Ltd"
       context.get.standardReturnLink mustBe "/standard-org"
       context.get.nilReturnLink mustBe "/nil-org"
-
-      verify(connector).getUnsubmittedMonthlyReturns(eqTo("CIS-123"))(any[HeaderCarrier])
       verifyNoInteractions(sessionRepo)
     }
 
