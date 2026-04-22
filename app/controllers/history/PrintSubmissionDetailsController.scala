@@ -48,7 +48,7 @@ class PrintSubmissionDetailsController @Inject() (
     request.userAnswers.get(SubmittedMonthlyReturnToPrintQuery) match {
       case Some(monthlyReturnToPrint) =>
         service
-          .getSubmittedMonthlyReturns(
+          .getSubmittedMonthlyReturnsData(
             monthlyReturnToPrint.instanceId,
             monthlyReturnToPrint.taxYear,
             monthlyReturnToPrint.taxYear,
@@ -59,7 +59,7 @@ class PrintSubmissionDetailsController @Inject() (
             val monthYear              = monthlyReturnToPrint.monthYear(langCode) // "April 2026"
             val submittedTime          = "8:46am"
             val submittedDate          = "16 March 2025"
-            val receiptReferenceNumber = response.receiptReferenceNumber
+            val receiptReferenceNumber = response.hmrcMarkGgis
               .map(IrMarkReferenceGenerator.fromBase64)
               .getOrElse("") // "6QEDAHDREBY455GDNCPMDCNDFBDBJSJSJDNDDHDJDZ5"
             val submissionType         = response.returnType.toLowerCase // "Monthly return"

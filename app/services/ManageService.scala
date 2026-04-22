@@ -20,7 +20,8 @@ import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
 import models.history.SubmittedReturnsData
-import models.requests.DeleteUnsubmittedMonthlyReturnRequest
+import models.requests.*
+import models.response.*
 import models.*
 import pages.*
 import play.api.Logging
@@ -217,8 +218,10 @@ class ManageService @Inject() (
 
   def getSubmittedMonthlyReturnsData(instanceId: String, taxYear: Int, taxMonth: Int, amendment: String)(implicit
     hc: HeaderCarrier
-  ): Future[GetSubmittedMonthlyReturnResponse] =
-    cisConnector.getSubmittedMonthlyReturn(GetSubmittedMonthlyReturnsRequest(instanceId, taxYear, taxMonth, amendment))
+  ): Future[GetSubmittedMonthlyReturnsDataResponse] =
+    cisConnector.getSubmittedMonthlyReturnsData(
+      GetSubmittedMonthlyReturnsDataRequest(instanceId, taxYear, taxMonth, amendment)
+    )
 
   private def formatPeriod(taxMonth: Int, taxYear: Int): String = {
     val monthName = java.time.Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)

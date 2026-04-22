@@ -19,7 +19,7 @@ package models.response
 import models.MonthlyReturnItem
 import play.api.libs.json.{Json, OFormat}
 
-case class GetSubmittedMonthlyReturnResponse(
+case class GetSubmittedMonthlyReturnsDataResponse(
   // scheme: ContractorScheme,
   taxOfficeNumber: String,
   taxOfficeReference: String,
@@ -32,8 +32,8 @@ case class GetSubmittedMonthlyReturnResponse(
   monthlyReturnItems: Seq[MonthlyReturnItem],
   // submission: Submission,
   acceptedTime: Option[String],
-  receiptReferenceNumber: Option[String] // hmrcMarkGgis: Option[String],
+  hmrcMarkGgis: Option[String] // hmrcMarkGgis: Option[String],
 )
 
-object GetSubmittedMonthlyReturnResponse:
-  given format: OFormat[GetSubmittedMonthlyReturnResponse] = Json.format[GetSubmittedMonthlyReturnResponse]
+object GetSubmittedMonthlyReturnsDataResponse:
+  given format: OFormat[GetSubmittedMonthlyReturnsDataResponse] = Json.format[GetSubmittedMonthlyReturnsDataResponse]
