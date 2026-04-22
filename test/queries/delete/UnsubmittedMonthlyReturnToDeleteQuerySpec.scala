@@ -17,10 +17,8 @@
 package queries.delete
 
 import base.SpecBase
-import models.UnsubmittedMonthlyReturn
+import models.UnsubmittedMonthlyReturnsRow
 import play.api.libs.json.JsPath
-
-import java.time.Instant
 
 class UnsubmittedMonthlyReturnToDeleteQuerySpec extends SpecBase {
   "UnsubmittedMonthlyReturnToDeleteQuery" - {
@@ -34,18 +32,16 @@ class UnsubmittedMonthlyReturnToDeleteQuerySpec extends SpecBase {
     }
 
     "set, get, and remove a value in UserAnswers" in {
-      val now: Instant = Instant.parse("2026-04-09T12:34:56.789Z")
 
-      val deletableReturn = UnsubmittedMonthlyReturn(
-        instanceId = "1",
+      val deletableReturn = UnsubmittedMonthlyReturnsRow(
         monthlyReturnId = 3000L,
         taxYear = 2025,
         taxMonth = 1,
         returnType = "Nil",
         status = "STARTED",
+        lastUpdate = None,
         amendment = Some("Y"),
-        deletable = true,
-        lastUpdated = now
+        deletable = true
       )
 
       val ua1 = emptyUserAnswers.set(UnsubmittedMonthlyReturnToDeleteQuery, deletableReturn).success.value
