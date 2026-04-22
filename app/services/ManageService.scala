@@ -26,12 +26,10 @@ import play.api.Logging
 import play.api.libs.json.Json
 import repositories.{SessionRepository, UnsubmittedMonthlyReturnRepository}
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.{ReturnLandingViewModel, ReturnsLandingContext}
+import viewmodels.ReturnsLandingContext
 import viewmodels.agent.AgentLandingViewModel
 
-import java.time.{Clock, Instant, LocalDateTime}
-import java.time.format.{DateTimeFormatter, TextStyle}
-import java.util.Locale
+import java.time.{Clock, Instant}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -148,7 +146,7 @@ class ManageService @Inject() (
           client  <- clients.find(_.uniqueId == instanceId)
         } yield (
           appConfig.fileStandardReturnUrl(instanceId),
-          appConfig.fileNilReturnUrl(instanceId)
+          appConfig.fileNilReturnUrl(instanceId),
         )
       } else {
         Some((appConfig.fileStandardReturnUrl, appConfig.fileNilReturnUrl))
@@ -157,18 +155,6 @@ class ManageService @Inject() (
     (contractorNameOpt, linksOpt) match {
       case (Some(name), Some((standardLink, nilLink))) =>
         getUnsubmittedMonthlyReturns(instanceId).flatMap { response =>
-
-          val returnsList =
-            response.unsubmittedCisReturns.map { r =>
-              ReturnLandingViewModel(
-                monthlyReturnId = r.monthlyReturnId,
-                taxMonth = formatPeriod(r.taxMonth, r.taxYear),
-                returnType = r.returnType,
-                dateSubmitted = formatLastUpdate(r.lastUpdate),
-                status = r.status,
-                amendment = r.amendment
-              )
-            }
 
           val unsubmittedReturnsToPersist = response.unsubmittedCisReturns.map { r =>
             UnsubmittedMonthlyReturn(
@@ -186,7 +172,9 @@ class ManageService @Inject() (
 
           for {
             _ <- Future.traverse(unsubmittedReturnsToPersist)(unsubmittedReturnRepository.upsert)
-          } yield Some(ReturnsLandingContext(name, standardLink, nilLink, returnsList))
+          } yield Some(
+            ReturnsLandingContext(name, standardLink, nilLink)
+          )
         }
 
       case _ =>
@@ -205,16 +193,4 @@ class ManageService @Inject() (
         amendment = returnToDelete.amendment.getOrElse("N")
       )
     )
-
-  private def formatPeriod(taxMonth: Int, taxYear: Int): String = {
-    val monthName = java.time.Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)
-    s"$monthName $taxYear"
-  }
-
-  private def formatLastUpdate(lastUpdate: Option[LocalDateTime]): String =
-    lastUpdate match {
-      case Some(dateTime) =>
-        dateTime.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK))
-      case None           => ""
-    }
 }

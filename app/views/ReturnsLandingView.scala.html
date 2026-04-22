@@ -38,10 +38,11 @@
     nav: Nav,
     paragraphWithLinks: ParagraphWithLinks,
     caption: Caption,
-    tableRowTagColour: TableRowTagColour
+    tableRowTagColour: TableRowTagColour,
+    ptaCard: PtaCard
 )
 
-@(contractorName: String, returnsList: Seq[ReturnLandingViewModel], standardReturnLink: String, nilReturnLink: String)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
+@(contractorName: String, standardReturnLink: String, nilReturnLink: String)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
 
 @sidebar = {
     @aside("returnsLanding.aside.h2", nav(Seq(
@@ -52,124 +53,40 @@
     )))
 }
 
-@htmlNotificationBanner = {
-    @paragraph("returnsLanding.banner.header", extraClasses = "govuk-notification-banner__heading")
-    @paragraph(messages("returnsLanding.banner.p1"))
-    @paragraphWithLinks(
-        linkTextUrlOne = "returnsLanding.banner.p2.link1",
-        linkUrlOne = standardReturnLink,
-        suffixTextKey = "returnsLanding.banner.p2.text",
-        linkTextUrlTwo = "returnsLanding.banner.p2.link2",
-        linkUrlTwo = nilReturnLink
-    )
-}
-
 @layout(
     pageTitle = titleNoForm(messages("returnsLanding.title")),
     showSignOut = false,
     sidebar = Some(sidebar)
 ) {
 
-    @govukNotificationBanner(NotificationBanner(
-        content = HtmlContent(htmlNotificationBanner)
-    ))
-
     @caption(contractorName)
     @h1(messages("returnsLanding.heading"))
 
     @twoColumnGrid(
-        HtmlFormat.fill(Seq(
-            headingLink("returnsLanding.fileStandardReturn.h3.link", standardReturnLink),
-            paragraph("returnsLanding.fileStandardReturn.p1")
-        )),
-        HtmlFormat.fill(Seq(
-            headingLink("returnsLanding.fileNilReturn.h3.link", nilReturnLink),
-            paragraph("returnsLanding.fileNilReturn.p1")
-        ))
+        ptaCard(
+            title = messages("returnsLanding.fileMonthlyReturn.h3.link"),
+            link = standardReturnLink,
+            content = Html(messages("returnsLanding.fileMonthlyReturn.p1"))
+        ),
+        ptaCard(
+            title = messages("returnsLanding.fileNilReturn.h3.link"),
+            link = nilReturnLink,
+            content = Html(messages("returnsLanding.fileNilReturn.p1"))
+        )
     )
 
     @twoColumnGrid(
-        HtmlFormat.fill(Seq(
-            headingLink("returnsLanding.amendReturn.h3.link", config.amendReturnUrl),
-            paragraph("returnsLanding.amendReturn.p1")
-        )),
-        HtmlFormat.fill(Seq(
-            headingLink("returnsLanding.paymentsAndDeductions.h3.link", config.paymentsAndDeductionsUrl),
-            paragraph("returnsLanding.paymentsAndDeductions.p1")
-        ))
-    )
-
-    @oneColumnGrid(
-        HtmlFormat.fill(Seq(
-            headingLink("returnsLanding.noticesAndStatements.h3.link", config.noticesAndStatementsUrl),
-            paragraph("returnsLanding.noticeAndStatements.p1")
-        ))
-    )
-
-    @sectionBreak()
-
-    @h2(messages("returnsLanding.recentCisReturns.h2"))
-
-    @if(returnsList.isEmpty) {
-        @paragraph(messages("returnsLanding.noUnsubmittedReturns"))
-    } else  {
-        @govukTable(
-            Table(
-                head = Some(
-                    Seq(
-                        "returnsLanding.taxMonth.th",
-                        "returnsLanding.type.th",
-                        "returnsLanding.status.th",
-                        "returnsLanding.lastUpdated.th",
-                        "site.delete"
-                    ).map { key =>
-                        HeadCell(content = Text(messages(key)))
-                    }
-                ),
-                rows = returnsList.map { item =>
-                    val isFailed = item.status.trim.equalsIgnoreCase("Failed")
-
-                    Seq(
-                        TableRow(
-                            content =
-                                if (!isFailed) HtmlContent(s"""<a href="#" class="govuk-link">${item.taxMonth}</a>""")
-                                else Text(item.taxMonth),
-                            classes = "govuk-table__header"
-                        ),
-                        TableRow(content = Text(item.returnType)),
-                        TableRow(
-                            content = {
-                                val tag = tableRowTagColour(
-                                    text = item.status,
-                                    colour = item.status.trim.toUpperCase match {
-                                        case "IN PROGRESS" => "govuk-tag--light-blue"
-                                        case "AWAITING CONFIRMATION" => "govuk-tag--blue"
-                                        case "FAILED" => "govuk-tag--red"
-                                        case _ => "govuk-tag--light-blue"
-                                    }
-                                )
-
-                                if (isFailed)
-                                    HtmlContent(s"""<a href="#" class="govuk-link">$tag</a>""")
-                                else
-                                    HtmlContent(tag)
-                            }
-                        ),
-                        TableRow(content = Text(item.dateSubmitted)),
-                        TableRow(content =
-                            if (item.status.trim.equalsIgnoreCase("In progress")) {
-                                HtmlContent(
-                                    s"""<a href="${controllers.routes.ReturnsLandingController.onDeleteRedirect(item.monthlyReturnId).url}" class="govuk-link">Delete</a>"""
-                                )
-                            } else {
-                                HtmlContent("")
-                            }
-                        )
-                    )
-                }
-            )
+        ptaCard(
+            title = messages("returnsLanding.viewSubmittedReturns.h3.link"),
+            link = controllers.history.routes.SubmittedReturnsChooseTaxYearController.onPageLoad().url,
+            content = Html(messages("returnsLanding.viewSubmittedReturns.p1"))
+        ),
+        ptaCard(
+            title = messages("returnsLanding.incompleteReturns.h3.link"),
+            link = "#",
+            content = Html(messages("returnsLanding.incompleteReturns.p1"))
         )
-    }
+    )
 
-    @link(linkTextKey = "returnsLanding.viewReturnsHistory.link", linkUrl = config.viewReturnsHistoryUrl)
+    @link(linkTextKey = "returnsLanding.returnToHome.link", linkUrl = controllers.contractor.routes.ContractorLandingController.onPageLoad().url)
 }
