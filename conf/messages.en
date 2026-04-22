@@ -16,6 +16,7 @@ site.pagination.previous = Previous
 site.pagination.next = Next
 site.delete = Delete
 site.or = or
+site.view = View
 
 date.day = Day
 date.month = Month
@@ -399,7 +400,7 @@ addContractorDetails.p1 = This is a placeholder page for adding contractor detai
 
 delete.deleteMonthlyReturn.title = Are you sure you want to delete the monthly return for {0}?
 delete.deleteMonthlyReturn.heading = Are you sure you want to delete the monthly return for {0}?
-delete.deleteMonthlyReturn.error.required = Select ‘Yes’ to delete the return.
+delete.deleteMonthlyReturn.error.required = Select yes to delete this return
 
 delete.deleteNilMonthlyReturn.title = Are you sure you want to delete the nil monthly return for {0}?
 delete.deleteNilMonthlyReturn.heading = Are you sure you want to delete the nil monthly return for {0}?
@@ -411,7 +412,7 @@ delete.deleteAmendedMonthlyReturn.error.required = Select yes to delete this ame
 
 delete.deleteAmendedNilMonthlyReturn.title = Are you sure you want to delete the amended nil monthly return for {0}?
 delete.deleteAmendedNilMonthlyReturn.heading = Are you sure you want to delete the amended nil monthly return for {0}?
-delete.deleteAmendedNilMonthlyReturn.error.required = Select yes to delete this amended nil monthly return.
+delete.deleteAmendedNilMonthlyReturn.error.required = Select yes to delete this amended nil monthly return
 
 history.submittedReturnsChooseTaxYear.title = Which tax year do you want to view?
 history.submittedReturnsChooseTaxYear.heading = Which tax year do you want to view?
@@ -442,3 +443,32 @@ history.printSubmissionDetails.paymentsMadeToSubcontractors.taxDeducted = Tax de
 history.printSubmissionDetails.printThisPage.link = Print this page
 history.printSubmissionDetails.monthlyReturnHistory.link = Return to Monthly return history
 
+history.returnHistory.allYears.title = Monthly return history for all tax years
+history.returnHistory.allYears.heading = Monthly return history for all tax years
+history.returnHistory.singleYear.title = Monthly return history for tax year {0} to {1}
+history.returnHistory.singleYear.heading = Monthly return history for tax year {0} to {1}
+history.returnHistory.caption = Submitted returns
+history.returnHistory.noSubmittedReturns = You have not submitted any monthly returns. // TODO: confirm if this message is needed
+history.returnHistory.taxYear.caption = Tax year {0} to {1}
+history.returnHistory.table.returnPeriodEnd = Return period ended
+history.returnHistory.table.returnType = Type
+history.returnHistory.table.dateSubmitted = Date submitted
+history.returnHistory.table.monthlyReturn = Monthly return
+history.returnHistory.table.submissionReceipt = Submission receipt
+history.returnHistory.table.status = Status
+history.returnHistory.returnType.standard = Standard
+history.returnHistory.returnType.nil = Nil
+history.returnHistory.backLink = Return to View tax year
+history.returnHistory.status.awaitingConfirmation = Awaiting confirmation
+history.returnHistory.status.amend = Amend
+history.returnHistory.status.notAvailable = Not available
+history.returnHistory.status.awaitingConfirmation = Awaiting confirmation
+history.returnHistory.status.inProgress = In progress
+
+amend.noReturnsSubmitted.title = You have not submitted any returns
+amend.noReturnsSubmitted.heading = You have not submitted any returns
+amend.noReturnsSubmitted.p1 = To view a monthly return, or make any amendments, you must file one first.
+amend.noReturnsSubmitted.p2 = You can do this in
+amend.noReturnsSubmitted.p2.link = Manage your CIS return
+amend.noReturnsSubmitted.p3 = Find out more about
+amend.noReturnsSubmitted.p3.link = what you must do as a CIS contractor

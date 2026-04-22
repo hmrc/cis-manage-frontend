@@ -18,9 +18,9 @@ package controllers.delete
 
 import base.SpecBase
 import forms.delete.DeleteAmendedMonthlyReturnFormProvider
-import models.{NormalMode, UnsubmittedMonthlyReturn, UserAnswers}
+import models.{Deletable, NormalMode, NotDeletable, UnsubmittedMonthlyReturnsRow, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verifyNoInteractions, when}
+import org.mockito.Mockito.{never, verify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.delete.DeleteAmendedMonthlyReturnPage
 import play.api.data.Form
@@ -30,9 +30,9 @@ import play.api.test.Helpers.*
 import queries.delete.UnsubmittedMonthlyReturnToDeleteQuery
 import repositories.SessionRepository
 import services.ManageService
+import uk.gov.hmrc.http.HeaderCarrier
 import views.html.delete.DeleteAmendedMonthlyReturnView
 
-import java.time.Instant
 import scala.concurrent.Future
 
 class DeleteAmendedMonthlyReturnControllerSpec extends SpecBase with MockitoSugar {
@@ -40,11 +40,9 @@ class DeleteAmendedMonthlyReturnControllerSpec extends SpecBase with MockitoSuga
   val formProvider        = new DeleteAmendedMonthlyReturnFormProvider()
   val form: Form[Boolean] = formProvider()
 
+  val deletableRow        = UnsubmittedMonthlyReturnsRow(3000L, 2026, 4, "Standard", "In Progress", None, Some("Y"), true)
   val baseUa: UserAnswers = userAnswersWithCisId
-    .set(
-      UnsubmittedMonthlyReturnToDeleteQuery,
-      UnsubmittedMonthlyReturn("1", 3000L, 2026, 4, "Standard", "In Progress", Some("Y"), true, Instant.now())
-    )
+    .set(UnsubmittedMonthlyReturnToDeleteQuery, deletableRow)
     .success
     .value
 
@@ -98,9 +96,14 @@ class DeleteAmendedMonthlyReturnControllerSpec extends SpecBase with MockitoSuga
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val mockManageService = mock[ManageService]
+
+      when(
+        mockManageService.checkUnsubmittedMonthlyReturnDeletion(any[UserAnswers], any[Long])(any[HeaderCarrier])
+      ).thenReturn(Future.successful(Deletable(deletableRow)))
+
       when(
         mockManageService
-          .deleteUnsubmittedMonthlyReturn(any[UnsubmittedMonthlyReturn])(any())
+          .deleteUnsubmittedMonthlyReturn(any[UserAnswers], any[UnsubmittedMonthlyReturnsRow])(any())
       ).thenReturn(Future.successful(()))
 
       val application =
@@ -205,13 +208,31 @@ class DeleteAmendedMonthlyReturnControllerSpec extends SpecBase with MockitoSuga
       }
     }
 
-    "must redirect to Journey Recovery for a POST if delete api failed" in {
+    "must redirect to Journey Recovery for a POST if CisId missing in user answers" in {
+
+      val userAnswers: UserAnswers =
+        emptyUserAnswers.set(UnsubmittedMonthlyReturnToDeleteQuery, deletableRow).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, deleteAmendedMonthlyReturnRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if record is not deletable" in {
       val mockSessionRepository = mock[SessionRepository]
       val mockManageService     = mock[ManageService]
-      when(
-        mockManageService
-          .deleteUnsubmittedMonthlyReturn(any[UnsubmittedMonthlyReturn])(any())
-      ).thenReturn(Future.failed(new RuntimeException("boom")))
+
+      when(mockManageService.checkUnsubmittedMonthlyReturnDeletion(any[UserAnswers], any[Long])(any()))
+        .thenReturn(Future.successful(NotDeletable))
 
       val application =
         applicationBuilder(userAnswers = Some(baseUa))
@@ -233,6 +254,7 @@ class DeleteAmendedMonthlyReturnControllerSpec extends SpecBase with MockitoSuga
       }
 
       verifyNoInteractions(mockSessionRepository)
+      verify(mockManageService, never()).deleteUnsubmittedMonthlyReturn(any(), any())(any())
     }
 
     "must redirect to Journey Recovery for a GET if UnsubmittedReturnToDeleteQuery is missing" in {

@@ -16,9 +16,12 @@
 
 package models
 
+import play.api.i18n.Lang
 import play.api.libs.json.{Json, OFormat}
 
 import java.time.LocalDateTime
+import java.util.Locale
+import utils.Utils.monthName
 
 case class UnsubmittedMonthlyReturnsRow(
   monthlyReturnId: Long,
@@ -29,7 +32,12 @@ case class UnsubmittedMonthlyReturnsRow(
   lastUpdate: Option[LocalDateTime],
   amendment: Option[String],
   deletable: Boolean
-)
+) {
+  def monthYear(langCode: String): String = {
+    val locale: Locale = Lang.get(langCode).map(_.locale).getOrElse(Locale.UK)
+    s"${monthName(taxMonth, locale)} $taxYear"
+  }
+}
 
 object UnsubmittedMonthlyReturnsRow {
   given format: OFormat[UnsubmittedMonthlyReturnsRow] = Json.format[UnsubmittedMonthlyReturnsRow]

@@ -18,14 +18,13 @@ package controllers.actions
 
 import base.SpecBase
 import controllers.Execution.trampoline
+import models.UnsubmittedMonthlyReturnsRow
 import models.requests.DataRequest
-import models.UnsubmittedMonthlyReturn
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import queries.delete.UnsubmittedMonthlyReturnToDeleteQuery
 
-import java.time.Instant
 import scala.concurrent.Future
 
 class DeletableReturnActionSpec extends SpecBase with MockitoSugar {
@@ -37,21 +36,18 @@ class DeletableReturnActionSpec extends SpecBase with MockitoSugar {
 
   "DeletableReturnAction" - {
 
-    val now: Instant = Instant.parse("2026-04-09T12:34:56.789Z")
-
     "when return exists and is deletable" - {
       "must return Right with DeletableReturnRequest" in {
 
-        val deletableReturn = UnsubmittedMonthlyReturn(
-          instanceId = "1",
+        val deletableReturn = UnsubmittedMonthlyReturnsRow(
           monthlyReturnId = 3000L,
           taxYear = 2025,
           taxMonth = 1,
           returnType = "Nil",
-          status = "STARTED",
+          status = "In Progress",
+          lastUpdate = None,
           amendment = Some("Y"),
-          deletable = true,
-          lastUpdated = now
+          deletable = true
         )
 
         val userAnswers = emptyUserAnswers
@@ -73,16 +69,15 @@ class DeletableReturnActionSpec extends SpecBase with MockitoSugar {
     "when return exists but is NOT deletable" - {
       "must return Left and redirect to JourneyRecovery" in {
 
-        val nonDeletableReturn = UnsubmittedMonthlyReturn(
-          instanceId = "1",
+        val nonDeletableReturn = UnsubmittedMonthlyReturnsRow(
           monthlyReturnId = 3000L,
           taxYear = 2025,
           taxMonth = 1,
           returnType = "Nil",
-          status = "STARTED",
+          status = "In Progress",
+          lastUpdate = None,
           amendment = Some("Y"),
-          deletable = false,
-          lastUpdated = now
+          deletable = false
         )
 
         val userAnswers = emptyUserAnswers
