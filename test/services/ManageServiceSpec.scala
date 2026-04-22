@@ -418,8 +418,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
   "getSubmittedMonthlyReturns" should {
 
     "delegate to connector and return response (happy path)" in {
-      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
-      val instanceId                                                         = "900063"
+      val (service, connector, sessionRepo) = newService()
+      val instanceId                        = "900063"
 
       val resp = SubmittedReturnsData(
         scheme = SubmittedSchemeData(
@@ -463,9 +463,9 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
     }
 
     "propagate failure from connector" in {
-      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
-      val instanceId                                                         = "900063"
-      val boom                                                               = new RuntimeException("Backend error")
+      val (service, connector, sessionRepo) = newService()
+      val instanceId                        = "900063"
+      val boom                              = new RuntimeException("Backend error")
 
       when(connector.getSubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
         .thenReturn(Future.failed(boom))
