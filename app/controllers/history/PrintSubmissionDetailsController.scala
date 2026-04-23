@@ -17,7 +17,6 @@
 package controllers.history
 
 import controllers.actions.*
-import models.history.SubcontractorPayment
 import pages.CisIdPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -26,11 +25,8 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.SubmittedMonthlyReturnToPrintQuery
 import services.{ManageService, SubmittedReturnsService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.{DateTimeFormats, IrMarkReferenceGenerator}
-import utils.Utils
 import views.html.history.PrintSubmissionDetailsView
 
-import java.time.LocalDateTime
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 

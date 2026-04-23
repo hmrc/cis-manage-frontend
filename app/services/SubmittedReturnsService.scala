@@ -16,15 +16,15 @@
 
 package services
 
-import play.api.i18n.Lang
 import models.history.*
 import models.response.GetSubmittedMonthlyReturnsDataResponse
-import viewmodels.{LinkViewModel, ReturnTypeViewModel, StatusViewModel, SubmittedReturnsPageViewModel, SubmittedReturnsRowViewModel, TaxYearHistoryViewModel}
+import play.api.i18n.Lang
+import utils.{DateTimeFormats, IrMarkReferenceGenerator, Utils}
 import viewmodels.StatusViewModel.Text
-import utils.{DateTimeFormats, IrMarkReferenceGenerator}
-import utils.Utils
+import viewmodels.*
+
 import java.time.format.DateTimeFormatter
-import java.time.{Instant, LocalDateTime, YearMonth, ZoneId, ZoneOffset, ZonedDateTime}
+import java.time.*
 import javax.inject.{Inject, Singleton}
 
 @Singleton
