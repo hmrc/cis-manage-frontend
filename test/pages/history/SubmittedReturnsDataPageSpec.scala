@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package queries.delete
+package pages.history
 
-import models.UnsubmittedMonthlyReturnsRow
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.JsPath
-import queries.{Gettable, Settable}
 
-case object UnsubmittedMonthlyReturnToDeleteQuery
-    extends Gettable[UnsubmittedMonthlyReturnsRow]
-    with Settable[UnsubmittedMonthlyReturnsRow] {
+class SubmittedReturnsDataPageSpec extends AnyWordSpec with Matchers {
 
-  override def path: JsPath = JsPath \ "unsubmittedMonthlyReturnToDelete"
+  "SubmittedReturnsDataPage" should {
+    "have the correct path and string value" in {
+      SubmittedReturnsDataPage.path     shouldBe (JsPath \ "submittedReturnData")
+      SubmittedReturnsDataPage.toString shouldBe "submittedReturnData"
+    }
+  }
 }

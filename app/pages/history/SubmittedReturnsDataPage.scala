@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package queries.delete
+package pages.history
 
-import models.UnsubmittedMonthlyReturnsRow
+import models.history.SubmittedReturnsData
+import pages.QuestionPage
 import play.api.libs.json.JsPath
-import queries.{Gettable, Settable}
 
-case object UnsubmittedMonthlyReturnToDeleteQuery
-    extends Gettable[UnsubmittedMonthlyReturnsRow]
-    with Settable[UnsubmittedMonthlyReturnsRow] {
+case object SubmittedReturnsDataPage extends QuestionPage[SubmittedReturnsData] {
+  override def path: JsPath = JsPath \ "submittedReturnData"
 
-  override def path: JsPath = JsPath \ "unsubmittedMonthlyReturnToDelete"
+  override def toString: String = "submittedReturnData"
 }

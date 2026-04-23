@@ -647,6 +647,67 @@ class ConstructionIndustrySchemeConnectorSpec
     }
   }
 
+  "getSubmittedMonthlyReturns" should {
+
+    "return SubmittedReturnsData when BE returns 200 with valid JSON" in {
+      val instanceId = "900063"
+
+      stubFor(
+        get(urlPathEqualTo(s"/cis/monthly-returns/submitted/$instanceId"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                """{
+                  |  "scheme": {
+                  |    "name": "ABC Construction Ltd",
+                  |    "taxOfficeNumber": "123",
+                  |    "taxOfficeReference": "AB456"
+                  |  },
+                  |  "monthlyReturns": [
+                  |    {
+                  |      "monthlyReturnId": 1,
+                  |      "taxYear": 2025,
+                  |      "taxMonth": 1,
+                  |      "nilReturnIndicator": "Y",
+                  |      "status": "SUBMITTED"
+                  |    }
+                  |  ],
+                  |  "submissions": [
+                  |    {
+                  |      "submissionId": 100,
+                  |      "status": "ACCEPTED"
+                  |    }
+                  |  ]
+                  |}""".stripMargin
+              )
+          )
+      )
+
+      val result = connector.getSubmittedMonthlyReturns(instanceId).futureValue
+
+      result.scheme.name mustBe "ABC Construction Ltd"
+      result.monthlyReturns.head.taxYear mustBe 2025
+      result.monthlyReturns.head.status mustBe "SUBMITTED"
+      result.submissions.head.submissionId mustBe 100L
+      result.submissions.head.status mustBe "ACCEPTED"
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      val instanceId = "900063"
+
+      stubFor(
+        get(urlPathEqualTo(s"/cis/monthly-returns/submitted/$instanceId"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = intercept[Exception] {
+        connector.getSubmittedMonthlyReturns(instanceId).futureValue
+      }
+      ex.getMessage must include("returned 500")
+    }
+  }
+
   "Save" should {
 
     val userId                           = "900063"

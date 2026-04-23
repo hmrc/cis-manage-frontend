@@ -74,3 +74,46 @@
         display: block;
     }
 }
+/* Return history table width */
+
+.return-history-desktop {
+    display: block;
+}
+
+.return-history-mobile {
+    display: none;
+}
+
+.return-history-table-wrapper {
+  width: 100%;
+}
+
+/* Narrow table width to match prototype alignment */
+.return-history-table {
+  width: 87%;
+  table-layout: fixed;
+
+  $col-widths: (
+    period: 16%,
+    type: 16%,
+    date: 14%,
+    return: 16%,
+    receipt: 16%,
+    status: 22%
+  );
+
+  @each $key, $value in $col-widths {
+    .rh-col-#{$key} {
+      width: $value;
+    }
+  }
+}
+
+@media (max-width: 799px) {
+    .return-history-desktop {
+        display: none;
+    }
+    .return-history-mobile {
+        display: block;
+    }
+}

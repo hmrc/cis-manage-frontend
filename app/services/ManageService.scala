@@ -19,18 +19,19 @@ package services
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.agent.AgentClientData
+import models.history.SubmittedReturnsData
 import models.requests.DeleteUnsubmittedMonthlyReturnRequest
 import models.*
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
-import repositories.{SessionRepository, UnsubmittedMonthlyReturnRepository}
+import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel, ReturnsLandingContext}
 import viewmodels.agent.AgentLandingViewModel
 
 import java.time.*
-import java.time.format.DateTimeFormatter
+import java.time.format.*
 import java.util.Locale
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,9 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ManageService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector,
-  sessionRepository: SessionRepository,
-  unsubmittedReturnRepository: UnsubmittedMonthlyReturnRepository,
-  clock: Clock
+  sessionRepository: SessionRepository
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends Logging {
 
@@ -142,6 +141,11 @@ class ManageService @Inject() (
         }
     }
 
+  def getSubmittedMonthlyReturns(instanceId: String)(implicit
+    hc: HeaderCarrier
+  ): Future[SubmittedReturnsData] =
+    cisConnector.getSubmittedMonthlyReturns(instanceId)
+
   def buildReturnsLandingContext(
     instanceId: String,
     userAnswers: UserAnswers,
@@ -180,19 +184,43 @@ class ManageService @Inject() (
     }
   }
 
-  private def buildReturnPeriodEnd(taxMonth: Int, taxYear: Int): String =
-    YearMonth.of(taxYear, taxMonth).format(shortMonthYearFormatter)
-  def deleteUnsubmittedMonthlyReturn(returnToDelete: UnsubmittedMonthlyReturn)(implicit
+  def checkUnsubmittedMonthlyReturnDeletion(ua: UserAnswers, monthlyReturnId: Long)(implicit
+    hc: HeaderCarrier
+  ): Future[UnsubmittedMonthlyReturnDeletionStatus] =
+    ua.get(CisIdPage) match {
+      case Some(instanceId) =>
+        getUnsubmittedMonthlyReturns(instanceId).map { response =>
+          response.unsubmittedCisReturns
+            .find(_.monthlyReturnId == monthlyReturnId) match {
+            case Some(record) if record.deletable => Deletable(record)
+            case _                                => NotDeletable
+          }
+        }
+      case _                =>
+        logger.error(s"[checkUnsubmittedMonthlyReturnDeletion] missing instanceId in user answers")
+        Future.failed(new RuntimeException("Missing instanceId in user answers"))
+    }
+
+  def deleteUnsubmittedMonthlyReturn(ua: UserAnswers, returnToDelete: UnsubmittedMonthlyReturnsRow)(implicit
     hc: HeaderCarrier
   ): Future[Unit] =
-    cisConnector.deleteUnsubmittedMonthlyReturn(
-      DeleteUnsubmittedMonthlyReturnRequest(
-        instanceId = returnToDelete.instanceId,
-        taxYear = returnToDelete.taxYear,
-        taxMonth = returnToDelete.taxMonth,
-        amendment = returnToDelete.amendment.getOrElse("N")
-      )
-    )
+    ua.get(CisIdPage) match {
+      case Some(instanceId) =>
+        cisConnector.deleteUnsubmittedMonthlyReturn(
+          DeleteUnsubmittedMonthlyReturnRequest(
+            instanceId = instanceId,
+            taxYear = returnToDelete.taxYear,
+            taxMonth = returnToDelete.taxMonth,
+            amendment = returnToDelete.amendment.getOrElse("N")
+          )
+        )
+      case _                =>
+        logger.error(s"[deleteUnsubmittedMonthlyReturn] missing instanceId in user answers")
+        Future.failed(new RuntimeException("Missing instanceId in user answers"))
+    }
+
+  private def buildReturnPeriodEnd(taxMonth: Int, taxYear: Int): String =
+    YearMonth.of(taxYear, taxMonth).format(shortMonthYearFormatter)
 
   private def formatLastUpdate(lastUpdate: Option[LocalDateTime]): String =
     lastUpdate match {
