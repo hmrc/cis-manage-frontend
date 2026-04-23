@@ -18,16 +18,19 @@ package controllers.history
 
 import controllers.actions.*
 import models.history.SubcontractorPayment
+import pages.CisIdPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import queries.SubmittedMonthlyReturnToPrintQuery
-import services.ManageService
+import services.{ManageService, SubmittedReturnsService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.IrMarkReferenceGenerator
+import utils.{DateTimeFormats, IrMarkReferenceGenerator}
+import utils.Utils
 import views.html.history.PrintSubmissionDetailsView
 
+import java.time.LocalDateTime
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,7 +39,8 @@ class PrintSubmissionDetailsController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  service: ManageService,
+  manageService: ManageService,
+  submittedReturnsService: SubmittedReturnsService,
   val controllerComponents: MessagesControllerComponents,
   view: PrintSubmissionDetailsView
 )(implicit ec: ExecutionContext)
@@ -45,56 +49,26 @@ class PrintSubmissionDetailsController @Inject() (
     with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    request.userAnswers.get(SubmittedMonthlyReturnToPrintQuery) match {
-      case Some(monthlyReturnToPrint) =>
-        service
+    (request.userAnswers.get(SubmittedMonthlyReturnToPrintQuery), request.userAnswers.get(CisIdPage)) match {
+      case (Some(monthlyReturnToPrint), Some(instanceId)) =>
+        manageService
           .getSubmittedMonthlyReturnsData(
-            monthlyReturnToPrint.instanceId,
+            instanceId,
             monthlyReturnToPrint.taxYear,
             monthlyReturnToPrint.taxYear,
-            monthlyReturnToPrint.amendment.getOrElse("N")
+            monthlyReturnToPrint.amendmentStatus.getOrElse("N")
           )
           .map { response =>
-            val langCode               = messagesApi.preferred(request).lang.code
-            val monthYear              = monthlyReturnToPrint.monthYear(langCode) // "April 2026"
-            val submittedTime          = "8:46am"
-            val submittedDate          = "16 March 2025"
-            val receiptReferenceNumber = response.hmrcMarkGgis
-              .map(IrMarkReferenceGenerator.fromBase64)
-              .getOrElse("") // "6QEDAHDREBY455GDNCPMDCNDFBDBJSJSJDNDDHDJDZ5"
-            val submissionType         = response.returnType.toLowerCase // "Monthly return"
-            val contractorName         = response.contractorName // "PAL 355 Scheme"
-            val payeReference          = s"${response.taxOfficeNumber}/${response.taxOfficeReference}" // "123/AB456"
-            val totalPaymentsMade      = "£1900"
-            val totalCostOfMaterials   = "£616"
-            val totalTaxDeducted       = "£380"
-            val subcontractors         = Seq(
-              SubcontractorPayment("BuildRight Construction", "£165", "£95", "£95"),
-              SubcontractorPayment("Northern Trades Ltd", "£75", "£55", "£55"),
-              SubcontractorPayment("TyneWear Ltd", "£165", "£125", "£55")
-            )
-            Ok(
-              view(
-                monthYear,
-                submittedTime,
-                submittedDate,
-                receiptReferenceNumber,
-                submissionType,
-                contractorName,
-                payeReference,
-                totalPaymentsMade,
-                totalCostOfMaterials,
-                totalTaxDeducted,
-                subcontractors
-              )
-            )
+            val lang     = messagesApi.preferred(request).lang
+            val viewData = submittedReturnsService.buildSubmittedReturnPrintViewModel(response, lang)
+            Ok(view(viewData))
           }
           .recover { case ex =>
             logger.error("[PrintSubmissionDetailsController] Failed to get submitted monthly return", ex)
             Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
-      case _                          =>
-        logger.error("[PrintSubmissionDetailsController] SubmittedMonthlyReturnToPrintQuery missing")
+      case _                                              =>
+        logger.error("[PrintSubmissionDetailsController] SubmittedMonthlyReturnToPrintQuery or CisID is missing")
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
   }

@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package queries
+package models.history
 
-import models.history.SubmittedMonthlyReturnData
-import play.api.libs.json.JsPath
-
-case object SubmittedMonthlyReturnToPrintQuery
-    extends Gettable[SubmittedMonthlyReturnData]
-    with Settable[SubmittedMonthlyReturnData] {
-
-  override def path: JsPath = JsPath \ "submittedMonthlyReturnToPrint"
-}
+case class SubmittedReturnPrintViewModel(
+  monthYear: String,
+  submittedTime: String,
+  submittedDate: String,
+  receiptReferenceNumber: String,
+  submissionType: String,
+  contractorName: String,
+  payeReference: String,
+  totalPaymentsMade: String,
+  totalCostOfMaterials: String,
+  totalTaxDeducted: String,
+  subcontractors: Seq[SubcontractorPayment]
+)

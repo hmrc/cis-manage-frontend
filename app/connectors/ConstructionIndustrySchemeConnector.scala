@@ -173,7 +173,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
     request: GetSubmittedMonthlyReturnsDataRequest
   )(implicit hc: HeaderCarrier): Future[GetSubmittedMonthlyReturnsDataResponse] =
     http
-      .post(url"$cisBaseUrl/monthly-returns/submitted")
+      .post(url"$cisBaseUrl/monthly-returns/submitted-data")
       .withBody(Json.toJson(request))
       .execute[GetSubmittedMonthlyReturnsDataResponse]
 }

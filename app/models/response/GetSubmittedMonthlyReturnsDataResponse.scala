@@ -16,23 +16,18 @@
 
 package models.response
 
+import models.history.*
 import models.MonthlyReturnItem
 import play.api.libs.json.{Json, OFormat}
 
 case class GetSubmittedMonthlyReturnsDataResponse(
-  // scheme: ContractorScheme,
-  taxOfficeNumber: String,
-  taxOfficeReference: String,
-  contractorName: String,
-  // monthlyReturn: MonthlyReturn,
+  scheme: SubmittedSchemeData,
   monthlyReturnId: Long,
   taxYear: Int,
   taxMonth: Int,
   returnType: String,
   monthlyReturnItems: Seq[MonthlyReturnItem],
-  // submission: Submission,
-  acceptedTime: Option[String],
-  hmrcMarkGgis: Option[String] // hmrcMarkGgis: Option[String],
+  submission: SubmittedSubmissionData
 )
 
 object GetSubmittedMonthlyReturnsDataResponse:

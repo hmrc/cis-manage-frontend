@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import models.history.SubcontractorPayment
+@import models.history.*
 
 @this(
     layout: templates.Layout,
@@ -28,97 +28,92 @@
     link: components.Link
 )
 
-@(
-    monthYear: String,
-    submittedTime: String,
-    submittedDate: String,
-    receiptReferenceNumber: String,
-    submissionType: String,
-    contractorName: String,
-    payeReference: String,
-    totalPaymentsMade: String,
-    totalCostOfMaterials: String,
-    totalTaxDeducted: String,
-    subcontractors: Seq[SubcontractorPayment]
-)(implicit request: Request[_], messages: Messages)
+@(data: SubmittedReturnPrintViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("history.printSubmissionDetails.title", monthYear))) {
+@layout(pageTitle = titleNoForm(messages("history.printSubmissionDetails.title", data.monthYear))) {
 
-    @h1(messages("history.printSubmissionDetails.heading", monthYear))
+    @h1(messages("history.printSubmissionDetails.heading", data.monthYear))
 
     @h2(messages("history.printSubmissionDetails.submissionDetails.heading"))
     @paragraph(
         message = "history.printSubmissionDetails.submissionDetails.p",
-        args    = Seq(submittedTime, submittedDate)
+        args    = Seq(data.submittedTime, data.submittedDate)
     )
 
     @govukSummaryList(
-        SummaryListViewModel(Seq(
-            SummaryListRowViewModel(
+        SummaryListViewModel({
+            Option.when(data.receiptReferenceNumber.trim.nonEmpty) {
+                SummaryListRowViewModel(
                 key   = KeyViewModel(Text(messages("history.printSubmissionDetails.submissionDetails.referenceNumber"))),
-                value = ValueViewModel(Text(receiptReferenceNumber))
-            ),
-            SummaryListRowViewModel(
-                key   = KeyViewModel(Text(messages("history.printSubmissionDetails.submissionDetails.submissionType"))),
-                value = ValueViewModel(Text(messages(s"history.printSubmissionDetails.submissionDetails.submissionType.${submissionType}")))
-            ),
-            SummaryListRowViewModel(
-                key   = KeyViewModel(Text(messages("history.printSubmissionDetails.submissionDetails.contractorName"))),
-                value = ValueViewModel(Text(contractorName))
-            ),
-            SummaryListRowViewModel(
-                key   = KeyViewModel(Text(messages("history.printSubmissionDetails.submissionDetails.payeReference"))),
-                value = ValueViewModel(Text(payeReference))
-            )
-        ))
-    )
-
-    @h2(messages("history.printSubmissionDetails.paymentDetails.heading"))
-    @govukSummaryList(
-        SummaryListViewModel(Seq(
-            SummaryListRowViewModel(
-                key   = KeyViewModel(Text(messages("history.printSubmissionDetails.paymentDetails.numberOfSubcontractorAdded"))),
-                value = ValueViewModel(Text(subcontractors.size.toString))
-            ),
-            SummaryListRowViewModel(
-                key   = KeyViewModel(Text(messages("history.printSubmissionDetails.paymentDetails.totalPaymentsMade"))),
-                value = ValueViewModel(Text(messages(totalPaymentsMade)))
-            ),
-            SummaryListRowViewModel(
-                key   = KeyViewModel(Text(messages("history.printSubmissionDetails.paymentDetails.totalCostOfMaterials"))),
-                value = ValueViewModel(Text(totalCostOfMaterials))
-            ),
-            SummaryListRowViewModel(
-                key   = KeyViewModel(Text(messages("history.printSubmissionDetails.paymentDetails.totalTaxDeducted"))),
-                value = ValueViewModel(Text(totalTaxDeducted))
-            )
-        ))
-    )
-
-    @h2(messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.heading"))
-    @govukTable(
-        Table(
-            firstCellIsHeader = true,
-            head = Some(
-                Seq(
-                    messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.subcontractor"),
-                    messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.paymentsMade"),
-                    messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.costOfMaterials"),
-                    messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.taxDeducted")
-                ).map { heading =>
-                        HeadCell(content = Text(heading))
-                    }
-                ),
-            rows =  subcontractors.map { subcontractor =>
-                Seq(
-                    TableRow(Text(subcontractor.name)),
-                    TableRow(Text(subcontractor.paymentsMade)),
-                    TableRow(Text(subcontractor.costOfMaterials)),
-                    TableRow(Text(subcontractor.taxDeducted))
+                value = ValueViewModel(Text(data.receiptReferenceNumber))
                 )
-            }
-        )
+            }.toSeq ++
+                Seq(
+                    SummaryListRowViewModel(
+                    key   = KeyViewModel(Text(messages("history.printSubmissionDetails.submissionDetails.submissionType"))),
+                    value = ValueViewModel(Text(messages(s"history.printSubmissionDetails.submissionDetails.submissionType.${data.submissionType}")))
+                ),
+                    SummaryListRowViewModel(
+                    key   = KeyViewModel(Text(messages("history.printSubmissionDetails.submissionDetails.contractorName"))),
+                    value = ValueViewModel(Text(data.contractorName))
+                ),
+                    SummaryListRowViewModel(
+                    key   = KeyViewModel(Text(messages("history.printSubmissionDetails.submissionDetails.payeReference"))),
+                    value = ValueViewModel(Text(data.payeReference))
+                )
+            )
+        })
     )
+
+    @if(data.submissionType == "standard") {
+        @h2(messages("history.printSubmissionDetails.paymentDetails.heading"))
+        @govukSummaryList(
+            SummaryListViewModel(Seq(
+                SummaryListRowViewModel(
+                    key   = KeyViewModel(Text(messages("history.printSubmissionDetails.paymentDetails.numberOfSubcontractorAdded"))),
+                    value = ValueViewModel(Text(data.subcontractors.size.toString))
+                ),
+                SummaryListRowViewModel(
+                    key   = KeyViewModel(Text(messages("history.printSubmissionDetails.paymentDetails.totalPaymentsMade"))),
+                    value = ValueViewModel(Text(messages(data.totalPaymentsMade)))
+                ),
+                SummaryListRowViewModel(
+                    key   = KeyViewModel(Text(messages("history.printSubmissionDetails.paymentDetails.totalCostOfMaterials"))),
+                    value = ValueViewModel(Text(data.totalCostOfMaterials))
+                ),
+                SummaryListRowViewModel(
+                    key   = KeyViewModel(Text(messages("history.printSubmissionDetails.paymentDetails.totalTaxDeducted"))),
+                    value = ValueViewModel(Text(data.totalTaxDeducted))
+                )
+            ))
+        )
+
+
+        @h2(messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.heading"))
+        @govukTable(
+            Table(
+                firstCellIsHeader = true,
+                head = Some(
+                    Seq(
+                        messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.subcontractor"),
+                        messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.paymentsMade"),
+                        messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.costOfMaterials"),
+                        messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.taxDeducted")
+                    ).map { heading =>
+                            HeadCell(content = Text(heading))
+                        }
+                    ),
+                rows =  data.subcontractors.map { subcontractor =>
+                    Seq(
+                        TableRow(Text(subcontractor.name)),
+                        TableRow(Text(subcontractor.paymentsMade)),
+                        TableRow(Text(subcontractor.costOfMaterials)),
+                        TableRow(Text(subcontractor.taxDeducted))
+                    )
+                }
+            )
+        )
+    }
 
     @printLink(messages("history.printSubmissionDetails.printThisPage.link"))
     @link("history.printSubmissionDetails.monthlyReturnHistory.link","#")
