@@ -17,12 +17,15 @@
 package services
 
 import base.SpecBase
+import models.MonthlyReturnItem
+import models.history.*
+import models.response.GetSubmittedMonthlyReturnsDataResponse
+import org.scalatest.matchers.should.Matchers.*
+import play.api.i18n.Lang
+import viewmodels.StatusViewModel.Text
+import viewmodels.{ReturnTypeViewModel, StatusViewModel, SubmittedReturnsRowViewModel}
 
 import java.time.Instant
-import models.history.*
-import org.scalatest.matchers.should.Matchers.*
-import viewmodels.{ReturnTypeViewModel, StatusViewModel, SubmittedReturnsRowViewModel}
-import viewmodels.StatusViewModel.Text
 
 class SubmittedReturnsServiceSpec extends SpecBase {
 
@@ -280,6 +283,102 @@ class SubmittedReturnsServiceSpec extends SpecBase {
       )
 
       row.status shouldBe StatusViewModel.Text("")
+    }
+
+    "SubmittedReturnPrintViewModel should return correct data without payment details" in {
+      val input = GetSubmittedMonthlyReturnsDataResponse(
+        scheme = SubmittedSchemeData("PAL 355 Scheme", "163", "AB0063"),
+        monthlyReturnId = 3000L,
+        taxYear = 2026,
+        taxMonth = 4,
+        returnType = "Nil",
+        monthlyReturnItems = Seq.empty,
+        submission = SubmittedSubmissionData(
+          submissionId = 10L,
+          submissionType = Some("Original"),
+          activeObjectId = Some(20L),
+          status = "Accepted",
+          hmrcMarkGenerated = Some("mark1"),
+          hmrcMarkGgis = Some("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"),
+          emailRecipient = Some("test@example.com"),
+          acceptedTime = Some(Instant.parse("2026-04-01T10:15:30Z"))
+        )
+      )
+
+      val out = service.buildSubmittedReturnPrintViewModel(input, Lang("en"))
+      out.monthYear mustBe "April 2026"
+      out.submittedDate mustBe "1 April 2026"
+      out.receiptReferenceNumber mustBe "AAIIGECRQ4QJFCZQ2OHUCFETKFKZOYM5W7RZ5OY"
+      out.submissionType mustBe "nil"
+      out.contractorName mustBe "PAL 355 Scheme"
+      out.payeReference mustBe "163/AB0063"
+      out.totalPaymentsMade mustBe "£0.00"
+      out.totalCostOfMaterials mustBe "£0.00"
+      out.totalTaxDeducted mustBe "£0.00"
+      out.subcontractors mustBe Seq.empty
+
+    }
+
+    "SubmittedReturnPrintViewModel should return correct data with payment details" in {
+      val input = GetSubmittedMonthlyReturnsDataResponse(
+        scheme = SubmittedSchemeData("PAL 355 Scheme", "163", "AB0063"),
+        monthlyReturnId = 3000L,
+        taxYear = 2026,
+        taxMonth = 4,
+        returnType = "Standard",
+        monthlyReturnItems = Seq(
+          MonthlyReturnItem(
+            monthlyReturnId = 3000L,
+            monthlyReturnItemId = 1L,
+            totalPayments = Some("100"),
+            costOfMaterials = Some("100"),
+            totalDeducted = Some("100"),
+            unmatchedTaxRateIndicator = None,
+            subcontractorId = None,
+            subcontractorName = Some("Contractor 01"),
+            verificationNumber = None,
+            itemResourceReference = None
+          ),
+          MonthlyReturnItem(
+            monthlyReturnId = 3000L,
+            monthlyReturnItemId = 2L,
+            totalPayments = Some("200"),
+            costOfMaterials = Some("200"),
+            totalDeducted = Some("200"),
+            unmatchedTaxRateIndicator = None,
+            subcontractorId = None,
+            subcontractorName = Some("Contractor 02"),
+            verificationNumber = None,
+            itemResourceReference = None
+          )
+        ),
+        submission = SubmittedSubmissionData(
+          submissionId = 10L,
+          submissionType = Some("Original"),
+          activeObjectId = Some(20L),
+          status = "Accepted",
+          hmrcMarkGenerated = Some("mark1"),
+          hmrcMarkGgis = None,
+          emailRecipient = Some("test@example.com"),
+          acceptedTime = Some(Instant.parse("2026-04-01T10:15:30Z"))
+        )
+      )
+
+      val out = service.buildSubmittedReturnPrintViewModel(input, Lang("en"))
+      out.monthYear mustBe "April 2026"
+      out.submittedDate mustBe "1 April 2026"
+      out.receiptReferenceNumber mustBe ""
+      out.submissionType mustBe "standard"
+      out.contractorName mustBe "PAL 355 Scheme"
+      out.payeReference mustBe "163/AB0063"
+      out.totalPaymentsMade mustBe "£300.00"
+      out.totalCostOfMaterials mustBe "£300.00"
+      out.totalTaxDeducted mustBe "£300.00"
+      out.subcontractors mustBe Seq(
+        SubcontractorPayment("Contractor 01", "£100.00", "£100.00", "£100.00"),
+        SubcontractorPayment("Contractor 02", "£200.00", "£200.00", "£200.00")
+      )
+
     }
   }
 }
