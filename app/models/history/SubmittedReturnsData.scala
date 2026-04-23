@@ -16,12 +16,9 @@
 
 package models.history
 
-import play.api.i18n.Lang
 import play.api.libs.json.{Json, OFormat}
-import utils.Utils.monthName
 
 import java.time.Instant
-import java.util.Locale
 
 case class SubmittedReturnsData(
   scheme: SubmittedSchemeData,

@@ -20,13 +20,17 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import itutil.ApplicationWithWiremock
 import models.Scheme
 import models.agent.AgentClientData
-import models.requests.DeleteUnsubmittedMonthlyReturnRequest
+import models.history.{SubmittedSchemeData, SubmittedSubmissionData}
+import models.requests.{DeleteUnsubmittedMonthlyReturnRequest, GetSubmittedMonthlyReturnsDataRequest}
+import models.response.GetSubmittedMonthlyReturnsDataResponse
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpException, UpstreamErrorResponse}
+
+import java.time.Instant
 
 class ConstructionIndustrySchemeConnectorSpec
     extends AnyWordSpec
@@ -789,6 +793,70 @@ class ConstructionIndustrySchemeConnectorSpec
 
       val ex = intercept[Exception] {
         connector.deleteUnsubmittedMonthlyReturn(req).futureValue
+      }
+      ex.getMessage must include("boom")
+    }
+  }
+
+  "getSubmittedMonthlyReturnsData" should {
+
+    "return SubmittedMonthlyReturnsData when BE returns 200 with valid JSON" in {
+
+      val req = GetSubmittedMonthlyReturnsDataRequest(
+        instanceId = "1",
+        taxYear = 2025,
+        taxMonth = 1,
+        amendment = "N"
+      )
+
+      val responseJson = Json.toJson(
+        GetSubmittedMonthlyReturnsDataResponse(
+          scheme = SubmittedSchemeData("Scheme Name", "163", "AB0063"),
+          monthlyReturnId = 3000L,
+          taxYear = 2025,
+          taxMonth = 1,
+          returnType = "Nil",
+          monthlyReturnItems = Seq.empty,
+          submission = SubmittedSubmissionData(
+            submissionId = 10L,
+            submissionType = Some("Original"),
+            activeObjectId = Some(20L),
+            status = "Accepted",
+            hmrcMarkGenerated = Some("mark1"),
+            hmrcMarkGgis = Some("ggis1"),
+            emailRecipient = Some("test@example.com"),
+            acceptedTime = Some(Instant.now())
+          )
+        )
+      )
+
+      stubFor(
+        post(urlPathEqualTo("/cis/monthly-returns/submitted-data"))
+          .withHeader("Content-Type", equalTo("application/json"))
+          .withRequestBody(equalToJson(Json.toJson(req).toString(), true, true))
+          .willReturn(aResponse().withStatus(200).withBody(responseJson.toString))
+      )
+
+      val out = connector.getSubmittedMonthlyReturnsData(req).futureValue
+      Json.toJson(out) mustBe responseJson
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+
+      val req = GetSubmittedMonthlyReturnsDataRequest(
+        instanceId = "1",
+        taxYear = 2025,
+        taxMonth = 1,
+        amendment = "N"
+      )
+
+      stubFor(
+        post(urlPathEqualTo("/cis/monthly-returns/submitted-data"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = intercept[Exception] {
+        connector.getSubmittedMonthlyReturnsData(req).futureValue
       }
       ex.getMessage must include("boom")
     }
