@@ -18,10 +18,10 @@ package controllers.history
 
 import base.SpecBase
 import models.UserAnswers
-import models.history.{SubcontractorPayment, SubmittedMonthlyReturnData, SubmittedReturnPrintViewModel, SubmittedSchemeData, SubmittedSubmissionData}
+import models.history.*
 import models.response.GetSubmittedMonthlyReturnsDataResponse
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -132,6 +132,98 @@ class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(model)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to SystemErrorController when ManageService fails" in {
+
+      val userAnswers: UserAnswers = emptyUserAnswers
+        .set(
+          SubmittedMonthlyReturnToPrintQuery,
+          SubmittedMonthlyReturnData(
+            monthlyReturnId = 1L,
+            taxYear = 2026,
+            taxMonth = 4,
+            nilReturnIndicator = "Y",
+            status = "Submitted",
+            supersededBy = None,
+            amendmentStatus = Some("None"),
+            monthlyReturnItems = Some("items")
+          )
+        )
+        .success
+        .value
+
+      val submittedReturnsService = mock[SubmittedReturnsService]
+      val mockManageService       = mock[ManageService]
+
+      when(mockManageService.getSubmittedMonthlyReturnsData(any(), any(), any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(
+          bind[ManageService].toInstance(mockManageService),
+          bind[SubmittedReturnsService].toInstance(submittedReturnsService)
+        )
+        .build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, controllers.history.routes.PrintSubmissionDetailsController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      verifyNoInteractions(submittedReturnsService)
+    }
+
+    "must redirect to Journey Recovery for a GET if SubmittedMonthlyReturnToPrintQuery missing in user answers" in {
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId)).build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, controllers.history.routes.PrintSubmissionDetailsController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET if CisId missing in user answers" in {
+
+      val userAnswers: UserAnswers = emptyUserAnswers
+        .set(
+          SubmittedMonthlyReturnToPrintQuery,
+          SubmittedMonthlyReturnData(
+            monthlyReturnId = 1L,
+            taxYear = 2026,
+            taxMonth = 4,
+            nilReturnIndicator = "Y",
+            status = "Submitted",
+            supersededBy = None,
+            amendmentStatus = Some("None"),
+            monthlyReturnItems = Some("items")
+          )
+        )
+        .success
+        .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, controllers.history.routes.PrintSubmissionDetailsController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
