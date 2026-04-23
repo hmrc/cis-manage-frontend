@@ -129,6 +129,27 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
       }
     }
 
+    "must redirect to Journey Recovery for a GET when only one tax year is returned" in {
+
+      val singleTaxYearTuple = Seq((2021, 2022))
+      when(mockManageService.getSubmittedTaxYears(any())(any())) thenReturn Future.successful(singleTaxYearTuple)
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+        .overrides(
+          bind[ManageService].toInstance(mockManageService)
+        )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, submittedReturnsChooseTaxYearRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must redirect to System Error for a GET when the service fails" in {
 
       when(mockManageService.getSubmittedTaxYears(any())(any())) thenReturn Future.failed(

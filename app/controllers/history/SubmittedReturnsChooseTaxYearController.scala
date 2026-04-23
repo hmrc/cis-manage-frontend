@@ -59,7 +59,10 @@ class SubmittedReturnsChooseTaxYearController @Inject() (
               "[SubmittedReturnsChooseTaxYearController] Error trying to retrieve submitted tax years"
             )
             Redirect(controllers.routes.SystemErrorController.onPageLoad())
-          else
+          else if (taxYears.length == 1) {
+            // TODO: wire to correct controller once its ready
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          } else
             val taxYearStrings = taxYears.map((start, end) => s"$start to $end")
 
             val form = formProvider(taxYearStrings)
