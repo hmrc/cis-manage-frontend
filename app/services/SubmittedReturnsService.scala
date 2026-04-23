@@ -157,7 +157,14 @@ class SubmittedReturnsService @Inject() {
             if (isSuperseded(monthlyReturn)) {
               buildAmendmentStatus(monthlyReturn)
             } else if (!acceptedTime.isBefore(amendmentCutOffInstant)) {
-              StatusViewModel.Text("history.returnHistory.status.amend")
+              StatusViewModel.Link(
+                link = LinkViewModel(
+                  url = "#", // TODO
+                  hiddenText = buildReturnPeriodEnd(monthlyReturn)
+                ),
+                textKey = "history.returnHistory.status.amend",
+                hiddenTextKey = "history.returnHistory.hidden.status.amend"
+              )
             } else {
               StatusViewModel.Text("history.returnHistory.status.notAvailable")
             }
@@ -174,14 +181,29 @@ class SubmittedReturnsService @Inject() {
   private def buildAmendmentStatus(monthlyReturn: SubmittedMonthlyReturnData): StatusViewModel =
     monthlyReturn.amendmentStatus match {
       case Some("STARTED") | Some("VALIDATED")                               =>
-        StatusViewModel.Text("history.returnHistory.status.inProgress")
+        StatusViewModel.Link(
+          link = LinkViewModel(
+            url = "#", // TODO
+            hiddenText = buildReturnPeriodEnd(monthlyReturn)
+          ),
+          textKey = "history.returnHistory.status.inProgress",
+          hiddenTextKey = "history.returnHistory.hidden.status.inProgress"
+        )
       case Some("PENDING") | Some("ACCEPTED") | Some("SUBMITTED_NO_RECEIPT") =>
         StatusViewModel.Text("history.returnHistory.status.awaitingConfirmation")
       case Some("SUBMITTED")                                                 =>
-        StatusViewModel.Text("history.returnHistory.status.amend")
+        StatusViewModel.Link(
+          link = LinkViewModel(
+            url = "#", // TODO
+            hiddenText = buildReturnPeriodEnd(monthlyReturn)
+          ),
+          textKey = "history.returnHistory.status.amend",
+          hiddenTextKey = "history.returnHistory.hidden.status.amend"
+        )
       case Some("DEPARTMENTAL_ERROR") | Some("FATAL_ERROR")                  =>
         StatusViewModel.Text("history.returnHistory.status.notAvailable")
-      case _                                                                 => StatusViewModel.Text("")
+      case _                                                                 =>
+        StatusViewModel.Text("")
     }
 
   private def isSuperseded(monthlyReturn: SubmittedMonthlyReturnData): Boolean =

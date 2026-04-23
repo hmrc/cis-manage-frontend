@@ -21,7 +21,7 @@ import base.SpecBase
 import java.time.Instant
 import models.history.*
 import org.scalatest.matchers.should.Matchers.*
-import viewmodels.{ReturnTypeViewModel, StatusViewModel, SubmittedReturnsRowViewModel}
+import viewmodels.{LinkViewModel, ReturnTypeViewModel, StatusViewModel, SubmittedReturnsRowViewModel}
 import viewmodels.StatusViewModel.Text
 
 class SubmittedReturnsServiceSpec extends SpecBase {
@@ -99,7 +99,14 @@ class SubmittedReturnsServiceSpec extends SpecBase {
       row.dateSubmitted            shouldBe "1 Apr 2024"
       row.monthlyReturn.url        shouldBe "#"
       row.monthlyReturn.hiddenText shouldBe "Mar 2023"
-      row.status                   shouldBe StatusViewModel.Text("history.returnHistory.status.amend")
+      row.status                   shouldBe StatusViewModel.Link(
+        link = LinkViewModel(
+          url = "#",
+          hiddenText = "Mar 2023"
+        ),
+        textKey = "history.returnHistory.status.amend",
+        hiddenTextKey = "history.returnHistory.hidden.status.amend"
+      )
     }
 
     "buildSingleYearViewModel returns only the selected tax year" in {
@@ -204,7 +211,14 @@ class SubmittedReturnsServiceSpec extends SpecBase {
         )
       )
 
-      row.status shouldBe StatusViewModel.Text("history.returnHistory.status.inProgress")
+      row.status shouldBe StatusViewModel.Link(
+        link = LinkViewModel(
+          url = "#",
+          hiddenText = "Mar 2023"
+        ),
+        textKey = "history.returnHistory.status.inProgress",
+        hiddenTextKey = "history.returnHistory.hidden.status.inProgress"
+      )
     }
 
     "returns awaitingConfirmation for superseded return with amendment status PENDING" in {
@@ -244,7 +258,14 @@ class SubmittedReturnsServiceSpec extends SpecBase {
         )
       )
 
-      row.status shouldBe StatusViewModel.Text("history.returnHistory.status.amend")
+      row.status shouldBe StatusViewModel.Link(
+        link = LinkViewModel(
+          url = "#",
+          hiddenText = "Mar 2023"
+        ),
+        textKey = "history.returnHistory.status.amend",
+        hiddenTextKey = "history.returnHistory.hidden.status.amend"
+      )
     }
 
     "returns notAvailable for superseded return with amendment status FATAL_ERROR" in {
