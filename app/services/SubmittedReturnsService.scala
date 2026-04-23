@@ -86,7 +86,7 @@ class SubmittedReturnsService @Inject() {
       returnType = returnType,
       dateSubmitted = dateSubmittedText,
       monthlyReturn = LinkViewModel(
-        url = "#", // TODO: F2 and F3 - replace with real route of page sr-04 Print monthly return
+        url = "#",
         hiddenText = periodEndText
       ),
       submissionReceipt = buildSubmissionReceipt(submissionOpt, periodEndText),
@@ -121,8 +121,8 @@ class SubmittedReturnsService @Inject() {
     if (isSubmissionReceiptAvailable(submissionOpt)) {
       StatusViewModel.Link(
         link = LinkViewModel(
-          url = "#", // TODO: F2 and F3 - replace with real route of page SR-02-f View/save submitted return
-          hiddenText = s"submission receipt for $periodEndText"
+          url = "#", // TODO
+          hiddenText = periodEndText
         ),
         textKey = "site.view",
         hiddenTextKey = "history.returnHistory.hidden.submissionReceipt"
