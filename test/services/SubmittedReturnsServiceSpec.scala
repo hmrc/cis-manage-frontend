@@ -149,7 +149,7 @@ class SubmittedReturnsServiceSpec extends SpecBase {
       val row = singleRow(
         data(
           monthlyReturns = Seq(
-            monthlyReturn(id = 3L, status = "SUBMITTED")
+            monthlyReturn(id = 3L)
           ),
           submissions = Seq(
             submission(submissionId = 13L, activeObjectId = Some(3L), acceptedTime = None)
@@ -179,7 +179,7 @@ class SubmittedReturnsServiceSpec extends SpecBase {
       val row = singleRow(
         data(
           monthlyReturns = Seq(
-            monthlyReturn(id = 5L, status = "SUBMITTED")
+            monthlyReturn(id = 5L)
           ),
           submissions = Seq(
             submission(
@@ -200,7 +200,6 @@ class SubmittedReturnsServiceSpec extends SpecBase {
           monthlyReturns = Seq(
             monthlyReturn(
               id = 6L,
-              status = "SUBMITTED",
               supersededBy = Some(99L),
               amendmentStatus = Some("STARTED")
             )
@@ -227,7 +226,6 @@ class SubmittedReturnsServiceSpec extends SpecBase {
           monthlyReturns = Seq(
             monthlyReturn(
               id = 7L,
-              status = "SUBMITTED",
               supersededBy = Some(99L),
               amendmentStatus = Some("PENDING")
             )
@@ -247,7 +245,6 @@ class SubmittedReturnsServiceSpec extends SpecBase {
           monthlyReturns = Seq(
             monthlyReturn(
               id = 8L,
-              status = "SUBMITTED",
               supersededBy = Some(99L),
               amendmentStatus = Some("SUBMITTED")
             )
@@ -274,7 +271,6 @@ class SubmittedReturnsServiceSpec extends SpecBase {
           monthlyReturns = Seq(
             monthlyReturn(
               id = 9L,
-              status = "SUBMITTED",
               supersededBy = Some(99L),
               amendmentStatus = Some("FATAL_ERROR")
             )
