@@ -57,7 +57,6 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
       val app =
         applicationBuilder(
           userAnswers = Some(userAnswersWithCisId),
-          isAgent = false,
           additionalBindings = Seq(bind[ManageService].toInstance(mockManageService))
         ).build()
 
