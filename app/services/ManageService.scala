@@ -18,10 +18,10 @@ package services
 
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
+import models.*
 import models.agent.AgentClientData
 import models.history.SubmittedReturnsData
 import models.requests.DeleteUnsubmittedMonthlyReturnRequest
-import models.*
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
@@ -30,9 +30,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.agent.AgentLandingViewModel
 import viewmodels.{ReturnLandingViewModel, ReturnsLandingContext}
 
-import java.time.LocalDateTime
+import java.time.{LocalDate, LocalDateTime}
 import java.time.format.{DateTimeFormatter, TextStyle}
-import java.time.{Clock, Instant, LocalDate, LocalDateTime}
 import java.util.Locale
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}

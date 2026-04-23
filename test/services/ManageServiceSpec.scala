@@ -18,10 +18,10 @@ package services
 
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
+import models.*
 import models.agent.AgentClientData
-import models.*
+import models.history.*
 import models.requests.DeleteUnsubmittedMonthlyReturnRequest
-import models.*
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
@@ -34,11 +34,9 @@ import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.agent.AgentLandingViewModel
 
-import java.time.temporal.ChronoUnit
-import java.time.{Clock, Instant, LocalDateTime, ZoneId}
+import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
-import scala.jdk.CollectionConverters.*
 import scala.util.Failure
 
 class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
@@ -656,41 +654,6 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       verify(connector).getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier])
       verifyNoInteractions(sessionRepo)
     }
-    "propagate failure from connector" in {
-      val (service, connector, sessionRepo, unsubmittedMonthlyReturnRepo, _) = newService()
-      val instanceId                                                         = "900063"
-      val boom                                                               = new RuntimeException("Backend error")
-      val now: Instant                                                       = Instant.parse("2026-04-09T12:34:56.789Z")
-
-      val dataModel = UnsubmittedMonthlyReturn(
-        instanceId = instanceId,
-        monthlyReturnId = 3000L,
-        taxYear = 2026,
-        taxMonth = 4,
-        returnType = "Nil",
-        status = "In Progress",
-        amendment = Some("Y"),
-        deletable = true,
-        lastUpdated = now
-      )
-
-      val expectedRequest = DeleteUnsubmittedMonthlyReturnRequest(
-        instanceId = instanceId,
-        taxYear = 2026,
-        taxMonth = 4,
-        amendment = "Y"
-      )
-
-      when(connector.deleteUnsubmittedMonthlyReturn(eqTo(expectedRequest))(any[HeaderCarrier]))
-        .thenReturn(Future.failed(boom))
-
-      val ex = service.deleteUnsubmittedMonthlyReturn(dataModel).failed.futureValue
-      ex mustBe boom
-
-      verify(connector).deleteUnsubmittedMonthlyReturn(eqTo(expectedRequest))(any[HeaderCarrier])
-      verifyNoInteractions(sessionRepo)
-      verifyNoInteractions(unsubmittedMonthlyReturnRepo)
-    }
   }
 
   "deleteUnsubmittedMonthlyReturn" should {
@@ -792,24 +755,77 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
   "getSubmittedTaxYears" should {
 
     "return sorted distinct tax years from submitted monthly returns" in {
-      val (service, connector, _, _, _) = newService()
-      val instanceId                    = "CIS-123"
+      val (service, connector, _) = newService()
+      val instanceId              = "CIS-123"
 
-      val monthlyReturns = Seq(
-        MonthlyReturnData(1L, 2024, 4, "N", "SUBMITTED", None, None, None), // April 2024 -> 2024-04-05 -> 2023 to 2024
-        MonthlyReturnData(2L, 2024, 5, "N", "SUBMITTED", None, None, None), // May 2024 -> 2024-05-05 -> 2024 to 2025
-        MonthlyReturnData(3L, 2023, 3, "N", "SUBMITTED", None, None, None), // March 2023 -> 2023-03-05 -> 2022 to 2023
-        MonthlyReturnData(4L, 2023, 4, "N", "SUBMITTED", None, None, None) // April 2023 -> 2023-04-05 -> 2022 to 2023
-      )
-
-      val response = SubmittedMonthlyReturnsResponse(
-        scheme = SchemeData("TEST LTD", "111", "test111"),
-        monthlyReturns = monthlyReturns,
-        submissions = Nil
+      val resp = SubmittedReturnsData(
+        scheme = SubmittedSchemeData(
+          name = "ABC Construction Ltd",
+          taxOfficeNumber = "123",
+          taxOfficeReference = "AB456"
+        ),
+        monthlyReturns = Seq(
+          // April 2024 -> 2024-04-05 -> 2023 to 2024
+          SubmittedMonthlyReturnData(
+            monthlyReturnId = 1L,
+            taxYear = 2024,
+            taxMonth = 4,
+            nilReturnIndicator = "Y",
+            status = "SUBMITTED",
+            supersededBy = None,
+            amendmentStatus = None,
+            monthlyReturnItems = None
+          ),
+          // May 2024 -> 2024-05-05 -> 2024 to 2025
+          SubmittedMonthlyReturnData(
+            monthlyReturnId = 2L,
+            taxYear = 2024,
+            taxMonth = 5,
+            nilReturnIndicator = "Y",
+            status = "SUBMITTED",
+            supersededBy = None,
+            amendmentStatus = None,
+            monthlyReturnItems = None
+          ),
+          // March 2023 -> 2023-03-05 -> 2022 to 2023
+          SubmittedMonthlyReturnData(
+            monthlyReturnId = 3L,
+            taxYear = 2023,
+            taxMonth = 3,
+            nilReturnIndicator = "Y",
+            status = "SUBMITTED",
+            supersededBy = None,
+            amendmentStatus = None,
+            monthlyReturnItems = None
+          ),
+          // April 2023 -> 2023-04-05 -> 2022 to 2023
+          SubmittedMonthlyReturnData(
+            monthlyReturnId = 4L,
+            taxYear = 2023,
+            taxMonth = 4,
+            nilReturnIndicator = "Y",
+            status = "SUBMITTED",
+            supersededBy = None,
+            amendmentStatus = None,
+            monthlyReturnItems = None
+          )
+        ),
+        submissions = Seq(
+          SubmittedSubmissionData(
+            submissionId = 100L,
+            submissionType = Some("MONTHLY_RETURN"),
+            activeObjectId = Some(1L),
+            status = "ACCEPTED",
+            hmrcMarkGenerated = None,
+            hmrcMarkGgis = None,
+            emailRecipient = Some("test@test.com"),
+            acceptedTime = None
+          )
+        )
       )
 
       when(connector.getSubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(response))
+        .thenReturn(Future.successful(resp))
 
       val result = service.getSubmittedTaxYears(instanceId).futureValue
 
@@ -817,9 +833,9 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
     }
 
     "propagate failure from connector" in {
-      val (service, connector, _, _, _) = newService()
-      val instanceId                    = "CIS-123"
-      val boom                          = new RuntimeException("Backend error")
+      val (service, connector, _) = newService()
+      val instanceId              = "CIS-123"
+      val boom                    = new RuntimeException("Backend error")
 
       when(connector.getSubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
         .thenReturn(Future.failed(boom))
