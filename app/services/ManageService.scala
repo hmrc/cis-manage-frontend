@@ -18,22 +18,18 @@ package services
 
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
+import models.*
 import models.agent.AgentClientData
 import models.history.SubmittedReturnsData
 import models.requests.DeleteUnsubmittedMonthlyReturnRequest
-import models.*
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.{ReturnLandingViewModel, ReturnsLandingContext}
+import viewmodels.ReturnsLandingContext
 import viewmodels.agent.AgentLandingViewModel
 
-import java.time.LocalDateTime
-import java.time.format.{DateTimeFormatter, TextStyle}
-import java.util.Locale
-import java.time.{Clock, Instant}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -200,17 +196,5 @@ class ManageService @Inject() (
       case _                =>
         logger.error(s"[deleteUnsubmittedMonthlyReturn] missing instanceId in user answers")
         Future.failed(new RuntimeException("Missing instanceId in user answers"))
-    }
-
-  private def formatPeriod(taxMonth: Int, taxYear: Int): String = {
-    val monthName = java.time.Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)
-    s"$monthName $taxYear"
-  }
-
-  private def formatLastUpdate(lastUpdate: Option[LocalDateTime]): String =
-    lastUpdate match {
-      case Some(dateTime) =>
-        dateTime.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK))
-      case None           => ""
     }
 }

@@ -3,6 +3,7 @@
     Styling in this and other .scss files will be compiled by the sbt-sass-compiler plugin: https://github.com/hmrc/sbt-sass-compiler
     If you encounter any issue with Sass compilation using the plugin, please reach out to the PlatUI team.
  */
+@import "pta-card";
 
 .js-visible {
   display: none !important;
@@ -74,44 +75,4 @@
     .return-history-mobile {
         display: block;
     }
-}
-
-.pta-card-link-wrapper {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-}
-
-.pta-card {
-    background: #f8f8f8;
-    border-radius: 4px;
-    transition: 0.1s ease-in-out;
-}
-
-.pta-card-body {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-.pta-card-link-wrapper:hover .pta-card {
-    background: #005EA5;
-    color: #ffffff;
-    cursor: pointer;
-}
-.pta-card-heading {
-   color: #005EA5;
-}
-
-.pta-card-link-wrapper:hover .pta-card-heading,
-.pta-card-link-wrapper:hover .pta-card-text {
-    color: #ffffff;
-}
-
-.pta-card-link-wrapper:focus .pta-card-heading {
-   outline: 3px solid transparent;
-   color: #ffffff;
-   background-color: #ffdd00;
-   box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
-   text-decoration: none;
 }

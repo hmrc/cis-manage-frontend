@@ -18,14 +18,13 @@ package forms.mappings
 
 import forms.Validation.{clientNameInputMaxLength, clientReferenceInputMaxLength, employerReferenceInputMaxLength}
 import generators.StringGenerators
+import models.Enumerable
+import models.agent.ClientListFormData
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import play.api.data.*
 import play.api.data.Forms.*
-import play.api.data.{Form, FormError}
-import models.Enumerable
-import models.agent.ClientListFormData
+import play.api.data.*
 
 object MappingsSpec {
 
@@ -44,7 +43,7 @@ object MappingsSpec {
 
 class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mappings with StringGenerators {
 
-  import MappingsSpec._
+  import MappingsSpec.*
 
   "text" - {
 

@@ -18,10 +18,10 @@ package services
 
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
+import models.*
 import models.agent.AgentClientData
 import models.history.{SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSchemeData, SubmittedSubmissionData}
 import models.requests.DeleteUnsubmittedMonthlyReturnRequest
-import models.*
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
@@ -34,7 +34,6 @@ import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.agent.AgentLandingViewModel
 
-import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Failure

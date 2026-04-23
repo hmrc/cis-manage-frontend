@@ -1,0 +1,45 @@
+$pta-blue: #005ea5;
+$pta-black: #0b0c0c;
+$pta-grey: #f8f8f8;
+$pta-yellow: #ffdd00;
+$pta-white: #ffffff;
+
+.pta-card-link-wrapper {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+
+  &:hover .pta-card {
+    background: $pta-blue;
+    color: $pta-white;
+  }
+
+  &:hover .pta-card-heading,
+  &:hover .pta-card-text {
+    color: $pta-white;
+  }
+
+  &:focus .pta-card-heading {
+    outline: 3px solid transparent;
+    color: $pta-white;
+    background-color: $pta-yellow;
+    box-shadow: 0 -2px $pta-yellow, 0 4px $pta-black;
+    text-decoration: none;
+  }
+}
+
+.pta-card {
+  background: $pta-grey;
+  border-radius: 4px;
+  transition: background-color 0.1s ease-in-out;
+
+  &-body {
+     display: flex;
+     flex-direction: column;
+     height: 100%;
+   }
+
+  &-heading {
+    color: $pta-blue;
+  }
+}
