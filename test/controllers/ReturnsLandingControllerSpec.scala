@@ -27,7 +27,7 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.ManageService
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.{ReturnLandingViewModel, ReturnsLandingContext}
+import viewmodels.ReturnsLandingContext
 
 import scala.concurrent.Future
 
@@ -171,6 +171,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
         taxMonth = 4,
         returnType = "Nil",
         status = "In Progress",
+        action = Seq("Continue", "Delete"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -213,6 +214,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
         taxMonth = 4,
         returnType = "Nil",
         status = "In Progress",
+        action = Seq("Continue", "Delete"),
         lastUpdate = None,
         amendment = Some("N"),
         deletable = true
@@ -255,6 +257,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
         taxMonth = 4,
         returnType = "Standard",
         status = "In Progress",
+        action = Seq("Continue", "Delete"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -297,6 +300,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
         taxMonth = 4,
         returnType = "Standard",
         status = "In Progress",
+        action = Seq("Continue", "Delete"),
         lastUpdate = None,
         amendment = Some("N"),
         deletable = true
@@ -370,6 +374,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
         taxMonth = 4,
         returnType = "Invalid Type",
         status = "In Progress",
+        action = Seq("Continue", "Delete"),
         lastUpdate = None,
         amendment = Some("N"),
         deletable = true

@@ -39,6 +39,7 @@ class UnsubmittedMonthlyReturnToDeleteQuerySpec extends SpecBase {
         taxMonth = 1,
         returnType = "Nil",
         status = "STARTED",
+        action = Seq("Continue", "Delete"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true

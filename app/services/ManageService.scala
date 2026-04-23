@@ -124,8 +124,13 @@ class ManageService @Inject() (
 
   def getUnsubmittedMonthlyReturns(instanceId: String)(implicit
     hc: HeaderCarrier
+  ): Future[UnsubmittedMonthlyReturnsResponse] =
+    cisConnector.getUnsubmittedMonthlyReturns(instanceId)
+
+  def getUnsubmittedMonthlyReturnRows(instanceId: String)(implicit
+    hc: HeaderCarrier
   ): Future[Seq[IncompleteReturnsRowViewModel]] =
-    cisConnector.getUnsubmittedMonthlyReturns(instanceId).map { response =>
+    getUnsubmittedMonthlyReturns(instanceId).map { response =>
       response.unsubmittedCisReturns
         .sortBy(r => (r.taxYear, r.taxMonth))
         .reverse
@@ -231,7 +236,6 @@ class ManageService @Inject() (
   private def buildActions(instanceId: String, row: UnsubmittedMonthlyReturnsRow): Seq[ActionLinkViewModel] = {
     val returnType  = row.returnType
     val isDeletable = row.deletable
-    val isNilReturn = row.returnType.equals("Nil")
     val isAmendment = row.amendment.exists(_.equals("Y"))
 
     row.status match {
@@ -241,9 +245,6 @@ class ManageService @Inject() (
             textKey = "incompleteReturns.action.continue",
             href = if (isAmendment) {
               controllers.routes.JourneyRecoveryController.onPageLoad().url
-            } else if (isNilReturn) {
-              appConfig
-                .continueReturnJourneyUrl(instanceId, row.taxYear.toString, row.taxMonth.toString)
             } else {
               appConfig
                 .continueReturnJourneyUrl(instanceId, row.taxYear.toString, row.taxMonth.toString)

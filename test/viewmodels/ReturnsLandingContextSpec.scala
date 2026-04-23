@@ -24,10 +24,6 @@ class ReturnsLandingContextSpec extends AnyWordSpec with Matchers {
   "ReturnsLandingContext" should {
 
     "hold the values passed to it" in {
-      val returns = Seq(
-        ReturnLandingViewModel(3000L, "August 2025", "Standard", "19 September 2025", "Accepted", Some("Y"))
-      )
-
       val context = ReturnsLandingContext(
         contractorName = "ABC Construction Ltd",
         standardReturnLink = "/standard",

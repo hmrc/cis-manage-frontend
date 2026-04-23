@@ -372,9 +372,41 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
   "getUnsubmittedMonthlyReturns" should {
 
-    "delegate to connector and return response (happy path)" in {
+    "delegate to connector and return raw response" in {
       val (service, connector, sessionRepo) = newService()
-      val instanceId                              = "900063"
+      val instanceId                        = "900063"
+
+      val resp = UnsubmittedMonthlyReturnsResponse(
+        unsubmittedCisReturns = Seq(
+          UnsubmittedMonthlyReturnsRow(
+            taxYear = 2025,
+            taxMonth = 1,
+            returnType = "Nil",
+            status = "In progress",
+            monthlyReturnId = 123L,
+            action = Seq("Continue", "Delete"),
+            lastUpdate = Some(LocalDateTime.parse("2025-01-01T00:00:00")),
+            amendment = Some("N"),
+            deletable = true
+          )
+        )
+      )
+
+      when(connector.getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(resp))
+
+      service.getUnsubmittedMonthlyReturns(instanceId).futureValue mustBe resp
+
+      verify(connector).getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+  }
+
+  "getUnsubmittedMonthlyReturnRows" should {
+
+    "delegate to connector and return mapped row view models" in {
+      val (service, connector, sessionRepo) = newService()
+      val instanceId                        = "900063"
 
       when(appConfig.continueReturnJourneyUrl(any[String], any[String], any[String]))
         .thenReturn("/continue")
@@ -391,7 +423,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             returnType = "Nil",
             status = "In progress",
             monthlyReturnId = 123L,
-            action = Seq.empty,
+            action = Seq("Continue", "Delete"),
             lastUpdate = Some(LocalDateTime.parse("2025-01-01T00:00:00")),
             amendment = Some("N"),
             deletable = true
@@ -402,7 +434,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       when(connector.getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(resp))
 
-      service.getUnsubmittedMonthlyReturns(instanceId).futureValue mustBe Seq(
+      service.getUnsubmittedMonthlyReturnRows(instanceId).futureValue mustBe Seq(
         IncompleteReturnsRowViewModel(
           returnPeriodEnd = "Jan 2025",
           returnType = "Nil",
@@ -424,15 +456,14 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         )
       )
 
-      verify(connector).getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
+      verify(connector, times(1)).getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
       verifyNoInteractions(sessionRepo)
-      verifyNoInteractions(unsubmittedMonthlyReturnRepo)
     }
 
     "propagate failure from connector" in {
       val (service, connector, sessionRepo) = newService()
-      val instanceId                              = "900063"
-      val boom                                    = new RuntimeException("Backend error")
+      val instanceId                        = "900063"
+      val boom                              = new RuntimeException("Backend error")
 
       when(connector.getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
         .thenReturn(Future.failed(boom))
@@ -523,8 +554,28 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       val mockResponse = UnsubmittedMonthlyReturnsResponse(
         unsubmittedCisReturns = Seq(
-          UnsubmittedMonthlyReturnsRow(3000L, 2025, 1, "Nil", "In Progress", None, Some("Y"), true),
-          UnsubmittedMonthlyReturnsRow(3001L, 2025, 2, "Nil", "In Progress", Some(LocalDateTime.now()), Some("Y"), true)
+          UnsubmittedMonthlyReturnsRow(
+            2025,
+            1,
+            "Nil",
+            "In Progress",
+            3000L,
+            Seq("Continue", "Delete"),
+            None,
+            Some("Y"),
+            true
+          ),
+          UnsubmittedMonthlyReturnsRow(
+            2025,
+            2,
+            "Nil",
+            "In Progress",
+            3001L,
+            Seq("Continue", "Delete"),
+            Some(LocalDateTime.now()),
+            Some("Y"),
+            true
+          )
         )
       )
 
@@ -601,6 +652,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         taxMonth = 1,
         returnType = "Nil",
         status = "PENDING",
+        action = Seq("Awaiting confirmation"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -631,6 +683,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         taxMonth = 1,
         returnType = "Nil",
         status = "PENDING",
+        action = Seq("Awaiting confirmation"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = false
@@ -696,6 +749,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         taxMonth = 4,
         returnType = "Nil",
         status = "In Progress",
+        action = Seq("Continue", "Delete"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -728,6 +782,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         taxMonth = 4,
         returnType = "Nil",
         status = "In Progress",
+        action = Seq("Continue", "Delete"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -755,6 +810,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         taxMonth = 4,
         returnType = "Nil",
         status = "In Progress",
+        action = Seq("Continue", "Delete"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true

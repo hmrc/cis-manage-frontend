@@ -43,7 +43,7 @@ class IncompleteReturnsController @Inject() (
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     request.userAnswers.get(CisIdPage) match {
       case Some(instanceId) =>
-        service.getUnsubmittedMonthlyReturns(instanceId).map { vm =>
+        service.getUnsubmittedMonthlyReturnRows(instanceId).map { vm =>
           Ok(view(vm))
         }
 

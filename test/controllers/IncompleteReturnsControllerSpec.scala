@@ -54,7 +54,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         )
       )
 
-      when(mockService.getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
+      when(mockService.getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(rows))
 
       val userAnswers = emptyUserAnswers.set(CisIdPage, "1234567890").success.value
@@ -73,7 +73,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(rows)(request, messages(application)).toString
 
-        verify(mockService).getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
+        verify(mockService).getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier])
       }
     }
 
