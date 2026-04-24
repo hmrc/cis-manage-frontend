@@ -18,10 +18,10 @@ package services
 
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
-import models.agent.AgentClientData
-import models.history.{SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSchemeData, SubmittedSubmissionData}
-import models.requests.DeleteUnsubmittedMonthlyReturnRequest
 import models.*
+import models.agent.AgentClientData
+import models.history.*
+import models.requests.DeleteUnsubmittedMonthlyReturnRequest
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
@@ -749,6 +749,99 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       verify(connector).deleteUnsubmittedMonthlyReturn(eqTo(expectedRequest))(any[HeaderCarrier])
       verifyNoInteractions(sessionRepo)
+    }
+  }
+
+  "getSubmittedTaxYears" should {
+
+    "return sorted distinct tax years from submitted monthly returns" in {
+      val (service, connector, _) = newService()
+      val instanceId              = "CIS-123"
+
+      val resp = SubmittedReturnsData(
+        scheme = SubmittedSchemeData(
+          name = "ABC Construction Ltd",
+          taxOfficeNumber = "123",
+          taxOfficeReference = "AB456"
+        ),
+        monthlyReturns = Seq(
+          // April 2024 -> 2024-04-05 -> 2023 to 2024
+          SubmittedMonthlyReturnData(
+            monthlyReturnId = 1L,
+            taxYear = 2024,
+            taxMonth = 4,
+            nilReturnIndicator = "Y",
+            status = "SUBMITTED",
+            supersededBy = None,
+            amendmentStatus = None,
+            monthlyReturnItems = None
+          ),
+          // May 2024 -> 2024-05-05 -> 2024 to 2025
+          SubmittedMonthlyReturnData(
+            monthlyReturnId = 2L,
+            taxYear = 2024,
+            taxMonth = 5,
+            nilReturnIndicator = "Y",
+            status = "SUBMITTED",
+            supersededBy = None,
+            amendmentStatus = None,
+            monthlyReturnItems = None
+          ),
+          // March 2023 -> 2023-03-05 -> 2022 to 2023
+          SubmittedMonthlyReturnData(
+            monthlyReturnId = 3L,
+            taxYear = 2023,
+            taxMonth = 3,
+            nilReturnIndicator = "Y",
+            status = "SUBMITTED",
+            supersededBy = None,
+            amendmentStatus = None,
+            monthlyReturnItems = None
+          ),
+          // April 2023 -> 2023-04-05 -> 2022 to 2023
+          SubmittedMonthlyReturnData(
+            monthlyReturnId = 4L,
+            taxYear = 2023,
+            taxMonth = 4,
+            nilReturnIndicator = "Y",
+            status = "SUBMITTED",
+            supersededBy = None,
+            amendmentStatus = None,
+            monthlyReturnItems = None
+          )
+        ),
+        submissions = Seq(
+          SubmittedSubmissionData(
+            submissionId = 100L,
+            submissionType = Some("MONTHLY_RETURN"),
+            activeObjectId = Some(1L),
+            status = "ACCEPTED",
+            hmrcMarkGenerated = None,
+            hmrcMarkGgis = None,
+            emailRecipient = Some("test@test.com"),
+            acceptedTime = None
+          )
+        )
+      )
+
+      when(connector.getSubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(resp))
+
+      val result = service.getSubmittedTaxYears(instanceId).futureValue
+
+      result mustBe Seq((2022, 2023), (2023, 2024), (2024, 2025))
+    }
+
+    "propagate failure from connector" in {
+      val (service, connector, _) = newService()
+      val instanceId              = "CIS-123"
+      val boom                    = new RuntimeException("Backend error")
+
+      when(connector.getSubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(boom))
+
+      val ex = service.getSubmittedTaxYears(instanceId).failed.futureValue
+      ex mustBe boom
     }
   }
 }
