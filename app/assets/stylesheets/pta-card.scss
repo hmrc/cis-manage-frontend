@@ -9,17 +9,19 @@ $pta-white: #ffffff;
   text-decoration: none;
   color: inherit;
 
-  &:hover .pta-card {
-    background: $pta-blue;
-    color: $pta-white;
+  &:hover {
+    .pta-card {
+      background: $pta-blue;
+      color: $pta-white;
+    }
+
+    .pta-card-heading,
+    .pta-card-text {
+      color: $pta-white;
+    }
   }
 
-  &:hover .pta-card-heading,
-  &:hover .pta-card-text {
-    color: $pta-white;
-  }
-
-  &:focus .pta-card-heading {
+  &:focus-visible .pta-card-heading {
     outline: 3px solid transparent;
     color: $pta-white;
     background-color: $pta-yellow;
