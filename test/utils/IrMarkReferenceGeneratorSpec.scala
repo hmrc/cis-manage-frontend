@@ -41,5 +41,45 @@ class IrMarkReferenceGeneratorSpec extends AnyFreeSpec with Matchers {
       out must not be empty
       out.forall(ch => "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".contains(ch)) mustBe true
     }
+
+    "must cover remaining == 1 branch" in {
+      val bytes: Array[Byte] = Array(1) // length = 1 → remainder 1
+      val b64                = java.util.Base64.getEncoder.encodeToString(bytes)
+
+      val out = IrMarkReferenceGenerator.fromBase64(b64)
+      out.length mustBe 2
+
+      val alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
+      out.forall(alphabet.contains) mustBe true
+    }
+
+    "must cover remaining == 2 branch" in {
+      val bytes: Array[Byte] = Array(1, 2)
+      val b64                = java.util.Base64.getEncoder.encodeToString(bytes)
+
+      val out = IrMarkReferenceGenerator.fromBase64(b64)
+
+      out.length mustBe 4
+
+      val alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
+      out.forall(alphabet.contains) mustBe true
+    }
+
+    "must cover remaining == 3 branch" in {
+      val bytes: Array[Byte] = Array(1, 2, 3)
+      val b64                = java.util.Base64.getEncoder.encodeToString(bytes)
+
+      val out = IrMarkReferenceGenerator.fromBase64(b64)
+
+      out.length mustBe 5
+
+      val alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
+      out.forall(alphabet.contains) mustBe true
+    }
+
+    "must return empty string for empty input" in {
+      val out = IrMarkReferenceGenerator.fromBase64("")
+      out mustBe ""
+    }
   }
 }
