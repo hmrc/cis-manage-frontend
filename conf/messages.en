@@ -463,7 +463,7 @@ history.returnHistory.status.notAvailable = Not available
 history.returnHistory.status.awaitingConfirmation = Awaiting confirmation
 history.returnHistory.status.inProgress = In progress
 history.returnHistory.hidden.status.amend = amend return for {0}
-history.returnHistory.hidden.status.inProgress = continue return for {0}
+history.returnHistory.hidden.status.inProgress = submission return for {0}
 history.returnHistory.hidden.monthlyReturn = monthly return for {0}
 history.returnHistory.hidden.submissionReceipt = submission receipt for {0}
 
