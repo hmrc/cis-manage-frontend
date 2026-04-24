@@ -43,7 +43,7 @@ class IrMarkReferenceGeneratorSpec extends AnyFreeSpec with Matchers {
     }
 
     "must cover remaining == 1 branch" in {
-      val bytes: Array[Byte] = Array(1) // length = 1 → remainder 1
+      val bytes: Array[Byte] = Array(1)
       val b64                = java.util.Base64.getEncoder.encodeToString(bytes)
 
       val out = IrMarkReferenceGenerator.fromBase64(b64)
