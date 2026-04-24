@@ -33,7 +33,7 @@ class SubmittedReturnsChooseTaxYearFormProviderSpec extends OptionFieldBehaviour
     behave like optionsField[String](
       form,
       fieldName,
-      validValues = taxYears,
+      validValues = taxYears ++ Seq("all"),
       invalidError = FormError(fieldName, "error.invalid")
     )
 
