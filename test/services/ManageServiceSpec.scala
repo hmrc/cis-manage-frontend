@@ -384,7 +384,6 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             returnType = "Nil",
             status = "In progress",
             monthlyReturnId = 123L,
-            action = Seq("Continue", "Delete"),
             lastUpdate = Some(LocalDateTime.parse("2025-01-01T00:00:00")),
             amendment = Some("N"),
             deletable = true
@@ -423,7 +422,6 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             returnType = "Nil",
             status = "In progress",
             monthlyReturnId = 123L,
-            action = Seq("Continue", "Delete"),
             lastUpdate = Some(LocalDateTime.parse("2025-01-01T00:00:00")),
             amendment = Some("N"),
             deletable = true
@@ -448,7 +446,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             ),
             ActionLinkViewModel(
               textKey = "incompleteReturns.action.delete",
-              href = controllers.delete.routes.DeleteNilMonthlyReturnController.onPageLoad().url,
+              href = controllers.routes.IncompleteReturnsController.onDeleteRedirect(123L).url,
               hiddenTextKey = Some("incompleteReturns.action.delete")
             )
           ),
@@ -560,7 +558,6 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             "Nil",
             "In Progress",
             3000L,
-            Seq("Continue", "Delete"),
             None,
             Some("Y"),
             true
@@ -571,7 +568,6 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             "Nil",
             "In Progress",
             3001L,
-            Seq("Continue", "Delete"),
             Some(LocalDateTime.now()),
             Some("Y"),
             true
@@ -652,7 +648,6 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         taxMonth = 1,
         returnType = "Nil",
         status = "PENDING",
-        action = Seq("Awaiting confirmation"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -683,7 +678,6 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         taxMonth = 1,
         returnType = "Nil",
         status = "PENDING",
-        action = Seq("Awaiting confirmation"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = false
@@ -749,7 +743,6 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         taxMonth = 4,
         returnType = "Nil",
         status = "In Progress",
-        action = Seq("Continue", "Delete"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -782,7 +775,6 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         taxMonth = 4,
         returnType = "Nil",
         status = "In Progress",
-        action = Seq("Continue", "Delete"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -810,7 +802,6 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         taxMonth = 4,
         returnType = "Nil",
         status = "In Progress",
-        action = Seq("Continue", "Delete"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true

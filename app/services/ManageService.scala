@@ -234,7 +234,6 @@ class ManageService @Inject() (
     }
 
   private def buildActions(instanceId: String, row: UnsubmittedMonthlyReturnsRow): Seq[ActionLinkViewModel] = {
-    val returnType  = row.returnType
     val isDeletable = row.deletable
     val isAmendment = row.amendment.exists(_.equals("Y"))
 
@@ -244,7 +243,7 @@ class ManageService @Inject() (
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.continue",
             href = if (isAmendment) {
-              controllers.routes.JourneyRecoveryController.onPageLoad().url
+              controllers.routes.JourneyRecoveryController.onPageLoad().url // TODO: MR03-03
             } else {
               appConfig
                 .continueReturnJourneyUrl(instanceId, row.taxYear.toString, row.taxMonth.toString)
@@ -254,7 +253,7 @@ class ManageService @Inject() (
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.delete",
             href = if (isDeletable) {
-              deleteReturnUrl(isAmendment, returnType)
+              controllers.routes.IncompleteReturnsController.onDeleteRedirect(row.monthlyReturnId).url
             } else {
               controllers.routes.JourneyRecoveryController.onPageLoad().url
             },
@@ -284,14 +283,4 @@ class ManageService @Inject() (
         Seq.empty
     }
   }
-
-  private def deleteReturnUrl(isAmendment: Boolean, returnType: String): String =
-    (isAmendment, returnType) match {
-      case (false, "Standard") => controllers.delete.routes.DeleteMonthlyReturnController.onPageLoad().url
-      case (false, "Nil")      => controllers.delete.routes.DeleteNilMonthlyReturnController.onPageLoad().url
-      case (true, "Standard")  => controllers.delete.routes.DeleteAmendedMonthlyReturnController.onPageLoad().url
-      case (true, "Nil")       => controllers.delete.routes.DeleteAmendedNilMonthlyReturnController.onPageLoad().url
-      case (_, _)              => controllers.routes.JourneyRecoveryController.onPageLoad().url
-    }
-
 }

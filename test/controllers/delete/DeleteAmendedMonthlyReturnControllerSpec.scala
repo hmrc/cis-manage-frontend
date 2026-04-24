@@ -46,7 +46,6 @@ class DeleteAmendedMonthlyReturnControllerSpec extends SpecBase with MockitoSuga
     "Standard",
     "In Progress",
     3000L,
-    Seq("Continue", "Delete"),
     None,
     Some("Y"),
     true

@@ -48,7 +48,6 @@ class DeleteMonthlyReturnControllerSpec extends SpecBase with MockitoSugar {
     "Standard",
     "In Progress",
     3000L,
-    Seq("Continue", "Delete"),
     None,
     Some("N"),
     true

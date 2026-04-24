@@ -18,10 +18,14 @@ package controllers
 
 import controllers.actions.*
 import pages.CisIdPage
+import models.*
+import play.api.Logging
 
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import queries.delete.UnsubmittedMonthlyReturnToDeleteQuery
+import repositories.SessionRepository
 import services.ManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IncompleteReturnsView
@@ -33,12 +37,14 @@ class IncompleteReturnsController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: IncompleteReturnsView,
   service: ManageService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     request.userAnswers.get(CisIdPage) match {
@@ -51,4 +57,29 @@ class IncompleteReturnsController @Inject() (
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
   }
+
+  def onDeleteRedirect(monthlyReturnId: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      service.checkUnsubmittedMonthlyReturnDeletion(request.userAnswers, monthlyReturnId).flatMap {
+        case Deletable(record) =>
+          for {
+            updatedAnswers <- Future.fromTry(
+                                request.userAnswers.set(UnsubmittedMonthlyReturnToDeleteQuery, record)
+                              )
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(resolveDeleteRoute(record))
+        case _                 => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      }
+    }
+
+  private def resolveDeleteRoute(record: UnsubmittedMonthlyReturnsRow): Call =
+    (record.returnType, record.amendment) match {
+      case ("Nil", Some("Y"))      => controllers.delete.routes.DeleteAmendedNilMonthlyReturnController.onPageLoad()
+      case ("Nil", Some("N"))      => controllers.delete.routes.DeleteNilMonthlyReturnController.onPageLoad()
+      case ("Standard", Some("Y")) => controllers.delete.routes.DeleteAmendedMonthlyReturnController.onPageLoad()
+      case ("Standard", Some("N")) => controllers.delete.routes.DeleteMonthlyReturnController.onPageLoad()
+      case _                       =>
+        logger.warn(s"[ReturnsLandingController] No delete route mapping for monthlyReturnId=${record.monthlyReturnId}")
+        controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
 }

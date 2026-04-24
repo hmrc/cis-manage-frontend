@@ -45,7 +45,6 @@ class DeletableReturnActionSpec extends SpecBase with MockitoSugar {
           taxMonth = 1,
           returnType = "Nil",
           status = "In Progress",
-          action = Seq("Continue", "Delete"),
           lastUpdate = None,
           amendment = Some("Y"),
           deletable = true
@@ -76,7 +75,6 @@ class DeletableReturnActionSpec extends SpecBase with MockitoSugar {
           taxMonth = 1,
           returnType = "Nil",
           status = "In Progress",
-          action = Seq("Continue", "Delete"),
           lastUpdate = None,
           amendment = Some("Y"),
           deletable = false

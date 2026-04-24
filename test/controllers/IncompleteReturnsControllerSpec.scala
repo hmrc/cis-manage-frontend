@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import models.{Deletable, NotDeletable, UnsubmittedMonthlyReturnsRow, UserAnswers}
 import org.mockito.Mockito.*
 import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.mockito.MockitoSugar
@@ -24,6 +25,7 @@ import pages.CisIdPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import repositories.SessionRepository
 import services.ManageService
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel}
@@ -33,7 +35,7 @@ import scala.concurrent.Future
 
 class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
 
-  "IncompleteReturnsController" - {
+  "IncompleteReturnsController.onPageLoad" - {
 
     "must return OK and the correct view for a GET when CisIdPage is present" in {
       val mockService = mock[ManageService]
@@ -93,6 +95,255 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
 
         verifyNoInteractions(mockService)
+      }
+    }
+  }
+
+  "IncompleteReturnsController.onDeleteRedirect" - {
+
+    val monthlyReturnId = 3000L
+
+    lazy val onDeleteRedirectRoute: String =
+      controllers.routes.IncompleteReturnsController.onDeleteRedirect(monthlyReturnId).url
+
+    "must redirect to DeleteAmendedNilMonthlyReturnController" in {
+      val mockManageService     = mock[ManageService]
+      val mockSessionRepository = mock[SessionRepository]
+
+      val mockDeletableResult = UnsubmittedMonthlyReturnsRow(
+        monthlyReturnId = monthlyReturnId,
+        taxYear = 2026,
+        taxMonth = 4,
+        returnType = "Nil",
+        status = "In Progress",
+        lastUpdate = None,
+        amendment = Some("Y"),
+        deletable = true
+      )
+
+      when(
+        mockManageService.checkUnsubmittedMonthlyReturnDeletion(any[UserAnswers], any[Long])(
+          any[HeaderCarrier]
+        )
+      ).thenReturn(Future.successful(Deletable(mockDeletableResult)))
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[ManageService].toInstance(mockManageService)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, onDeleteRedirectRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.delete.routes.DeleteAmendedNilMonthlyReturnController
+          .onPageLoad()
+          .url
+      }
+    }
+
+    "must redirect to DeleteNilMonthlyReturnController" in {
+      val mockManageService     = mock[ManageService]
+      val mockSessionRepository = mock[SessionRepository]
+
+      val mockDeletableResult = UnsubmittedMonthlyReturnsRow(
+        monthlyReturnId = monthlyReturnId,
+        taxYear = 2026,
+        taxMonth = 4,
+        returnType = "Nil",
+        status = "In Progress",
+        lastUpdate = None,
+        amendment = Some("N"),
+        deletable = true
+      )
+
+      when(
+        mockManageService.checkUnsubmittedMonthlyReturnDeletion(any[UserAnswers], any[Long])(
+          any[HeaderCarrier]
+        )
+      ).thenReturn(Future.successful(Deletable(mockDeletableResult)))
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[ManageService].toInstance(mockManageService)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, onDeleteRedirectRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.delete.routes.DeleteNilMonthlyReturnController
+          .onPageLoad()
+          .url
+      }
+    }
+
+    "must redirect to DeleteAmendedMonthlyReturnController" in {
+      val mockManageService     = mock[ManageService]
+      val mockSessionRepository = mock[SessionRepository]
+
+      val mockDeletableResult = UnsubmittedMonthlyReturnsRow(
+        monthlyReturnId = monthlyReturnId,
+        taxYear = 2026,
+        taxMonth = 4,
+        returnType = "Standard",
+        status = "In Progress",
+        lastUpdate = None,
+        amendment = Some("Y"),
+        deletable = true
+      )
+
+      when(
+        mockManageService.checkUnsubmittedMonthlyReturnDeletion(any[UserAnswers], any[Long])(
+          any[HeaderCarrier]
+        )
+      ).thenReturn(Future.successful(Deletable(mockDeletableResult)))
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[ManageService].toInstance(mockManageService)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, onDeleteRedirectRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.delete.routes.DeleteAmendedMonthlyReturnController
+          .onPageLoad()
+          .url
+      }
+    }
+
+    "must redirect to DeleteMonthlyReturnController" in {
+      val mockManageService     = mock[ManageService]
+      val mockSessionRepository = mock[SessionRepository]
+
+      val mockDeletableResult = UnsubmittedMonthlyReturnsRow(
+        monthlyReturnId = monthlyReturnId,
+        taxYear = 2026,
+        taxMonth = 4,
+        returnType = "Standard",
+        status = "In Progress",
+        lastUpdate = None,
+        amendment = Some("N"),
+        deletable = true
+      )
+
+      when(
+        mockManageService.checkUnsubmittedMonthlyReturnDeletion(any[UserAnswers], any[Long])(
+          any[HeaderCarrier]
+        )
+      ).thenReturn(Future.successful(Deletable(mockDeletableResult)))
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[ManageService].toInstance(mockManageService)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, onDeleteRedirectRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.delete.routes.DeleteMonthlyReturnController
+          .onPageLoad()
+          .url
+      }
+    }
+
+    "must redirect to journey recovery when an unsubmitted return is not deletable" in {
+      val mockManageService     = mock[ManageService]
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(
+        mockManageService.checkUnsubmittedMonthlyReturnDeletion(any[UserAnswers], any[Long])(
+          any[HeaderCarrier]
+        )
+      ).thenReturn(Future.successful(NotDeletable))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[ManageService].toInstance(mockManageService)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, onDeleteRedirectRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
+          .onPageLoad()
+          .url
+      }
+
+      verifyNoInteractions(mockSessionRepository)
+    }
+
+    "must redirect to journey recovery when unable to resolve the route" in {
+      val mockManageService     = mock[ManageService]
+      val mockSessionRepository = mock[SessionRepository]
+
+      val mockDeletableResult = UnsubmittedMonthlyReturnsRow(
+        monthlyReturnId = monthlyReturnId,
+        taxYear = 2026,
+        taxMonth = 4,
+        returnType = "Invalid Type",
+        status = "In Progress",
+        lastUpdate = None,
+        amendment = Some("N"),
+        deletable = true
+      )
+
+      when(
+        mockManageService.checkUnsubmittedMonthlyReturnDeletion(any[UserAnswers], any[Long])(
+          any[HeaderCarrier]
+        )
+      ).thenReturn(Future.successful(Deletable(mockDeletableResult)))
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[ManageService].toInstance(mockManageService)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, onDeleteRedirectRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
+          .onPageLoad()
+          .url
       }
     }
   }

@@ -43,7 +43,7 @@ class DeleteNilMonthlyReturnControllerSpec extends SpecBase with MockitoSugar {
   private val monthYear: String = "April 2026"
 
   val deletableRow        =
-    UnsubmittedMonthlyReturnsRow(2026, 4, "Nil", "In Progress", 3000L, Seq("Continue", "Delete"), None, Some("N"), true)
+    UnsubmittedMonthlyReturnsRow(2026, 4, "Nil", "In Progress", 3000L, None, Some("N"), true)
   val baseUa: UserAnswers = userAnswersWithCisId
     .set(UnsubmittedMonthlyReturnToDeleteQuery, deletableRow)
     .success

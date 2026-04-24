@@ -29,7 +29,6 @@ case class UnsubmittedMonthlyReturnsRow(
   returnType: String,
   status: String,
   monthlyReturnId: Long,
-  action: Seq[String],
   lastUpdate: Option[LocalDateTime],
   amendment: Option[String],
   deletable: Boolean
