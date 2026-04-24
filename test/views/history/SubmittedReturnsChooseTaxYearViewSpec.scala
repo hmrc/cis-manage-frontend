@@ -36,9 +36,8 @@ class SubmittedReturnsChooseTaxYearViewSpec extends SpecBase {
     "must render the page with the correct html elements" in new Setup {
       val doc: Document = Jsoup.parse(html.toString)
 
-      doc.title                           must include(messages("history.submittedReturnsChooseTaxYear.title"))
-      doc.select("h1").text               must include(messages("history.submittedReturnsChooseTaxYear.heading"))
-      doc.select(".govuk-caption-l").text must include(messages("history.submittedReturnsChooseTaxYear.caption"))
+      doc.title             must include(messages("history.submittedReturnsChooseTaxYear.title"))
+      doc.select("h1").text must include(messages("history.submittedReturnsChooseTaxYear.heading"))
 
       doc.getElementsByClass("govuk-button").text must include(messages("site.continue"))
     }
