@@ -1,11 +1,12 @@
-package forms
+package forms.amend
 
+import forms.amend.ConfirmCancelAmendmentFormProvider
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
 class ConfirmCancelAmendmentFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "confirmCancelAmendment.error.required"
+  val requiredKey = "amend.confirmCancelAmendment.error.required"
   val invalidKey  = "error.boolean"
 
   val form = new ConfirmCancelAmendmentFormProvider()()

@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.amend
 
-import controllers.actions._
-import forms.ConfirmCancelAmendmentFormProvider
-import javax.inject.Inject
+import controllers.actions.*
+import forms.amend.ConfirmCancelAmendmentFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.ConfirmCancelAmendmentPage
+import pages.amend.ConfirmCancelAmendmentPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.ConfirmCancelAmendmentView
+import views.html.amend.ConfirmCancelAmendmentView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmCancelAmendmentController @Inject() (

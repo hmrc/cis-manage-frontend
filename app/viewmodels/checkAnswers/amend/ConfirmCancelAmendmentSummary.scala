@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.amend
 
 import controllers.routes
 import models.{CheckMode, UserAnswers}
-import pages.ConfirmCancelAmendmentPage
+import pages.amend.ConfirmCancelAmendmentPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
 object ConfirmCancelAmendmentSummary {
 
@@ -35,7 +35,10 @@ object ConfirmCancelAmendmentSummary {
         key = "confirmCancelAmendment.checkYourAnswersLabel",
         value = ValueViewModel(value),
         actions = Seq(
-          ActionItemViewModel("site.change", routes.ConfirmCancelAmendmentController.onPageLoad(CheckMode).url)
+          ActionItemViewModel(
+            "site.change",
+            controllers.amend.routes.ConfirmCancelAmendmentController.onPageLoad(CheckMode).url
+          )
             .withVisuallyHiddenText(messages("confirmCancelAmendment.change.hidden"))
         )
       )
