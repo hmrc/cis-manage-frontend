@@ -470,3 +470,9 @@ amend.noReturnsSubmitted.p2 = You can do this in
 amend.noReturnsSubmitted.p2.link = Manage your CIS return
 amend.noReturnsSubmitted.p3 = Find out more about
 amend.noReturnsSubmitted.p3.link = what you must do as a CIS contractor
+
+confirmCancelAmendment.title = confirmCancelAmendment
+confirmCancelAmendment.heading = confirmCancelAmendment
+confirmCancelAmendment.checkYourAnswersLabel = confirmCancelAmendment
+confirmCancelAmendment.error.required = Select yes if confirmCancelAmendment
+confirmCancelAmendment.change.hidden = ConfirmCancelAmendment
