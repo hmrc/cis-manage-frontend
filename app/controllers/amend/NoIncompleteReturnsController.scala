@@ -26,21 +26,22 @@ import views.html.amend.NoIncompleteReturnsView
 
 import javax.inject.Inject
 
-class NoIncompleteReturnsController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: NoIncompleteReturnsView
-                                     ) extends FrontendBaseController with I18nSupport with Logging {
+class NoIncompleteReturnsController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: NoIncompleteReturnsView
+) extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      val cisId = request.userAnswers.get(CisIdPage).getOrElse {
-        logger.error("[NoIncompleteReturnsController] cisId missing from userAnswers")
-        throw new IllegalStateException("cisId missing from userAnswers")
-      }
-      Ok(view(cisId))
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    val cisId = request.userAnswers.get(CisIdPage).getOrElse {
+      logger.error("[NoIncompleteReturnsController] cisId missing from userAnswers")
+      throw new IllegalStateException("cisId missing from userAnswers")
+    }
+    Ok(view(cisId))
   }
 }
