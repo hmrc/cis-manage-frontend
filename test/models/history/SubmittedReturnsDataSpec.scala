@@ -39,6 +39,7 @@ class SubmittedReturnsDataSpec extends AnyWordSpec with Matchers {
             taxMonth = 3,
             nilReturnIndicator = "Y",
             status = "Submitted",
+            amendment = "N",
             supersededBy = None,
             amendmentStatus = Some("None"),
             monthlyReturnItems = Some("items")

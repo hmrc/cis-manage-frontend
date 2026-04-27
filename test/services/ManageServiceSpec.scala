@@ -435,6 +435,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             taxMonth = 1,
             nilReturnIndicator = "Y",
             status = "SUBMITTED",
+            amendment = "N",
             supersededBy = None,
             amendmentStatus = None,
             monthlyReturnItems = None

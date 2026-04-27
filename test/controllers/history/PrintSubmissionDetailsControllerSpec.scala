@@ -20,13 +20,12 @@ import base.SpecBase
 import models.UserAnswers
 import models.history.*
 import models.response.GetSubmittedMonthlyReturnsDataResponse
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import queries.SubmittedMonthlyReturnToPrintQuery
 import services.{ManageService, SubmittedReturnsService}
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.history.PrintSubmissionDetailsView
@@ -35,6 +34,9 @@ import java.time.Instant
 import scala.concurrent.Future
 
 class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
+
+  lazy val printSubmissionDetailsRoute: String =
+    controllers.history.routes.PrintSubmissionDetailsController.onPageLoad(2026, 4, "N").url
 
   "PrintSubmissionDetails Controller" - {
 
@@ -45,8 +47,8 @@ class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
       val mockResponse = GetSubmittedMonthlyReturnsDataResponse(
         scheme = SubmittedSchemeData("Scheme Name", "163", "AB0063"),
         monthlyReturnId = 3000L,
-        taxYear = 2025,
-        taxMonth = 1,
+        taxYear = 2026,
+        taxMonth = 4,
         nilReturnIndicator = "Y",
         monthlyReturnItems = Seq.empty,
         submission = SubmittedSubmissionData(
@@ -61,7 +63,9 @@ class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
         )
       )
 
-      when(mockManageService.getSubmittedMonthlyReturnsData(any(), any(), any(), any())(any[HeaderCarrier]))
+      when(
+        mockManageService.getSubmittedMonthlyReturnsData(eqTo("1"), eqTo(2026), eqTo(4), eqTo("N"))(any[HeaderCarrier])
+      )
         .thenReturn(Future.successful(mockResponse))
 
       val submittedReturnsService = mock[SubmittedReturnsService]
@@ -99,24 +103,7 @@ class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       when(submittedReturnsService.buildSubmittedReturnPrintViewModel(any(), any())).thenReturn(model)
 
-      val userAnswers: UserAnswers = userAnswersWithCisId
-        .set(
-          SubmittedMonthlyReturnToPrintQuery,
-          SubmittedMonthlyReturnData(
-            monthlyReturnId = 1L,
-            taxYear = 2026,
-            taxMonth = 4,
-            nilReturnIndicator = "Y",
-            status = "Submitted",
-            supersededBy = None,
-            amendmentStatus = Some("None"),
-            monthlyReturnItems = Some("items")
-          )
-        )
-        .success
-        .value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
         .overrides(
           bind[ManageService].toInstance(mockManageService),
           bind[SubmittedReturnsService].toInstance(submittedReturnsService)
@@ -124,7 +111,7 @@ class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, controllers.history.routes.PrintSubmissionDetailsController.onPageLoad().url)
+        val request = FakeRequest(GET, printSubmissionDetailsRoute)
 
         val result = route(application, request).value
 
@@ -137,30 +124,13 @@ class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to SystemErrorController when ManageService fails" in {
 
-      val userAnswers: UserAnswers = emptyUserAnswers
-        .set(
-          SubmittedMonthlyReturnToPrintQuery,
-          SubmittedMonthlyReturnData(
-            monthlyReturnId = 1L,
-            taxYear = 2026,
-            taxMonth = 4,
-            nilReturnIndicator = "Y",
-            status = "Submitted",
-            supersededBy = None,
-            amendmentStatus = Some("None"),
-            monthlyReturnItems = Some("items")
-          )
-        )
-        .success
-        .value
-
       val submittedReturnsService = mock[SubmittedReturnsService]
       val mockManageService       = mock[ManageService]
 
       when(mockManageService.getSubmittedMonthlyReturnsData(any(), any(), any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers))
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
         .overrides(
           bind[ManageService].toInstance(mockManageService),
           bind[SubmittedReturnsService].toInstance(submittedReturnsService)
@@ -169,7 +139,7 @@ class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
 
-        val request = FakeRequest(GET, controllers.history.routes.PrintSubmissionDetailsController.onPageLoad().url)
+        val request = FakeRequest(GET, printSubmissionDetailsRoute)
 
         val result = route(application, request).value
 
@@ -180,45 +150,13 @@ class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
       verifyNoInteractions(submittedReturnsService)
     }
 
-    "must redirect to Journey Recovery for a GET if SubmittedMonthlyReturnToPrintQuery missing in user answers" in {
-
-      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId)).build()
-
-      running(application) {
-
-        val request = FakeRequest(GET, controllers.history.routes.PrintSubmissionDetailsController.onPageLoad().url)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
     "must redirect to Journey Recovery for a GET if CisId missing in user answers" in {
 
-      val userAnswers: UserAnswers = emptyUserAnswers
-        .set(
-          SubmittedMonthlyReturnToPrintQuery,
-          SubmittedMonthlyReturnData(
-            monthlyReturnId = 1L,
-            taxYear = 2026,
-            taxMonth = 4,
-            nilReturnIndicator = "Y",
-            status = "Submitted",
-            supersededBy = None,
-            amendmentStatus = Some("None"),
-            monthlyReturnItems = Some("items")
-          )
-        )
-        .success
-        .value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
 
-        val request = FakeRequest(GET, controllers.history.routes.PrintSubmissionDetailsController.onPageLoad().url)
+        val request = FakeRequest(GET, printSubmissionDetailsRoute)
 
         val result = route(application, request).value
 

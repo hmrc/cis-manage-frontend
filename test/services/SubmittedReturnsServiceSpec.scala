@@ -53,6 +53,7 @@ class SubmittedReturnsServiceSpec extends SpecBase {
       taxMonth = taxMonth,
       nilReturnIndicator = nilReturnIndicator,
       status = status,
+      amendment = "N",
       supersededBy = supersededBy,
       amendmentStatus = amendmentStatus,
       monthlyReturnItems = monthlyReturnItems
@@ -100,7 +101,13 @@ class SubmittedReturnsServiceSpec extends SpecBase {
       row.returnPeriodEnd          shouldBe "Mar 2023"
       row.returnType               shouldBe ReturnTypeViewModel.Standard
       row.dateSubmitted            shouldBe "1 Apr 2024"
-      row.monthlyReturn.url        shouldBe "#"
+      row.monthlyReturn.url        shouldBe controllers.history.routes.PrintSubmissionDetailsController
+        .onPageLoad(
+          monthlyReturn().taxYear,
+          monthlyReturn().taxMonth,
+          monthlyReturn().amendment
+        )
+        .url
       row.monthlyReturn.hiddenText shouldBe "Mar 2023"
       row.status                   shouldBe StatusViewModel.Text("history.returnHistory.status.amend")
     }
@@ -291,7 +298,7 @@ class SubmittedReturnsServiceSpec extends SpecBase {
         monthlyReturnId = 3000L,
         taxYear = 2026,
         taxMonth = 4,
-        nilReturnIndicator = "N",
+        nilReturnIndicator = "Y",
         monthlyReturnItems = Seq.empty,
         submission = SubmittedSubmissionData(
           submissionId = 10L,
@@ -325,7 +332,7 @@ class SubmittedReturnsServiceSpec extends SpecBase {
         monthlyReturnId = 3000L,
         taxYear = 2026,
         taxMonth = 4,
-        nilReturnIndicator = "Y",
+        nilReturnIndicator = "N",
         monthlyReturnItems = Seq(
           MonthlyReturnItem(
             monthlyReturnId = 3000L,

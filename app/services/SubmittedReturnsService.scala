@@ -91,9 +91,9 @@ class SubmittedReturnsService @Inject() {
       submittedDate = submittedDate,
       receiptReferenceNumber = receiptReferenceNumber,
       submissionType = if (data.nilReturnIndicator == "Y") {
-        "standard"
-      } else {
         "nil"
+      } else {
+        "standard"
       },
       contractorName = data.scheme.name,
       payeReference = s"${data.scheme.taxOfficeNumber}/${data.scheme.taxOfficeReference}",
@@ -142,7 +142,13 @@ class SubmittedReturnsService @Inject() {
       returnType = returnType,
       dateSubmitted = dateSubmittedText,
       monthlyReturn = LinkViewModel(
-        url = "#", // TODO: F2 and F3 - replace with real route of page sr-04 Print monthly return
+        url = controllers.history.routes.PrintSubmissionDetailsController
+          .onPageLoad(
+            monthlyReturn.taxYear,
+            monthlyReturn.taxMonth,
+            monthlyReturn.amendment
+          )
+          .url,
         hiddenText = periodEndText
       ),
       submissionReceipt = buildSubmissionReceipt(submissionOpt, periodEndText),
