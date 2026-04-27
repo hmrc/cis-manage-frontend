@@ -488,3 +488,5 @@ submissionConfirmation.backToManage = Back to Manage your CIS return
 submissionConfirmation.needHelp.heading = Need help?
 submissionConfirmation.needHelp.p1 = For any questions about your return submission, contact the
 submissionConfirmation.needHelp.link = Construction Industry Scheme general enquiries (opens in new tab).
+submissionConfirmation.returnType.monthly = Monthly
+submissionConfirmation.returnType.nil = Nil

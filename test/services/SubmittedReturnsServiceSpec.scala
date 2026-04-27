@@ -389,7 +389,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       vm.taxYear         shouldBe 2024
       vm.taxMonth        shouldBe 6
       vm.returnPeriodEnd shouldBe "June 2024"
-      vm.returnType      shouldBe "Monthly"
+      vm.returnType      shouldBe "submissionConfirmation.returnType.monthly"
       vm.submissionType  shouldBe "Original"
       vm.hmrcMark        shouldBe Some("HMRC-123-ABC")
       vm.submittedAt.value should include("July 2024")
@@ -434,7 +434,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
       result shouldBe a[Right[_, _]]
       val vm = result.toOption.get
-      vm.returnType     shouldBe "Nil"
+      vm.returnType     shouldBe "submissionConfirmation.returnType.nil"
       vm.contractorName shouldBe "Nil Co"
       vm.items          shouldBe empty
       vm.submittedAt    shouldBe None

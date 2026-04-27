@@ -33,7 +33,7 @@
 @(viewModel: SubmissionReceiptViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(
-    pageTitle = titleNoForm(messages("submissionConfirmation.title", viewModel.returnType)),
+    pageTitle = titleNoForm(messages("submissionConfirmation.title", messages(viewModel.returnType))),
     showBackLink = false
 ) {
 
@@ -41,7 +41,7 @@
     @defining(HtmlFormat.escape(reference).body.grouped(22).mkString("<br>")) { formattedReference =>
 
     @govukPanel(Panel(
-        title = Text(messages("submissionConfirmation.panel.heading", viewModel.returnType)),
+        title = Text(messages("submissionConfirmation.panel.heading", messages(viewModel.returnType))),
         content = HtmlContent(
             HtmlFormat.raw(
                 messages("submissionConfirmation.panel.referenceLabel") +

@@ -228,6 +228,12 @@ class SubmittedReturnsService @Inject() (
       case _                                                                  => false
     }
 
+  private def buildReceiptReturnType(nilIndicator: Option[String]): String =
+    nilIndicator match {
+      case Some(n) if n.trim.equalsIgnoreCase("Y") => "submissionConfirmation.returnType.nil"
+      case _                                       => "submissionConfirmation.returnType.monthly"
+    }
+
   private def buildReceiptViewModel(
     response: MonthlyReturnCompleteResponse,
     instanceId: String,
@@ -240,10 +246,7 @@ class SubmittedReturnsService @Inject() (
 
     val monthName = Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)
 
-    val returnType = mr.flatMap(_.nilReturnIndicator) match {
-      case Some(n) if n.trim.equalsIgnoreCase("Y") => "Nil"
-      case _                                       => "Monthly"
-    }
+    val returnType = buildReceiptReturnType(mr.flatMap(_.nilReturnIndicator))
 
     val submissionType = submission.map(_.submissionType).getOrElse("Monthly return")
 
@@ -259,7 +262,7 @@ class SubmittedReturnsService @Inject() (
         scala.util.Try {
           val dateTime = LocalDateTime.parse(ts.take(19)).atZone(ukTimezone)
           val time     = dateTime.format(displayTimeFormatter)
-          val date     = dateTime.toLocalDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK))
+          val date     = dateTime.toLocalDate.format(displayDateFormatter)
           s"$time on $date"
         }.toOption
       }
