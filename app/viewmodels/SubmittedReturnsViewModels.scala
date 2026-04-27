@@ -44,9 +44,9 @@ case class LinkViewModel(
 sealed trait ReturnTypeViewModel
 
 object ReturnTypeViewModel {
-  case object Nil extends ReturnTypeViewModel
-  case object Standard extends ReturnTypeViewModel
-  case object Unknown extends ReturnTypeViewModel
+  case object Nil extends WithName("Nil") with ReturnTypeViewModel
+  case object Standard extends WithName("Standard") with ReturnTypeViewModel
+  case object Unknown extends WithName("Unknown") with ReturnTypeViewModel
 }
 
 sealed trait StatusViewModel

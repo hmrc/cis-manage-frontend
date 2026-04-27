@@ -15,6 +15,7 @@
  *@
 
 @import models.history.*
+@import viewmodels.ReturnTypeViewModel
 
 @this(
     layout: templates.Layout,
@@ -65,7 +66,7 @@
         })
     )
 
-    @if(data.submissionType == "standard") {
+    @if(data.submissionType == ReturnTypeViewModel.Standard.toString.toLowerCase) {
         @h2(messages("history.printSubmissionDetails.paymentDetails.heading"))
         @govukSummaryList(
             SummaryListViewModel(Seq(

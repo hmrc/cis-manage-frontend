@@ -91,9 +91,9 @@ class SubmittedReturnsService @Inject() {
       submittedDate = submittedDate,
       receiptReferenceNumber = receiptReferenceNumber,
       submissionType = if (data.nilReturnIndicator == "Y") {
-        "nil"
+        ReturnTypeViewModel.Nil.toString.toLowerCase
       } else {
-        "standard"
+        ReturnTypeViewModel.Standard.toString.toLowerCase
       },
       contractorName = data.scheme.name,
       payeReference = s"${data.scheme.taxOfficeNumber}/${data.scheme.taxOfficeReference}",
@@ -163,9 +163,9 @@ class SubmittedReturnsService @Inject() {
 
   private def buildReturnType(monthlyReturn: SubmittedMonthlyReturnData): ReturnTypeViewModel =
     monthlyReturn.nilReturnIndicator match {
-      case "Nil"      => ReturnTypeViewModel.Nil
-      case "Standard" => ReturnTypeViewModel.Standard
-      case _          => ReturnTypeViewModel.Unknown
+      case ReturnTypeViewModel.Nil.toString      => ReturnTypeViewModel.Nil
+      case ReturnTypeViewModel.Standard.toString => ReturnTypeViewModel.Standard
+      case _                                     => ReturnTypeViewModel.Unknown
     }
 
   private def buildDateSubmittedText(submissionOpt: Option[SubmittedSubmissionData]): String =
