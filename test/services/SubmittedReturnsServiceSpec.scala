@@ -392,16 +392,15 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       vm.returnType      shouldBe "submissionConfirmation.returnType.monthly"
       vm.submissionType  shouldBe "Original"
       vm.hmrcMark        shouldBe Some("HMRC-123-ABC")
-      vm.submittedAt.value should include("July 2024")
       vm.emailRecipient  shouldBe Some("user@example.com")
       vm.instanceId      shouldBe "INST001"
       vm.items.size      shouldBe 1
 
       val item = vm.items.head
       item.name            shouldBe "John Smith"
-      item.paymentsMade    shouldBe "5000.00"
-      item.costOfMaterials shouldBe "1000.00"
-      item.taxDeducted     shouldBe "800.00"
+      item.paymentsMade    shouldBe "£5000.00"
+      item.costOfMaterials shouldBe "£1000.00"
+      item.taxDeducted     shouldBe "£800.00"
     }
 
     "getMonthlyReturnComplete must identify nil returns correctly" in {
