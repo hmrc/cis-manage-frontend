@@ -18,7 +18,7 @@ package controllers.actions
 
 import base.SpecBase
 import controllers.Execution.trampoline
-import models.requests.DataRequest
+import models.requests.{CisIdDataRequest, DataRequest}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Result
 import play.api.test.FakeRequest
@@ -28,7 +28,7 @@ import scala.concurrent.Future
 class CisIdRequiredActionSpec extends SpecBase with MockitoSugar {
 
   object Harness extends CisIdRequiredActionImpl {
-    def callRefine[A](request: DataRequest[A]): Future[Either[Result, DataRequest[A]]] = refine(request)
+    def callRefine[A](request: DataRequest[A]): Future[Either[Result, CisIdDataRequest[A]]] = refine(request)
   }
 
   "CisId Required Action" - {
