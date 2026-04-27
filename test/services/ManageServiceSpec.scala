@@ -760,7 +760,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       val instanceId                        = "900063"
       val taxYear                           = 2026
       val taxMonth                          = 4
-      val amendment                         = "Y"
+      val amendment                         = "N"
 
       val expectedRequest = GetSubmittedMonthlyReturnsDataRequest(
         instanceId = instanceId,
@@ -774,7 +774,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         monthlyReturnId = 3000L,
         taxYear = 2025,
         taxMonth = 1,
-        returnType = "nil",
+        nilReturnIndicator = "N",
         monthlyReturnItems = Seq.empty,
         submission = SubmittedSubmissionData(
           submissionId = 10L,

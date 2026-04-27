@@ -47,7 +47,7 @@ class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
         monthlyReturnId = 3000L,
         taxYear = 2025,
         taxMonth = 1,
-        returnType = "nil",
+        nilReturnIndicator = "Y",
         monthlyReturnItems = Seq.empty,
         submission = SubmittedSubmissionData(
           submissionId = 10L,

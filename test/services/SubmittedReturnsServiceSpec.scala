@@ -291,7 +291,7 @@ class SubmittedReturnsServiceSpec extends SpecBase {
         monthlyReturnId = 3000L,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Nil",
+        nilReturnIndicator = "N",
         monthlyReturnItems = Seq.empty,
         submission = SubmittedSubmissionData(
           submissionId = 10L,
@@ -325,7 +325,7 @@ class SubmittedReturnsServiceSpec extends SpecBase {
         monthlyReturnId = 3000L,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Standard",
+        nilReturnIndicator = "Y",
         monthlyReturnItems = Seq(
           MonthlyReturnItem(
             monthlyReturnId = 3000L,

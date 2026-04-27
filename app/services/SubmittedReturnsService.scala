@@ -90,7 +90,11 @@ class SubmittedReturnsService @Inject() {
       submittedTime = submittedTime,
       submittedDate = submittedDate,
       receiptReferenceNumber = receiptReferenceNumber,
-      submissionType = data.returnType.toLowerCase,
+      submissionType = if (data.nilReturnIndicator == "Y") {
+        "standard"
+      } else {
+        "nil"
+      },
       contractorName = data.scheme.name,
       payeReference = s"${data.scheme.taxOfficeNumber}/${data.scheme.taxOfficeReference}",
       totalPaymentsMade = totalPaymentsMade,

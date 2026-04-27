@@ -25,7 +25,7 @@ case class GetSubmittedMonthlyReturnsDataResponse(
   monthlyReturnId: Long,
   taxYear: Int,
   taxMonth: Int,
-  returnType: String,
+  nilReturnIndicator: String,
   monthlyReturnItems: Seq[MonthlyReturnItem],
   submission: SubmittedSubmissionData
 )
