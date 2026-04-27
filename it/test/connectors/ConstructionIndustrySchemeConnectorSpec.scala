@@ -815,7 +815,7 @@ class ConstructionIndustrySchemeConnectorSpec
           monthlyReturnId = 3000L,
           taxYear = 2025,
           taxMonth = 1,
-          returnType = "Nil",
+          nilReturnIndicator = "N",
           monthlyReturnItems = Seq.empty,
           submission = SubmittedSubmissionData(
             submissionId = 10L,
