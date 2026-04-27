@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,12 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package viewmodels
+@this()
 
-case class ReturnsLandingContext(
-  contractorName: String,
-  standardReturnLink: String,
-  nilReturnLink: String
-)
+@(title: String, link: String, content: Html)
+
+<a href="@link" class="govuk-link pta-card-link-wrapper govuk-summary-card">
+    <div class="pta-card govuk-summary-card__title-wrapper">
+        <div class="pta-card-body">
+            <h3 class="govuk-heading-s pta-card-heading">
+                @title
+            </h3>
+            <p class="govuk-body pta-card-text">
+                @content
+            </p>
+        </div>
+    </div>
+</a>
