@@ -1,6 +1,5 @@
 package forms.amend
 
-import forms.amend.ConfirmCancelAmendmentFormProvider
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
