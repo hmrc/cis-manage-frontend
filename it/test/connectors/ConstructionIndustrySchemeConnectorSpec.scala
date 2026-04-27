@@ -672,7 +672,8 @@ class ConstructionIndustrySchemeConnectorSpec
                   |      "taxYear": 2025,
                   |      "taxMonth": 1,
                   |      "nilReturnIndicator": "Y",
-                  |      "status": "SUBMITTED"
+                  |      "status": "SUBMITTED",
+                  |      "amendment": "N"
                   |    }
                   |  ],
                   |  "submissions": [
@@ -691,6 +692,7 @@ class ConstructionIndustrySchemeConnectorSpec
       result.scheme.name mustBe "ABC Construction Ltd"
       result.monthlyReturns.head.taxYear mustBe 2025
       result.monthlyReturns.head.status mustBe "SUBMITTED"
+      result.monthlyReturns.head.amendment mustBe "N"
       result.submissions.head.submissionId mustBe 100L
       result.submissions.head.status mustBe "ACCEPTED"
     }

@@ -17,7 +17,6 @@
 package controllers.history
 
 import base.SpecBase
-import models.UserAnswers
 import models.history.*
 import models.response.GetSubmittedMonthlyReturnsDataResponse
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}

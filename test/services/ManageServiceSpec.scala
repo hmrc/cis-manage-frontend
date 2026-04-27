@@ -774,6 +774,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             taxMonth = 4,
             nilReturnIndicator = "Y",
             status = "SUBMITTED",
+            amendment = "N",
             supersededBy = None,
             amendmentStatus = None,
             monthlyReturnItems = None
@@ -785,6 +786,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             taxMonth = 5,
             nilReturnIndicator = "Y",
             status = "SUBMITTED",
+            amendment = "N",
             supersededBy = None,
             amendmentStatus = None,
             monthlyReturnItems = None
@@ -796,6 +798,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             taxMonth = 3,
             nilReturnIndicator = "Y",
             status = "SUBMITTED",
+            amendment = "N",
             supersededBy = None,
             amendmentStatus = None,
             monthlyReturnItems = None
@@ -807,6 +810,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             taxMonth = 4,
             nilReturnIndicator = "Y",
             status = "SUBMITTED",
+            amendment = "N",
             supersededBy = None,
             amendmentStatus = None,
             monthlyReturnItems = None
