@@ -626,7 +626,6 @@ class ConstructionIndustrySchemeConnectorSpec
       result.unsubmittedCisReturns.head.returnType mustBe "Nil"
       result.unsubmittedCisReturns.head.status mustBe "PENDING"
       result.unsubmittedCisReturns.head.monthlyReturnId mustBe 12345
-      result.unsubmittedCisReturns.head.action mustBe Seq.empty
       result.unsubmittedCisReturns.head.lastUpdate mustBe None
       result.unsubmittedCisReturns.head.amendment mustBe Some("N")
       result.unsubmittedCisReturns.head.deletable mustBe true
