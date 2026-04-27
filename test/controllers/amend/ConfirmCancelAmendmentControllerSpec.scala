@@ -9,12 +9,13 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.amend.ConfirmCancelAmendmentPage
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.ConfirmCancelAmendmentView
+import views.html.amend.ConfirmCancelAmendmentView
 
 import scala.concurrent.Future
 
@@ -22,10 +23,13 @@ class ConfirmCancelAmendmentControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new ConfirmCancelAmendmentFormProvider()
-  val form         = formProvider()
+  val formProvider        = new ConfirmCancelAmendmentFormProvider()
+  val form: Form[Boolean] = formProvider()
 
-  lazy val confirmCancelAmendmentRoute = routes.ConfirmCancelAmendmentController.onPageLoad(NormalMode).url
+  lazy val confirmCancelAmendmentRoute: String =
+    controllers.amend.routes.ConfirmCancelAmendmentController.onPageLoad(NormalMode).url
+
+  private val monthYear: String = "April 2026"
 
   "ConfirmCancelAmendment Controller" - {
 
@@ -41,7 +45,7 @@ class ConfirmCancelAmendmentControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[ConfirmCancelAmendmentView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, monthYear, NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -59,7 +63,10 @@ class ConfirmCancelAmendmentControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), monthYear, NormalMode)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -105,7 +112,10 @@ class ConfirmCancelAmendmentControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, monthYear, NormalMode)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 

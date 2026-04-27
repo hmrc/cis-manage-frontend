@@ -16,7 +16,6 @@
 
 package viewmodels.checkAnswers.amend
 
-import controllers.routes
 import models.{CheckMode, UserAnswers}
 import pages.amend.ConfirmCancelAmendmentPage
 import play.api.i18n.Messages

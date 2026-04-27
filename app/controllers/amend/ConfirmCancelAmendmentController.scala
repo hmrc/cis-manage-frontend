@@ -50,7 +50,7 @@ class ConfirmCancelAmendmentController @Inject() (
   val form: Form[Boolean] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    getPeriodEnd match {
+    getMonthYear match {
       case Some(monthYear) =>
         val preparedForm = request.userAnswers.get(ConfirmCancelAmendmentPage) match {
           case None        => form
@@ -66,7 +66,7 @@ class ConfirmCancelAmendmentController @Inject() (
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      getPeriodEnd match {
+      getMonthYear match {
         case Some(monthYear) =>
           form
             .bindFromRequest()
@@ -84,6 +84,6 @@ class ConfirmCancelAmendmentController @Inject() (
       }
   }
 
-  private def getPeriodEnd: Option[String] =
+  private def getMonthYear: Option[String] =
     Some("April 2026")
 }
