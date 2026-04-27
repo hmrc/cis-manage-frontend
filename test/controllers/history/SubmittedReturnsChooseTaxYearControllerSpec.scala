@@ -19,7 +19,8 @@ package controllers.history
 import base.SpecBase
 import controllers.routes
 import forms.history.SubmittedReturnsChooseTaxYearFormProvider
-import models.UserAnswers
+import models.history.TaxYearSelection.TaxYear
+import models.history.TaxYearSelection
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -31,6 +32,7 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import services.ManageService
 import views.html.history.SubmittedReturnsChooseTaxYearView
 
 import scala.concurrent.Future
@@ -43,15 +45,27 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
     controllers.history.routes.SubmittedReturnsChooseTaxYearController.onPageLoad().url
   val taxYears: Seq[String]                           =
     Seq("2021 to 2022", "2022 to 2023", "2023 to 2024", "2024 to 2025")
+  val taxYearTuples: Seq[(Int, Int)]                  =
+    Seq((2021, 2022), (2022, 2023), (2023, 2024), (2024, 2025))
+  val taxYearSelections: Seq[TaxYearSelection]        =
+    Seq(TaxYear(2021, 2022), TaxYear(2022, 2023), TaxYear(2023, 2024), TaxYear(2024, 2025))
 
   val formProvider       = new SubmittedReturnsChooseTaxYearFormProvider()
   val form: Form[String] = formProvider(taxYears)
+
+  val mockManageService = mock[ManageService]
 
   "SubmittedReturnsChooseTaxYear Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      when(mockManageService.getSubmittedTaxYears(any())(any())) thenReturn Future.successful(taxYearTuples)
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+        .overrides(
+          bind[ManageService].toInstance(mockManageService)
+        )
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, submittedReturnsChooseTaxYearRoute)
@@ -67,12 +81,18 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId)
-        .set(SubmittedReturnsChooseTaxYearPage, taxYears.head)
+      when(mockManageService.getSubmittedTaxYears(any())(any())) thenReturn Future.successful(taxYearTuples)
+
+      val userAnswers = userAnswersWithCisId
+        .set(SubmittedReturnsChooseTaxYearPage, taxYearSelections.head)
         .success
         .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(
+          bind[ManageService].toInstance(mockManageService)
+        )
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, submittedReturnsChooseTaxYearRoute)
@@ -89,16 +109,110 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
       }
     }
 
-    "must redirect back to the same page when valid data is submitted" in {
+    "must redirect to System Error for a GET when no tax years are returned" in {
+
+      when(mockManageService.getSubmittedTaxYears(any())(any())) thenReturn Future.successful(Seq.empty)
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+        .overrides(
+          bind[ManageService].toInstance(mockManageService)
+        )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, submittedReturnsChooseTaxYearRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET when only one tax year is returned" in {
+
+      val singleTaxYearTuple = Seq((2021, 2022))
+      when(mockManageService.getSubmittedTaxYears(any())(any())) thenReturn Future.successful(singleTaxYearTuple)
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+        .overrides(
+          bind[ManageService].toInstance(mockManageService)
+        )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, submittedReturnsChooseTaxYearRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to System Error for a GET when the service fails" in {
+
+      when(mockManageService.getSubmittedTaxYears(any())(any())) thenReturn Future.failed(
+        new Exception("service failed")
+      )
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+        .overrides(
+          bind[ManageService].toInstance(mockManageService)
+        )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, submittedReturnsChooseTaxYearRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
+      }
+    }
+
+    "must redirect back to the same page when 'all' is submitted" in {
+
+      when(mockManageService.getSubmittedTaxYears(any())(any())) thenReturn Future.successful(taxYearTuples)
 
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[ManageService].toInstance(mockManageService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, submittedReturnsChooseTaxYearRoute)
+            .withFormUrlEncodedBody(("value", "all"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.history.routes.SubmittedReturnsChooseTaxYearController.onPageLoad().url
+      }
+    }
+
+    "must redirect back to the same page when valid data is submitted" in {
+
+      when(mockManageService.getSubmittedTaxYears(any())(any())) thenReturn Future.successful(taxYearTuples)
+
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[ManageService].toInstance(mockManageService)
           )
           .build()
 
@@ -115,14 +229,70 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
       }
     }
 
+    "must return an internal server error when a different invalid tax year format is submitted that passes form validation" in {
+
+      val weirdTaxYearTuples = Seq((2021, 22))
+      when(mockManageService.getSubmittedTaxYears(any())(any())) thenReturn Future.successful(weirdTaxYearTuples)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+          .overrides(
+            bind[ManageService].toInstance(mockManageService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, submittedReturnsChooseTaxYearRoute)
+            .withFormUrlEncodedBody(("value", "2021 to 22"))
+
+        val result = route(application, request).value
+
+        intercept[Exception] {
+          await(result)
+        }.getMessage must include("unable to parse tax year selection")
+      }
+    }
+
+    "must return an internal server error when an invalid tax year format is submitted that passes form validation" in {
+
+      val weirdTaxYearTuples = Seq((1, 2))
+      when(mockManageService.getSubmittedTaxYears(any())(any())) thenReturn Future.successful(weirdTaxYearTuples)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+          .overrides(
+            bind[ManageService].toInstance(mockManageService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, submittedReturnsChooseTaxYearRoute)
+            .withFormUrlEncodedBody(("value", "1 to 2"))
+
+        val result = route(application, request).value
+
+        intercept[Exception] {
+          await(result)
+        }.getMessage must include("unable to parse tax year selection")
+      }
+    }
+
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val userAnswers = emptyUserAnswers
-        .set(SubmittedReturnsChooseTaxYearPage, taxYears.head)
+      when(mockManageService.getSubmittedTaxYears(any())(any())) thenReturn Future.successful(taxYearTuples)
+
+      val userAnswers = userAnswersWithCisId
+        .set(SubmittedReturnsChooseTaxYearPage, taxYearSelections.head)
         .success
         .value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(
+          bind[ManageService].toInstance(mockManageService)
+        )
+        .build()
 
       running(application) {
         val request =
