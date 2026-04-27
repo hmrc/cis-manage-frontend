@@ -16,6 +16,7 @@
 
 package viewmodels
 
+import models.history.SubcontractorPayment
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
@@ -37,7 +38,7 @@ class SubmissionReceiptViewModelSpec extends AnyWordSpec with Matchers {
         emailRecipient = Some("user@example.com"),
         instanceId = "INST001",
         items = Seq(
-          SubmissionReceiptItemViewModel("John Smith", "5000.00", "1000.00", "800.00")
+          SubcontractorPayment("John Smith", "5000.00", "1000.00", "800.00")
         )
       )
 

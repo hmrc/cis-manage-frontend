@@ -17,9 +17,10 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
-import models.history.{MonthlyReturnCompleteResponse, SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSubmissionData}
+import models.history.{MonthlyReturnCompleteResponse, SubcontractorPayment, SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSubmissionData}
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.{LinkViewModel, ReturnTypeViewModel, StatusViewModel, SubmissionReceiptItemViewModel, SubmissionReceiptViewModel, SubmittedReturnsPageViewModel, SubmittedReturnsRowViewModel, TaxYearHistoryViewModel}
+import utils.Utils
+import viewmodels.{LinkViewModel, ReturnTypeViewModel, StatusViewModel, SubmissionReceiptViewModel, SubmittedReturnsPageViewModel, SubmittedReturnsRowViewModel, TaxYearHistoryViewModel}
 import viewmodels.StatusViewModel.Text
 
 import java.time.format.{DateTimeFormatter, TextStyle}
@@ -87,7 +88,6 @@ class SubmittedReturnsService @Inject() (
     val periodEndText     = buildReturnPeriodEnd(monthlyReturn)
     val returnType        = buildReturnType(monthlyReturn)
     val dateSubmittedText = buildDateSubmittedText(submissionOpt)
-    val amendment         = if (monthlyReturn.supersededBy.isDefined) "Y" else "N"
 
     SubmittedReturnsRowViewModel(
       returnPeriodEnd = periodEndText,
@@ -98,7 +98,7 @@ class SubmittedReturnsService @Inject() (
         hiddenText = periodEndText
       ),
       submissionReceipt =
-        buildSubmissionReceipt(submissionOpt, periodEndText, monthlyReturn.taxYear, monthlyReturn.taxMonth, amendment),
+        buildSubmissionReceipt(submissionOpt, periodEndText, monthlyReturn.taxYear, monthlyReturn.taxMonth),
       status = buildStatus(monthlyReturn, submissionOpt)
     )
   }
@@ -127,15 +127,14 @@ class SubmittedReturnsService @Inject() (
     submissionOpt: Option[SubmittedSubmissionData],
     periodEndText: String,
     taxYear: Int,
-    taxMonth: Int,
-    amendment: String
+    taxMonth: Int
   ): StatusViewModel =
     if (isSubmissionReceiptAvailable(submissionOpt)) {
 
       StatusViewModel.Link(
         link = LinkViewModel(
           url =
-            s"/construction-industry-scheme/management/monthly-return/confirmation-history?taxYear=$taxYear&taxMonth=$taxMonth&amendment=$amendment",
+            s"/construction-industry-scheme/management/monthly-return/confirmation-history?taxYear=$taxYear&taxMonth=$taxMonth&amendment=N",
           hiddenText = s"submission receipt for $periodEndText"
         ),
         textKey = "site.view",
@@ -266,11 +265,11 @@ class SubmittedReturnsService @Inject() (
       }
 
     val items = response.monthlyReturnItems.map { item =>
-      SubmissionReceiptItemViewModel(
-        subcontractorName = item.subcontractorName.getOrElse("Unknown"),
-        totalPayments = item.totalPayments.getOrElse("0.00"),
-        costOfMaterials = item.costOfMaterials.getOrElse("0.00"),
-        totalDeducted = item.totalDeducted.getOrElse("0.00")
+      SubcontractorPayment(
+        item.subcontractorName.getOrElse(""),
+        Utils.formatCurrency(Utils.toBigDecimal(item.totalPayments)),
+        Utils.formatCurrency(Utils.toBigDecimal(item.costOfMaterials)),
+        Utils.formatCurrency(Utils.toBigDecimal(item.totalDeducted))
       )
     }
 

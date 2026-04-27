@@ -291,6 +291,58 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       row.status shouldBe StatusViewModel.Text("")
     }
 
+    "submissionReceipt is a Link when IRMark sent and received match" in {
+      val row = singleRow(
+        data(
+          monthlyReturns = Seq(monthlyReturn()),
+          submissions = Seq(
+            submission().copy(
+              hmrcMarkGenerated = Some("MARK-ABC"),
+              hmrcMarkGgis = Some("MARK-ABC")
+            )
+          )
+        )
+      )
+
+      row.submissionReceipt shouldBe a[StatusViewModel.Link]
+      val link = row.submissionReceipt.asInstanceOf[StatusViewModel.Link]
+      link.link.url should include("taxYear=2023")
+      link.link.url should include("taxMonth=3")
+      link.link.url should include("amendment=N")
+    }
+
+    "submissionReceipt is empty Text when IRMarks do not match" in {
+      val row = singleRow(
+        data(
+          monthlyReturns = Seq(monthlyReturn()),
+          submissions = Seq(
+            submission().copy(
+              hmrcMarkGenerated = Some("MARK-A"),
+              hmrcMarkGgis = Some("MARK-B")
+            )
+          )
+        )
+      )
+
+      row.submissionReceipt shouldBe StatusViewModel.Text("")
+    }
+
+    "submissionReceipt is empty Text when both IRMarks are None" in {
+      val row = singleRow(
+        data(
+          monthlyReturns = Seq(monthlyReturn()),
+          submissions = Seq(
+            submission().copy(
+              hmrcMarkGenerated = None,
+              hmrcMarkGgis = None
+            )
+          )
+        )
+      )
+
+      row.submissionReceipt shouldBe StatusViewModel.Text("")
+    }
+
     "getMonthlyReturnComplete must build a SubmissionReceiptViewModel from connector response" in {
       implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -346,10 +398,10 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       vm.items.size      shouldBe 1
 
       val item = vm.items.head
-      item.subcontractorName shouldBe "John Smith"
-      item.totalPayments     shouldBe "5000.00"
-      item.costOfMaterials   shouldBe "1000.00"
-      item.totalDeducted     shouldBe "800.00"
+      item.name            shouldBe "John Smith"
+      item.paymentsMade    shouldBe "5000.00"
+      item.costOfMaterials shouldBe "1000.00"
+      item.taxDeducted     shouldBe "800.00"
     }
 
     "getMonthlyReturnComplete must identify nil returns correctly" in {

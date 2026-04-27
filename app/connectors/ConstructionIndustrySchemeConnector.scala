@@ -18,7 +18,7 @@ package connectors
 
 import models.*
 import models.agent.AgentClientData
-import models.history.SubmittedReturnsData
+import models.history.{MonthlyReturnCompleteResponse, SubmittedReturnsData}
 import models.requests.DeleteUnsubmittedMonthlyReturnRequest
 import play.api.Logging
 import play.api.http.Status.{NO_CONTENT, OK}

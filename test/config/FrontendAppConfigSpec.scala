@@ -56,6 +56,7 @@ class FrontendAppConfigSpec extends SpecBase {
       appConfig.hmrcOnlineServiceDeskUrl mustBe
         "https://www.gov.uk/find-hmrc-contacts/technical-support-with-hmrc-online-services"
       appConfig.payeCisForAgentsOnlineService mustBe "https://www.gov.uk/guidance/payecis-for-agents-online-service"
+      appConfig.hmrcContactCISUrl mustBe "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/construction-industry-scheme"
 
       appConfig.timeout mustBe 900
       appConfig.countdown mustBe 120

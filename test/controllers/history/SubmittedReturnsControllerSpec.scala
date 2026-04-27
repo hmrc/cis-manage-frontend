@@ -18,7 +18,7 @@ package controllers.history
 
 import base.SpecBase
 import models.UserAnswers
-import models.history.{SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSchemeData, SubmittedSubmissionData}
+import models.history.{SubcontractorPayment, SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSchemeData, SubmittedSubmissionData}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -303,7 +303,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         emailRecipient = Some("user@example.com"),
         instanceId = "INST001",
         items = Seq(
-          SubmissionReceiptItemViewModel("John Smith", "5000.00", "1000.00", "800.00")
+          SubcontractorPayment("John Smith", "5000.00", "1000.00", "800.00")
         )
       )
 
@@ -340,7 +340,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         emailRecipient = None,
         instanceId = "INST001",
         items = Seq(
-          SubmissionReceiptItemViewModel("John Smith", "5000.00", "1000.00", "800.00")
+          SubcontractorPayment("John Smith", "5000.00", "1000.00", "800.00")
         )
       )
 

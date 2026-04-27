@@ -16,6 +16,7 @@
 
 package viewmodels
 
+import models.history.SubcontractorPayment
 import play.api.libs.json.{Json, OFormat}
 
 case class SubmissionReceiptViewModel(
@@ -30,20 +31,9 @@ case class SubmissionReceiptViewModel(
   submittedAt: Option[String],
   emailRecipient: Option[String],
   instanceId: String,
-  items: Seq[SubmissionReceiptItemViewModel]
+  items: Seq[SubcontractorPayment]
 )
 
 object SubmissionReceiptViewModel {
   given format: OFormat[SubmissionReceiptViewModel] = Json.format[SubmissionReceiptViewModel]
-}
-
-case class SubmissionReceiptItemViewModel(
-  subcontractorName: String,
-  totalPayments: String,
-  costOfMaterials: String,
-  totalDeducted: String
-)
-
-object SubmissionReceiptItemViewModel {
-  given format: OFormat[SubmissionReceiptItemViewModel] = Json.format[SubmissionReceiptItemViewModel]
 }

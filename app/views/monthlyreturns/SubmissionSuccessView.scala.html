@@ -16,6 +16,7 @@
 
 @import viewmodels.SubmissionReceiptViewModel
 @import views.html.components.*
+@import config.FrontendAppConfig
 
 @this(
     layout: templates.Layout,
@@ -25,7 +26,8 @@
     h2: H2,
     paragraph: Paragraph,
     link: Link,
-    printLinkButton: PrintLinkButton
+    printLinkButton: PrintLinkButton,
+    appConfig: FrontendAppConfig
 )
 
 @(viewModel: SubmissionReceiptViewModel)(implicit request: Request[_], messages: Messages)
@@ -87,7 +89,7 @@
     @h2(messages("submissionConfirmation.whatYouCanDo.heading"))
 
     @if(viewModel.emailRecipient.isEmpty) {
-        <p class="govuk-body">@messages("submissionConfirmation.noEmail")</p>
+        @paragraph("submissionConfirmation.noEmail")
     }
 
     @govukInsetText(InsetText(
@@ -99,18 +101,17 @@
         )
     ))
 
-    <p class="govuk-body">
-        <a href="@{controllers.routes.ReturnsLandingController.onPageLoad(viewModel.instanceId).url}" class="govuk-link">
-            @messages("submissionConfirmation.backToManage")
-        </a>
-    </p>
+    @link(
+        linkTextKey = "submissionConfirmation.backToManage",
+        linkUrl = controllers.routes.ReturnsLandingController.onPageLoad(viewModel.instanceId).url
+    )
 
     @h2(messages("submissionConfirmation.needHelp.heading"))
 
-    <p class="govuk-body">
-        @messages("submissionConfirmation.needHelp.p1")
-        <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/construction-industry-scheme" class="govuk-link" rel="noreferrer noopener" target="_blank">
-            @messages("submissionConfirmation.needHelp.link")
-        </a>
-    </p>
+    @link(
+        linkTextKey = "submissionConfirmation.needHelp.link",
+        linkUrl = appConfig.hmrcContactCISUrl,
+        isNewTab = true,
+        prefixTextKey = "submissionConfirmation.needHelp.p1"
+    )
 }

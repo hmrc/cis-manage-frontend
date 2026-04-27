@@ -23,7 +23,8 @@ import org.scalatest.matchers.should.Matchers.*
 import play.api.mvc.{AnyContent, Request}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.GET
-import viewmodels.{SubmissionReceiptItemViewModel, SubmissionReceiptViewModel}
+import models.history.SubcontractorPayment
+import viewmodels.SubmissionReceiptViewModel
 import views.html.monthlyreturns.SubmissionSuccessView
 
 class SubmissionSuccessViewSpec extends SpecBase {
@@ -41,8 +42,8 @@ class SubmissionSuccessViewSpec extends SpecBase {
     emailRecipient = Some("user@example.com"),
     instanceId = "INST001",
     items = Seq(
-      SubmissionReceiptItemViewModel("John Smith", "5000.00", "1000.00", "800.00"),
-      SubmissionReceiptItemViewModel("Jane Doe", "3000.00", "500.00", "500.00")
+      SubcontractorPayment("John Smith", "5000.00", "1000.00", "800.00"),
+      SubcontractorPayment("Jane Doe", "3000.00", "500.00", "500.00")
     )
   )
 
@@ -59,7 +60,7 @@ class SubmissionSuccessViewSpec extends SpecBase {
     emailRecipient = None,
     instanceId = "INST001",
     items = Seq(
-      SubmissionReceiptItemViewModel("John Smith", "5000.00", "1000.00", "800.00")
+      SubcontractorPayment("John Smith", "5000.00", "1000.00", "800.00")
     )
   )
 

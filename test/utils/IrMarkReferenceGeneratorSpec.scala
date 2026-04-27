@@ -21,14 +21,15 @@ import org.scalatest.matchers.must.Matchers
 
 class IrMarkReferenceGeneratorSpec extends AnyFreeSpec with Matchers {
 
+  private val base32Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
+
   "IrMarkReferenceGenerator.fromBase64" - {
 
     "must convert a known IR mark (base64) to the expected base32 reference without padding" in {
       val base64   = "Pyy1LRJh053AE+nuyp0GJR7oESw="
       val expected = "H4WLKLISMHJZ3QAT5HXMVHIGEUPOQEJM"
 
-      val out = IrMarkReferenceGenerator.fromBase64(base64)
-      out mustBe expected
+      IrMarkReferenceGenerator.fromBase64(base64) mustBe expected
     }
 
     "must be stable for random bytes and contain only base32 alphabet" in {
@@ -39,7 +40,20 @@ class IrMarkReferenceGeneratorSpec extends AnyFreeSpec with Matchers {
       val out = IrMarkReferenceGenerator.fromBase64(b64)
 
       out must not be empty
-      out.forall(ch => "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".contains(ch)) mustBe true
+      out.forall(ch => base32Chars.contains(ch)) mustBe true
+    }
+
+    "must return empty string for empty input" in {
+      IrMarkReferenceGenerator.fromBase64("") mustBe ""
+    }
+
+    "must encode 4 remaining bytes (7-char output)" in {
+      // 4 zero bytes encode to base64 "AAAAAA==" and base32 "AAAAAAA"
+      IrMarkReferenceGenerator.fromBase64("AAAAAA==") mustBe "AAAAAAA"
+    }
+
+    "must throw for invalid base64 input" in {
+      a[IllegalArgumentException] should be thrownBy IrMarkReferenceGenerator.fromBase64("not-valid!!!")
     }
   }
 }
