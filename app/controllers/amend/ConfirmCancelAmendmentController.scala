@@ -21,6 +21,8 @@ import forms.amend.ConfirmCancelAmendmentFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.amend.ConfirmCancelAmendmentPage
+import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -42,31 +44,46 @@ class ConfirmCancelAmendmentController @Inject() (
   view: ConfirmCancelAmendmentView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
-  val form = formProvider()
+  val form: Form[Boolean] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    getPeriodEnd match {
+      case Some(monthYear) =>
+        val preparedForm = request.userAnswers.get(ConfirmCancelAmendmentPage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
+        }
 
-    val preparedForm = request.userAnswers.get(ConfirmCancelAmendmentPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+        Ok(view(preparedForm, monthYear, mode))
+      case None            =>
+        logger.error("[ConfirmCancelAmendmentController] monthYear missing")
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
-
-    Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(ConfirmCancelAmendmentPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(ConfirmCancelAmendmentPage, mode, updatedAnswers))
-        )
+      getPeriodEnd match {
+        case Some(monthYear) =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, monthYear, mode))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(ConfirmCancelAmendmentPage, value))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(navigator.nextPage(ConfirmCancelAmendmentPage, mode, updatedAnswers))
+            )
+        case None            =>
+          logger.error("[ConfirmCancelAmendmentController] monthYear missing")
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
   }
+
+  private def getPeriodEnd: Option[String] =
+    Some("April 2026")
 }

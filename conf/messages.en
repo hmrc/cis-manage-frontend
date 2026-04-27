@@ -471,8 +471,8 @@ amend.noReturnsSubmitted.p2.link = Manage your CIS return
 amend.noReturnsSubmitted.p3 = Find out more about
 amend.noReturnsSubmitted.p3.link = what you must do as a CIS contractor
 
-amend.confirmCancelAmendment.title = confirmCancelAmendment
-amend.confirmCancelAmendment.heading = confirmCancelAmendment
+amend.confirmCancelAmendment.title = Are you sure you want to cancel the amended monthly return for {0}?
+amend.confirmCancelAmendment.heading = Are you sure you want to cancel the amended monthly return for {0}?
 amend.confirmCancelAmendment.checkYourAnswersLabel = confirmCancelAmendment
-amend.confirmCancelAmendment.error.required = Select yes if confirmCancelAmendment
+amend.confirmCancelAmendment.error.required = Select yes to cancel this return
 amend.confirmCancelAmendment.change.hidden = ConfirmCancelAmendment

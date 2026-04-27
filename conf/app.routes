@@ -92,7 +92,7 @@ GET        /history/monthly-return-history-tax-year/:taxYear        controllers.
 
 GET        /amend-monthly-return/no-return-submitted                controllers.amend.NoReturnsSubmittedController.onPageLoad()
 
-GET        /confirmCancelAmendment                        controllers.amend.ConfirmCancelAmendmentController.onPageLoad(mode: Mode = NormalMode)
-POST       /confirmCancelAmendment                        controllers.amend.ConfirmCancelAmendmentController.onSubmit(mode: Mode = NormalMode)
-GET        /changeConfirmCancelAmendment                  controllers.amend.ConfirmCancelAmendmentController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeConfirmCancelAmendment                  controllers.amend.ConfirmCancelAmendmentController.onSubmit(mode: Mode = CheckMode)
+GET        /cancel-amended-monthly-return                           controllers.amend.ConfirmCancelAmendmentController.onPageLoad(mode: Mode = NormalMode)
+POST       /cancel-amended-monthly-return                           controllers.amend.ConfirmCancelAmendmentController.onSubmit(mode: Mode = NormalMode)
+GET        /change-cancel-amended-monthly-return                    controllers.amend.ConfirmCancelAmendmentController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-cancel-amended-monthly-return                    controllers.amend.ConfirmCancelAmendmentController.onSubmit(mode: Mode = CheckMode)
