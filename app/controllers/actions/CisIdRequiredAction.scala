@@ -17,21 +17,33 @@
 package controllers.actions
 
 import javax.inject.Inject
-import models.requests.DataRequest
+import models.requests.{CisIdDataRequest, DataRequest}
 import pages.CisIdPage
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait CisIdRequiredAction extends ActionRefiner[DataRequest, DataRequest]
+trait CisIdRequiredAction extends ActionRefiner[DataRequest, CisIdDataRequest]
 
 class CisIdRequiredActionImpl @Inject() (implicit val executionContext: ExecutionContext) extends CisIdRequiredAction {
 
-  override protected def refine[A](request: DataRequest[A]): Future[Either[Result, DataRequest[A]]] =
+  override protected def refine[A](request: DataRequest[A]): Future[Either[Result, CisIdDataRequest[A]]] =
     request.userAnswers.get(CisIdPage) match {
       case Some(cisId) =>
-        Future.successful(Right(request))
+        Future.successful(
+          Right(
+            CisIdDataRequest[A](
+              request.request,
+              request.userId,
+              request.userAnswers,
+              cisId,
+              request.employerReference,
+              request.agentReference,
+              request.isAgent
+            )
+          )
+        )
       case None        =>
         Future.successful(
           Left(Redirect(controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad()))

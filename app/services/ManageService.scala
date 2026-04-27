@@ -18,16 +18,16 @@ package services
 
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
+import models.*
 import models.agent.AgentClientData
 import models.history.SubmittedReturnsData
 import models.requests.DeleteUnsubmittedMonthlyReturnRequest
-import models.*
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel, ReturnsLandingContext}
+import viewmodels.*
 import viewmodels.agent.AgentLandingViewModel
 
 import java.time.*
@@ -145,6 +145,21 @@ class ManageService @Inject() (
           )
         }
     }
+
+  def getSubmittedTaxYears(instanceId: String)(implicit
+    hc: HeaderCarrier
+  ): Future[Seq[(Int, Int)]] = cisConnector.getSubmittedMonthlyReturns(instanceId).map { response =>
+    (for {
+      monthlyReturn <- response.monthlyReturns
+      taxDate        = LocalDate.of(monthlyReturn.taxYear, monthlyReturn.taxMonth, 5)
+      taxYearStart   = if (taxDate.isBefore(LocalDate.of(monthlyReturn.taxYear, 4, 6)))
+                         LocalDate.of(monthlyReturn.taxYear - 1, 4, 6)
+                       else
+                         LocalDate.of(monthlyReturn.taxYear, 4, 6)
+      taxYearEnd     = taxYearStart.plusYears(1)
+      taxYearString  = s"${taxYearStart.getYear} to ${taxYearEnd.getYear}"
+    } yield (taxYearStart.getYear, taxYearEnd.getYear)).distinct.sorted
+  }
 
   def getSubmittedMonthlyReturns(instanceId: String)(implicit
     hc: HeaderCarrier
