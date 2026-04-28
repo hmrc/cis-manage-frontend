@@ -35,6 +35,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel}
 import viewmodels.agent.AgentLandingViewModel
 
+import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Failure
@@ -538,7 +539,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
   "buildReturnsLandingContext" should {
 
-    "return Some(context) for agent when name + client exist" in {
+    "return Some(context) for agent when name + client exist and connector returns returns" in {
       val (service, connector, sessionRepo) = newService()
 
       when(appConfig.fileStandardReturnUrl(any[String])).thenReturn("/standard")
@@ -549,8 +550,6 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       val ua = UserAnswers("test-user").set(AgentClientsPage, List(client)).get
 
-      <<<<<<< HEAD
-        =======
       val mockResponse = UnsubmittedMonthlyReturnsResponse(
         unsubmittedCisReturns = Seq(
           UnsubmittedMonthlyReturnsRow(
@@ -579,18 +578,14 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       when(connector.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
         .thenReturn(Future.successful(mockResponse))
 
-      >>>>>>> main
       val context = service.buildReturnsLandingContext(instanceId, ua, isAgent = true).futureValue
 
       context.isDefined mustBe true
       context.get.contractorName mustBe "Client Ltd"
       context.get.standardReturnLink mustBe "/standard"
       context.get.nilReturnLink mustBe "/nil"
-        <<<<<<< HEAD
-      =======
 
       verifyNoInteractions(connector)
-        >>>>>>> main
       verifyNoInteractions(sessionRepo)
     }
 
@@ -620,11 +615,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       context.get.contractorName mustBe "Org Ltd"
       context.get.standardReturnLink mustBe "/standard-org"
       context.get.nilReturnLink mustBe "/nil-org"
-        <<<<<<< HEAD
-      =======
 
       verifyNoInteractions(connector)
-        >>>>>>> main
       verifyNoInteractions(sessionRepo)
     }
 
