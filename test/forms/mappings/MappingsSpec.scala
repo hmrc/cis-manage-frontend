@@ -23,7 +23,6 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.data.*
 import play.api.data.Forms.*
-import play.api.data.{Form, FormError}
 import models.Enumerable
 import models.agent.ClientListFormData
 

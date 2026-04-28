@@ -16,12 +16,15 @@
 
 package services
 
-import models.history.{SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSubmissionData}
-import viewmodels.{LinkViewModel, ReturnTypeViewModel, StatusViewModel, SubmittedReturnsPageViewModel, SubmittedReturnsRowViewModel, TaxYearHistoryViewModel}
+import models.history.*
+import models.response.GetSubmittedMonthlyReturnsDataResponse
+import play.api.i18n.Lang
+import utils.{DateTimeFormats, IrMarkReferenceGenerator, Utils}
 import viewmodels.StatusViewModel.Text
+import viewmodels.*
 
 import java.time.format.DateTimeFormatter
-import java.time.{Instant, YearMonth, ZoneId, ZoneOffset, ZonedDateTime}
+import java.time.*
 import javax.inject.{Inject, Singleton}
 
 @Singleton
@@ -47,6 +50,59 @@ class SubmittedReturnsService @Inject() {
         selectedTaxYear = Some(taxYear)
       )
     }
+
+  def buildSubmittedReturnPrintViewModel(
+    data: GetSubmittedMonthlyReturnsDataResponse,
+    lang: Lang
+  ): SubmittedReturnPrintViewModel = {
+    val langCode = lang.code
+
+    val submittedTime = data.submission.acceptedTime
+      .map(_.atZone(ukTimezone))
+      .map(_.format(DateTimeFormats.timeFormat()(lang)).toLowerCase)
+      .getOrElse("")
+
+    val submittedDate = data.submission.acceptedTime
+      .map(_.atZone(ukTimezone))
+      .map(_.format(DateTimeFormats.dateTimeFormat()(lang)))
+      .getOrElse("")
+
+    val receiptReferenceNumber = data.submission.hmrcMarkGgis.map(IrMarkReferenceGenerator.fromBase64).getOrElse("")
+
+    val totalPaymentsMade    =
+      Utils.formatCurrency(data.monthlyReturnItems.flatMap(_.totalPayments).map(BigDecimal(_)).sum)
+    val totalCostOfMaterials =
+      Utils.formatCurrency(data.monthlyReturnItems.flatMap(_.costOfMaterials).map(BigDecimal(_)).sum)
+    val totalTaxDeducted     =
+      Utils.formatCurrency(data.monthlyReturnItems.flatMap(_.totalDeducted).map(BigDecimal(_)).sum)
+    val subcontractors       =
+      data.monthlyReturnItems.map { item =>
+        SubcontractorPayment(
+          item.subcontractorName.getOrElse(""),
+          Utils.formatCurrency(Utils.toBigDecimal(item.totalPayments)),
+          Utils.formatCurrency(Utils.toBigDecimal(item.costOfMaterials)),
+          Utils.formatCurrency(Utils.toBigDecimal(item.totalDeducted))
+        )
+      }
+
+    SubmittedReturnPrintViewModel(
+      monthYear = Utils.monthYear(data.taxYear, data.taxMonth, langCode),
+      submittedTime = submittedTime,
+      submittedDate = submittedDate,
+      receiptReferenceNumber = receiptReferenceNumber,
+      submissionType = if (data.nilReturnIndicator == "Y") {
+        ReturnTypeViewModel.Nil.toString.toLowerCase
+      } else {
+        ReturnTypeViewModel.Standard.toString.toLowerCase
+      },
+      contractorName = data.scheme.name,
+      payeReference = s"${data.scheme.taxOfficeNumber}/${data.scheme.taxOfficeReference}",
+      totalPaymentsMade = totalPaymentsMade,
+      totalCostOfMaterials = totalCostOfMaterials,
+      totalTaxDeducted = totalTaxDeducted,
+      subcontractors = subcontractors
+    )
+  }
 
   private def buildTaxYearSections(data: SubmittedReturnsData): Seq[TaxYearHistoryViewModel] = {
     val rowsWithTaxYear =
@@ -86,7 +142,13 @@ class SubmittedReturnsService @Inject() {
       returnType = returnType,
       dateSubmitted = dateSubmittedText,
       monthlyReturn = LinkViewModel(
-        url = "#", // TODO: F2 and F3 - replace with real route of page sr-04 Print monthly return
+        url = controllers.history.routes.PrintSubmissionDetailsController
+          .onPageLoad(
+            monthlyReturn.taxYear,
+            monthlyReturn.taxMonth,
+            monthlyReturn.amendment
+          )
+          .url,
         hiddenText = periodEndText
       ),
       submissionReceipt = buildSubmissionReceipt(submissionOpt, periodEndText),
@@ -101,9 +163,9 @@ class SubmittedReturnsService @Inject() {
 
   private def buildReturnType(monthlyReturn: SubmittedMonthlyReturnData): ReturnTypeViewModel =
     monthlyReturn.nilReturnIndicator match {
-      case "Nil"      => ReturnTypeViewModel.Nil
-      case "Standard" => ReturnTypeViewModel.Standard
-      case _          => ReturnTypeViewModel.Unknown
+      case ReturnTypeViewModel.Nil.toString      => ReturnTypeViewModel.Nil
+      case ReturnTypeViewModel.Standard.toString => ReturnTypeViewModel.Standard
+      case _                                     => ReturnTypeViewModel.Unknown
     }
 
   private def buildDateSubmittedText(submissionOpt: Option[SubmittedSubmissionData]): String =

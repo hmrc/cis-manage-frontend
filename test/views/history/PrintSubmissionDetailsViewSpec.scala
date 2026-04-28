@@ -17,9 +17,10 @@
 package views.history
 
 import base.SpecBase
-import models.history.SubcontractorPayment
+import models.history.{SubcontractorPayment, SubmittedReturnPrintViewModel}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
 import play.api.Application
 import play.api.i18n.*
 import play.api.mvc.Request
@@ -31,7 +32,39 @@ class PrintSubmissionDetailsViewSpec extends SpecBase {
 
   "PrintSubmissionDetailsView" - {
 
-    "must render all details correctly including subcontractor table" in new Setup {
+    "must render all details correctly including subcontractor table when type is standard monthly return" in new Setup {
+      val monthYear              = "April 2026"
+      val submittedTime          = "8:46am"
+      val submittedDate          = "16 March 2025"
+      val receiptReferenceNumber = "ABC123456789"
+      val submissionType         = "standard"
+      val contractorName         = "PAL 355 Scheme"
+      val payeReference          = "123/AB456"
+      val totalPaymentsMade      = "£1900"
+      val totalCostOfMaterials   = "£616"
+      val totalTaxDeducted       = "£380"
+
+      val subcontractors = Seq(
+        SubcontractorPayment("BuildRight Construction", "£165", "£95", "£95"),
+        SubcontractorPayment("Northern Trades Ltd", "£75", "£55", "£55"),
+        SubcontractorPayment("TyneWear Ltd", "£165", "£125", "£55")
+      )
+
+      val model = SubmittedReturnPrintViewModel(
+        monthYear = "April 2026",
+        submittedTime = submittedTime,
+        submittedDate = submittedDate,
+        receiptReferenceNumber = receiptReferenceNumber,
+        submissionType = submissionType,
+        contractorName = contractorName,
+        payeReference = payeReference,
+        totalPaymentsMade = totalPaymentsMade,
+        totalCostOfMaterials = totalCostOfMaterials,
+        totalTaxDeducted = totalTaxDeducted,
+        subcontractors = subcontractors
+      )
+
+      lazy val html: HtmlFormat.Appendable = view(model)
 
       val doc: Document = Jsoup.parse(html.toString)
       doc.title must include(messages("history.printSubmissionDetails.title", monthYear))
@@ -52,9 +85,9 @@ class PrintSubmissionDetailsViewSpec extends SpecBase {
         )
       )
 
-      val summaryText = doc.select(".govuk-summary-list").text()
+      val summaryText: String = doc.select(".govuk-summary-list").text()
       summaryText must include(receiptReferenceNumber)
-      summaryText must include(messages(submissionType))
+      summaryText must include(messages("history.printSubmissionDetails.submissionDetails.submissionType.standard"))
       summaryText must include(contractorName)
       summaryText must include(payeReference)
 
@@ -71,7 +104,7 @@ class PrintSubmissionDetailsViewSpec extends SpecBase {
         messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.heading")
       )
 
-      val tableHead = doc.select("table thead tr").text()
+      val tableHead: String = doc.select("table thead tr").text()
       tableHead must include(
         messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.subcontractor")
       )
@@ -83,7 +116,7 @@ class PrintSubmissionDetailsViewSpec extends SpecBase {
       )
       tableHead must include(messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.taxDeducted"))
 
-      val tableRows = doc.select("table tbody tr")
+      val tableRows: Elements = doc.select("table tbody tr")
       tableRows.size mustBe subcontractors.size
       subcontractors.zipWithIndex.foreach { case (sub, idx) =>
         val row = tableRows.get(idx).text()
@@ -101,6 +134,59 @@ class PrintSubmissionDetailsViewSpec extends SpecBase {
         messages("history.printSubmissionDetails.monthlyReturnHistory.link")
       )
     }
+
+    "must render all details correctly when type is nil monthly return but receiptReferenceNumber is empty" in new Setup {
+      val monthYear              = "April 2026"
+      val submittedTime          = "8:46am"
+      val submittedDate          = "16 March 2025"
+      val receiptReferenceNumber = ""
+      val submissionType         = "nil"
+      val contractorName         = "PAL 355 Scheme"
+      val payeReference          = "123/AB456"
+      val totalPaymentsMade      = ""
+      val totalCostOfMaterials   = ""
+      val totalTaxDeducted       = ""
+
+      val model = SubmittedReturnPrintViewModel(
+        monthYear = monthYear,
+        submittedTime = submittedTime,
+        submittedDate = submittedDate,
+        receiptReferenceNumber = receiptReferenceNumber,
+        submissionType = submissionType,
+        contractorName = contractorName,
+        payeReference = payeReference,
+        totalPaymentsMade = totalPaymentsMade,
+        totalCostOfMaterials = totalCostOfMaterials,
+        totalTaxDeducted = totalTaxDeducted,
+        subcontractors = Seq.empty
+      )
+
+      lazy val html: HtmlFormat.Appendable = view(model)
+
+      val doc: Document = Jsoup.parse(html.toString)
+      doc.title must include(messages("history.printSubmissionDetails.title", monthYear))
+
+      doc.select("h1").text must include(
+        messages("history.printSubmissionDetails.heading", monthYear)
+      )
+
+      doc.select("h2").text must include(
+        messages("history.printSubmissionDetails.submissionDetails.heading")
+      )
+
+      doc.select("p.govuk-body").text must include(
+        messages(
+          "history.printSubmissionDetails.submissionDetails.p",
+          submittedTime,
+          submittedDate
+        )
+      )
+
+      val summaryText: String = doc.select(".govuk-summary-list").text()
+      summaryText must include(messages("history.printSubmissionDetails.submissionDetails.submissionType.nil"))
+      summaryText must include(contractorName)
+      summaryText must include(payeReference)
+    }
   }
 
   trait Setup {
@@ -115,36 +201,5 @@ class PrintSubmissionDetailsViewSpec extends SpecBase {
         Lang.defaultLang,
         app.injector.instanceOf[MessagesApi]
       )
-
-    val monthYear              = "April 2026"
-    val submittedTime          = "8:46am"
-    val submittedDate          = "16 March 2025"
-    val receiptReferenceNumber = "ABC123456789"
-    val submissionType         = "Monthly return"
-    val contractorName         = "PAL 355 Scheme"
-    val payeReference          = "123/AB456"
-    val totalPaymentsMade      = "£1900"
-    val totalCostOfMaterials   = "£616"
-    val totalTaxDeducted       = "£380"
-
-    val subcontractors = Seq(
-      SubcontractorPayment("BuildRight Construction", "£165", "£95", "£95"),
-      SubcontractorPayment("Northern Trades Ltd", "£75", "£55", "£55"),
-      SubcontractorPayment("TyneWear Ltd", "£165", "£125", "£55")
-    )
-
-    lazy val html: HtmlFormat.Appendable = view(
-      monthYear = monthYear,
-      submittedTime = submittedTime,
-      submittedDate = submittedDate,
-      receiptReferenceNumber = receiptReferenceNumber,
-      submissionType = submissionType,
-      contractorName = contractorName,
-      payeReference = payeReference,
-      totalPaymentsMade = totalPaymentsMade,
-      totalCostOfMaterials = totalCostOfMaterials,
-      totalTaxDeducted = totalTaxDeducted,
-      subcontractors = subcontractors
-    )
   }
 }

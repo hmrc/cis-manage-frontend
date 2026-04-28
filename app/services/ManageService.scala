@@ -18,10 +18,11 @@ package services
 
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
-import models.*
 import models.agent.AgentClientData
 import models.history.SubmittedReturnsData
-import models.requests.DeleteUnsubmittedMonthlyReturnRequest
+import models.requests.*
+import models.response.*
+import models.*
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
@@ -229,6 +230,13 @@ class ManageService @Inject() (
         logger.error(s"[deleteUnsubmittedMonthlyReturn] missing instanceId in user answers")
         Future.failed(new RuntimeException("Missing instanceId in user answers"))
     }
+
+  def getSubmittedMonthlyReturnsData(instanceId: String, taxYear: Int, taxMonth: Int, amendment: String)(implicit
+    hc: HeaderCarrier
+  ): Future[GetSubmittedMonthlyReturnsDataResponse] =
+    cisConnector.getSubmittedMonthlyReturnsData(
+      GetSubmittedMonthlyReturnsDataRequest(instanceId, taxYear, taxMonth, amendment)
+    )
 
   private def formatPeriod(taxMonth: Int, taxYear: Int): String = {
     val monthName = java.time.Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)

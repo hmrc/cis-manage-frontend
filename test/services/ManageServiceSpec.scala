@@ -21,7 +21,8 @@ import connectors.ConstructionIndustrySchemeConnector
 import models.*
 import models.agent.AgentClientData
 import models.history.*
-import models.requests.DeleteUnsubmittedMonthlyReturnRequest
+import models.requests.*
+import models.response.GetSubmittedMonthlyReturnsDataResponse
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
@@ -34,7 +35,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.agent.AgentLandingViewModel
 
-import java.time.LocalDateTime
+import java.time.{Instant, LocalDateTime}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Failure
@@ -434,6 +435,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             taxMonth = 1,
             nilReturnIndicator = "Y",
             status = "SUBMITTED",
+            amendment = "N",
             supersededBy = None,
             amendmentStatus = None,
             monthlyReturnItems = None
@@ -772,6 +774,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             taxMonth = 4,
             nilReturnIndicator = "Y",
             status = "SUBMITTED",
+            amendment = "N",
             supersededBy = None,
             amendmentStatus = None,
             monthlyReturnItems = None
@@ -783,6 +786,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             taxMonth = 5,
             nilReturnIndicator = "Y",
             status = "SUBMITTED",
+            amendment = "N",
             supersededBy = None,
             amendmentStatus = None,
             monthlyReturnItems = None
@@ -794,6 +798,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             taxMonth = 3,
             nilReturnIndicator = "Y",
             status = "SUBMITTED",
+            amendment = "N",
             supersededBy = None,
             amendmentStatus = None,
             monthlyReturnItems = None
@@ -805,6 +810,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             taxMonth = 4,
             nilReturnIndicator = "Y",
             status = "SUBMITTED",
+            amendment = "N",
             supersededBy = None,
             amendmentStatus = None,
             monthlyReturnItems = None
@@ -842,6 +848,76 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       val ex = service.getSubmittedTaxYears(instanceId).failed.futureValue
       ex mustBe boom
+    }
+  }
+
+  "getSubmittedMonthlyReturnsData" should {
+
+    "delegate to connector and return response (happy path)" in {
+      val (service, connector, sessionRepo) = newService()
+      val instanceId                        = "900063"
+      val taxYear                           = 2026
+      val taxMonth                          = 4
+      val amendment                         = "N"
+
+      val expectedRequest = GetSubmittedMonthlyReturnsDataRequest(
+        instanceId = instanceId,
+        taxYear = taxYear,
+        taxMonth = taxMonth,
+        amendment = amendment
+      )
+
+      val mockResponse = GetSubmittedMonthlyReturnsDataResponse(
+        scheme = SubmittedSchemeData("Scheme Name", "163", "AB0063"),
+        monthlyReturnId = 3000L,
+        taxYear = 2025,
+        taxMonth = 1,
+        nilReturnIndicator = "N",
+        monthlyReturnItems = Seq.empty,
+        submission = SubmittedSubmissionData(
+          submissionId = 10L,
+          submissionType = Some("Original"),
+          activeObjectId = Some(20L),
+          status = "Accepted",
+          hmrcMarkGenerated = Some("mark1"),
+          hmrcMarkGgis = Some("ggis1"),
+          emailRecipient = Some("test@example.com"),
+          acceptedTime = Some(Instant.now())
+        )
+      )
+      when(connector.getSubmittedMonthlyReturnsData(eqTo(expectedRequest))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(mockResponse))
+
+      val out = service.getSubmittedMonthlyReturnsData(instanceId, taxYear, taxMonth, amendment).futureValue
+      out mustBe mockResponse
+
+      verify(connector).getSubmittedMonthlyReturnsData(eqTo(expectedRequest))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+
+    "propagate failure from connector" in {
+      val (service, connector, sessionRepo) = newService()
+      val instanceId                        = "900063"
+      val taxYear                           = 2026
+      val taxMonth                          = 4
+      val amendment                         = "Y"
+      val boom                              = new RuntimeException("Backend error")
+
+      val expectedRequest = GetSubmittedMonthlyReturnsDataRequest(
+        instanceId = instanceId,
+        taxYear = taxYear,
+        taxMonth = taxMonth,
+        amendment = amendment
+      )
+
+      when(connector.getSubmittedMonthlyReturnsData(eqTo(expectedRequest))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(boom))
+
+      val ex = service.getSubmittedMonthlyReturnsData(instanceId, taxYear, taxMonth, amendment).failed.futureValue
+      ex mustBe boom
+
+      verify(connector).getSubmittedMonthlyReturnsData(eqTo(expectedRequest))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
     }
   }
 }

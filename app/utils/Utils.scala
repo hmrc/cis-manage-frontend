@@ -16,6 +16,7 @@
 
 package utils
 
+import play.api.i18n.Lang
 import java.time.Month
 import java.time.format.TextStyle
 import java.util.Locale
@@ -25,4 +26,15 @@ object Utils {
 
   def monthName(taxMonth: Int, locale: Locale): String =
     Month.of(taxMonth).getDisplayName(TextStyle.FULL, locale)
+
+  def monthYear(taxYear: Int, taxMonth: Int, langCode: String): String = {
+    val locale: Locale = Lang.get(langCode).map(_.locale).getOrElse(Locale.UK)
+    s"${monthName(taxMonth, locale)} $taxYear"
+  }
+
+  def formatCurrency(amount: BigDecimal): String =
+    f"£$amount%.2f"
+
+  def toBigDecimal(value: Option[String]): BigDecimal =
+    value.map(v => BigDecimal(v.trim)).getOrElse(BigDecimal(0))
 }

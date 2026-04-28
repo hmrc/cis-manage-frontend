@@ -25,9 +25,16 @@ object DateTimeFormats {
 
   private val dateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
+  private val timeFormatter = DateTimeFormatter.ofPattern("h:mma")
+
   private val localisedDateTimeFormatters = Map(
     "en" -> dateTimeFormatter,
     "cy" -> dateTimeFormatter.withLocale(new Locale("cy"))
+  )
+
+  private val localisedTimeFormatters = Map(
+    "en" -> timeFormatter,
+    "cy" -> timeFormatter.withLocale(new Locale("cy"))
   )
 
   def dateTimeFormat()(implicit lang: Lang): DateTimeFormatter =
@@ -35,4 +42,7 @@ object DateTimeFormats {
 
   val dateTimeHintFormat: DateTimeFormatter =
     DateTimeFormatter.ofPattern("d M yyyy")
+
+  def timeFormat()(implicit lang: Lang): DateTimeFormatter =
+    localisedTimeFormatters.getOrElse(lang.code, dateTimeFormatter)
 }
