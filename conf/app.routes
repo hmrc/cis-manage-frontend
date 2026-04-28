@@ -91,3 +91,4 @@ GET        /history/monthly-return-history-all-tax-years            controllers.
 GET        /history/monthly-return-history-tax-year/:taxYear        controllers.history.SubmittedReturnsController.onPageLoadSingleYear(taxYear)
 
 GET        /amend-monthly-return/no-return-submitted                controllers.amend.NoReturnsSubmittedController.onPageLoad()
+GET        /amend-monthly-return/no-incomplete-returns                  controllers.amend.NoIncompleteReturnsController.onPageLoad()
