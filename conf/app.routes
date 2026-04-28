@@ -63,7 +63,6 @@ GET        /automatic-subcontractor-update-successful-no-records/:instanceId/:ta
 POST       /automatic-subcontractor-update-successful-no-records/:instanceId/:targetKey    controllers.SuccessfulNoRecordsFoundController.onSubmit(instanceId: String, targetKey: String)
 
 GET        /manage-cis-return/:instanceId                           controllers.ReturnsLandingController.onPageLoad(instanceId: String)
-GET        /manage-cis-return/delete-return/:monthlyReturnId        controllers.ReturnsLandingController.onDeleteRedirect(monthlyReturnId: Long)
 GET        /manage-subcontractors/:instanceId                       controllers.SubcontractorsLandingPageController.onPageLoad(instanceId: String)
 
 GET        /manage-notices-statements/:instanceId                   controllers.notices.ManageNoticesStatementsController.onPageLoad(instanceId: String)
@@ -90,6 +89,9 @@ GET        /history/monthly-return-submission-details               controllers.
 GET        /history/monthly-return-history-all-tax-years            controllers.history.SubmittedReturnsController.onPageLoadAllYears()
 GET        /history/monthly-return-history-tax-year/:taxYear        controllers.history.SubmittedReturnsController.onPageLoadSingleYear(taxYear)
 GET        /monthly-return/confirmation-history                  controllers.history.SubmittedReturnsController.viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String)
+
+GET        /manage-your-cis-return/incomplete-returns                                       controllers.IncompleteReturnsController.onPageLoad()
+GET        /manage-your-cis-return/incomplete-returns/delete-return/:monthlyReturnId        controllers.IncompleteReturnsController.onDeleteRedirect(monthlyReturnId: Long)
 
 GET        /amend-monthly-return/no-return-submitted                controllers.amend.NoReturnsSubmittedController.onPageLoad()
 GET        /amend-monthly-return/no-incomplete-returns                  controllers.amend.NoIncompleteReturnsController.onPageLoad()

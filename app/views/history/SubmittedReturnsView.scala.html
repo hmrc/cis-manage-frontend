@@ -99,13 +99,15 @@
             <div class="govuk-grid-column-full">
                 @for(taxYear <- viewModel.taxYears) {
 
-                    <h2 class="govuk-heading-m govuk-!-margin-bottom-4">
-                        @messages(
-                            "history.returnHistory.taxYear.caption",
-                            taxYear.fromYear.toString,
-                            taxYear.toYear.toString
-                        )
-                    </h2>
+                    @if(viewModel.showTaxYearHeadings) {
+                        <h2 class="govuk-heading-m govuk-!-margin-bottom-4">
+                            @messages(
+                                "history.returnHistory.taxYear.caption",
+                                taxYear.fromYear.toString,
+                                taxYear.toYear.toString
+                            )
+                        </h2>
+                    }
 
                     <div class="return-history-desktop">
                         <div class="return-history-table-wrapper">

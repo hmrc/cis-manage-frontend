@@ -32,6 +32,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import pages.*
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
+import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel}
 import viewmodels.agent.AgentLandingViewModel
 
 import java.time.LocalDateTime
@@ -371,31 +372,89 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
   "getUnsubmittedMonthlyReturns" should {
 
-    "delegate to connector and return response (happy path)" in {
+    "delegate to connector and return raw response" in {
       val (service, connector, sessionRepo) = newService()
       val instanceId                        = "900063"
 
       val resp = UnsubmittedMonthlyReturnsResponse(
         unsubmittedCisReturns = Seq(
           UnsubmittedMonthlyReturnsRow(
-            monthlyReturnId = 3000L,
             taxYear = 2025,
             taxMonth = 1,
             returnType = "Nil",
-            status = "PENDING",
-            lastUpdate = None,
-            amendment = Some("Y"),
+            status = "In progress",
+            monthlyReturnId = 123L,
+            lastUpdate = Some(LocalDateTime.parse("2025-01-01T00:00:00")),
+            amendment = Some("N"),
             deletable = true
           )
         )
       )
 
-      when(connector.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
+      when(connector.getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(resp))
 
       service.getUnsubmittedMonthlyReturns(instanceId).futureValue mustBe resp
 
-      verify(connector).getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier])
+      verify(connector).getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+  }
+
+  "getUnsubmittedMonthlyReturnRows" should {
+
+    "delegate to connector and return mapped row view models" in {
+      val (service, connector, sessionRepo) = newService()
+      val instanceId                        = "900063"
+
+      when(appConfig.continueReturnJourneyUrl(any[String], any[String], any[String]))
+        .thenReturn("/continue")
+      when(appConfig.submissionInProgressUrl(any[String]))
+        .thenReturn("/submission-in-progress")
+      when(appConfig.submissionUnsuccessfulCannotResubmitUrl(any[String]))
+        .thenReturn("/submission-unsuccessful")
+
+      val resp = UnsubmittedMonthlyReturnsResponse(
+        unsubmittedCisReturns = Seq(
+          UnsubmittedMonthlyReturnsRow(
+            taxYear = 2025,
+            taxMonth = 1,
+            returnType = "Nil",
+            status = "In progress",
+            monthlyReturnId = 123L,
+            lastUpdate = Some(LocalDateTime.parse("2025-01-01T00:00:00")),
+            amendment = Some("N"),
+            deletable = true
+          )
+        )
+      )
+
+      when(connector.getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(resp))
+
+      service.getUnsubmittedMonthlyReturnRows(instanceId).futureValue mustBe Seq(
+        IncompleteReturnsRowViewModel(
+          returnPeriodEnd = "Jan 2025",
+          returnType = "Nil",
+          lastUpdate = "01 Jan 2025",
+          status = "In progress",
+          action = Seq(
+            ActionLinkViewModel(
+              textKey = "incompleteReturns.action.continue",
+              href = "/continue",
+              hiddenTextKey = Some("incompleteReturns.action.continue")
+            ),
+            ActionLinkViewModel(
+              textKey = "incompleteReturns.action.delete",
+              href = controllers.routes.IncompleteReturnsController.onDeleteRedirect(123L).url,
+              hiddenTextKey = Some("incompleteReturns.action.delete")
+            )
+          ),
+          amendment = Some("N")
+        )
+      )
+
+      verify(connector, times(1)).getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
       verifyNoInteractions(sessionRepo)
     }
 
@@ -404,13 +463,13 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       val instanceId                        = "900063"
       val boom                              = new RuntimeException("Backend error")
 
-      when(connector.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
+      when(connector.getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
         .thenReturn(Future.failed(boom))
 
       val ex = service.getUnsubmittedMonthlyReturns(instanceId).failed.futureValue
       ex mustBe boom
 
-      verify(connector).getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier])
+      verify(connector).getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
       verifyNoInteractions(sessionRepo)
     }
   }
@@ -493,8 +552,26 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       val mockResponse = UnsubmittedMonthlyReturnsResponse(
         unsubmittedCisReturns = Seq(
-          UnsubmittedMonthlyReturnsRow(3000L, 2025, 1, "Nil", "In Progress", None, Some("Y"), true),
-          UnsubmittedMonthlyReturnsRow(3001L, 2025, 2, "Nil", "In Progress", Some(LocalDateTime.now()), Some("Y"), true)
+          UnsubmittedMonthlyReturnsRow(
+            2025,
+            1,
+            "Nil",
+            "In Progress",
+            3000L,
+            None,
+            Some("Y"),
+            true
+          ),
+          UnsubmittedMonthlyReturnsRow(
+            2025,
+            2,
+            "Nil",
+            "In Progress",
+            3001L,
+            Some(LocalDateTime.now()),
+            Some("Y"),
+            true
+          )
         )
       )
 
@@ -508,7 +585,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       context.get.standardReturnLink mustBe "/standard"
       context.get.nilReturnLink mustBe "/nil"
 
-      verify(connector).getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier])
+      verifyNoInteractions(connector)
       verifyNoInteractions(sessionRepo)
     }
 
@@ -532,10 +609,6 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       val ua = UserAnswers("test-user").set(ContractorNamePage, "Org Ltd").get
 
-      val resp = UnsubmittedMonthlyReturnsResponse(Nil)
-      when(connector.getUnsubmittedMonthlyReturns(eqTo("CIS-123"))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(resp))
-
       val context = service.buildReturnsLandingContext("CIS-123", ua, isAgent = false).futureValue
 
       context.isDefined mustBe true
@@ -543,7 +616,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       context.get.standardReturnLink mustBe "/standard-org"
       context.get.nilReturnLink mustBe "/nil-org"
 
-      verify(connector).getUnsubmittedMonthlyReturns(eqTo("CIS-123"))(any[HeaderCarrier])
+      verifyNoInteractions(connector)
       verifyNoInteractions(sessionRepo)
     }
 

@@ -27,6 +27,7 @@ import org.scalatest.matchers.should.Matchers.*
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ReturnTypeViewModel, StatusViewModel, SubmittedReturnsRowViewModel}
+import viewmodels.{LinkViewModel, ReturnTypeViewModel, StatusViewModel, SubmittedReturnsRowViewModel}
 import viewmodels.StatusViewModel.Text
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -108,7 +109,14 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       row.dateSubmitted            shouldBe "1 Apr 2024"
       row.monthlyReturn.url        shouldBe "#"
       row.monthlyReturn.hiddenText shouldBe "Mar 2023"
-      row.status                   shouldBe StatusViewModel.Text("history.returnHistory.status.amend")
+      row.status                   shouldBe StatusViewModel.Link(
+        link = LinkViewModel(
+          url = "#",
+          hiddenText = "Mar 2023"
+        ),
+        textKey = "history.returnHistory.status.amend",
+        hiddenTextKey = "history.returnHistory.hidden.status.amend"
+      )
     }
 
     "buildSingleYearViewModel returns only the selected tax year" in {
@@ -151,7 +159,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       val row = singleRow(
         data(
           monthlyReturns = Seq(
-            monthlyReturn(id = 3L, status = "SUBMITTED")
+            monthlyReturn(id = 3L)
           ),
           submissions = Seq(
             submission(submissionId = 13L, activeObjectId = Some(3L), acceptedTime = None)
@@ -181,7 +189,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       val row = singleRow(
         data(
           monthlyReturns = Seq(
-            monthlyReturn(id = 5L, status = "SUBMITTED")
+            monthlyReturn(id = 5L)
           ),
           submissions = Seq(
             submission(
@@ -202,7 +210,6 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
           monthlyReturns = Seq(
             monthlyReturn(
               id = 6L,
-              status = "SUBMITTED",
               supersededBy = Some(99L),
               amendmentStatus = Some("STARTED")
             )
@@ -213,7 +220,14 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         )
       )
 
-      row.status shouldBe StatusViewModel.Text("history.returnHistory.status.inProgress")
+      row.status shouldBe StatusViewModel.Link(
+        link = LinkViewModel(
+          url = "#",
+          hiddenText = "Mar 2023"
+        ),
+        textKey = "history.returnHistory.status.inProgress",
+        hiddenTextKey = "history.returnHistory.hidden.status.inProgress"
+      )
     }
 
     "returns awaitingConfirmation for superseded return with amendment status PENDING" in {
@@ -222,7 +236,6 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
           monthlyReturns = Seq(
             monthlyReturn(
               id = 7L,
-              status = "SUBMITTED",
               supersededBy = Some(99L),
               amendmentStatus = Some("PENDING")
             )
@@ -242,7 +255,6 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
           monthlyReturns = Seq(
             monthlyReturn(
               id = 8L,
-              status = "SUBMITTED",
               supersededBy = Some(99L),
               amendmentStatus = Some("SUBMITTED")
             )
@@ -253,7 +265,14 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         )
       )
 
-      row.status shouldBe StatusViewModel.Text("history.returnHistory.status.amend")
+      row.status shouldBe StatusViewModel.Link(
+        link = LinkViewModel(
+          url = "#",
+          hiddenText = "Mar 2023"
+        ),
+        textKey = "history.returnHistory.status.amend",
+        hiddenTextKey = "history.returnHistory.hidden.status.amend"
+      )
     }
 
     "returns notAvailable for superseded return with amendment status FATAL_ERROR" in {
@@ -262,7 +281,6 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
           monthlyReturns = Seq(
             monthlyReturn(
               id = 9L,
-              status = "SUBMITTED",
               supersededBy = Some(99L),
               amendmentStatus = Some("FATAL_ERROR")
             )

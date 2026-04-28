@@ -603,13 +603,14 @@ class ConstructionIndustrySchemeConnectorSpec
                 """{
                   |  "unsubmittedCisReturns": [
                   |    {
-                  |      "monthlyReturnId": 3000,
                   |      "taxYear": 2025,
                   |      "taxMonth": 1,
                   |      "returnType": "Nil",
                   |      "status": "PENDING",
+                  |      "monthlyReturnId": 12345,
+                  |      "action": [],
                   |      "lastUpdate": null,
-                  |      "amendment": "Y",
+                  |      "amendment": "N",
                   |      "deletable": true
                   |    }
                   |  ]
@@ -620,13 +621,13 @@ class ConstructionIndustrySchemeConnectorSpec
 
       val result = connector.getUnsubmittedMonthlyReturns(instanceId).futureValue
       result.unsubmittedCisReturns.length mustBe 1
-      result.unsubmittedCisReturns.head.monthlyReturnId mustBe 3000
       result.unsubmittedCisReturns.head.taxYear mustBe 2025
       result.unsubmittedCisReturns.head.taxMonth mustBe 1
       result.unsubmittedCisReturns.head.returnType mustBe "Nil"
       result.unsubmittedCisReturns.head.status mustBe "PENDING"
+      result.unsubmittedCisReturns.head.monthlyReturnId mustBe 12345
       result.unsubmittedCisReturns.head.lastUpdate mustBe None
-      result.unsubmittedCisReturns.head.amendment mustBe Some("Y")
+      result.unsubmittedCisReturns.head.amendment mustBe Some("N")
       result.unsubmittedCisReturns.head.deletable mustBe true
     }
 
