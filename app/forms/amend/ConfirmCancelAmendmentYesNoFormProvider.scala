@@ -21,10 +21,10 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class ConfirmCancelAmendmentFormProvider @Inject() extends Mappings {
+class ConfirmCancelAmendmentYesNoFormProvider @Inject() extends Mappings {
 
   def apply(): Form[Boolean] =
     Form(
-      "value" -> boolean("amend.confirmCancelAmendment.error.required")
+      "value" -> boolean("amend.confirmCancelAmendmentYesNo.error.required")
     )
 }

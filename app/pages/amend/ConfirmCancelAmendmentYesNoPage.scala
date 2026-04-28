@@ -19,9 +19,9 @@ package pages.amend
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object ConfirmCancelAmendmentPage extends QuestionPage[Boolean] {
+case object ConfirmCancelAmendmentYesNoPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "confirmCancelAmendment"
+  override def toString: String = "confirmCancelAmendmentYesNo"
 }

@@ -23,11 +23,11 @@ class ConfirmCancelAmendmentPageSpec extends SpecBase {
 
   "ConfirmCancelAmendmentPage" - {
     "have the correct path" in {
-      ConfirmCancelAmendmentPage.path mustBe (JsPath \ "confirmCancelAmendment")
+      ConfirmCancelAmendmentYesNoPage.path mustBe (JsPath \ "confirmCancelAmendment")
     }
 
     "have the correct toString" in {
-      ConfirmCancelAmendmentPage.toString mustBe "confirmCancelAmendment"
+      ConfirmCancelAmendmentYesNoPage.toString mustBe "confirmCancelAmendment"
     }
   }
 }

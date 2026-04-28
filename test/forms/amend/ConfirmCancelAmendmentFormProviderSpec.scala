@@ -8,7 +8,7 @@ class ConfirmCancelAmendmentFormProviderSpec extends BooleanFieldBehaviours {
   val requiredKey = "amend.confirmCancelAmendment.error.required"
   val invalidKey  = "error.boolean"
 
-  val form = new ConfirmCancelAmendmentFormProvider()()
+  val form = new ConfirmCancelAmendmentYesNoFormProvider()()
 
   ".value" - {
 

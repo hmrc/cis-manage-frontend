@@ -2,20 +2,20 @@ package controllers.amend
 
 import base.SpecBase
 import controllers.routes
-import forms.amend.ConfirmCancelAmendmentFormProvider
+import forms.amend.ConfirmCancelAmendmentYesNoFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.amend.ConfirmCancelAmendmentPage
+import pages.amend.ConfirmCancelAmendmentYesNoPage
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.amend.ConfirmCancelAmendmentView
+import views.html.amend.ConfirmCancelAmendmentYesNoView
 
 import scala.concurrent.Future
 
@@ -23,11 +23,11 @@ class ConfirmCancelAmendmentControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider        = new ConfirmCancelAmendmentFormProvider()
+  val formProvider        = new ConfirmCancelAmendmentYesNoFormProvider()
   val form: Form[Boolean] = formProvider()
 
-  lazy val confirmCancelAmendmentRoute: String =
-    controllers.amend.routes.ConfirmCancelAmendmentController.onPageLoad(NormalMode).url
+  lazy val confirmCancelAmendmentYesNoRoute: String =
+    controllers.amend.routes.ConfirmCancelAmendmentYesNoController.onPageLoad().url
 
   private val monthYear: String = "April 2026"
 
@@ -38,32 +38,32 @@ class ConfirmCancelAmendmentControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, confirmCancelAmendmentRoute)
+        val request = FakeRequest(GET, confirmCancelAmendmentYesNoRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[ConfirmCancelAmendmentView]
+        val view = application.injector.instanceOf[ConfirmCancelAmendmentYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, monthYear, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, monthYear)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(ConfirmCancelAmendmentPage, true).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(ConfirmCancelAmendmentYesNoPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, confirmCancelAmendmentRoute)
+        val request = FakeRequest(GET, confirmCancelAmendmentYesNoRoute)
 
-        val view = application.injector.instanceOf[ConfirmCancelAmendmentView]
+        val view = application.injector.instanceOf[ConfirmCancelAmendmentYesNoView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), monthYear, NormalMode)(
+        contentAsString(result) mustEqual view(form.fill(true), monthYear)(
           request,
           messages(application)
         ).toString
@@ -86,7 +86,7 @@ class ConfirmCancelAmendmentControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, confirmCancelAmendmentRoute)
+          FakeRequest(POST, confirmCancelAmendmentYesNoRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -102,17 +102,17 @@ class ConfirmCancelAmendmentControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, confirmCancelAmendmentRoute)
+          FakeRequest(POST, confirmCancelAmendmentYesNoRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[ConfirmCancelAmendmentView]
+        val view = application.injector.instanceOf[ConfirmCancelAmendmentYesNoView]
 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, monthYear, NormalMode)(
+        contentAsString(result) mustEqual view(boundForm, monthYear)(
           request,
           messages(application)
         ).toString
@@ -124,7 +124,7 @@ class ConfirmCancelAmendmentControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, confirmCancelAmendmentRoute)
+        val request = FakeRequest(GET, confirmCancelAmendmentYesNoRoute)
 
         val result = route(application, request).value
 
@@ -139,7 +139,7 @@ class ConfirmCancelAmendmentControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, confirmCancelAmendmentRoute)
+          FakeRequest(POST, confirmCancelAmendmentYesNoRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value

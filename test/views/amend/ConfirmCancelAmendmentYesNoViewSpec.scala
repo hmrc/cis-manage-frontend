@@ -17,8 +17,7 @@
 package views.amend
 
 import base.SpecBase
-import forms.amend.ConfirmCancelAmendmentFormProvider
-import models.NormalMode
+import forms.amend.ConfirmCancelAmendmentYesNoFormProvider
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
@@ -26,23 +25,23 @@ import play.api.data.Form
 import play.api.i18n.{Lang, Messages}
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import views.html.amend.ConfirmCancelAmendmentView
+import views.html.amend.ConfirmCancelAmendmentYesNoView
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-class ConfirmCancelAmendmentViewSpec extends SpecBase {
+class ConfirmCancelAmendmentYesNoViewSpec extends SpecBase {
 
-  "ConfirmCancelAmendmentView" - {
+  "ConfirmCancelAmendmentYesNoView" - {
 
     "must render the page with the correct html elements" in new Setup {
       val doc: Document = Jsoup.parse(html.toString)
 
-      doc.title must include(messages("amend.confirmCancelAmendment.title", monthYear))
+      doc.title must include(messages("amend.confirmCancelAmendmentYesNo.title", monthYear))
       doc.title must include(monthYear)
 
-      doc.select("h1").text must include(messages("amend.confirmCancelAmendment.heading", monthYear))
+      doc.select("h1").text must include(messages("amend.confirmCancelAmendmentYesNo.heading", monthYear))
       doc.select("h1").text must include(monthYear)
 
       doc.getElementsByClass("govuk-button").text must include(messages("site.continue"))
@@ -60,7 +59,7 @@ class ConfirmCancelAmendmentViewSpec extends SpecBase {
 
     "must pre-populate the form when user has previously answered 'true'" in new Setup {
       val filledForm: Form[Boolean]         = form.fill(true)
-      val filledHtml: HtmlFormat.Appendable = view(filledForm, monthYear, NormalMode)(request, messages)
+      val filledHtml: HtmlFormat.Appendable = view(filledForm, monthYear)(request, messages)
       val doc: Document                     = Jsoup.parse(filledHtml.toString)
 
       doc.select("input[value=true]").hasAttr("checked") mustBe true
@@ -69,7 +68,7 @@ class ConfirmCancelAmendmentViewSpec extends SpecBase {
 
     "must pre-populate the form when user has previously answered 'false'" in new Setup {
       val filledForm: Form[Boolean]         = form.fill(false)
-      val filledHtml: HtmlFormat.Appendable = view(filledForm, monthYear, NormalMode)(request, messages)
+      val filledHtml: HtmlFormat.Appendable = view(filledForm, monthYear)(request, messages)
       val doc: Document                     = Jsoup.parse(filledHtml.toString)
 
       doc.select("input[value=true]").hasAttr("checked") mustBe false
@@ -79,8 +78,8 @@ class ConfirmCancelAmendmentViewSpec extends SpecBase {
 
   trait Setup {
     val app: Application                          = applicationBuilder().build()
-    val view: ConfirmCancelAmendmentView          = app.injector.instanceOf[ConfirmCancelAmendmentView]
-    val formProvider                              = new ConfirmCancelAmendmentFormProvider()
+    val view: ConfirmCancelAmendmentYesNoView     = app.injector.instanceOf[ConfirmCancelAmendmentYesNoView]
+    val formProvider                              = new ConfirmCancelAmendmentYesNoFormProvider()
     val form: Form[Boolean]                       = formProvider()
     implicit val request: play.api.mvc.Request[_] = FakeRequest()
 
@@ -93,6 +92,6 @@ class ConfirmCancelAmendmentViewSpec extends SpecBase {
     val monthYear: String =
       monthYearDate.format(DateTimeFormatter.ofPattern("MMMM uuuu").withLocale(Locale.UK))
 
-    val html: HtmlFormat.Appendable = view(form, monthYear, NormalMode)(request, messages)
+    val html: HtmlFormat.Appendable = view(form, monthYear)(request, messages)
   }
 }
