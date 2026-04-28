@@ -24,11 +24,11 @@ import java.util.Locale
 import utils.Utils.monthName
 
 case class UnsubmittedMonthlyReturnsRow(
-  monthlyReturnId: Long,
   taxYear: Int,
   taxMonth: Int,
   returnType: String,
   status: String,
+  monthlyReturnId: Long,
   lastUpdate: Option[LocalDateTime],
   amendment: Option[String],
   deletable: Boolean

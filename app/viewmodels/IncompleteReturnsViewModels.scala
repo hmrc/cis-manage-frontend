@@ -16,8 +16,17 @@
 
 package viewmodels
 
-case class ReturnsLandingContext(
-  contractorName: String,
-  standardReturnLink: String,
-  nilReturnLink: String
+case class IncompleteReturnsRowViewModel(
+  returnPeriodEnd: String,
+  returnType: String,
+  lastUpdate: String,
+  status: String,
+  action: Seq[ActionLinkViewModel],
+  amendment: Option[String]
+)
+
+case class ActionLinkViewModel(
+  textKey: String,
+  href: String,
+  hiddenTextKey: Option[String] = None
 )

@@ -18,12 +18,9 @@ package controllers
 
 import config.FrontendAppConfig
 import controllers.actions.*
-import models.{Deletable, UnsubmittedMonthlyReturnsRow}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
-import queries.delete.UnsubmittedMonthlyReturnToDeleteQuery
-import repositories.SessionRepository
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.ManageService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -31,7 +28,7 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.ReturnsLandingView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
 
 class ReturnsLandingController @Inject() (
@@ -41,8 +38,7 @@ class ReturnsLandingController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: ReturnsLandingView,
-  service: ManageService,
-  sessionRepository: SessionRepository
+  service: ManageService
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -56,7 +52,7 @@ class ReturnsLandingController @Inject() (
         .buildReturnsLandingContext(instanceId, request.userAnswers, request.isAgent)
         .map {
           case Some(context) =>
-            Ok(view(context.contractorName, context.returnsList, context.standardReturnLink, context.nilReturnLink))
+            Ok(view(context.contractorName, context.standardReturnLink, context.nilReturnLink))
           case None          =>
             logger.warn(
               s"[ReturnsLandingController] missing context (isAgent=${request.isAgent}, instanceId=$instanceId)"
@@ -67,30 +63,5 @@ class ReturnsLandingController @Inject() (
           logger.error(s"[ReturnsLandingController] failed for instanceId=$instanceId)", e)
           Redirect(controllers.routes.SystemErrorController.onPageLoad())
         }
-    }
-
-  def onDeleteRedirect(monthlyReturnId: Long): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      service.checkUnsubmittedMonthlyReturnDeletion(request.userAnswers, monthlyReturnId).flatMap {
-        case Deletable(record) =>
-          for {
-            updatedAnswers <- Future.fromTry(
-                                request.userAnswers.set(UnsubmittedMonthlyReturnToDeleteQuery, record)
-                              )
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(resolveDeleteRoute(record))
-        case _                 => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-      }
-    }
-
-  private def resolveDeleteRoute(record: UnsubmittedMonthlyReturnsRow): Call =
-    (record.returnType, record.amendment) match {
-      case ("Nil", Some("Y"))      => controllers.delete.routes.DeleteAmendedNilMonthlyReturnController.onPageLoad()
-      case ("Nil", Some("N"))      => controllers.delete.routes.DeleteNilMonthlyReturnController.onPageLoad()
-      case ("Standard", Some("Y")) => controllers.delete.routes.DeleteAmendedMonthlyReturnController.onPageLoad()
-      case ("Standard", Some("N")) => controllers.delete.routes.DeleteMonthlyReturnController.onPageLoad()
-      case _                       =>
-        logger.warn(s"[ReturnsLandingController] No delete route mapping for monthlyReturnId=${record.monthlyReturnId}")
-        controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 }
