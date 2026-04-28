@@ -51,6 +51,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val cisHelpWhatIsUrl: String                           = configuration.get[String]("urls.cis-help-what-is")
   lazy val cisHelpMonthlyUrl: String                          = configuration.get[String]("urls.cis-help-monthly")
   lazy val cisHelp340Url: String                              = configuration.get[String]("urls.cis-help-340")
+  lazy val cisHelpWhatYouMustDoAsContractor: String           =
+    configuration.get[String]("urls.cis-help-what-you-must-do-as-a-contractor")
   lazy val hmrcOnlineServiceDeskUrl: String                   = configuration.get[String]("urls.hmrcOnlineServiceDesk")
   lazy val payeCisForAgentsOnlineService: String              = configuration.get[String]("urls.payeCisForAgentsOnlineService")
   lazy val cisMonthlyReturnsGuidanceUrl: String               = configuration.get[String]("urls.cisMonthlyReturnsGuidance")

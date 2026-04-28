@@ -490,3 +490,11 @@ submissionConfirmation.needHelp.p1 = For any questions about your return submiss
 submissionConfirmation.needHelp.link = Construction Industry Scheme general enquiries (opens in new tab).
 submissionConfirmation.returnType.monthly = Monthly
 submissionConfirmation.returnType.nil = Nil
+
+amend.noIncompleteReturns.title = You do not have any incomplete returns
+amend.noIncompleteReturns.heading = You do not have any incomplete returns
+amend.noIncompleteReturns.p1 = To view a monthly return, or make any amendments, you must file one first.
+amend.noIncompleteReturns.p2 = You can do this in
+amend.noIncompleteReturns.p2.link = Manage your CIS return
+amend.noIncompleteReturns.p3 = Find out more about
+amend.noIncompleteReturns.p3.link = what you must do as a CIS contractor

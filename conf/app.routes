@@ -92,3 +92,4 @@ GET        /history/monthly-return-history-tax-year/:taxYear        controllers.
 GET        /monthly-return/confirmation-history                  controllers.history.SubmittedReturnsController.viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String)
 
 GET        /amend-monthly-return/no-return-submitted                controllers.amend.NoReturnsSubmittedController.onPageLoad()
+GET        /amend-monthly-return/no-incomplete-returns                  controllers.amend.NoIncompleteReturnsController.onPageLoad()
