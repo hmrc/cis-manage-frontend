@@ -24,7 +24,6 @@ class ReturnsLandingContextSpec extends AnyWordSpec with Matchers {
   "ReturnsLandingContext" should {
 
     "hold the values passed to it" in {
-
       val context = ReturnsLandingContext(
         contractorName = "ABC Construction Ltd",
         standardReturnLink = "/standard",

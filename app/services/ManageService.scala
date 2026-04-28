@@ -27,10 +27,12 @@ import play.api.Logging
 import play.api.libs.json.Json
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.ReturnsLandingContext
+import viewmodels.*
 import viewmodels.agent.AgentLandingViewModel
 
-import java.time.LocalDate
+import java.time.*
+import java.time.format.*
+import java.util.Locale
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,6 +42,9 @@ class ManageService @Inject() (
   sessionRepository: SessionRepository
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends Logging {
+
+  private val shortMonthYearFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM yyyy", Locale.UK)
+  private val lastUpdateFormatter: DateTimeFormatter     = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.UK)
 
   def resolveAndStoreCisId(ua: UserAnswers)(implicit hc: HeaderCarrier): Future[(String, UserAnswers)] =
     ua.get(CisIdPage) match {
@@ -121,6 +126,25 @@ class ManageService @Inject() (
     hc: HeaderCarrier
   ): Future[UnsubmittedMonthlyReturnsResponse] =
     cisConnector.getUnsubmittedMonthlyReturns(instanceId)
+
+  def getUnsubmittedMonthlyReturnRows(instanceId: String)(implicit
+    hc: HeaderCarrier
+  ): Future[Seq[IncompleteReturnsRowViewModel]] =
+    getUnsubmittedMonthlyReturns(instanceId).map { response =>
+      response.unsubmittedCisReturns
+        .sortBy(r => (r.taxYear, r.taxMonth))
+        .reverse
+        .map { r =>
+          IncompleteReturnsRowViewModel(
+            returnPeriodEnd = buildReturnPeriodEnd(r.taxMonth, r.taxYear),
+            returnType = r.returnType,
+            lastUpdate = formatLastUpdate(r.lastUpdate),
+            status = r.status,
+            action = buildActions(instanceId, r),
+            amendment = r.amendment
+          )
+        }
+    }
 
   def getSubmittedTaxYears(instanceId: String)(implicit
     hc: HeaderCarrier
@@ -213,4 +237,64 @@ class ManageService @Inject() (
         logger.error(s"[deleteUnsubmittedMonthlyReturn] missing instanceId in user answers")
         Future.failed(new RuntimeException("Missing instanceId in user answers"))
     }
+
+  private def buildReturnPeriodEnd(taxMonth: Int, taxYear: Int): String =
+    YearMonth.of(taxYear, taxMonth).format(shortMonthYearFormatter)
+
+  private def formatLastUpdate(lastUpdate: Option[LocalDateTime]): String =
+    lastUpdate match {
+      case Some(dateTime) => dateTime.toLocalDate.format(lastUpdateFormatter)
+      case None           => ""
+    }
+
+  private def buildActions(instanceId: String, row: UnsubmittedMonthlyReturnsRow): Seq[ActionLinkViewModel] = {
+    val isDeletable = row.deletable
+    val isAmendment = row.amendment.exists(_.equals("Y"))
+
+    row.status match {
+      case "In progress" =>
+        Seq(
+          ActionLinkViewModel(
+            textKey = "incompleteReturns.action.continue",
+            href = if (isAmendment) {
+              controllers.routes.JourneyRecoveryController.onPageLoad().url // TODO: MR03-03
+            } else {
+              appConfig
+                .continueReturnJourneyUrl(instanceId, row.taxYear.toString, row.taxMonth.toString)
+            },
+            hiddenTextKey = Some("incompleteReturns.action.continue")
+          ),
+          ActionLinkViewModel(
+            textKey = "incompleteReturns.action.delete",
+            href = if (isDeletable) {
+              controllers.routes.IncompleteReturnsController.onDeleteRedirect(row.monthlyReturnId).url
+            } else {
+              controllers.routes.JourneyRecoveryController.onPageLoad().url
+            },
+            hiddenTextKey = Some("incompleteReturns.action.delete")
+          )
+        )
+
+      case "Awaiting confirmation" =>
+        Seq(
+          ActionLinkViewModel(
+            textKey = "incompleteReturns.action.view",
+            href = appConfig.submissionInProgressUrl(instanceId),
+            hiddenTextKey = Some("incompleteReturns.action.view")
+          )
+        )
+
+      case "Unsuccessful" =>
+        Seq(
+          ActionLinkViewModel(
+            textKey = "incompleteReturns.action.view",
+            href = appConfig.submissionUnsuccessfulCannotResubmitUrl(instanceId),
+            hiddenTextKey = Some("incompleteReturns.action.view")
+          )
+        )
+
+      case _ =>
+        Seq.empty
+    }
+  }
 }

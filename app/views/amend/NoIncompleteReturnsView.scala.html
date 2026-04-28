@@ -18,34 +18,34 @@
 @import config.FrontendAppConfig
 
 @this(
-        layout: templates.Layout,
-        govukButton: GovukButton,
-        h1: H1,
-        paragraph: Paragraph,
-        link: components.Link,
-        appConfig: FrontendAppConfig
+ layout: templates.Layout,
+ govukButton: GovukButton,
+ h1: H1,
+ paragraph: Paragraph,
+ link: Link,
+ appConfig: FrontendAppConfig
 )
 
 @(cisId: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("amend.noReturnsSubmitted.title"))) {
+@layout(pageTitle = titleNoForm(messages("amend.noIncompleteReturns.title"))) {
 
-    @h1(messages("amend.noReturnsSubmitted.heading"))
+@h1(messages("amend.noIncompleteReturns.heading"))
 
-    @paragraph(messages("amend.noReturnsSubmitted.p1"))
+@paragraph(messages("amend.noIncompleteReturns.p1"))
 
     @link(
-        linkTextKey = "amend.noReturnsSubmitted.p2.link",
+        linkTextKey = "amend.noIncompleteReturns.p2.link",
         linkUrl = controllers.routes.ReturnsLandingController.onPageLoad(cisId).url,
         hasFullStop = true,
-        prefixTextKey = "amend.noReturnsSubmitted.p2"
+        prefixTextKey = "amend.noIncompleteReturns.p2"
     )
 
     @link(
-        linkTextKey = "amend.noReturnsSubmitted.p3.link",
+        linkTextKey = "amend.noIncompleteReturns.p3.link",
         linkUrl = appConfig.cisHelpWhatYouMustDoAsContractor,
-        isNewTab = true,
+        isNewTab = false,
         hasFullStop = true,
-        prefixTextKey = "amend.noReturnsSubmitted.p3"
+        prefixTextKey = "amend.noIncompleteReturns.p3"
     )
 }
