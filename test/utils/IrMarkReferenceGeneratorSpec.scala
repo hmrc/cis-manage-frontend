@@ -47,6 +47,21 @@ class IrMarkReferenceGeneratorSpec extends AnyFreeSpec with Matchers {
       IrMarkReferenceGenerator.fromBase64("") mustBe ""
     }
 
+    "must encode 1 remaining byte (2-char output)" in {
+      // 1 zero byte encodes to base64 "AA==" and base32 "AA"
+      IrMarkReferenceGenerator.fromBase64("AA==") mustBe "AA"
+    }
+
+    "must encode 2 remaining bytes (4-char output)" in {
+      // 2 zero bytes encode to base64 "AAA=" and base32 "AAAA"
+      IrMarkReferenceGenerator.fromBase64("AAA=") mustBe "AAAA"
+    }
+
+    "must encode 3 remaining bytes (5-char output)" in {
+      // 3 zero bytes encode to base64 "AAAA" and base32 "AAAAA"
+      IrMarkReferenceGenerator.fromBase64("AAAA") mustBe "AAAAA"
+    }
+
     "must encode 4 remaining bytes (7-char output)" in {
       // 4 zero bytes encode to base64 "AAAAAA==" and base32 "AAAAAAA"
       IrMarkReferenceGenerator.fromBase64("AAAAAA==") mustBe "AAAAAAA"
