@@ -470,3 +470,11 @@ amend.noReturnsSubmitted.p2 = You can do this in
 amend.noReturnsSubmitted.p2.link = Manage your CIS return
 amend.noReturnsSubmitted.p3 = Find out more about
 amend.noReturnsSubmitted.p3.link = what you must do as a CIS contractor
+
+amend.noIncompleteReturns.title = You do not have any incomplete returns
+amend.noIncompleteReturns.heading = You do not have any incomplete returns
+amend.noIncompleteReturns.p1 = To view a monthly return, or make any amendments, you must file one first.
+amend.noIncompleteReturns.p2 = You can do this in
+amend.noIncompleteReturns.p2.link = Manage your CIS return
+amend.noIncompleteReturns.p3 = Find out more about
+amend.noIncompleteReturns.p3.link = what you must do as a CIS contractor
