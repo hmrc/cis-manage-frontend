@@ -311,9 +311,9 @@ returnsLanding.viewSubmittedReturns.p1 = View a return to make amendments, chang
 returnsLanding.incompleteReturns.h3.link = Incomplete returns
 returnsLanding.incompleteReturns.p1 = Submit or delete a return in progress. You can also resubmit a return that was not initially accepted.
 returnsLanding.aside.h2 = Help and guidance
-returnsLanding.aside.link1 = What is the Construction Industry Scheme
+returnsLanding.aside.link1 = What is the Construction Industry Scheme?
 returnsLanding.aside.link2 = CIS monthly returns guidance
-returnsLanding.aside.link3 = CIS 340: Penalties for late returns
+returnsLanding.aside.link3 = CIS 340: penalties for late returns
 returnsLanding.aside.link4 = Understanding CIS penalties
 returnsLanding.returnToHome.link = Return to home
 
