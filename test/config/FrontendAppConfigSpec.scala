@@ -46,7 +46,8 @@ class FrontendAppConfigSpec extends SpecBase {
       appConfig.cisHelpMonthlyUrl mustBe "https://www.gov.uk/what-you-must-do-as-a-cis-contractor/file-your-monthly-returns#guide-contents"
       appConfig.cisHelp340Url mustBe
         "https://www.gov.uk/what-you-must-do-as-a-cis-contractor/file-your-monthly-returns#penalties-for-late-returns"
-
+      appConfig.cisHelpWhatYouMustDoAsContractor mustBe
+        "https://www.gov.uk/what-you-must-do-as-a-cis-contractor"
       appConfig.returnToHomeUrl mustBe "http://localhost:6996/construction-industry-scheme/management"
 
       appConfig.contractorLandingWhatIsUrl mustBe "https://www.gov.uk/what-is-the-construction-industry-scheme"

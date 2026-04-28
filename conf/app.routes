@@ -93,3 +93,4 @@ GET        /manage-your-cis-return/incomplete-returns                           
 GET        /manage-your-cis-return/incomplete-returns/delete-return/:monthlyReturnId        controllers.IncompleteReturnsController.onDeleteRedirect(monthlyReturnId: Long)
 
 GET        /amend-monthly-return/no-return-submitted                controllers.amend.NoReturnsSubmittedController.onPageLoad()
+GET        /amend-monthly-return/no-incomplete-returns                  controllers.amend.NoIncompleteReturnsController.onPageLoad()
