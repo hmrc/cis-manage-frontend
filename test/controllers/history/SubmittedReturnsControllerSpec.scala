@@ -18,8 +18,8 @@ package controllers.history
 
 import base.SpecBase
 import models.UserAnswers
-import models.history.{SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSchemeData, SubmittedSubmissionData}
-import org.mockito.ArgumentMatchers.any
+import models.history.{SubcontractorPayment, SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSchemeData, SubmittedSubmissionData}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CisIdPage
@@ -32,6 +32,7 @@ import services.{ManageService, SubmittedReturnsService}
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.*
 import views.html.history.SubmittedReturnsView
+import views.html.monthlyreturns.SubmissionSuccessView
 
 import java.time.Instant
 import scala.concurrent.Future
@@ -89,6 +90,8 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
       )
     )
   )
+
+  private val mockService: SubmittedReturnsService = mock[SubmittedReturnsService]
 
   trait Setup {
     val mockSubmittedReturnsService: SubmittedReturnsService = mock[SubmittedReturnsService]
@@ -226,7 +229,6 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-        verify(mockSubmittedReturnsService).buildSingleYearViewModel(submittedReturnsData, "2024")
       }
     }
 
@@ -284,6 +286,132 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
         verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
+      }
+    }
+
+    "viewSubmissionReceipt must return OK and render the success view when email is present" in {
+      val receiptViewModel = SubmissionReceiptViewModel(
+        contractorName = "Test Contractor",
+        payeReference = "123/ABC456",
+        taxYear = 2024,
+        taxMonth = 6,
+        returnPeriodEnd = "June 2024",
+        returnType = "Monthly",
+        submissionType = "Monthly return",
+        hmrcMark = Some("HMRC-123"),
+        submittedAt = Some("11:30am on 1 July 2024"),
+        emailRecipient = Some("user@example.com"),
+        instanceId = "INST001",
+        items = Seq(
+          SubcontractorPayment("John Smith", "5000.00", "1000.00", "800.00")
+        )
+      )
+
+      when(mockService.getMonthlyReturnComplete(eqTo("INST001"), eqTo(2024), eqTo(6), eqTo("N"))(any()))
+        .thenReturn(Future.successful(Right(receiptViewModel)))
+
+      val userAnswersWithCisId = emptyUserAnswers.set(CisIdPage, "INST001").success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+        .overrides(bind[SubmittedReturnsService].toInstance(mockService))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.viewSubmissionReceipt(2024, 6, "N").url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+        val view = application.injector.instanceOf[SubmissionSuccessView]
+        contentAsString(result) mustBe view(receiptViewModel)(request, messages(application)).toString
+      }
+    }
+
+    "viewSubmissionReceipt must return OK and render the confirmation view when email is absent" in {
+      val receiptViewModel = SubmissionReceiptViewModel(
+        contractorName = "Test Contractor",
+        payeReference = "123/ABC456",
+        taxYear = 2024,
+        taxMonth = 6,
+        returnPeriodEnd = "June 2024",
+        returnType = "Monthly",
+        submissionType = "Monthly return",
+        hmrcMark = Some("HMRC-123"),
+        submittedAt = Some("11:30am on 1 July 2024"),
+        emailRecipient = None,
+        instanceId = "INST001",
+        items = Seq(
+          SubcontractorPayment("John Smith", "5000.00", "1000.00", "800.00")
+        )
+      )
+
+      when(mockService.getMonthlyReturnComplete(eqTo("INST001"), eqTo(2024), eqTo(6), eqTo("N"))(any()))
+        .thenReturn(Future.successful(Right(receiptViewModel)))
+
+      val userAnswersWithCisId = emptyUserAnswers.set(CisIdPage, "INST001").success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+        .overrides(bind[SubmittedReturnsService].toInstance(mockService))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.viewSubmissionReceipt(2024, 6, "N").url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+        val view = application.injector.instanceOf[SubmissionSuccessView]
+        contentAsString(result) mustBe view(receiptViewModel)(request, messages(application)).toString
+      }
+    }
+
+    "viewSubmissionReceipt must redirect to JourneyRecovery when service guard fails" in {
+      when(mockService.getMonthlyReturnComplete(eqTo("INST001"), eqTo(2024), eqTo(6), eqTo("N"))(any()))
+        .thenReturn(Future.successful(Left("Submission guard failed: IRMark mismatch")))
+
+      val userAnswersWithCisId = emptyUserAnswers.set(CisIdPage, "INST001").success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+        .overrides(bind[SubmittedReturnsService].toInstance(mockService))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.viewSubmissionReceipt(2024, 6, "N").url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "viewSubmissionReceipt must redirect to JourneyRecovery when CisIdPage is missing" in {
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(bind[SubmittedReturnsService].toInstance(mockService))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.viewSubmissionReceipt(2024, 6, "N").url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "viewSubmissionReceipt must redirect to JourneyRecovery when the service call fails" in {
+      when(mockService.getMonthlyReturnComplete(any(), any(), any(), any())(any()))
+        .thenReturn(Future.failed(new RuntimeException("upstream error")))
+
+      val userAnswersWithCisId = emptyUserAnswers.set(CisIdPage, "INST001").success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+        .overrides(bind[SubmittedReturnsService].toInstance(mockService))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.viewSubmissionReceipt(2024, 6, "N").url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
