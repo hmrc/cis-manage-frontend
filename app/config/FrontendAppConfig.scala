@@ -65,8 +65,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val noticesAndStatementsUrl: String                    = configuration.get[String]("urls.noticesAndStatements")
   lazy val viewReturnsHistoryUrl: String                      = configuration.get[String]("urls.viewReturnsHistory")
   lazy val hmrcContactCISUrl: String
-  private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
-  lazy val exitSurveyUrl: String        = s"$exitSurveyBaseUrl/feedback/cis-manage-frontend"
+  private val exitSurveyBaseUrl: String                       = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
+  lazy val exitSurveyUrl: String                              = s"$exitSurveyBaseUrl/feedback/cis-manage-frontend"
 
   lazy val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("features.welsh-translation")
