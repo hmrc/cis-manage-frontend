@@ -89,8 +89,8 @@ GET        /history/monthly-return-submission-details               controllers.
 GET        /history/monthly-return-history-all-tax-years            controllers.history.SubmittedReturnsController.onPageLoadAllYears()
 GET        /history/monthly-return-history-tax-year/:taxYear        controllers.history.SubmittedReturnsController.onPageLoadSingleYear(taxYear)
 
-GET        /manage-your-cis-return/incomplete-returns                                       controllers.IncompleteReturnsController.onPageLoad()
-GET        /manage-your-cis-return/incomplete-returns/delete-return/:monthlyReturnId        controllers.IncompleteReturnsController.onDeleteRedirect(monthlyReturnId: Long)
+GET        /manage-your-cis-return/incomplete-returns                                       controllers.history.IncompleteReturnsController.onPageLoad()
+GET        /manage-your-cis-return/incomplete-returns/delete-return/:monthlyReturnId        controllers.history.IncompleteReturnsController.onDeleteRedirect(monthlyReturnId: Long)
 
-GET        /amend-monthly-return/no-return-submitted                controllers.amend.NoReturnsSubmittedController.onPageLoad()
+GET        /amend-monthly-return/no-return-submitted                    controllers.amend.NoReturnsSubmittedController.onPageLoad()
 GET        /amend-monthly-return/no-incomplete-returns                  controllers.amend.NoIncompleteReturnsController.onPageLoad()

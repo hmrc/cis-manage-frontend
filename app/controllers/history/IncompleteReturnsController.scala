@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.history
 
 import controllers.actions.*
-import pages.CisIdPage
+import controllers.routes
 import models.*
 import play.api.Logging
-
-import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import queries.delete.UnsubmittedMonthlyReturnToDeleteQuery
@@ -30,6 +28,7 @@ import services.ManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IncompleteReturnsView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class IncompleteReturnsController @Inject() (
@@ -37,6 +36,7 @@ class IncompleteReturnsController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  requireCisId: CisIdRequiredAction,
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: IncompleteReturnsView,
@@ -46,16 +46,15 @@ class IncompleteReturnsController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    request.userAnswers.get(CisIdPage) match {
-      case Some(instanceId) =>
-        service.getUnsubmittedMonthlyReturnRows(instanceId).map { vm =>
-          Ok(view(vm))
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData andThen requireCisId).async {
+    implicit request =>
+      service.getUnsubmittedMonthlyReturnRows(request.cisId).map { rows =>
+        if (rows.isEmpty) {
+          Redirect(controllers.amend.routes.NoIncompleteReturnsController.onPageLoad())
+        } else {
+          Ok(view(rows))
         }
-
-      case None =>
-        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-    }
+      }
   }
 
   def onDeleteRedirect(monthlyReturnId: Long): Action[AnyContent] =

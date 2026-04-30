@@ -109,16 +109,39 @@ class SubmittedReturnsServiceSpec extends SpecBase {
       )
     }
 
+    "buildAllYearsViewModel assigns monthly returns to the correct tax years" in {
+      val testData = data(
+        monthlyReturns = Seq(
+          monthlyReturn(id = 21L, taxYear = 2024, taxMonth = 4),
+          monthlyReturn(id = 22L, taxYear = 2024, taxMonth = 5)
+        ),
+        submissions = Seq(
+          submission(submissionId = 21L, activeObjectId = Some(21L)),
+          submission(submissionId = 22L, activeObjectId = Some(22L))
+        )
+      )
+
+      val result = service.buildAllYearsViewModel(testData).value
+
+      result.taxYears.map(t => (t.fromYear, t.toYear)) shouldBe Seq(
+        2024 -> 2025,
+        2023 -> 2024
+      )
+
+      result.taxYears.head.rows.map(_.returnPeriodEnd) shouldBe Seq("May 2024")
+      result.taxYears(1).rows.map(_.returnPeriodEnd)   shouldBe Seq("Apr 2024")
+    }
+
     "buildSingleYearViewModel returns only the selected tax year" in {
       val testData = data(
         monthlyReturns = Seq(monthlyReturn()),
         submissions = Seq(submission())
       )
 
-      val result = service.buildSingleYearViewModel(testData, "2023")
+      val result = service.buildSingleYearViewModel(testData, "2022")
 
-      result.value.selectedTaxYear                           shouldBe Some("2023")
-      result.value.taxYears.map(t => (t.fromYear, t.toYear)) shouldBe Seq(2023 -> 2024)
+      result.value.selectedTaxYear                           shouldBe Some("2022")
+      result.value.taxYears.map(t => (t.fromYear, t.toYear)) shouldBe Seq(2022 -> 2023)
     }
 
     "buildSingleYearViewModel returns None for invalid tax year" in {

@@ -18,7 +18,8 @@ package viewmodels
 
 case class SubmittedReturnsPageViewModel(
   taxYears: Seq[TaxYearHistoryViewModel],
-  selectedTaxYear: Option[String]
+  selectedTaxYear: Option[String],
+  showReturnToTaxYearsLink: Boolean = false
 ) {
   val showTaxYearHeadings: Boolean = taxYears.size > 1
 }

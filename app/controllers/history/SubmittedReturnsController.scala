@@ -18,8 +18,7 @@ package controllers.history
 
 import controllers.actions.*
 import models.history.SubmittedReturnsData
-import models.requests.DataRequest
-import pages.CisIdPage
+import models.requests.CisIdDataRequest
 import pages.history.SubmittedReturnsDataPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -37,6 +36,7 @@ class SubmittedReturnsController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  requireCisId: CisIdRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: SubmittedReturnsView,
   submittedReturnsService: SubmittedReturnsService,
@@ -45,62 +45,49 @@ class SubmittedReturnsController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoadSingleYear(taxYear: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onPageLoadSingleYear(taxYear: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
 
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       resolveSubmittedReturnsData
-        .map {
-          case Some(data) =>
-            submittedReturnsService.buildSingleYearViewModel(data, taxYear) match {
-              case Some(vm) => Ok(view(vm))
-              case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            }
-
-          case None =>
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        .map { data =>
+          submittedReturnsService.buildSingleYearViewModel(data, taxYear) match {
+            case Some(vm) => Ok(view(vm))
+            case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
         }
-        .recover { case e =>
+        .recover { case _ =>
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
-  }
+    }
 
-  def onPageLoadAllYears: Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onPageLoadAllYears: Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
 
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       resolveSubmittedReturnsData
-        .map {
-          case Some(data) =>
-            submittedReturnsService.buildAllYearsViewModel(data) match {
-              case Some(vm) => Ok(view(vm))
-              case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            }
-
-          case None =>
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        .map { data =>
+          submittedReturnsService.buildAllYearsViewModel(data) match {
+            case Some(vm) => Ok(view(vm))
+            case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
         }
         .recover { case e =>
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
-  }
+    }
 
   private def resolveSubmittedReturnsData(implicit
-    request: DataRequest[AnyContent],
+    request: CisIdDataRequest[AnyContent],
     hc: HeaderCarrier
-  ): Future[Option[SubmittedReturnsData]] =
+  ): Future[SubmittedReturnsData] =
     request.userAnswers.get(SubmittedReturnsDataPage) match {
       case Some(data) =>
-        Future.successful(Some(data))
-      case None       =>
-        request.userAnswers.get(CisIdPage) match {
-          case Some(instanceId) =>
-            manageService.getSubmittedMonthlyReturns(instanceId).map(Some(_))
+        Future.successful(data)
 
-          case None =>
-            Future.successful(None)
-        }
+      case None =>
+        manageService.getSubmittedMonthlyReturns(request.cisId)
     }
 }

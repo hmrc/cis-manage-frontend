@@ -21,7 +21,7 @@ import viewmodels.{LinkViewModel, ReturnTypeViewModel, StatusViewModel, Submitte
 import viewmodels.StatusViewModel.Text
 
 import java.time.format.DateTimeFormatter
-import java.time.{Instant, YearMonth, ZoneId, ZoneOffset, ZonedDateTime}
+import java.time.{Instant, LocalDate, YearMonth, ZoneId, ZoneOffset, ZonedDateTime}
 import javax.inject.{Inject, Singleton}
 
 @Singleton
@@ -33,30 +33,42 @@ class SubmittedReturnsService @Inject() {
   private val amendmentCutOffInstant: Instant            = ZonedDateTime.of(2016, 2, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant
 
   def buildAllYearsViewModel(data: SubmittedReturnsData): Option[SubmittedReturnsPageViewModel] =
+    val taxYearSections = buildTaxYearSections(data)
+
     Some(
       SubmittedReturnsPageViewModel(
-        taxYears = buildTaxYearSections(data),
-        selectedTaxYear = None
+        taxYears = taxYearSections,
+        selectedTaxYear = None,
+        showReturnToTaxYearsLink = taxYearSections.size > 1
       )
     )
 
   def buildSingleYearViewModel(data: SubmittedReturnsData, taxYear: String): Option[SubmittedReturnsPageViewModel] =
     taxYear.toIntOption.map { taxYearInt =>
+      val taxYearSections = buildTaxYearSections(data)
+
       SubmittedReturnsPageViewModel(
-        taxYears = buildTaxYearSections(data).filter(_.fromYear == taxYearInt),
-        selectedTaxYear = Some(taxYear)
+        taxYears = taxYearSections.filter(_.fromYear == taxYearInt),
+        selectedTaxYear = Some(taxYear),
+        showReturnToTaxYearsLink = taxYearSections.size > 1
       )
     }
 
   private def buildTaxYearSections(data: SubmittedReturnsData): Seq[TaxYearHistoryViewModel] = {
+    val submissionsByMonthlyReturnId =
+      data.submissions
+        .flatMap(submission => submission.activeObjectId.map(_ -> submission))
+        .toMap
+
     val rowsWithTaxYear =
       data.monthlyReturns
         .sortBy(mr => (mr.taxYear, mr.taxMonth))(Ordering.Tuple2(Ordering.Int, Ordering.Int).reverse)
         .flatMap { monthlyReturn =>
-          data.submissions
-            .find(_.activeObjectId.contains(monthlyReturn.monthlyReturnId))
+          submissionsByMonthlyReturnId
+            .get(monthlyReturn.monthlyReturnId)
             .map { submission =>
-              monthlyReturn.taxYear -> toRowViewModel(monthlyReturn, Some(submission))
+              val fromYear = taxYearFromYear(monthlyReturn)
+              fromYear -> toRowViewModel(monthlyReturn, Some(submission))
             }
         }
 
@@ -72,6 +84,16 @@ class SubmittedReturnsService @Inject() {
         )
       }
   }
+
+  private def taxYearFromYear(monthlyReturn: SubmittedMonthlyReturnData): Int =
+    val returnPeriodDate = LocalDate.of(monthlyReturn.taxYear, monthlyReturn.taxMonth, 5)
+    val taxYearStartDate = LocalDate.of(monthlyReturn.taxYear, 4, 6)
+
+    if (returnPeriodDate.isBefore(taxYearStartDate)) {
+      monthlyReturn.taxYear - 1
+    } else {
+      monthlyReturn.taxYear
+    }
 
   private def toRowViewModel(
     monthlyReturn: SubmittedMonthlyReturnData,

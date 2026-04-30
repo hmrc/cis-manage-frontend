@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.history
 
 import base.SpecBase
 import models.{Deletable, NotDeletable, UnsubmittedMonthlyReturnsRow, UserAnswers}
-import org.mockito.Mockito.*
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CisIdPage
 import play.api.inject.bind
@@ -79,10 +79,15 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to JourneyRecovery when CisIdPage is missing" in {
+    "must redirect to NoIncompleteReturnsController when there are no incomplete returns" in {
       val mockService = mock[ManageService]
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      when(mockService.getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Seq.empty))
+
+      val userAnswers = emptyUserAnswers.set(CisIdPage, "123").success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[ManageService].toInstance(mockService))
         .build()
 
@@ -92,9 +97,10 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual
+          controllers.amend.routes.NoIncompleteReturnsController.onPageLoad().url
 
-        verifyNoInteractions(mockService)
+        verify(mockService).getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier])
       }
     }
   }
@@ -104,7 +110,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
     val monthlyReturnId = 3000L
 
     lazy val onDeleteRedirectRoute: String =
-      controllers.routes.IncompleteReturnsController.onDeleteRedirect(monthlyReturnId).url
+      routes.IncompleteReturnsController.onDeleteRedirect(monthlyReturnId).url
 
     "must redirect to DeleteAmendedNilMonthlyReturnController" in {
       val mockManageService     = mock[ManageService]
