@@ -32,7 +32,7 @@
     ptaCard: PtaCard
 )
 
-@(contractorName: String, standardReturnLink: String, nilReturnLink: String)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
+@(contractorName: String, standardReturnLink: String, nilReturnLink: String, returnToHomeLink: String)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
 
 @sidebar = {
     @aside("returnsLanding.aside.h2", nav(Seq(
@@ -78,5 +78,5 @@
         )
     )
 
-    @link(linkTextKey = "returnsLanding.returnToHome.link", linkUrl = controllers.contractor.routes.ContractorLandingController.onPageLoad().url)
+    @link(linkTextKey = "returnsLanding.returnToHome.link", linkUrl = returnToHomeLink)
 }

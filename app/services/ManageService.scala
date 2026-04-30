@@ -182,23 +182,30 @@ class ManageService @Inject() (
         userAnswers.get(ContractorNamePage)
       }
 
-    val linksOpt: Option[(String, String)] =
+    val linksOpt: Option[(String, String, String)] =
       if (isAgent) {
         for {
           clients <- userAnswers.get(AgentClientsPage)
           client  <- clients.find(_.uniqueId == instanceId)
         } yield (
           appConfig.fileStandardReturnUrl(instanceId),
-          appConfig.fileNilReturnUrl(instanceId)
+          appConfig.fileNilReturnUrl(instanceId),
+          controllers.agent.routes.AgentLandingController.onPageLoad(instanceId).url
         )
       } else {
-        Some((appConfig.fileStandardReturnUrl, appConfig.fileNilReturnUrl))
+        Some(
+          (
+            appConfig.fileStandardReturnUrl,
+            appConfig.fileNilReturnUrl,
+            controllers.contractor.routes.ContractorLandingController.onPageLoad().url
+          )
+        )
       }
 
     (contractorNameOpt, linksOpt) match {
-      case (Some(name), Some((standardLink, nilLink))) =>
-        Future.successful(Some(ReturnsLandingContext(name, standardLink, nilLink)))
-      case _                                           =>
+      case (Some(name), Some((standardLink, nilLink, returnToHomeLink))) =>
+        Future.successful(Some(ReturnsLandingContext(name, standardLink, nilLink, returnToHomeLink)))
+      case _                                                             =>
         Future.successful(None)
     }
   }
