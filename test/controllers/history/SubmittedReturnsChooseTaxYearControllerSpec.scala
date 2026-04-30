@@ -21,7 +21,6 @@ import controllers.routes
 import forms.history.SubmittedReturnsChooseTaxYearFormProvider
 import models.history.TaxYearSelection.TaxYear
 import models.history.TaxYearSelection
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -109,7 +108,7 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
       }
     }
 
-    "must redirect to System Error for a GET when no tax years are returned" in {
+    "must redirect to NoReturnsSubmittedController for a GET when no tax years are returned" in {
 
       when(mockManageService.getSubmittedTaxYears(any())(any())) thenReturn Future.successful(Seq.empty)
 
@@ -125,13 +124,15 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
+        redirectLocation(result).value mustEqual
+          controllers.amend.routes.NoReturnsSubmittedController.onPageLoad().url
       }
     }
 
-    "must redirect to Journey Recovery for a GET when only one tax year is returned" in {
+    "must redirect to the single tax year page for a GET when only one tax year is returned" in {
 
       val singleTaxYearTuple = Seq((2021, 2022))
+
       when(mockManageService.getSubmittedTaxYears(any())(any())) thenReturn Future.successful(singleTaxYearTuple)
 
       val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
@@ -146,7 +147,8 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual
+          controllers.history.routes.SubmittedReturnsController.onPageLoadSingleYear("2021").url
       }
     }
 
@@ -172,7 +174,7 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
       }
     }
 
-    "must redirect back to the same page when 'all' is submitted" in {
+    "must redirect to the all tax years submitted returns page when 'all' is submitted" in {
 
       when(mockManageService.getSubmittedTaxYears(any())(any())) thenReturn Future.successful(taxYearTuples)
 
@@ -196,11 +198,11 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.history.routes.SubmittedReturnsChooseTaxYearController.onPageLoad().url
+          controllers.history.routes.SubmittedReturnsController.onPageLoadAllYears().url
       }
     }
 
-    "must redirect back to the same page when valid data is submitted" in {
+    "must redirect to the selected single tax year page when valid data is submitted" in {
 
       when(mockManageService.getSubmittedTaxYears(any())(any())) thenReturn Future.successful(taxYearTuples)
 
@@ -210,7 +212,6 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
       val application =
         applicationBuilder(userAnswers = Some(userAnswersWithCisId))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),
             bind[ManageService].toInstance(mockManageService)
           )
@@ -225,7 +226,7 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.history.routes.SubmittedReturnsChooseTaxYearController.onPageLoad().url
+          controllers.history.routes.SubmittedReturnsController.onPageLoadSingleYear("2021").url
       }
     }
 

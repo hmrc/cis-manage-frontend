@@ -107,7 +107,13 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
 
     "onPageLoadSingleYear must return OK using SubmittedReturnsDataPage when present" in new Setup {
       val userAnswers =
-        emptyUserAnswers.set(SubmittedReturnsDataPage, submittedReturnsData).success.value
+        emptyUserAnswers
+          .set(CisIdPage, "900063")
+          .success
+          .value
+          .set(SubmittedReturnsDataPage, submittedReturnsData)
+          .success
+          .value
 
       when(mockSubmittedReturnsService.buildSingleYearViewModel(submittedReturnsData, "2024"))
         .thenReturn(Some(viewModel))
@@ -127,7 +133,13 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
 
     "onPageLoadAllYears must return OK using SubmittedReturnsDataPage when present" in new Setup {
       val userAnswers =
-        emptyUserAnswers.set(SubmittedReturnsDataPage, submittedReturnsData).success.value
+        emptyUserAnswers
+          .set(CisIdPage, "900063")
+          .success
+          .value
+          .set(SubmittedReturnsDataPage, submittedReturnsData)
+          .success
+          .value
 
       when(mockSubmittedReturnsService.buildAllYearsViewModel(submittedReturnsData))
         .thenReturn(Some(viewModel))
@@ -187,33 +199,15 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "onPageLoadSingleYear must redirect to JourneyRecovery when no data can be resolved" in new Setup {
-      val app = application(emptyUserAnswers)
-
-      running(app) {
-        val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadSingleYear("2024").url)
-        val result  = route(app, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "onPageLoadAllYears must redirect to JourneyRecovery when no data can be resolved" in new Setup {
-      val app = application(emptyUserAnswers)
-
-      running(app) {
-        val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadAllYears().url)
-        val result  = route(app, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
     "onPageLoadSingleYear must redirect to JourneyRecovery when buildSingleYearViewModel returns None" in new Setup {
       val userAnswers =
-        emptyUserAnswers.set(SubmittedReturnsDataPage, submittedReturnsData).success.value
+        emptyUserAnswers
+          .set(CisIdPage, "900063")
+          .success
+          .value
+          .set(SubmittedReturnsDataPage, submittedReturnsData)
+          .success
+          .value
 
       when(mockSubmittedReturnsService.buildSingleYearViewModel(submittedReturnsData, "2024"))
         .thenReturn(None)
@@ -251,7 +245,13 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
 
     "onPageLoadAllYears must redirect to JourneyRecovery when buildAllYearsViewModel returns None" in new Setup {
       val userAnswers =
-        emptyUserAnswers.set(SubmittedReturnsDataPage, submittedReturnsData).success.value
+        emptyUserAnswers
+          .set(CisIdPage, "900063")
+          .success
+          .value
+          .set(SubmittedReturnsDataPage, submittedReturnsData)
+          .success
+          .value
 
       when(mockSubmittedReturnsService.buildAllYearsViewModel(submittedReturnsData))
         .thenReturn(None)

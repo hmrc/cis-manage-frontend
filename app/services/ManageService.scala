@@ -268,7 +268,7 @@ class ManageService @Inject() (
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.delete",
             href = if (isDeletable) {
-              controllers.routes.IncompleteReturnsController.onDeleteRedirect(row.monthlyReturnId).url
+              controllers.history.routes.IncompleteReturnsController.onDeleteRedirect(row.monthlyReturnId).url
             } else {
               controllers.routes.JourneyRecoveryController.onPageLoad().url
             },
