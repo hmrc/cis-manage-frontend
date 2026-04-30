@@ -30,7 +30,7 @@ class ReturnsLandingViewSpec extends SpecBase {
 
   "ReturnsLandingView" - {
     "must render the page with the correct html elements" in new Setup {
-      val html: HtmlFormat.Appendable = view(contractorName, standardReturnLink, nilReturnLink)
+      val html: HtmlFormat.Appendable = view(contractorName, standardReturnLink, nilReturnLink, returnToHomeLink)
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.title             must include(messages("returnsLanding.title"))
@@ -68,5 +68,6 @@ class ReturnsLandingViewSpec extends SpecBase {
     val contractorName                            = "ABC Ltd..."
     val standardReturnLink: String                = appConfig.fileStandardReturnUrl
     val nilReturnLink: String                     = appConfig.fileNilReturnUrl
+    val returnToHomeLink                          = "/example"
   }
 }
