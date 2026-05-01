@@ -16,21 +16,29 @@
 
 package services
 
-import models.history.{SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSubmissionData}
-import viewmodels.{LinkViewModel, ReturnTypeViewModel, StatusViewModel, SubmittedReturnsPageViewModel, SubmittedReturnsRowViewModel, TaxYearHistoryViewModel}
+import connectors.ConstructionIndustrySchemeConnector
+import models.history.{MonthlyReturnCompleteResponse, SubcontractorPayment, SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSubmissionData}
+import uk.gov.hmrc.http.HeaderCarrier
+import utils.Utils
+import viewmodels.{LinkViewModel, ReturnTypeViewModel, StatusViewModel, SubmissionReceiptViewModel, SubmittedReturnsPageViewModel, SubmittedReturnsRowViewModel, TaxYearHistoryViewModel}
 import viewmodels.StatusViewModel.Text
 
-import java.time.format.DateTimeFormatter
-import java.time.{Instant, YearMonth, ZoneId, ZoneOffset, ZonedDateTime}
+import java.time.format.{DateTimeFormatter, TextStyle}
+import java.time.{Instant, LocalDateTime, Month, YearMonth, ZoneId, ZoneOffset, ZonedDateTime}
+import java.util.Locale
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmittedReturnsService @Inject() {
+class SubmittedReturnsService @Inject() (
+  connector: ConstructionIndustrySchemeConnector
+)(implicit ec: ExecutionContext) {
 
   private val ukTimezone: ZoneId                         = ZoneId.of("Europe/London")
-  private val displayDateFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("d MMM yyyy")
+  private val displayDateFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.UK)
   private val shortMonthYearFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM yyyy")
   private val amendmentCutOffInstant: Instant            = ZonedDateTime.of(2016, 2, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant
+  private val displayTimeFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("h:mma", Locale.UK)
 
   def buildAllYearsViewModel(data: SubmittedReturnsData): Option[SubmittedReturnsPageViewModel] =
     Some(
@@ -89,7 +97,8 @@ class SubmittedReturnsService @Inject() {
         url = "#",
         hiddenText = periodEndText
       ),
-      submissionReceipt = buildSubmissionReceipt(submissionOpt, periodEndText),
+      submissionReceipt =
+        buildSubmissionReceipt(submissionOpt, periodEndText, monthlyReturn.taxYear, monthlyReturn.taxMonth),
       status = buildStatus(monthlyReturn, submissionOpt)
     )
   }
@@ -116,13 +125,17 @@ class SubmittedReturnsService @Inject() {
 
   private def buildSubmissionReceipt(
     submissionOpt: Option[SubmittedSubmissionData],
-    periodEndText: String
+    periodEndText: String,
+    taxYear: Int,
+    taxMonth: Int
   ): StatusViewModel =
     if (isSubmissionReceiptAvailable(submissionOpt)) {
+
       StatusViewModel.Link(
         link = LinkViewModel(
-          url = "#", // TODO
-          hiddenText = periodEndText
+          url =
+            s"/construction-industry-scheme/management/monthly-return/confirmation-history?taxYear=$taxYear&taxMonth=$taxMonth&amendment=N",
+          hiddenText = s"submission receipt for $periodEndText"
         ),
         textKey = "site.view",
         hiddenTextKey = "history.returnHistory.hidden.submissionReceipt"
@@ -209,4 +222,97 @@ class SubmittedReturnsService @Inject() {
   private def isSuperseded(monthlyReturn: SubmittedMonthlyReturnData): Boolean =
     monthlyReturn.supersededBy.exists(_ > 0)
 
+  def getMonthlyReturnComplete(
+    instanceId: String,
+    taxYear: Int,
+    taxMonth: Int,
+    amendment: String
+  )(implicit hc: HeaderCarrier): Future[Either[String, SubmissionReceiptViewModel]] =
+    connector.getMonthlyReturnComplete(instanceId, taxYear, taxMonth, amendment).map { response =>
+      val submission = response.submission.headOption
+
+      submission match {
+        case Some(sub) if !isSubmissionValid(sub, amendment) =>
+          Left(s"Submission guard failed: status=${sub.status.getOrElse("None")}, amendment=$amendment")
+        case Some(sub) if !hasValidIrMark(sub)               =>
+          Left("Submission guard failed: IRMark sent/received is null or does not match")
+        case _                                               =>
+          Right(buildReceiptViewModel(response, instanceId, taxYear, taxMonth))
+      }
+    }
+
+  private def isSubmissionValid(sub: models.history.CompleteSubmissionData, amendment: String): Boolean =
+    sub.status.contains("SUBMITTED") || amendment.equalsIgnoreCase("Y")
+
+  private def hasValidIrMark(sub: models.history.CompleteSubmissionData): Boolean =
+    (sub.hmrcMarkGenerated, sub.hmrcMarkGgis) match {
+      case (Some(sent), Some(received)) if sent.nonEmpty && received.nonEmpty => sent == received
+      case _                                                                  => false
+    }
+
+  private def buildReceiptReturnType(nilIndicator: Option[String]): String =
+    nilIndicator match {
+      case Some(n) if n.trim.equalsIgnoreCase("Y") => "submissionConfirmation.returnType.nil"
+      case _                                       => "submissionConfirmation.returnType.monthly"
+    }
+
+  private def buildReceiptViewModel(
+    response: MonthlyReturnCompleteResponse,
+    instanceId: String,
+    taxYear: Int,
+    taxMonth: Int
+  ): SubmissionReceiptViewModel = {
+    val scheme     = response.scheme.headOption
+    val mr         = response.monthlyReturn.headOption
+    val submission = response.submission.headOption
+
+    val monthName = Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)
+
+    val returnType = buildReceiptReturnType(mr.flatMap(_.nilReturnIndicator))
+
+    val submissionType = submission.map(_.submissionType).getOrElse("Monthly return")
+
+    val payeReference = scheme
+      .map { s =>
+        s"${s.taxOfficeNumber}/${s.taxOfficeReference}"
+      }
+      .getOrElse("")
+
+    val submittedAt = submission
+      .flatMap(_.acceptedTime)
+      .flatMap { ts =>
+        scala.util.Try {
+          val dateTime = LocalDateTime.parse(ts.take(19)).atZone(ukTimezone)
+          val time     = dateTime.format(displayTimeFormatter)
+          val date     = dateTime.toLocalDate.format(displayDateFormatter)
+          s"$time on $date"
+        }.toOption
+      }
+
+    val items = response.monthlyReturnItems.map { item =>
+      SubcontractorPayment(
+        item.subcontractorName.getOrElse(""),
+        Utils.formatCurrency(Utils.toBigDecimal(item.totalPayments)),
+        Utils.formatCurrency(Utils.toBigDecimal(item.costOfMaterials)),
+        Utils.formatCurrency(Utils.toBigDecimal(item.totalDeducted))
+      )
+    }
+
+    SubmissionReceiptViewModel(
+      contractorName = scheme.flatMap(_.name).getOrElse(""),
+      payeReference = payeReference,
+      taxYear = taxYear,
+      taxMonth = taxMonth,
+      returnPeriodEnd = s"$monthName $taxYear",
+      returnType = returnType,
+      submissionType = submissionType,
+      hmrcMark = submission.flatMap(_.hmrcMarkGenerated).map { mark =>
+        scala.util.Try(utils.IrMarkReferenceGenerator.fromBase64(mark)).getOrElse(mark)
+      },
+      submittedAt = submittedAt,
+      emailRecipient = submission.flatMap(_.emailRecipient),
+      instanceId = instanceId,
+      items = items
+    )
+  }
 }
