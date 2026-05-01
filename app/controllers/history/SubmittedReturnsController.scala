@@ -18,8 +18,7 @@ package controllers.history
 
 import controllers.actions.*
 import models.history.SubmittedReturnsData
-import models.requests.DataRequest
-import pages.CisIdPage
+import models.requests.CisIdDataRequest
 import pages.history.SubmittedReturnsDataPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -39,6 +38,7 @@ class SubmittedReturnsController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  requireCisId: CisIdRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: SubmittedReturnsView,
   submittedReturnsService: SubmittedReturnsService,
@@ -49,85 +49,66 @@ class SubmittedReturnsController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoadSingleYear(taxYear: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onPageLoadSingleYear(taxYear: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
 
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       resolveSubmittedReturnsData
-        .map {
-          case Some(data) =>
-            submittedReturnsService.buildSingleYearViewModel(data, taxYear) match {
-              case Some(vm) => Ok(view(vm))
-              case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            }
-
-          case None =>
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        .map { data =>
+          submittedReturnsService.buildSingleYearViewModel(data, taxYear, request.cisId) match {
+            case Some(vm) => Ok(view(vm))
+            case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
         }
-        .recover { case e =>
+        .recover { case _ =>
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
-  }
-
-  def onPageLoadAllYears: Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-
-      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
-      resolveSubmittedReturnsData
-        .map {
-          case Some(data) =>
-            submittedReturnsService.buildAllYearsViewModel(data) match {
-              case Some(vm) => Ok(view(vm))
-              case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            }
-
-          case None =>
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
-        .recover { case e =>
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
-  }
-
-  private def resolveSubmittedReturnsData(implicit
-    request: DataRequest[AnyContent],
-    hc: HeaderCarrier
-  ): Future[Option[SubmittedReturnsData]] =
-    request.userAnswers.get(SubmittedReturnsDataPage) match {
-      case Some(data) =>
-        Future.successful(Some(data))
-      case None       =>
-        request.userAnswers.get(CisIdPage) match {
-          case Some(instanceId) =>
-            manageService.getSubmittedMonthlyReturns(instanceId).map(Some(_))
-
-          case None =>
-            Future.successful(None)
         }
     }
 
-  def viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+  def onPageLoadAllYears: Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-      request.userAnswers.get(CisIdPage) match {
-        case Some(instanceId) =>
-          submittedReturnsService
-            .getMonthlyReturnComplete(instanceId, taxYear, taxMonth, amendment)
-            .map {
-              case Right(vm)    => Ok(confirmationView(vm))
-              case Left(reason) =>
-                logger.warn(s"[viewSubmissionReceipt] guard failed: $reason")
-                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            }
-            .recover { case ex =>
-              logger.error("[viewSubmissionReceipt] failed", ex)
-              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            }
-        case None             =>
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      }
+      resolveSubmittedReturnsData
+        .map { data =>
+          submittedReturnsService.buildAllYearsViewModel(data, request.cisId) match {
+            case Some(vm) => Ok(view(vm))
+            case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
+        }
+        .recover { case _ =>
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
+
+  private def resolveSubmittedReturnsData(implicit
+    request: CisIdDataRequest[AnyContent],
+    hc: HeaderCarrier
+  ): Future[SubmittedReturnsData] =
+    request.userAnswers.get(SubmittedReturnsDataPage) match {
+      case Some(data) =>
+        Future.successful(data)
+      case None       =>
+        manageService.getSubmittedMonthlyReturns(request.cisId)
+    }
+
+  def viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
+      submittedReturnsService
+        .getMonthlyReturnComplete(request.cisId, taxYear, taxMonth, amendment)
+        .map {
+          case Right(vm)    => Ok(confirmationView(vm))
+          case Left(reason) =>
+            logger.warn(s"[viewSubmissionReceipt] guard failed: $reason")
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+        .recover { case ex =>
+          logger.error("[viewSubmissionReceipt] failed", ex)
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
     }
 }

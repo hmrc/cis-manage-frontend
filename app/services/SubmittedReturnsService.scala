@@ -16,6 +16,7 @@
 
 package services
 
+import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.history.{MonthlyReturnCompleteResponse, SubcontractorPayment, SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSubmissionData}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -31,7 +32,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SubmittedReturnsService @Inject() (
-  connector: ConstructionIndustrySchemeConnector
+  connector: ConstructionIndustrySchemeConnector,
+  appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext) {
 
   private val ukTimezone: ZoneId                         = ZoneId.of("Europe/London")
@@ -40,23 +42,27 @@ class SubmittedReturnsService @Inject() (
   private val amendmentCutOffInstant: Instant            = ZonedDateTime.of(2016, 2, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant
   private val displayTimeFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("h:mma", Locale.UK)
 
-  def buildAllYearsViewModel(data: SubmittedReturnsData): Option[SubmittedReturnsPageViewModel] =
+  def buildAllYearsViewModel(data: SubmittedReturnsData, instanceId: String): Option[SubmittedReturnsPageViewModel] =
     Some(
       SubmittedReturnsPageViewModel(
-        taxYears = buildTaxYearSections(data),
+        taxYears = buildTaxYearSections(data, instanceId),
         selectedTaxYear = None
       )
     )
 
-  def buildSingleYearViewModel(data: SubmittedReturnsData, taxYear: String): Option[SubmittedReturnsPageViewModel] =
+  def buildSingleYearViewModel(
+    data: SubmittedReturnsData,
+    taxYear: String,
+    instanceId: String
+  ): Option[SubmittedReturnsPageViewModel] =
     taxYear.toIntOption.map { taxYearInt =>
       SubmittedReturnsPageViewModel(
-        taxYears = buildTaxYearSections(data).filter(_.fromYear == taxYearInt),
+        taxYears = buildTaxYearSections(data, instanceId).filter(_.fromYear == taxYearInt),
         selectedTaxYear = Some(taxYear)
       )
     }
 
-  private def buildTaxYearSections(data: SubmittedReturnsData): Seq[TaxYearHistoryViewModel] = {
+  private def buildTaxYearSections(data: SubmittedReturnsData, instanceId: String): Seq[TaxYearHistoryViewModel] = {
     val rowsWithTaxYear =
       data.monthlyReturns
         .sortBy(mr => (mr.taxYear, mr.taxMonth))(Ordering.Tuple2(Ordering.Int, Ordering.Int).reverse)
@@ -64,7 +70,7 @@ class SubmittedReturnsService @Inject() (
           data.submissions
             .find(_.activeObjectId.contains(monthlyReturn.monthlyReturnId))
             .map { submission =>
-              monthlyReturn.taxYear -> toRowViewModel(monthlyReturn, Some(submission))
+              monthlyReturn.taxYear -> toRowViewModel(monthlyReturn, Some(submission), instanceId)
             }
         }
 
@@ -83,11 +89,13 @@ class SubmittedReturnsService @Inject() (
 
   private def toRowViewModel(
     monthlyReturn: SubmittedMonthlyReturnData,
-    submissionOpt: Option[SubmittedSubmissionData]
+    submissionOpt: Option[SubmittedSubmissionData],
+    instanceId: String
   ): SubmittedReturnsRowViewModel = {
     val periodEndText     = buildReturnPeriodEnd(monthlyReturn)
     val returnType        = buildReturnType(monthlyReturn)
     val dateSubmittedText = buildDateSubmittedText(submissionOpt)
+    val amendUrl          = buildAmendUrl(instanceId, monthlyReturn)
 
     SubmittedReturnsRowViewModel(
       returnPeriodEnd = periodEndText,
@@ -99,7 +107,7 @@ class SubmittedReturnsService @Inject() (
       ),
       submissionReceipt =
         buildSubmissionReceipt(submissionOpt, periodEndText, monthlyReturn.taxYear, monthlyReturn.taxMonth),
-      status = buildStatus(monthlyReturn, submissionOpt)
+      status = buildStatus(monthlyReturn, submissionOpt, amendUrl)
     )
   }
 
@@ -156,7 +164,8 @@ class SubmittedReturnsService @Inject() (
 
   private def buildStatus(
     monthlyReturn: SubmittedMonthlyReturnData,
-    submissionOpt: Option[SubmittedSubmissionData]
+    submissionOpt: Option[SubmittedSubmissionData],
+    amendUrl: String
   ): StatusViewModel = {
     val acceptedTimeOpt = submissionOpt.flatMap(_.acceptedTime)
 
@@ -168,11 +177,11 @@ class SubmittedReturnsService @Inject() (
         monthlyReturn.status match {
           case "SUBMITTED" =>
             if (isSuperseded(monthlyReturn)) {
-              buildAmendmentStatus(monthlyReturn)
+              buildAmendmentStatus(monthlyReturn, amendUrl)
             } else if (!acceptedTime.isBefore(amendmentCutOffInstant)) {
               StatusViewModel.Link(
                 link = LinkViewModel(
-                  url = "#", // TODO
+                  url = amendUrl,
                   hiddenText = buildReturnPeriodEnd(monthlyReturn)
                 ),
                 textKey = "history.returnHistory.status.amend",
@@ -191,7 +200,7 @@ class SubmittedReturnsService @Inject() (
     }
   }
 
-  private def buildAmendmentStatus(monthlyReturn: SubmittedMonthlyReturnData): StatusViewModel =
+  private def buildAmendmentStatus(monthlyReturn: SubmittedMonthlyReturnData, amendUrl: String): StatusViewModel =
     monthlyReturn.amendmentStatus match {
       case Some("STARTED") | Some("VALIDATED")                               =>
         StatusViewModel.Link(
@@ -207,7 +216,7 @@ class SubmittedReturnsService @Inject() (
       case Some("SUBMITTED")                                                 =>
         StatusViewModel.Link(
           link = LinkViewModel(
-            url = "#", // TODO
+            url = amendUrl,
             hiddenText = buildReturnPeriodEnd(monthlyReturn)
           ),
           textKey = "history.returnHistory.status.amend",
@@ -218,6 +227,13 @@ class SubmittedReturnsService @Inject() (
       case _                                                                 =>
         StatusViewModel.Text("")
     }
+
+  private def buildAmendUrl(instanceId: String, monthlyReturn: SubmittedMonthlyReturnData): String =
+    appConfig.confirmAmendmentUrl(
+      instanceId = instanceId,
+      taxYear = monthlyReturn.taxYear.toString,
+      taxMonth = monthlyReturn.taxMonth.toString
+    )
 
   private def isSuperseded(monthlyReturn: SubmittedMonthlyReturnData): Boolean =
     monthlyReturn.supersededBy.exists(_ > 0)
