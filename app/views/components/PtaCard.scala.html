@@ -14,11 +14,13 @@
  * limitations under the License.
  *@
 
+@import utils.Utils.emptyString
+
 @this()
 
-@(title: String, link: String, content: Html)
+@(title: String, link: String, content: Html, id: Option[String] = None)
 
-<a href="@link" class="govuk-link pta-card-link-wrapper govuk-summary-card">
+<a @{id.fold(emptyString)(id => s"id=$id")} href="@link" class="govuk-link pta-card-link-wrapper govuk-summary-card">
     <div class="pta-card govuk-summary-card__title-wrapper">
         <div class="pta-card-body">
             <h3 class="govuk-heading-s pta-card-heading">
