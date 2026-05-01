@@ -56,12 +56,14 @@
         ptaCard(
             title = messages("returnsLanding.fileMonthlyReturn.h3.link"),
             link = standardReturnLink,
-            content = Html(messages("returnsLanding.fileMonthlyReturn.p1"))
+            content = Html(messages("returnsLanding.fileMonthlyReturn.p1")),
+            id = Some("file-a-monthly-return")
         ),
         ptaCard(
             title = messages("returnsLanding.fileNilReturn.h3.link"),
             link = nilReturnLink,
-            content = Html(messages("returnsLanding.fileNilReturn.p1"))
+            content = Html(messages("returnsLanding.fileNilReturn.p1")),
+            id = Some("file-a-nil-return")
         )
     )
 
@@ -69,12 +71,14 @@
         ptaCard(
             title = messages("returnsLanding.viewSubmittedReturns.h3.link"),
             link = controllers.history.routes.SubmittedReturnsChooseTaxYearController.onPageLoad().url,
-            content = Html(messages("returnsLanding.viewSubmittedReturns.p1"))
+            content = Html(messages("returnsLanding.viewSubmittedReturns.p1")),
+            id = Some("view-submitted-returns")
         ),
         ptaCard(
             title = messages("returnsLanding.incompleteReturns.h3.link"),
             link = "#",
-            content = Html(messages("returnsLanding.incompleteReturns.p1"))
+            content = Html(messages("returnsLanding.incompleteReturns.p1")),
+            id = Some("incomplete-returns")
         )
     )
 
