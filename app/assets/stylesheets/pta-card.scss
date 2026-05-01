@@ -4,8 +4,20 @@ $pta-grey: #f8f8f8;
 $pta-yellow: #ffdd00;
 $pta-white: #ffffff;
 
+.govuk-grid-row:has(.pta-card-link-wrapper) {
+  display: flex;
+  flex-wrap: wrap;
+
+  > .govuk-grid-column-one-half {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
 .pta-card-link-wrapper {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   text-decoration: none;
   color: inherit;
 
@@ -34,6 +46,7 @@ $pta-white: #ffffff;
   background: $pta-grey;
   border-radius: 4px;
   transition: background-color 0.1s ease-in-out;
+  flex: 1;
 
   &-body {
      display: flex;
