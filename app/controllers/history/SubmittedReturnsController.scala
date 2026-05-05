@@ -21,6 +21,7 @@ import models.history.SubmittedReturnsData
 import models.requests.DataRequest
 import pages.CisIdPage
 import pages.history.SubmittedReturnsDataPage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{ManageService, SubmittedReturnsService}
@@ -28,6 +29,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.history.SubmittedReturnsView
+import views.html.monthlyreturns.SubmissionSuccessView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,10 +42,12 @@ class SubmittedReturnsController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: SubmittedReturnsView,
   submittedReturnsService: SubmittedReturnsService,
-  manageService: ManageService
+  manageService: ManageService,
+  confirmationView: SubmissionSuccessView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoadSingleYear(taxYear: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
@@ -102,5 +106,28 @@ class SubmittedReturnsController @Inject() (
           case None =>
             Future.successful(None)
         }
+    }
+
+  def viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
+      request.userAnswers.get(CisIdPage) match {
+        case Some(instanceId) =>
+          submittedReturnsService
+            .getMonthlyReturnComplete(instanceId, taxYear, taxMonth, amendment)
+            .map {
+              case Right(vm)    => Ok(confirmationView(vm))
+              case Left(reason) =>
+                logger.warn(s"[viewSubmissionReceipt] guard failed: $reason")
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
+            .recover { case ex =>
+              logger.error("[viewSubmissionReceipt] failed", ex)
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
+        case None             =>
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
     }
 }

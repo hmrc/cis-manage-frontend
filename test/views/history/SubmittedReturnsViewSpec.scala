@@ -68,12 +68,10 @@ class SubmittedReturnsViewSpec extends SpecBase {
         messages(app)("history.returnHistory.singleYear.heading", "2023", "2024")
     }
 
-    "render the tax year heading" in {
+    "not render the tax year heading for a single tax year" in {
       val doc = render(populatedViewModel)
 
-      doc.select("h2.govuk-heading-m").eachText() should contain(
-        messages(app)("history.returnHistory.taxYear.caption", "2023", "2024")
-      )
+      doc.select("h2.govuk-heading-m").eachText() shouldBe empty
     }
 
     "render the desktop table version" in {

@@ -16,8 +16,24 @@
 
 package viewmodels
 
-case class ReturnsLandingContext(
+import models.history.SubcontractorPayment
+import play.api.libs.json.{Json, OFormat}
+
+case class SubmissionReceiptViewModel(
   contractorName: String,
-  standardReturnLink: String,
-  nilReturnLink: String
+  payeReference: String,
+  taxYear: Int,
+  taxMonth: Int,
+  returnPeriodEnd: String,
+  returnType: String,
+  submissionType: String,
+  hmrcMark: Option[String],
+  submittedAt: Option[String],
+  emailRecipient: Option[String],
+  instanceId: String,
+  items: Seq[SubcontractorPayment]
 )
+
+object SubmissionReceiptViewModel {
+  given format: OFormat[SubmissionReceiptViewModel] = Json.format[SubmissionReceiptViewModel]
+}

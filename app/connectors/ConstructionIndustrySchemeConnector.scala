@@ -17,7 +17,7 @@
 package connectors
 
 import models.agent.AgentClientData
-import models.history.SubmittedReturnsData
+import models.history.*
 import models.*
 import models.requests.*
 import models.response.*
@@ -140,6 +140,24 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
     http
       .get(url"$cisBaseUrl/monthly-returns/submitted/$instanceId")
       .execute[SubmittedReturnsData]
+
+  def getMonthlyReturnComplete(
+    instanceId: String,
+    taxYear: Int,
+    taxMonth: Int,
+    amendment: String
+  )(implicit hc: HeaderCarrier): Future[MonthlyReturnCompleteResponse] =
+    http
+      .post(url"$cisBaseUrl/monthly-returns-complete")
+      .withBody(
+        Json.obj(
+          "instanceId" -> instanceId,
+          "taxYear"    -> taxYear,
+          "taxMonth"   -> taxMonth,
+          "amendment"  -> amendment
+        )
+      )
+      .execute[MonthlyReturnCompleteResponse]
 
   def saveAgentClient(userId: String, agentClientData: AgentClientData)(implicit
     hc: HeaderCarrier

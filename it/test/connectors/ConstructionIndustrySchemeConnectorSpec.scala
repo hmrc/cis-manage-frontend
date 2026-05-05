@@ -607,13 +607,14 @@ class ConstructionIndustrySchemeConnectorSpec
                 """{
                   |  "unsubmittedCisReturns": [
                   |    {
-                  |      "monthlyReturnId": 3000,
                   |      "taxYear": 2025,
                   |      "taxMonth": 1,
                   |      "returnType": "Nil",
                   |      "status": "PENDING",
+                  |      "monthlyReturnId": 12345,
+                  |      "action": [],
                   |      "lastUpdate": null,
-                  |      "amendment": "Y",
+                  |      "amendment": "N",
                   |      "deletable": true
                   |    }
                   |  ]
@@ -624,13 +625,13 @@ class ConstructionIndustrySchemeConnectorSpec
 
       val result = connector.getUnsubmittedMonthlyReturns(instanceId).futureValue
       result.unsubmittedCisReturns.length mustBe 1
-      result.unsubmittedCisReturns.head.monthlyReturnId mustBe 3000
       result.unsubmittedCisReturns.head.taxYear mustBe 2025
       result.unsubmittedCisReturns.head.taxMonth mustBe 1
       result.unsubmittedCisReturns.head.returnType mustBe "Nil"
       result.unsubmittedCisReturns.head.status mustBe "PENDING"
+      result.unsubmittedCisReturns.head.monthlyReturnId mustBe 12345
       result.unsubmittedCisReturns.head.lastUpdate mustBe None
-      result.unsubmittedCisReturns.head.amendment mustBe Some("Y")
+      result.unsubmittedCisReturns.head.amendment mustBe Some("N")
       result.unsubmittedCisReturns.head.deletable mustBe true
     }
 
@@ -708,6 +709,83 @@ class ConstructionIndustrySchemeConnectorSpec
       val ex = intercept[Exception] {
         connector.getSubmittedMonthlyReturns(instanceId).futureValue
       }
+      ex.getMessage must include("returned 500")
+    }
+  }
+
+  "getMonthlyReturnComplete" should {
+
+    "return MonthlyReturnCompleteResponse and post the expected request body" in {
+      stubFor(
+        post(urlPathEqualTo("/cis/monthly-returns-complete"))
+          .withRequestBody(equalToJson("""{
+                                       |  "instanceId": "900063",
+                                       |  "taxYear": 2024,
+                                       |  "taxMonth": 2,
+                                       |  "amendment": "N"
+                                       |}""".stripMargin))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                """{
+                  |  "scheme": [
+                  |    {
+                  |      "schemeId": 123,
+                  |      "instanceId": "900063",
+                  |      "accountsOfficeReference": "123P",
+                  |      "taxOfficeNumber": "123",
+                  |      "taxOfficeReference": "ABC456",
+                  |      "name": "Test Contractor"
+                  |    }
+                  |  ],
+                  |  "monthlyReturn": [
+                  |    {
+                  |      "monthlyReturnId": 100,
+                  |      "taxYear": 2024,
+                  |      "taxMonth": 2,
+                  |      "nilReturnIndicator": "Y",
+                  |      "status": "SUBMITTED",
+                  |      "amendment": "N"
+                  |    }
+                  |  ],
+                  |  "subcontractors": [],
+                  |  "monthlyReturnItems": [],
+                  |  "submission": [
+                  |    {
+                  |      "submissionId": 400,
+                  |      "submissionType": "Nil return",
+                  |      "activeObjectId": 100,
+                  |      "status": "SUBMITTED",
+                  |      "hmrcMarkGenerated": "ABC",
+                  |      "hmrcMarkGgis": "ABC"
+                  |    }
+                  |  ]
+                  |}""".stripMargin
+              )
+          )
+      )
+
+      val result = connector.getMonthlyReturnComplete("900063", 2024, 2, "N").futureValue
+
+      result.scheme.head.instanceId                 mustBe "900063"
+      result.monthlyReturn.head.nilReturnIndicator  mustBe Some("Y")
+      result.submission.head.submissionType         mustBe "Nil return"
+      result.submission.head.hmrcMarkGenerated      mustBe Some("ABC")
+      result.monthlyReturnItems                     mustBe empty
+      result.subcontractors                         mustBe empty
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      stubFor(
+        post(urlPathEqualTo("/cis/monthly-returns-complete"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = intercept[Exception] {
+        connector.getMonthlyReturnComplete("900063", 2024, 2, "N").futureValue
+      }
+
       ex.getMessage must include("returned 500")
     }
   }

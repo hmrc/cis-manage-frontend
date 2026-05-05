@@ -464,6 +464,11 @@ history.returnHistory.status.amend = Amend
 history.returnHistory.status.notAvailable = Not available
 history.returnHistory.status.awaitingConfirmation = Awaiting confirmation
 history.returnHistory.status.inProgress = In progress
+history.returnHistory.hidden.status.amend = amend return for {0}
+history.returnHistory.hidden.status.inProgress = submission return for {0}
+history.returnHistory.hidden.monthlyReturn = monthly return for {0}
+history.returnHistory.hidden.submissionReceipt = submission receipt for {0}
+
 
 amend.noReturnsSubmitted.title = You have not submitted any returns
 amend.noReturnsSubmitted.heading = You have not submitted any returns
@@ -473,6 +478,26 @@ amend.noReturnsSubmitted.p2.link = Manage your CIS return
 amend.noReturnsSubmitted.p3 = Find out more about
 amend.noReturnsSubmitted.p3.link = what you must do as a CIS contractor
 
+submissionConfirmation.title = {0} return successfully submitted
+submissionConfirmation.panel.heading = {0} return successfully submitted
+submissionConfirmation.panel.referenceLabel = Your receipt reference number
+submissionConfirmation.details.heading = Submission details
+submissionConfirmation.submittedOn = Submitted on
+submissionConfirmation.contractorName = Contractor name
+submissionConfirmation.payeReference = PAYE reference
+submissionConfirmation.returnPeriod = Return period ended
+submissionConfirmation.email = Email
+submissionConfirmation.whatYouCanDo.heading = What you can do
+submissionConfirmation.noEmail =  If you want to provide an email, you need to change your contacts in ‘About your organisation/firm’, under ‘Your HMRC Services’.
+submissionConfirmation.inset = You can save this page or print a copy for your records.
+submissionConfirmation.print = Print this page
+submissionConfirmation.backToManage = Back to Manage your CIS return
+submissionConfirmation.needHelp.heading = Need help?
+submissionConfirmation.needHelp.p1 = For any questions about your return submission, contact the
+submissionConfirmation.needHelp.link = Construction Industry Scheme general enquiries (opens in new tab).
+submissionConfirmation.returnType.monthly = Monthly
+submissionConfirmation.returnType.nil = Nil
+
 amend.noIncompleteReturns.title = You do not have any incomplete returns
 amend.noIncompleteReturns.heading = You do not have any incomplete returns
 amend.noIncompleteReturns.p1 = To view a monthly return, or make any amendments, you must file one first.
@@ -480,3 +505,15 @@ amend.noIncompleteReturns.p2 = You can do this in
 amend.noIncompleteReturns.p2.link = Manage your CIS return
 amend.noIncompleteReturns.p3 = Find out more about
 amend.noIncompleteReturns.p3.link = what you must do as a CIS contractor
+
+incompleteReturns.title = Incomplete returns
+incompleteReturns.heading = Incomplete returns
+incompleteReturns.message = A tax month cannot be changed if it is incorrect and the return is in progress. You must delete it and file a new return with the correct tax month.
+incompleteReturns.table.returnPeriodEnd = Return period ended
+incompleteReturns.table.returnType = Type
+incompleteReturns.table.lastUpdate = Last updated
+incompleteReturns.table.status = Status
+incompleteReturns.table.action = Action
+incompleteReturns.action.continue = Continue
+incompleteReturns.action.delete = Delete
+incompleteReturns.action.view = View

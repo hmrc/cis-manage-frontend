@@ -40,7 +40,16 @@ class DeleteAmendedMonthlyReturnControllerSpec extends SpecBase with MockitoSuga
   val formProvider        = new DeleteAmendedMonthlyReturnFormProvider()
   val form: Form[Boolean] = formProvider()
 
-  val deletableRow        = UnsubmittedMonthlyReturnsRow(3000L, 2026, 4, "Standard", "In Progress", None, Some("Y"), true)
+  val deletableRow        = UnsubmittedMonthlyReturnsRow(
+    2026,
+    4,
+    "Standard",
+    "In Progress",
+    3000L,
+    None,
+    Some("Y"),
+    true
+  )
   val baseUa: UserAnswers = userAnswersWithCisId
     .set(UnsubmittedMonthlyReturnToDeleteQuery, deletableRow)
     .success
