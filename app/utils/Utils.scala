@@ -37,5 +37,9 @@ object Utils {
     f"£$amount%.2f"
 
   def toBigDecimal(value: Option[String]): BigDecimal =
-    value.map(v => BigDecimal(v.trim)).getOrElse(BigDecimal(0))
+    value
+      .map(_.replace(",", "").trim)
+      .filter(_.nonEmpty)
+      .map(BigDecimal(_))
+      .getOrElse(BigDecimal(0))
 }

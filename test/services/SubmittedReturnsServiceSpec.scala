@@ -629,9 +629,9 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
           MonthlyReturnItem(
             monthlyReturnId = 3000L,
             monthlyReturnItemId = 1L,
-            totalPayments = Some("100"),
-            costOfMaterials = Some("100"),
-            totalDeducted = Some("100"),
+            totalPayments = Some("10,000.00"),
+            costOfMaterials = Some("10,000.00"),
+            totalDeducted = Some("10,000.00"),
             unmatchedTaxRateIndicator = None,
             subcontractorId = None,
             subcontractorName = Some("Contractor 01"),
@@ -641,9 +641,9 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
           MonthlyReturnItem(
             monthlyReturnId = 3000L,
             monthlyReturnItemId = 2L,
-            totalPayments = Some("200"),
-            costOfMaterials = Some("200"),
-            totalDeducted = Some("200"),
+            totalPayments = Some("20,000.00"),
+            costOfMaterials = Some("20,000.00"),
+            totalDeducted = Some("20,000.00"),
             unmatchedTaxRateIndicator = None,
             subcontractorId = None,
             subcontractorName = Some("Contractor 02"),
@@ -670,12 +670,12 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       out.submissionType mustBe "standard"
       out.contractorName mustBe "PAL 355 Scheme"
       out.payeReference mustBe "163/AB0063"
-      out.totalPaymentsMade mustBe "£300.00"
-      out.totalCostOfMaterials mustBe "£300.00"
-      out.totalTaxDeducted mustBe "£300.00"
+      out.totalPaymentsMade mustBe "£30000.00"
+      out.totalCostOfMaterials mustBe "£30000.00"
+      out.totalTaxDeducted mustBe "£30000.00"
       out.subcontractors mustBe Seq(
-        SubcontractorPayment("Contractor 01", "£100.00", "£100.00", "£100.00"),
-        SubcontractorPayment("Contractor 02", "£200.00", "£200.00", "£200.00")
+        SubcontractorPayment("Contractor 01", "£10000.00", "£10000.00", "£10000.00"),
+        SubcontractorPayment("Contractor 02", "£20000.00", "£20000.00", "£20000.00")
       )
 
     }

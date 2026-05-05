@@ -77,11 +77,17 @@ class SubmittedReturnsService @Inject() (
     val receiptReferenceNumber = data.submission.hmrcMarkGgis.map(IrMarkReferenceGenerator.fromBase64).getOrElse("")
 
     val totalPaymentsMade    =
-      Utils.formatCurrency(data.monthlyReturnItems.flatMap(_.totalPayments).map(BigDecimal(_)).sum)
+      Utils.formatCurrency(
+        data.monthlyReturnItems.flatMap(_.totalPayments).map(_.replace(",", "")).map(BigDecimal(_)).sum
+      )
     val totalCostOfMaterials =
-      Utils.formatCurrency(data.monthlyReturnItems.flatMap(_.costOfMaterials).map(BigDecimal(_)).sum)
+      Utils.formatCurrency(
+        data.monthlyReturnItems.flatMap(_.costOfMaterials).map(_.replace(",", "")).map(BigDecimal(_)).sum
+      )
     val totalTaxDeducted     =
-      Utils.formatCurrency(data.monthlyReturnItems.flatMap(_.totalDeducted).map(BigDecimal(_)).sum)
+      Utils.formatCurrency(
+        data.monthlyReturnItems.flatMap(_.totalDeducted).map(_.replace(",", "")).map(BigDecimal(_)).sum
+      )
     val subcontractors       =
       data.monthlyReturnItems.map { item =>
         SubcontractorPayment(
