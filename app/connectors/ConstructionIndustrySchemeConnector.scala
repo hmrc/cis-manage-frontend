@@ -16,9 +16,9 @@
 
 package connectors
 
+import models.*
 import models.agent.AgentClientData
 import models.history.*
-import models.*
 import models.requests.*
 import models.response.*
 import play.api.Logging

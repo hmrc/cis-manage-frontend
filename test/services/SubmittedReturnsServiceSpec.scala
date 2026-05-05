@@ -29,12 +29,8 @@ import org.scalatest.matchers.should.Matchers.*
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.i18n.Lang
-import viewmodels.StatusViewModel.Text
-import viewmodels.{ReturnTypeViewModel, StatusViewModel, SubmittedReturnsRowViewModel}
 import viewmodels.{LinkViewModel, ReturnTypeViewModel, StatusViewModel, SubmittedReturnsRowViewModel}
 import viewmodels.StatusViewModel.Text
-
-import java.time.Instant
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -249,7 +245,6 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
           monthlyReturns = Seq(
             monthlyReturn(
               id = 7L,
-              status = "SUBMITTED",
               supersededBy = Some(99L),
               amendmentStatus = Some("PENDING")
             )

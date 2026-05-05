@@ -18,11 +18,11 @@ package services
 
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
+import models.*
 import models.agent.AgentClientData
 import models.history.SubmittedReturnsData
 import models.requests.*
 import models.response.*
-import models.*
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
