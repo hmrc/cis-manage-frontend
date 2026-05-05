@@ -19,18 +19,14 @@ package services
 import models.history.*
 import models.response.GetSubmittedMonthlyReturnsDataResponse
 import play.api.i18n.Lang
-import utils.{DateTimeFormats, IrMarkReferenceGenerator, Utils}
 import connectors.ConstructionIndustrySchemeConnector
-import models.history.{MonthlyReturnCompleteResponse, SubcontractorPayment, SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSubmissionData}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.Utils
-import viewmodels.StatusViewModel.Text
+import utils.{DateTimeFormats, IrMarkReferenceGenerator, Utils}
 import viewmodels.*
+import viewmodels.StatusViewModel.Text
 
-import java.time.format.DateTimeFormatter
 import java.time.*
 import java.time.format.{DateTimeFormatter, TextStyle}
-import java.time.{Instant, LocalDateTime, Month, YearMonth, ZoneId, ZoneOffset, ZonedDateTime}
 import java.util.Locale
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}

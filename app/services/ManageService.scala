@@ -241,16 +241,11 @@ class ManageService @Inject() (
     }
 
   def getSubmittedMonthlyReturnsData(instanceId: String, taxYear: Int, taxMonth: Int, amendment: String)(implicit
-                                                                                                         hc: HeaderCarrier
+    hc: HeaderCarrier
   ): Future[GetSubmittedMonthlyReturnsDataResponse] =
     cisConnector.getSubmittedMonthlyReturnsData(
       GetSubmittedMonthlyReturnsDataRequest(instanceId, taxYear, taxMonth, amendment)
     )
-
-  private def formatPeriod(taxMonth: Int, taxYear: Int): String = {
-    val monthName = java.time.Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)
-    s"$monthName $taxYear"
-  }
 
   private def buildReturnPeriodEnd(taxMonth: Int, taxYear: Int): String =
     YearMonth.of(taxYear, taxMonth).format(shortMonthYearFormatter)
