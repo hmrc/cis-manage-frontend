@@ -442,12 +442,12 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             ActionLinkViewModel(
               textKey = "incompleteReturns.action.continue",
               href = "/continue",
-              hiddenTextKey = Some("incompleteReturns.action.continue")
+              hiddenTextKey = Some("incompleteReturns.action.continue.hidden")
             ),
             ActionLinkViewModel(
               textKey = "incompleteReturns.action.delete",
               href = controllers.routes.IncompleteReturnsController.onDeleteRedirect(123L).url,
-              hiddenTextKey = Some("incompleteReturns.action.delete")
+              hiddenTextKey = Some("incompleteReturns.action.delete.hidden")
             )
           ),
           amendment = Some("N")

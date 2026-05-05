@@ -263,7 +263,7 @@ class ManageService @Inject() (
               appConfig
                 .continueReturnJourneyUrl(instanceId, row.taxYear.toString, row.taxMonth.toString)
             },
-            hiddenTextKey = Some("incompleteReturns.action.continue")
+            hiddenTextKey = Some("incompleteReturns.action.continue.hidden")
           ),
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.delete",
@@ -272,7 +272,7 @@ class ManageService @Inject() (
             } else {
               controllers.routes.JourneyRecoveryController.onPageLoad().url
             },
-            hiddenTextKey = Some("incompleteReturns.action.delete")
+            hiddenTextKey = Some("incompleteReturns.action.delete.hidden")
           )
         )
 
@@ -281,7 +281,7 @@ class ManageService @Inject() (
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.view",
             href = appConfig.submissionInProgressUrl(instanceId),
-            hiddenTextKey = Some("incompleteReturns.action.view")
+            hiddenTextKey = Some("incompleteReturns.action.view.hidden")
           )
         )
 
@@ -290,7 +290,7 @@ class ManageService @Inject() (
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.view",
             href = appConfig.submissionUnsuccessfulCannotResubmitUrl(instanceId),
-            hiddenTextKey = Some("incompleteReturns.action.view")
+            hiddenTextKey = Some("incompleteReturns.action.view.hidden")
           )
         )
 

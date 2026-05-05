@@ -515,3 +515,6 @@ incompleteReturns.table.action = Action
 incompleteReturns.action.continue = Continue
 incompleteReturns.action.delete = Delete
 incompleteReturns.action.view = View
+incompleteReturns.action.continue.hidden = return for {0}
+incompleteReturns.action.delete.hidden = return for {0}
+incompleteReturns.action.view.hidden = return for {0}
