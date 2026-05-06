@@ -21,7 +21,8 @@ import connectors.ConstructionIndustrySchemeConnector
 import models.*
 import models.agent.AgentClientData
 import models.history.SubmittedReturnsData
-import models.requests.DeleteUnsubmittedMonthlyReturnRequest
+import models.requests.*
+import models.response.*
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
@@ -238,6 +239,13 @@ class ManageService @Inject() (
         logger.error(s"[deleteUnsubmittedMonthlyReturn] missing instanceId in user answers")
         Future.failed(new RuntimeException("Missing instanceId in user answers"))
     }
+
+  def getSubmittedMonthlyReturnsData(instanceId: String, taxYear: Int, taxMonth: Int, amendment: String)(implicit
+    hc: HeaderCarrier
+  ): Future[GetSubmittedMonthlyReturnsDataResponse] =
+    cisConnector.getSubmittedMonthlyReturnsData(
+      GetSubmittedMonthlyReturnsDataRequest(instanceId, taxYear, taxMonth, amendment)
+    )
 
   private def buildReturnPeriodEnd(taxMonth: Int, taxYear: Int): String =
     YearMonth.of(taxYear, taxMonth).format(shortMonthYearFormatter)
