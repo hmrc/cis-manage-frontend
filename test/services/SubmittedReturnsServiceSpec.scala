@@ -31,7 +31,6 @@ import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.i18n.Lang
 import viewmodels.*
-import viewmodels.LinkViewModel
 import viewmodels.StatusViewModel.Text
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -754,7 +753,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       result.left.toOption.get should include("IRMark")
     }
 
-    "SubmittedReturnPrintViewModel should return correct data without payment details" in {
+    "SubmittedReturnPrintViewModel should return correct data without payment details" in new Setup {
       val input = GetSubmittedMonthlyReturnsDataResponse(
         scheme = SubmittedSchemeData("PAL 355 Scheme", "163", "AB0063"),
         monthlyReturnId = 3000L,
@@ -788,7 +787,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
     }
 
-    "SubmittedReturnPrintViewModel should return correct data with payment details" in {
+    "SubmittedReturnPrintViewModel should return correct data with payment details" in new Setup {
       val input = GetSubmittedMonthlyReturnsDataResponse(
         scheme = SubmittedSchemeData("PAL 355 Scheme", "163", "AB0063"),
         monthlyReturnId = 3000L,

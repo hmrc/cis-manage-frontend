@@ -24,7 +24,6 @@ import play.api.i18n.Lang
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.*
 import utils.{DateTimeFormats, IrMarkReferenceGenerator, Utils}
-import viewmodels.*
 import viewmodels.StatusViewModel.Text
 import play.api.libs.json.Json
 
