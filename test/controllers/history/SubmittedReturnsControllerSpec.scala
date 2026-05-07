@@ -122,8 +122,8 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
       applicationBuilder(userAnswers = Some(userAnswers))
         .configure(
           "mongodb.timeToLiveInSeconds" -> 900,
-          "cis-frontend.host"     -> "http://localhost:6993",
-          "urls.confirmAmendment" -> "/construction-industry-scheme/manage-cis-return/amend-monthly-return/confirm-amendments"
+          "cis-frontend.host"           -> "http://localhost:6993",
+          "urls.confirmAmendment"       -> "/construction-industry-scheme/manage-cis-return/amend-monthly-return/confirm-amendments"
         )
         .overrides(
           bind[SubmittedReturnsService].toInstance(mockSubmittedReturnsService),
