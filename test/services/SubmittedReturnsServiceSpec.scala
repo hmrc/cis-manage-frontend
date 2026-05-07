@@ -377,7 +377,6 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         monthlyReturns = Seq(
           monthlyReturn(
             id = 1L,
-            taxYear = 2023,
             taxMonth = 3,
             nilReturnIndicator = "Standard"
           )
@@ -431,7 +430,6 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         monthlyReturns = Seq(
           monthlyReturn(
             id = 1L,
-            taxYear = 2023,
             taxMonth = 3,
             nilReturnIndicator = "Nil"
           )
@@ -480,7 +478,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
       val testData = data(
         monthlyReturns = Seq(
-          monthlyReturn(id = 1L, taxYear = 2023, taxMonth = 3)
+          monthlyReturn(id = 1L, taxMonth = 3)
         ),
         submissions = Seq(
           submission(activeObjectId = Some(1L))
@@ -506,7 +504,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
       val testData = data(
         monthlyReturns = Seq(
-          monthlyReturn(id = 1L, taxYear = 2023, taxMonth = 3)
+          monthlyReturn(id = 1L, taxMonth = 3)
         ),
         submissions = Seq(
           submission(activeObjectId = Some(1L))
