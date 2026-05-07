@@ -186,4 +186,13 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         }
       }
 
+  def createJourneyHandoff(journeyType: String, data: JsObject)(implicit
+    hc: HeaderCarrier
+  ): Future[String] =
+    http
+      .post(url"$cisBaseUrl/journey-handoffs/$journeyType")
+      .withBody(data)
+      .execute[JourneyHandoffResponse]
+      .map(_.id)
+
 }

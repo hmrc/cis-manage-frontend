@@ -88,7 +88,9 @@ GET        /history/monthly-return-submission-details               controllers.
 
 GET        /history/monthly-return-history-all-tax-years            controllers.history.SubmittedReturnsController.onPageLoadAllYears()
 GET        /history/monthly-return-history-tax-year/:taxYear        controllers.history.SubmittedReturnsController.onPageLoadSingleYear(taxYear)
-GET        /monthly-return/confirmation-history                  controllers.history.SubmittedReturnsController.viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String)
+GET        /history/amend/:taxYear/:taxMonth                        controllers.history.SubmittedReturnsController.startAmendment(taxYear: Int, taxMonth: Int)
+
+GET        /monthly-return/confirmation-history                     controllers.history.SubmittedReturnsController.viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String)
 
 GET        /manage-your-cis-return/incomplete-returns                                       controllers.IncompleteReturnsController.onPageLoad()
 GET        /manage-your-cis-return/incomplete-returns/delete-return/:monthlyReturnId        controllers.IncompleteReturnsController.onDeleteRedirect(monthlyReturnId: Long)

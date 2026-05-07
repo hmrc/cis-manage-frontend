@@ -17,15 +17,15 @@
 package services
 
 import base.SpecBase
-import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 
 import java.time.Instant
 import models.history.*
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ReturnTypeViewModel, StatusViewModel, SubmittedReturnsRowViewModel}
 import viewmodels.LinkViewModel
@@ -36,16 +36,9 @@ import scala.concurrent.Future
 
 class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
-  private val instanceId = "INST001"
-  private val amendUrl   = "/confirm-amendment?instanceId=INST001&taxYear=2023&taxMonth=3"
+  private val instanceId = "1"
 
-  private val mockConnector = mock[ConstructionIndustrySchemeConnector]
-  private val mockAppConfig = mock[FrontendAppConfig]
-
-  when(mockAppConfig.confirmAmendmentUrl(any[String], any[String], any[String]))
-    .thenReturn(amendUrl)
-
-  private val service = new SubmittedReturnsService(mockConnector, mockAppConfig)
+  private val amendUrl = "/construction-industry-scheme/management/history/amend/2023/3"
 
   private val baseScheme = SubmittedSchemeData(
     name = "Test Scheme",
@@ -100,12 +93,17 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       submissions = submissions
     )
 
-  private def singleRow(testData: SubmittedReturnsData): SubmittedReturnsRowViewModel =
-    service.buildAllYearsViewModel(testData, instanceId).value.taxYears.head.rows.head
+  trait Setup {
+    val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
+    val service: SubmittedReturnsService                   = new SubmittedReturnsService(mockConnector)
+
+    def singleRow(testData: SubmittedReturnsData): SubmittedReturnsRowViewModel =
+      service.buildAllYearsViewModel(testData).value.taxYears.head.rows.head
+  }
 
   "SubmittedReturnsService" - {
 
-    "buildAllYearsViewModel returns expected row for happy path" in {
+    "buildAllYearsViewModel returns expected row for happy path" in new Setup {
       val row = singleRow(
         data(
           monthlyReturns = Seq(monthlyReturn()),
@@ -128,28 +126,28 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       )
     }
 
-    "buildSingleYearViewModel returns only the selected tax year" in {
+    "buildSingleYearViewModel returns only the selected tax year" in new Setup {
       val testData = data(
         monthlyReturns = Seq(monthlyReturn()),
         submissions = Seq(submission())
       )
 
-      val result = service.buildSingleYearViewModel(testData, "2023", instanceId)
+      val result = service.buildSingleYearViewModel(testData, "2023")
 
       result.value.selectedTaxYear                           shouldBe Some("2023")
       result.value.taxYears.map(t => (t.fromYear, t.toYear)) shouldBe Seq(2023 -> 2024)
     }
 
-    "buildSingleYearViewModel returns None for invalid tax year" in {
+    "buildSingleYearViewModel returns None for invalid tax year" in new Setup {
       val testData = data(
         monthlyReturns = Seq(monthlyReturn()),
         submissions = Seq(submission())
       )
 
-      service.buildSingleYearViewModel(testData, "abc", instanceId) shouldBe None
+      service.buildSingleYearViewModel(testData, "abc") shouldBe None
     }
 
-    "uses Unknown return type for unhandled nilReturnIndicator" in {
+    "uses Unknown return type for unhandled nilReturnIndicator" in new Setup {
       val row = singleRow(
         data(
           monthlyReturns = Seq(
@@ -164,7 +162,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       row.returnType shouldBe ReturnTypeViewModel.Unknown
     }
 
-    "returns notAvailable when acceptedTime is missing" in {
+    "returns notAvailable when acceptedTime is missing" in new Setup {
       val row = singleRow(
         data(
           monthlyReturns = Seq(
@@ -179,7 +177,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       row.status shouldBe StatusViewModel.Text("history.returnHistory.status.notAvailable")
     }
 
-    "returns awaitingConfirmation for SUBMITTED_NO_RECEIPT" in {
+    "returns awaitingConfirmation for SUBMITTED_NO_RECEIPT" in new Setup {
       val row = singleRow(
         data(
           monthlyReturns = Seq(
@@ -194,7 +192,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       row.status shouldBe StatusViewModel.Text("history.returnHistory.status.awaitingConfirmation")
     }
 
-    "returns notAvailable for SUBMITTED before amendment cutoff" in {
+    "returns notAvailable for SUBMITTED before amendment cutoff" in new Setup {
       val row = singleRow(
         data(
           monthlyReturns = Seq(
@@ -213,7 +211,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       row.status shouldBe StatusViewModel.Text("history.returnHistory.status.notAvailable")
     }
 
-    "returns inProgress for superseded return with amendment status STARTED" in {
+    "returns inProgress for superseded return with amendment status STARTED" in new Setup {
       val row = singleRow(
         data(
           monthlyReturns = Seq(
@@ -239,7 +237,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       )
     }
 
-    "returns awaitingConfirmation for superseded return with amendment status PENDING" in {
+    "returns awaitingConfirmation for superseded return with amendment status PENDING" in new Setup {
       val row = singleRow(
         data(
           monthlyReturns = Seq(
@@ -258,7 +256,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       row.status shouldBe StatusViewModel.Text("history.returnHistory.status.awaitingConfirmation")
     }
 
-    "returns amend for superseded return with amendment status SUBMITTED" in {
+    "returns amend for superseded return with amendment status SUBMITTED" in new Setup {
       val row = singleRow(
         data(
           monthlyReturns = Seq(
@@ -284,7 +282,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       )
     }
 
-    "returns notAvailable for superseded return with amendment status FATAL_ERROR" in {
+    "returns notAvailable for superseded return with amendment status FATAL_ERROR" in new Setup {
       val row = singleRow(
         data(
           monthlyReturns = Seq(
@@ -303,7 +301,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       row.status shouldBe StatusViewModel.Text("history.returnHistory.status.notAvailable")
     }
 
-    "returns empty text for unhandled monthly return status" in {
+    "returns empty text for unhandled monthly return status" in new Setup {
       val row = singleRow(
         data(
           monthlyReturns = Seq(
@@ -318,7 +316,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       row.status shouldBe StatusViewModel.Text("")
     }
 
-    "submissionReceipt is a Link when IRMark sent and received match" in {
+    "submissionReceipt is a Link when IRMark sent and received match" in new Setup {
       val row = singleRow(
         data(
           monthlyReturns = Seq(monthlyReturn()),
@@ -338,7 +336,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       link.link.url should include("amendment=N")
     }
 
-    "submissionReceipt is empty Text when IRMarks do not match" in {
+    "submissionReceipt is empty Text when IRMarks do not match" in new Setup {
       val row = singleRow(
         data(
           monthlyReturns = Seq(monthlyReturn()),
@@ -354,7 +352,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       row.submissionReceipt shouldBe StatusViewModel.Text("")
     }
 
-    "submissionReceipt is empty Text when both IRMarks are None" in {
+    "submissionReceipt is empty Text when both IRMarks are None" in new Setup {
       val row = singleRow(
         data(
           monthlyReturns = Seq(monthlyReturn()),
@@ -370,7 +368,171 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       row.submissionReceipt shouldBe StatusViewModel.Text("")
     }
 
-    "getMonthlyReturnComplete must build a SubmissionReceiptViewModel from connector response" in {
+    "createAmendmentHandoff must create journey handoff and return handoff id" in new Setup {
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+
+      val handoffId = "handoff-123"
+
+      val testData = data(
+        monthlyReturns = Seq(
+          monthlyReturn(
+            id = 1L,
+            taxYear = 2023,
+            taxMonth = 3,
+            nilReturnIndicator = "Standard"
+          )
+        ),
+        submissions = Seq(
+          submission(
+            activeObjectId = Some(1L),
+            acceptedTime = Some(Instant.parse("2024-04-01T10:15:30Z"))
+          )
+        )
+      )
+
+      val expectedPayload = Json.obj(
+        "instanceId"   -> instanceId,
+        "taxYear"      -> 2023,
+        "taxMonth"     -> 3,
+        "returnType"   -> "Standard",
+        "acceptedTime" -> "2024-04-01T10:15:30Z"
+      )
+
+      when(
+        mockConnector.createJourneyHandoff(
+          "amend-monthly-return",
+          expectedPayload
+        )
+      ).thenReturn(Future.successful(handoffId))
+
+      val result = service
+        .createAmendmentHandoff(
+          data = testData,
+          instanceId = instanceId,
+          taxYear = 2023,
+          taxMonth = 3
+        )
+        .futureValue
+
+      result shouldBe Right(handoffId)
+
+      verify(mockConnector).createJourneyHandoff(
+        "amend-monthly-return",
+        expectedPayload
+      )
+    }
+
+    "createAmendmentHandoff must create payload without acceptedTime when matching submission has no acceptedTime" in new Setup {
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+
+      val handoffId = "handoff-123"
+
+      val testData = data(
+        monthlyReturns = Seq(
+          monthlyReturn(
+            id = 1L,
+            taxYear = 2023,
+            taxMonth = 3,
+            nilReturnIndicator = "Nil"
+          )
+        ),
+        submissions = Seq(
+          submission(
+            activeObjectId = Some(1L),
+            acceptedTime = None
+          )
+        )
+      )
+
+      val expectedPayload = Json.obj(
+        "instanceId" -> instanceId,
+        "taxYear"    -> 2023,
+        "taxMonth"   -> 3,
+        "returnType" -> "Nil"
+      )
+
+      when(
+        mockConnector.createJourneyHandoff(
+          "amend-monthly-return",
+          expectedPayload
+        )
+      ).thenReturn(Future.successful(handoffId))
+
+      val result = service
+        .createAmendmentHandoff(
+          data = testData,
+          instanceId = instanceId,
+          taxYear = 2023,
+          taxMonth = 3
+        )
+        .futureValue
+
+      result shouldBe Right(handoffId)
+
+      verify(mockConnector).createJourneyHandoff(
+        "amend-monthly-return",
+        expectedPayload
+      )
+    }
+
+    "createAmendmentHandoff must return Left when no matching monthly return exists" in new Setup {
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+
+      val testData = data(
+        monthlyReturns = Seq(
+          monthlyReturn(id = 1L, taxYear = 2023, taxMonth = 3)
+        ),
+        submissions = Seq(
+          submission(activeObjectId = Some(1L))
+        )
+      )
+
+      val result = service
+        .createAmendmentHandoff(
+          data = testData,
+          instanceId = instanceId,
+          taxYear = 2025,
+          taxMonth = 4
+        )
+        .futureValue
+
+      result shouldBe Left("No monthly return found for tax year 2025 and month 4")
+
+      verify(mockConnector, never()).createJourneyHandoff(any[String], any[JsObject])(any[HeaderCarrier])
+    }
+
+    "createAmendmentHandoff must propagate connector failure" in new Setup {
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+
+      val testData = data(
+        monthlyReturns = Seq(
+          monthlyReturn(id = 1L, taxYear = 2023, taxMonth = 3)
+        ),
+        submissions = Seq(
+          submission(activeObjectId = Some(1L))
+        )
+      )
+
+      when(
+        mockConnector.createJourneyHandoff(
+          any[String],
+          any[JsObject]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val result = service.createAmendmentHandoff(
+        data = testData,
+        instanceId = instanceId,
+        taxYear = 2023,
+        taxMonth = 3
+      )
+
+      whenReady(result.failed) { ex =>
+        ex.getMessage shouldBe "boom"
+      }
+    }
+
+    "getMonthlyReturnComplete must build a SubmissionReceiptViewModel from connector response" in new Setup {
       implicit val hc: HeaderCarrier = HeaderCarrier()
 
       val response = MonthlyReturnCompleteResponse(
@@ -404,7 +566,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         )
       )
 
-      when(mockConnector.getMonthlyReturnComplete(eqTo("INST001"), eqTo(2024), eqTo(6), eqTo("N"))(any()))
+      when(mockConnector.getMonthlyReturnComplete("INST001", 2024, 6, "N"))
         .thenReturn(Future.successful(response))
 
       val result = service.getMonthlyReturnComplete("INST001", 2024, 6, "N").futureValue
@@ -430,7 +592,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       item.taxDeducted     shouldBe "£800.00"
     }
 
-    "getMonthlyReturnComplete must identify nil returns correctly" in {
+    "getMonthlyReturnComplete must identify nil returns correctly" in new Setup {
       implicit val hc: HeaderCarrier = HeaderCarrier()
 
       val response = MonthlyReturnCompleteResponse(
@@ -466,7 +628,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       vm.submittedAt    shouldBe None
     }
 
-    "getMonthlyReturnComplete must fail guard when status is not SUBMITTED and amendment is not Y" in {
+    "getMonthlyReturnComplete must fail guard when status is not SUBMITTED and amendment is not Y" in new Setup {
       implicit val hc: HeaderCarrier = HeaderCarrier()
 
       val response = MonthlyReturnCompleteResponse(
@@ -498,7 +660,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       result.left.toOption.get should include("guard failed")
     }
 
-    "getMonthlyReturnComplete must pass guard when amendment is Y even if status is not SUBMITTED" in {
+    "getMonthlyReturnComplete must pass guard when amendment is Y even if status is not SUBMITTED" in new Setup {
       implicit val hc: HeaderCarrier = HeaderCarrier()
 
       val response = MonthlyReturnCompleteResponse(
@@ -529,7 +691,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       result shouldBe a[Right[_, _]]
     }
 
-    "getMonthlyReturnComplete must fail guard when IRMarks do not match" in {
+    "getMonthlyReturnComplete must fail guard when IRMarks do not match" in new Setup {
       implicit val hc: HeaderCarrier = HeaderCarrier()
 
       val response = MonthlyReturnCompleteResponse(
@@ -561,7 +723,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       result.left.toOption.get should include("IRMark")
     }
 
-    "getMonthlyReturnComplete must fail guard when IRMark is null" in {
+    "getMonthlyReturnComplete must fail guard when IRMark is null" in new Setup {
       implicit val hc: HeaderCarrier = HeaderCarrier()
 
       val response = MonthlyReturnCompleteResponse(

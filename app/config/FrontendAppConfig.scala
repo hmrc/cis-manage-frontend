@@ -114,9 +114,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     s"$cisFrontendBaseUrl$continueReturnJourneyPath" +
       s"?instanceId=$instanceId&taxYear=$taxYear&taxMonth=$taxMonth"
 
-  def confirmAmendmentUrl(instanceId: String, taxYear: String, taxMonth: String): String =
-    s"$cisFrontendBaseUrl$confirmAmendmentPath" +
-      s"?instanceId=$instanceId&taxYear=$taxYear&taxMonth=$taxMonth"
+  def confirmAmendmentUrl(handoffId: String): String =
+    s"$cisFrontendBaseUrl$confirmAmendmentPath?handoffId=$handoffId"
 
   def submissionInProgressUrl(cisId: String): String = s"$cisFrontendBaseUrl$submissionInProgressPath?cisId=$cisId"
 

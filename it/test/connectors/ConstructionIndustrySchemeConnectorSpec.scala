@@ -871,4 +871,65 @@ class ConstructionIndustrySchemeConnectorSpec
       ex.getMessage must include("boom")
     }
   }
+
+  "createJourneyHandoff" should {
+
+    "return handoff id when BE returns 201 with valid JSON" in {
+      val journeyType = "amend-monthly-return"
+
+      val requestBody = Json.obj(
+        "instanceId" -> "1",
+        "taxYear" -> 2026,
+        "taxMonth" -> 4,
+        "returnType" -> "standard",
+        "acceptedTime" -> "2026-04-20T21:49:19.702Z"
+      )
+
+      stubFor(
+        post(urlPathEqualTo(s"/cis/journey-handoffs/$journeyType"))
+          .withRequestBody(equalToJson(requestBody.toString()))
+          .willReturn(
+            aResponse()
+              .withStatus(CREATED)
+              .withHeader("Content-Type", "application/json")
+              .withBody("""{"id":"handoff-123"}""")
+          )
+      )
+
+      val result = connector.createJourneyHandoff(journeyType, requestBody).futureValue
+
+      result mustBe "handoff-123"
+
+      verify(
+        postRequestedFor(urlPathEqualTo(s"/cis/journey-handoffs/$journeyType"))
+          .withRequestBody(equalToJson(requestBody.toString()))
+      )
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      val journeyType = "amend-monthly-return"
+
+      val requestBody = Json.obj(
+        "instanceId" -> "1",
+        "taxYear" -> 2026,
+        "taxMonth" -> 4,
+        "returnType" -> "standard"
+      )
+
+      stubFor(
+        post(urlPathEqualTo(s"/cis/journey-handoffs/$journeyType"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody("boom")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.createJourneyHandoff(journeyType, requestBody).futureValue
+      }
+
+      ex.getMessage must include("returned 500")
+    }
+  }
 }

@@ -16,6 +16,7 @@
 
 package controllers.history
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import models.history.SubmittedReturnsData
 import models.requests.CisIdDataRequest
@@ -43,7 +44,8 @@ class SubmittedReturnsController @Inject() (
   view: SubmittedReturnsView,
   submittedReturnsService: SubmittedReturnsService,
   manageService: ManageService,
-  confirmationView: SubmissionSuccessView
+  confirmationView: SubmissionSuccessView,
+  appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -56,7 +58,7 @@ class SubmittedReturnsController @Inject() (
 
       resolveSubmittedReturnsData
         .map { data =>
-          submittedReturnsService.buildSingleYearViewModel(data, taxYear, request.cisId) match {
+          submittedReturnsService.buildSingleYearViewModel(data, taxYear) match {
             case Some(vm) => Ok(view(vm))
             case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
@@ -73,7 +75,7 @@ class SubmittedReturnsController @Inject() (
 
       resolveSubmittedReturnsData
         .map { data =>
-          submittedReturnsService.buildAllYearsViewModel(data, request.cisId) match {
+          submittedReturnsService.buildAllYearsViewModel(data) match {
             case Some(vm) => Ok(view(vm))
             case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
@@ -108,6 +110,33 @@ class SubmittedReturnsController @Inject() (
         }
         .recover { case ex =>
           logger.error("[viewSubmissionReceipt] failed", ex)
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
+
+  def startAmendment(taxYear: Int, taxMonth: Int): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
+      resolveSubmittedReturnsData
+        .flatMap { data =>
+          submittedReturnsService
+            .createAmendmentHandoff(
+              data = data,
+              instanceId = request.cisId,
+              taxYear = taxYear,
+              taxMonth = taxMonth
+            )
+            .map {
+              case Right(handoffId) =>
+                Redirect(appConfig.confirmAmendmentUrl(handoffId))
+              case Left(reason)     =>
+                logger.warn(s"[startAmendment] start amendment failed: $reason")
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
+        }
+        .recover { case ex =>
+          logger.error("[startAmendment] failed", ex)
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }
