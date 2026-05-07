@@ -17,14 +17,16 @@
 package services
 
 import connectors.ConstructionIndustrySchemeConnector
-import models.history.{MonthlyReturnCompleteResponse, SubcontractorPayment, SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSubmissionData}
+import models.history.*
+import models.response.GetSubmittedMonthlyReturnsDataResponse
+import play.api.i18n.Lang
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.Utils
-import viewmodels.{LinkViewModel, ReturnTypeViewModel, StatusViewModel, SubmissionReceiptViewModel, SubmittedReturnsPageViewModel, SubmittedReturnsRowViewModel, TaxYearHistoryViewModel}
+import utils.{DateTimeFormats, IrMarkReferenceGenerator, Utils}
+import viewmodels.*
 import viewmodels.StatusViewModel.Text
 
+import java.time.*
 import java.time.format.{DateTimeFormatter, TextStyle}
-import java.time.{Instant, LocalDateTime, Month, YearMonth, ZoneId, ZoneOffset, ZonedDateTime}
 import java.util.Locale
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,7 +37,7 @@ class SubmittedReturnsService @Inject() (
 )(implicit ec: ExecutionContext) {
 
   private val ukTimezone: ZoneId                         = ZoneId.of("Europe/London")
-  private val displayDateFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.UK)
+  private val displayDateFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("d MMM yyyy")
   private val shortMonthYearFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM yyyy")
   private val amendmentCutOffInstant: Instant            = ZonedDateTime.of(2016, 2, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant
   private val displayTimeFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("h:mma", Locale.UK)
@@ -55,6 +57,65 @@ class SubmittedReturnsService @Inject() (
         selectedTaxYear = Some(taxYear)
       )
     }
+
+  def buildSubmittedReturnPrintViewModel(
+    data: GetSubmittedMonthlyReturnsDataResponse,
+    lang: Lang
+  ): SubmittedReturnPrintViewModel = {
+    val langCode = lang.code
+
+    val submittedTime = data.submission.acceptedTime
+      .map(_.atZone(ukTimezone))
+      .map(_.format(DateTimeFormats.timeFormat()(lang)).toLowerCase)
+      .getOrElse("")
+
+    val submittedDate = data.submission.acceptedTime
+      .map(_.atZone(ukTimezone))
+      .map(_.format(DateTimeFormats.dateTimeFormat()(lang)))
+      .getOrElse("")
+
+    val receiptReferenceNumber = data.submission.hmrcMarkGgis.map(IrMarkReferenceGenerator.fromBase64).getOrElse("")
+
+    val totalPaymentsMade    =
+      Utils.formatCurrency(
+        data.monthlyReturnItems.flatMap(_.totalPayments).map(_.replace(",", "")).map(BigDecimal(_)).sum
+      )
+    val totalCostOfMaterials =
+      Utils.formatCurrency(
+        data.monthlyReturnItems.flatMap(_.costOfMaterials).map(_.replace(",", "")).map(BigDecimal(_)).sum
+      )
+    val totalTaxDeducted     =
+      Utils.formatCurrency(
+        data.monthlyReturnItems.flatMap(_.totalDeducted).map(_.replace(",", "")).map(BigDecimal(_)).sum
+      )
+    val subcontractors       =
+      data.monthlyReturnItems.map { item =>
+        SubcontractorPayment(
+          item.subcontractorName.getOrElse(""),
+          Utils.formatCurrency(Utils.toBigDecimal(item.totalPayments)),
+          Utils.formatCurrency(Utils.toBigDecimal(item.costOfMaterials)),
+          Utils.formatCurrency(Utils.toBigDecimal(item.totalDeducted))
+        )
+      }
+
+    SubmittedReturnPrintViewModel(
+      monthYear = Utils.monthYear(data.taxYear, data.taxMonth, langCode),
+      submittedTime = submittedTime,
+      submittedDate = submittedDate,
+      receiptReferenceNumber = receiptReferenceNumber,
+      submissionType = if (data.nilReturnIndicator == "Y") {
+        ReturnTypeViewModel.Nil.toString.toLowerCase
+      } else {
+        ReturnTypeViewModel.Standard.toString.toLowerCase
+      },
+      contractorName = data.scheme.name,
+      payeReference = s"${data.scheme.taxOfficeNumber}/${data.scheme.taxOfficeReference}",
+      totalPaymentsMade = totalPaymentsMade,
+      totalCostOfMaterials = totalCostOfMaterials,
+      totalTaxDeducted = totalTaxDeducted,
+      subcontractors = subcontractors
+    )
+  }
 
   private def buildTaxYearSections(data: SubmittedReturnsData): Seq[TaxYearHistoryViewModel] = {
     val rowsWithTaxYear =
@@ -94,7 +155,13 @@ class SubmittedReturnsService @Inject() (
       returnType = returnType,
       dateSubmitted = dateSubmittedText,
       monthlyReturn = LinkViewModel(
-        url = "#",
+        url = controllers.history.routes.PrintSubmissionDetailsController
+          .onPageLoad(
+            monthlyReturn.taxYear,
+            monthlyReturn.taxMonth,
+            monthlyReturn.amendment
+          )
+          .url,
         hiddenText = periodEndText
       ),
       submissionReceipt =
@@ -110,9 +177,9 @@ class SubmittedReturnsService @Inject() (
 
   private def buildReturnType(monthlyReturn: SubmittedMonthlyReturnData): ReturnTypeViewModel =
     monthlyReturn.nilReturnIndicator match {
-      case "Nil"      => ReturnTypeViewModel.Nil
-      case "Standard" => ReturnTypeViewModel.Standard
-      case _          => ReturnTypeViewModel.Unknown
+      case ReturnTypeViewModel.Nil.toString      => ReturnTypeViewModel.Nil
+      case ReturnTypeViewModel.Standard.toString => ReturnTypeViewModel.Standard
+      case _                                     => ReturnTypeViewModel.Unknown
     }
 
   private def buildDateSubmittedText(submissionOpt: Option[SubmittedSubmissionData]): String =

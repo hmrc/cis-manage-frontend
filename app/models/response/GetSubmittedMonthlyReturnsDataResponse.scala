@@ -14,11 +14,21 @@
  * limitations under the License.
  */
 
-package viewmodels
+package models.response
 
-case class ReturnsLandingContext(
-  contractorName: String,
-  standardReturnLink: String,
-  nilReturnLink: String,
-  returnToHomeLink: String
+import models.history.*
+import models.MonthlyReturnItem
+import play.api.libs.json.{Json, OFormat}
+
+case class GetSubmittedMonthlyReturnsDataResponse(
+  scheme: SubmittedSchemeData,
+  monthlyReturnId: Long,
+  taxYear: Int,
+  taxMonth: Int,
+  nilReturnIndicator: String,
+  monthlyReturnItems: Seq[MonthlyReturnItem],
+  submission: SubmittedSubmissionData
 )
+
+object GetSubmittedMonthlyReturnsDataResponse:
+  given format: OFormat[GetSubmittedMonthlyReturnsDataResponse] = Json.format[GetSubmittedMonthlyReturnsDataResponse]

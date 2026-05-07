@@ -20,13 +20,15 @@ import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
 
 import java.time.Instant
+import models.MonthlyReturnItem
 import models.history.*
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
+import models.response.GetSubmittedMonthlyReturnsDataResponse
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.{ReturnTypeViewModel, StatusViewModel, SubmittedReturnsRowViewModel}
+import play.api.i18n.Lang
 import viewmodels.{LinkViewModel, ReturnTypeViewModel, StatusViewModel, SubmittedReturnsRowViewModel}
 import viewmodels.StatusViewModel.Text
 
@@ -60,6 +62,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       taxMonth = taxMonth,
       nilReturnIndicator = nilReturnIndicator,
       status = status,
+      amendment = "N",
       supersededBy = supersededBy,
       amendmentStatus = amendmentStatus,
       monthlyReturnItems = monthlyReturnItems
@@ -107,7 +110,13 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       row.returnPeriodEnd          shouldBe "Mar 2023"
       row.returnType               shouldBe ReturnTypeViewModel.Standard
       row.dateSubmitted            shouldBe "1 Apr 2024"
-      row.monthlyReturn.url        shouldBe "#"
+      row.monthlyReturn.url        shouldBe controllers.history.routes.PrintSubmissionDetailsController
+        .onPageLoad(
+          monthlyReturn().taxYear,
+          monthlyReturn().taxMonth,
+          monthlyReturn().amendment
+        )
+        .url
       row.monthlyReturn.hiddenText shouldBe "Mar 2023"
       row.status                   shouldBe StatusViewModel.Link(
         link = LinkViewModel(
@@ -573,6 +582,102 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
       result                 shouldBe a[Left[_, _]]
       result.left.toOption.get should include("IRMark")
+    }
+
+    "SubmittedReturnPrintViewModel should return correct data without payment details" in {
+      val input = GetSubmittedMonthlyReturnsDataResponse(
+        scheme = SubmittedSchemeData("PAL 355 Scheme", "163", "AB0063"),
+        monthlyReturnId = 3000L,
+        taxYear = 2026,
+        taxMonth = 4,
+        nilReturnIndicator = "Y",
+        monthlyReturnItems = Seq.empty,
+        submission = SubmittedSubmissionData(
+          submissionId = 10L,
+          submissionType = Some("Original"),
+          activeObjectId = Some(20L),
+          status = "Accepted",
+          hmrcMarkGenerated = Some("mark1"),
+          hmrcMarkGgis = Some("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"),
+          emailRecipient = Some("test@example.com"),
+          acceptedTime = Some(Instant.parse("2026-04-01T10:15:30Z"))
+        )
+      )
+
+      val out = service.buildSubmittedReturnPrintViewModel(input, Lang("en"))
+      out.monthYear mustBe "April 2026"
+      out.submittedDate mustBe "1 April 2026"
+      out.receiptReferenceNumber mustBe "AAIIGECRQ4QJFCZQ2OHUCFETKFKZOYM5W7RZ5OY"
+      out.submissionType mustBe "nil"
+      out.contractorName mustBe "PAL 355 Scheme"
+      out.payeReference mustBe "163/AB0063"
+      out.totalPaymentsMade mustBe "£0.00"
+      out.totalCostOfMaterials mustBe "£0.00"
+      out.totalTaxDeducted mustBe "£0.00"
+      out.subcontractors mustBe Seq.empty
+
+    }
+
+    "SubmittedReturnPrintViewModel should return correct data with payment details" in {
+      val input = GetSubmittedMonthlyReturnsDataResponse(
+        scheme = SubmittedSchemeData("PAL 355 Scheme", "163", "AB0063"),
+        monthlyReturnId = 3000L,
+        taxYear = 2026,
+        taxMonth = 4,
+        nilReturnIndicator = "N",
+        monthlyReturnItems = Seq(
+          MonthlyReturnItem(
+            monthlyReturnId = 3000L,
+            monthlyReturnItemId = 1L,
+            totalPayments = Some("10,000.00"),
+            costOfMaterials = Some("10,000.00"),
+            totalDeducted = Some("10,000.00"),
+            unmatchedTaxRateIndicator = None,
+            subcontractorId = None,
+            subcontractorName = Some("Contractor 01"),
+            verificationNumber = None,
+            itemResourceReference = None
+          ),
+          MonthlyReturnItem(
+            monthlyReturnId = 3000L,
+            monthlyReturnItemId = 2L,
+            totalPayments = Some("20,000.00"),
+            costOfMaterials = Some("20,000.00"),
+            totalDeducted = Some("20,000.00"),
+            unmatchedTaxRateIndicator = None,
+            subcontractorId = None,
+            subcontractorName = Some("Contractor 02"),
+            verificationNumber = None,
+            itemResourceReference = None
+          )
+        ),
+        submission = SubmittedSubmissionData(
+          submissionId = 10L,
+          submissionType = Some("Original"),
+          activeObjectId = Some(20L),
+          status = "Accepted",
+          hmrcMarkGenerated = Some("mark1"),
+          hmrcMarkGgis = None,
+          emailRecipient = Some("test@example.com"),
+          acceptedTime = Some(Instant.parse("2026-04-01T10:15:30Z"))
+        )
+      )
+
+      val out = service.buildSubmittedReturnPrintViewModel(input, Lang("en"))
+      out.monthYear mustBe "April 2026"
+      out.submittedDate mustBe "1 April 2026"
+      out.receiptReferenceNumber mustBe ""
+      out.submissionType mustBe "standard"
+      out.contractorName mustBe "PAL 355 Scheme"
+      out.payeReference mustBe "163/AB0063"
+      out.totalPaymentsMade mustBe "£30000.00"
+      out.totalCostOfMaterials mustBe "£30000.00"
+      out.totalTaxDeducted mustBe "£30000.00"
+      out.subcontractors mustBe Seq(
+        SubcontractorPayment("Contractor 01", "£10000.00", "£10000.00", "£10000.00"),
+        SubcontractorPayment("Contractor 02", "£20000.00", "£20000.00", "£20000.00")
+      )
+
     }
   }
 }
