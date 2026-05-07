@@ -52,7 +52,9 @@ class ReturnsLandingController @Inject() (
         .buildReturnsLandingContext(instanceId, request.userAnswers, request.isAgent)
         .map {
           case Some(context) =>
-            Ok(view(context.contractorName, context.standardReturnLink, context.nilReturnLink))
+            Ok(
+              view(context.contractorName, context.standardReturnLink, context.nilReturnLink, context.returnToHomeLink)
+            )
           case None          =>
             logger.warn(
               s"[ReturnsLandingController] missing context (isAgent=${request.isAgent}, instanceId=$instanceId)"

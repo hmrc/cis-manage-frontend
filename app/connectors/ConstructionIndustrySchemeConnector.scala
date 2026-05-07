@@ -18,8 +18,9 @@ package connectors
 
 import models.*
 import models.agent.AgentClientData
-import models.history.{MonthlyReturnCompleteResponse, SubmittedReturnsData}
-import models.requests.DeleteUnsubmittedMonthlyReturnRequest
+import models.history.*
+import models.requests.*
+import models.response.*
 import play.api.Logging
 import play.api.http.Status.{NO_CONTENT, OK}
 import play.api.libs.json.{JsObject, JsValue, Json}
@@ -185,6 +186,14 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
           case status     => Future.failed(UpstreamErrorResponse(response.body, status, status))
         }
       }
+
+  def getSubmittedMonthlyReturnsData(
+    request: GetSubmittedMonthlyReturnsDataRequest
+  )(implicit hc: HeaderCarrier): Future[GetSubmittedMonthlyReturnsDataResponse] =
+    http
+      .post(url"$cisBaseUrl/monthly-returns/submitted-data")
+      .withBody(Json.toJson(request))
+      .execute[GetSubmittedMonthlyReturnsDataResponse]
 
   def createJourneyHandoff(journeyType: String, data: JsObject)(implicit
     hc: HeaderCarrier

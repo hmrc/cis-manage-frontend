@@ -29,14 +29,15 @@
 
 @(viewModel: Seq[IncompleteReturnsRowViewModel])(implicit request: Request[_], messages: Messages)
 
-@renderActions(actions: Seq[ActionLinkViewModel]) = {
-    @for((action, index) <- actions.zipWithIndex) {
+@renderActions(row: IncompleteReturnsRowViewModel) = {
+    @for((action, index) <- row.action.zipWithIndex) {
         @link(
             linkTextKey = action.textKey,
             linkUrl = action.href,
-            paragraphWrapped = false
+            paragraphWrapped = false,
+            visuallyHiddenText = action.hiddenTextKey.map { hiddenTextKey => messages(hiddenTextKey, row.returnPeriodEnd)}
         )
-        @if(index < actions.size -1) {
+        @if(index < row.action.size - 1) {
             <span aria-hidden="true"> | </span>
         }
     }
@@ -76,7 +77,7 @@
                                 TableRow(content = Text(row.returnType), classes = "ir-col-type"),
                                 TableRow(content = Text(row.lastUpdate), classes = "ir-col-date"),
                                 TableRow(content = Text(row.status), classes = "ir-col-status"),
-                                TableRow(content = HtmlContent(renderActions(row.action)), classes = "ir-col-action")
+                                TableRow(content = HtmlContent(renderActions(row)), classes = "ir-col-action")
                             )
                         }
                     )
@@ -105,7 +106,7 @@
                                 ),
                                 SummaryListRow(
                                     key = Key(content = Text(messages("incompleteReturns.table.action"))),
-                                    value = Value(content = HtmlContent(renderActions(row.action)))
+                                    value = Value(content = HtmlContent(renderActions(row)))
                                 )
                             )
                         )

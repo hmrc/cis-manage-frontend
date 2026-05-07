@@ -27,7 +27,8 @@ class ReturnsLandingContextSpec extends AnyWordSpec with Matchers {
       val context = ReturnsLandingContext(
         contractorName = "ABC Construction Ltd",
         standardReturnLink = "/standard",
-        nilReturnLink = "/nil"
+        nilReturnLink = "/nil",
+        returnToHomeLink = "/example"
       )
 
       context.contractorName mustBe "ABC Construction Ltd"
@@ -39,7 +40,8 @@ class ReturnsLandingContextSpec extends AnyWordSpec with Matchers {
       val context = ReturnsLandingContext(
         contractorName = "ABC",
         standardReturnLink = "/standard",
-        nilReturnLink = "/nil"
+        nilReturnLink = "/nil",
+        returnToHomeLink = "/example"
       )
 
       val updated = context.copy(contractorName = "NEW")
