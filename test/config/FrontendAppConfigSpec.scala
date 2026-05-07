@@ -126,6 +126,21 @@ class FrontendAppConfigSpec extends SpecBase {
     }
   }
 
+  "confirmAmendmentUrl" - {
+
+    "must build a URL with query params" in new Setup {
+      val url: String = appConfig.confirmAmendmentUrl(
+        instanceId = "1234567890",
+        taxYear = "2025",
+        taxMonth = "1"
+      )
+
+      url mustBe
+        "http://localhost:6993/construction-industry-scheme/manage-cis-return/amend-monthly-return/confirm-amendments" +
+        "?instanceId=1234567890&taxYear=2025&taxMonth=1"
+    }
+  }
+
   trait Setup {
     val app: Application             = applicationBuilder().build()
     val appConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]

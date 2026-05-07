@@ -89,6 +89,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   private lazy val fileStandardReturnPath: String                   = configuration.get[String]("urls.fileStandardReturn")
   private lazy val fileNilReturnPath: String                        = configuration.get[String]("urls.fileNilReturn")
   private lazy val continueReturnJourneyPath: String                = configuration.get[String]("urls.continueReturnJourney")
+  private lazy val confirmAmendmentPath: String                     = configuration.get[String]("urls.confirmAmendment")
   private lazy val submissionInProgressPath: String                 = configuration.get[String]("urls.submissionInProgress")
   private lazy val submissionUnsuccessfulCannotResubmitPath: String =
     configuration.get[String]("urls.submissionUnsuccessfulCannotResubmit")
@@ -111,6 +112,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   def continueReturnJourneyUrl(instanceId: String, taxYear: String, taxMonth: String): String =
     s"$cisFrontendBaseUrl$continueReturnJourneyPath" +
+      s"?instanceId=$instanceId&taxYear=$taxYear&taxMonth=$taxMonth"
+
+  def confirmAmendmentUrl(instanceId: String, taxYear: String, taxMonth: String): String =
+    s"$cisFrontendBaseUrl$confirmAmendmentPath" +
       s"?instanceId=$instanceId&taxYear=$taxYear&taxMonth=$taxMonth"
 
   def submissionInProgressUrl(cisId: String): String = s"$cisFrontendBaseUrl$submissionInProgressPath?cisId=$cisId"

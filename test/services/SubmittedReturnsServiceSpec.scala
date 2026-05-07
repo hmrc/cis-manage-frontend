@@ -17,6 +17,7 @@
 package services
 
 import base.SpecBase
+import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 
 import java.time.Instant
@@ -29,7 +30,8 @@ import org.scalatest.matchers.should.Matchers.*
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.i18n.Lang
-import viewmodels.{LinkViewModel, ReturnTypeViewModel, StatusViewModel, SubmittedReturnsRowViewModel}
+import viewmodels.*
+import viewmodels.LinkViewModel
 import viewmodels.StatusViewModel.Text
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -37,8 +39,16 @@ import scala.concurrent.Future
 
 class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
+  private val instanceId = "INST001"
+  private val amendUrl   = "/confirm-amendment?instanceId=INST001&taxYear=2023&taxMonth=3"
+
   private val mockConnector = mock[ConstructionIndustrySchemeConnector]
-  private val service       = new SubmittedReturnsService(mockConnector)
+  private val mockAppConfig = mock[FrontendAppConfig]
+
+  when(mockAppConfig.confirmAmendmentUrl(any[String], any[String], any[String]))
+    .thenReturn(amendUrl)
+
+  private val service = new SubmittedReturnsService(mockConnector, mockAppConfig)
 
   private val baseScheme = SubmittedSchemeData(
     name = "Test Scheme",
@@ -95,7 +105,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
     )
 
   private def singleRow(testData: SubmittedReturnsData): SubmittedReturnsRowViewModel =
-    service.buildAllYearsViewModel(testData).value.taxYears.head.rows.head
+    service.buildAllYearsViewModel(testData, instanceId).value.taxYears.head.rows.head
 
   "SubmittedReturnsService" - {
 
@@ -120,7 +130,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       row.monthlyReturn.hiddenText shouldBe "Mar 2023"
       row.status                   shouldBe StatusViewModel.Link(
         link = LinkViewModel(
-          url = "#",
+          url = amendUrl,
           hiddenText = "Mar 2023"
         ),
         textKey = "history.returnHistory.status.amend",
@@ -134,7 +144,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         submissions = Seq(submission())
       )
 
-      val result = service.buildSingleYearViewModel(testData, "2023")
+      val result = service.buildSingleYearViewModel(testData, "2023", instanceId)
 
       result.value.selectedTaxYear                           shouldBe Some("2023")
       result.value.taxYears.map(t => (t.fromYear, t.toYear)) shouldBe Seq(2023 -> 2024)
@@ -146,7 +156,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         submissions = Seq(submission())
       )
 
-      service.buildSingleYearViewModel(testData, "abc") shouldBe None
+      service.buildSingleYearViewModel(testData, "abc", instanceId) shouldBe None
     }
 
     "uses Unknown return type for unhandled nilReturnIndicator" in {
@@ -276,7 +286,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
       row.status shouldBe StatusViewModel.Link(
         link = LinkViewModel(
-          url = "#",
+          url = amendUrl,
           hiddenText = "Mar 2023"
         ),
         textKey = "history.returnHistory.status.amend",
