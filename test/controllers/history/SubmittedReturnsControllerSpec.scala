@@ -74,6 +74,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         taxMonth = 3,
         nilReturnIndicator = "Nil",
         status = "Submitted",
+        amendment = "N",
         supersededBy = None,
         amendmentStatus = None,
         monthlyReturnItems = None

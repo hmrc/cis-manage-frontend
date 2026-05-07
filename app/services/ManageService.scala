@@ -21,7 +21,8 @@ import connectors.ConstructionIndustrySchemeConnector
 import models.*
 import models.agent.AgentClientData
 import models.history.SubmittedReturnsData
-import models.requests.DeleteUnsubmittedMonthlyReturnRequest
+import models.requests.*
+import models.response.*
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
@@ -182,24 +183,30 @@ class ManageService @Inject() (
         userAnswers.get(ContractorNamePage)
       }
 
-    val linksOpt: Option[(String, String)] =
+    val linksOpt: Option[(String, String, String)] =
       if (isAgent) {
         for {
           clients <- userAnswers.get(AgentClientsPage)
           client  <- clients.find(_.uniqueId == instanceId)
         } yield (
           appConfig.fileStandardReturnUrl(instanceId),
-          appConfig.fileNilReturnUrl(instanceId)
+          appConfig.fileNilReturnUrl(instanceId),
+          controllers.agent.routes.AgentLandingController.onPageLoad(instanceId).url
         )
       } else {
-        Some((appConfig.fileStandardReturnUrl, appConfig.fileNilReturnUrl))
+        Some(
+          (
+            appConfig.fileStandardReturnUrl,
+            appConfig.fileNilReturnUrl,
+            controllers.contractor.routes.ContractorLandingController.onPageLoad().url
+          )
+        )
       }
 
     (contractorNameOpt, linksOpt) match {
-      case (Some(name), Some((standardLink, nilLink))) =>
-        Future.successful(Some(ReturnsLandingContext(name, standardLink, nilLink)))
-
-      case _ =>
+      case (Some(name), Some((standardLink, nilLink, returnToHomeLink))) =>
+        Future.successful(Some(ReturnsLandingContext(name, standardLink, nilLink, returnToHomeLink)))
+      case _                                                             =>
         Future.successful(None)
     }
   }
@@ -238,6 +245,13 @@ class ManageService @Inject() (
         logger.error(s"[deleteUnsubmittedMonthlyReturn] missing instanceId in user answers")
         Future.failed(new RuntimeException("Missing instanceId in user answers"))
     }
+
+  def getSubmittedMonthlyReturnsData(instanceId: String, taxYear: Int, taxMonth: Int, amendment: String)(implicit
+    hc: HeaderCarrier
+  ): Future[GetSubmittedMonthlyReturnsDataResponse] =
+    cisConnector.getSubmittedMonthlyReturnsData(
+      GetSubmittedMonthlyReturnsDataRequest(instanceId, taxYear, taxMonth, amendment)
+    )
 
   private def buildReturnPeriodEnd(taxMonth: Int, taxYear: Int): String =
     YearMonth.of(taxYear, taxMonth).format(shortMonthYearFormatter)

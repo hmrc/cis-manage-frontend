@@ -14,11 +14,22 @@
  * limitations under the License.
  */
 
-package viewmodels
+package models
 
-case class ReturnsLandingContext(
-  contractorName: String,
-  standardReturnLink: String,
-  nilReturnLink: String,
-  returnToHomeLink: String
+import play.api.libs.json.{Json, OFormat}
+
+case class MonthlyReturnItem(
+  monthlyReturnId: Long,
+  monthlyReturnItemId: Long,
+  totalPayments: Option[String],
+  costOfMaterials: Option[String],
+  totalDeducted: Option[String],
+  unmatchedTaxRateIndicator: Option[String],
+  subcontractorId: Option[Long],
+  subcontractorName: Option[String],
+  verificationNumber: Option[String],
+  itemResourceReference: Option[Long]
 )
+
+object MonthlyReturnItem:
+  given format: OFormat[MonthlyReturnItem] = Json.format[MonthlyReturnItem]

@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-package viewmodels
+package models.requests
 
-case class ReturnsLandingContext(
-  contractorName: String,
-  standardReturnLink: String,
-  nilReturnLink: String,
-  returnToHomeLink: String
+import play.api.libs.json.{Json, OFormat}
+
+case class GetSubmittedMonthlyReturnsDataRequest(
+  instanceId: String,
+  taxYear: Int,
+  taxMonth: Int,
+  amendment: String
 )
+
+object GetSubmittedMonthlyReturnsDataRequest {
+  given format: OFormat[GetSubmittedMonthlyReturnsDataRequest] = Json.format[GetSubmittedMonthlyReturnsDataRequest]
+}

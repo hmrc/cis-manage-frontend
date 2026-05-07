@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-package viewmodels
+package models.history
 
-case class ReturnsLandingContext(
+case class SubmittedReturnPrintViewModel(
+  monthYear: String,
+  submittedTime: String,
+  submittedDate: String,
+  receiptReferenceNumber: String,
+  submissionType: String,
   contractorName: String,
-  standardReturnLink: String,
-  nilReturnLink: String,
-  returnToHomeLink: String
+  payeReference: String,
+  totalPaymentsMade: String,
+  totalCostOfMaterials: String,
+  totalTaxDeducted: String,
+  subcontractors: Seq[SubcontractorPayment]
 )
