@@ -43,16 +43,22 @@ class PrintSubmissionDetailsController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(taxYear: Int, taxMonth: Int, amendment: String): Action[AnyContent] =
+  def onPageLoad(taxYear: Int, taxMonth: Int, amendment: String, from: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       request.userAnswers.get(CisIdPage) match {
         case Some(instanceId) =>
           manageService
             .getSubmittedMonthlyReturnsData(instanceId, taxYear, taxMonth, amendment)
             .map { response =>
-              val lang     = messagesApi.preferred(request).lang
-              val viewData = submittedReturnsService.buildSubmittedReturnPrintViewModel(response, lang)
-              Ok(view(viewData))
+              val lang       = messagesApi.preferred(request).lang
+              val viewData   = submittedReturnsService.buildSubmittedReturnPrintViewModel(response, lang)
+              val historyUrl = from match {
+                case "single" =>
+                  controllers.history.routes.SubmittedReturnsController.onPageLoadSingleYear(taxYear.toString).url
+                case _        =>
+                  controllers.history.routes.SubmittedReturnsController.onPageLoadAllYears().url
+              }
+              Ok(view(viewData, historyUrl))
             }
             .recover { case ex =>
               logger.error("[PrintSubmissionDetailsController] Failed to get submitted monthly return", ex)

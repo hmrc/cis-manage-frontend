@@ -19,6 +19,7 @@ package services
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.history.*
+import models.history.SubmittedReturnsHistorySource.{AllYears, SingleYear}
 import models.response.GetSubmittedMonthlyReturnsDataResponse
 import play.api.i18n.Lang
 import uk.gov.hmrc.http.HeaderCarrier
@@ -47,7 +48,7 @@ class SubmittedReturnsService @Inject() (
   def buildAllYearsViewModel(data: SubmittedReturnsData, instanceId: String): Option[SubmittedReturnsPageViewModel] =
     Some(
       SubmittedReturnsPageViewModel(
-        taxYears = buildTaxYearSections(data, instanceId),
+        taxYears = buildTaxYearSections(data, instanceId, AllYears),
         selectedTaxYear = None
       )
     )
@@ -59,7 +60,7 @@ class SubmittedReturnsService @Inject() (
   ): Option[SubmittedReturnsPageViewModel] =
     taxYear.toIntOption.map { taxYearInt =>
       SubmittedReturnsPageViewModel(
-        taxYears = buildTaxYearSections(data, instanceId).filter(_.fromYear == taxYearInt),
+        taxYears = buildTaxYearSections(data, instanceId, SingleYear).filter(_.fromYear == taxYearInt),
         selectedTaxYear = Some(taxYear)
       )
     }
@@ -123,7 +124,11 @@ class SubmittedReturnsService @Inject() (
     )
   }
 
-  private def buildTaxYearSections(data: SubmittedReturnsData, instanceId: String): Seq[TaxYearHistoryViewModel] = {
+  private def buildTaxYearSections(
+    data: SubmittedReturnsData,
+    instanceId: String,
+    source: SubmittedReturnsHistorySource
+  ): Seq[TaxYearHistoryViewModel] = {
     val rowsWithTaxYear =
       data.monthlyReturns
         .sortBy(mr => (mr.taxYear, mr.taxMonth))(Ordering.Tuple2(Ordering.Int, Ordering.Int).reverse)
@@ -131,7 +136,7 @@ class SubmittedReturnsService @Inject() (
           data.submissions
             .find(_.activeObjectId.contains(monthlyReturn.monthlyReturnId))
             .map { submission =>
-              monthlyReturn.taxYear -> toRowViewModel(monthlyReturn, Some(submission), instanceId)
+              monthlyReturn.taxYear -> toRowViewModel(monthlyReturn, Some(submission), instanceId, source)
             }
         }
 
@@ -151,7 +156,8 @@ class SubmittedReturnsService @Inject() (
   private def toRowViewModel(
     monthlyReturn: SubmittedMonthlyReturnData,
     submissionOpt: Option[SubmittedSubmissionData],
-    instanceId: String
+    instanceId: String,
+    source: SubmittedReturnsHistorySource
   ): SubmittedReturnsRowViewModel = {
     val periodEndText     = buildReturnPeriodEnd(monthlyReturn)
     val returnType        = buildReturnType(monthlyReturn)
@@ -167,7 +173,8 @@ class SubmittedReturnsService @Inject() (
           .onPageLoad(
             monthlyReturn.taxYear,
             monthlyReturn.taxMonth,
-            monthlyReturn.amendment
+            monthlyReturn.amendment,
+            source.queryValue
           )
           .url,
         hiddenText = periodEndText

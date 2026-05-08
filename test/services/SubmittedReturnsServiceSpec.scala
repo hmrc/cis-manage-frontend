@@ -23,6 +23,7 @@ import connectors.ConstructionIndustrySchemeConnector
 import java.time.Instant
 import models.MonthlyReturnItem
 import models.history.*
+import models.history.SubmittedReturnsHistorySource.SingleYear
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
 import models.response.GetSubmittedMonthlyReturnsDataResponse
@@ -31,7 +32,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.i18n.Lang
 import viewmodels.*
-import viewmodels.LinkViewModel
 import viewmodels.StatusViewModel.Text
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -148,6 +148,16 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
       result.value.selectedTaxYear                           shouldBe Some("2023")
       result.value.taxYears.map(t => (t.fromYear, t.toYear)) shouldBe Seq(2023 -> 2024)
+
+      result.value.taxYears.head.rows.head.monthlyReturn.url shouldBe
+        controllers.history.routes.PrintSubmissionDetailsController
+          .onPageLoad(
+            monthlyReturn().taxYear,
+            monthlyReturn().taxMonth,
+            monthlyReturn().amendment,
+            SingleYear.queryValue
+          )
+          .url
     }
 
     "buildSingleYearViewModel returns None for invalid tax year" in {

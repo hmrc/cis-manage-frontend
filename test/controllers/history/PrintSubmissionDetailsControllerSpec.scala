@@ -116,8 +116,10 @@ class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[PrintSubmissionDetailsView]
 
+        val historyUrl = controllers.history.routes.SubmittedReturnsController.onPageLoadAllYears().url
+
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(model)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(model, historyUrl)(request, messages(application)).toString
       }
     }
 
