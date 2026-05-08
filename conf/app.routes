@@ -95,3 +95,8 @@ GET        /manage-your-cis-return/incomplete-returns/delete-return/:monthlyRetu
 
 GET        /amend-monthly-return/no-return-submitted                controllers.amend.NoReturnsSubmittedController.onPageLoad()
 GET        /amend-monthly-return/no-incomplete-returns                  controllers.amend.NoIncompleteReturnsController.onPageLoad()
+
+GET        /verify/select-tax-year-for-verification-requests                controllers.verify.VerificationHistorySelectTaxYearController.onPageLoad(mode: Mode = NormalMode)
+POST       /verify/select-tax-year-for-verification-requests                controllers.verify.VerificationHistorySelectTaxYearController.onSubmit(mode: Mode = NormalMode)
+GET        /verify/change-select-tax-year-for-verification-requests         controllers.verify.VerificationHistorySelectTaxYearController.onPageLoad(mode: Mode = CheckMode)
+POST       /verify/change-select-tax-year-for-verification-requests         controllers.verify.VerificationHistorySelectTaxYearController.onSubmit(mode: Mode = CheckMode)

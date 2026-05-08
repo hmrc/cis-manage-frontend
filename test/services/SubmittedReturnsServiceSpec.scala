@@ -31,7 +31,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.i18n.Lang
 import viewmodels.*
-import viewmodels.LinkViewModel
 import viewmodels.StatusViewModel.Text
 
 import scala.concurrent.ExecutionContext.Implicits.global
