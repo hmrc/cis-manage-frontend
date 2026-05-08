@@ -128,16 +128,14 @@ class FrontendAppConfigSpec extends SpecBase {
 
   "confirmAmendmentUrl" - {
 
-    "must build a URL with query params" in new Setup {
+    "must build a URL with handoffId query param" in new Setup {
       val url: String = appConfig.confirmAmendmentUrl(
-        instanceId = "1234567890",
-        taxYear = "2025",
-        taxMonth = "1"
+        handoffId = "28c831a4-8723-4180-b625-a6d10706899f"
       )
 
       url mustBe
         "http://localhost:6993/construction-industry-scheme/manage-cis-return/amend-monthly-return/confirm-amendments" +
-        "?instanceId=1234567890&taxYear=2025&taxMonth=1"
+        "?handoffId=28c831a4-8723-4180-b625-a6d10706899f"
     }
   }
 

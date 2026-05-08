@@ -19,8 +19,8 @@ package controllers.history
 import base.SpecBase
 import models.UserAnswers
 import models.history.{SubcontractorPayment, SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSchemeData, SubmittedSubmissionData}
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CisIdPage
 import pages.history.SubmittedReturnsDataPage
@@ -94,34 +94,141 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
     )
   )
 
-  private val mockService: SubmittedReturnsService = mock[SubmittedReturnsService]
+  private val receiptViewModelWithEmail = SubmissionReceiptViewModel(
+    contractorName = "Test Contractor",
+    payeReference = "123/ABC456",
+    taxYear = 2024,
+    taxMonth = 6,
+    returnPeriodEnd = "June 2024",
+    returnType = "Monthly",
+    submissionType = "Monthly return",
+    hmrcMark = Some("HMRC-123"),
+    submittedAt = Some("11:30am on 1 July 2024"),
+    emailRecipient = Some("user@example.com"),
+    instanceId = "1",
+    items = Seq(
+      SubcontractorPayment("John Smith", "5000.00", "1000.00", "800.00")
+    )
+  )
+
+  private val receiptViewModelWithoutEmail =
+    receiptViewModelWithEmail.copy(emailRecipient = None)
 
   trait Setup {
+
     val mockSubmittedReturnsService: SubmittedReturnsService = mock[SubmittedReturnsService]
     val mockManageService: ManageService                     = mock[ManageService]
 
     def application(userAnswers: UserAnswers): Application =
       applicationBuilder(userAnswers = Some(userAnswers))
+        .configure(
+          "mongodb.timeToLiveInSeconds" -> 900,
+          "cis-frontend.host"           -> "http://localhost:6993",
+          "urls.confirmAmendment"       -> "/construction-industry-scheme/manage-cis-return/amend-monthly-return/confirm-amendments"
+        )
         .overrides(
           bind[SubmittedReturnsService].toInstance(mockSubmittedReturnsService),
           bind[ManageService].toInstance(mockManageService)
         )
         .build()
+
+    def userAnswersWithCisId: UserAnswers =
+      emptyUserAnswers
+        .set(CisIdPage, cisId)
+        .success
+        .value
+
+    def userAnswersWithSubmittedReturnsData: UserAnswers =
+      userAnswersWithCisId
+        .set(SubmittedReturnsDataPage, submittedReturnsData)
+        .success
+        .value
+
+    def userAnswersWithInstanceId: UserAnswers =
+      emptyUserAnswers
+        .set(CisIdPage, "1")
+        .success
+        .value
+
+    def mockManageServiceReturnsData(): Unit =
+      when(mockManageService.getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(submittedReturnsData))
+
+    def mockManageServiceFails(): Unit =
+      when(mockManageService.getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+    def mockSingleYearViewModelReturns(model: Option[SubmittedReturnsPageViewModel]): Unit =
+      when(
+        mockSubmittedReturnsService.buildSingleYearViewModel(
+          any[SubmittedReturnsData],
+          any[String]
+        )
+      ).thenReturn(model)
+
+    def mockAllYearsViewModelReturns(model: Option[SubmittedReturnsPageViewModel]): Unit =
+      when(
+        mockSubmittedReturnsService.buildAllYearsViewModel(
+          any[SubmittedReturnsData]
+        )
+      ).thenReturn(model)
+
+    def mockCreateAmendmentHandoffReturns(result: Either[String, String]): Unit =
+      when(
+        mockSubmittedReturnsService.createAmendmentHandoff(
+          any[SubmittedReturnsData],
+          any[String],
+          any[Int],
+          any[Int]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(result))
+
+    def mockCreateAmendmentHandoffFails(): Unit =
+      when(
+        mockSubmittedReturnsService.createAmendmentHandoff(
+          any[SubmittedReturnsData],
+          any[String],
+          any[Int],
+          any[Int]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.failed(new RuntimeException("boom")))
+
+    def mockReceiptReturns(result: Either[String, SubmissionReceiptViewModel]): Unit =
+      when(
+        mockSubmittedReturnsService.getMonthlyReturnComplete(
+          any[String],
+          any[Int],
+          any[Int],
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(result))
+
+    def mockReceiptFails(): Unit =
+      when(
+        mockSubmittedReturnsService.getMonthlyReturnComplete(
+          any[String],
+          any[Int],
+          any[Int],
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.failed(new RuntimeException("upstream error")))
+
+    def confirmAmendmentUrl(handoffId: String): String =
+      s"http://localhost:6993/construction-industry-scheme/manage-cis-return/amend-monthly-return/confirm-amendments?handoffId=$handoffId"
+
+    def unauthorisedUrl: String =
+      controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad().url
+
+    def journeyRecoveryUrl: String =
+      controllers.routes.JourneyRecoveryController.onPageLoad().url
   }
 
   "SubmittedReturnsController" - {
 
     "onPageLoadSingleYear must return OK using SubmittedReturnsDataPage when present" in new Setup {
-      val userAnswers =
-        emptyUserAnswers
-          .set(CisIdPage, cisId)
-          .success
-          .value
-          .set(SubmittedReturnsDataPage, submittedReturnsData)
-          .success
-          .value
+      val userAnswers = userAnswersWithSubmittedReturnsData
 
-      when(mockSubmittedReturnsService.buildSingleYearViewModel(submittedReturnsData, "2024", cisId))
+      when(mockSubmittedReturnsService.buildSingleYearViewModel(submittedReturnsData, "2024"))
         .thenReturn(Some(viewModel))
 
       val app = application(userAnswers)
@@ -133,21 +240,16 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
-        verify(mockSubmittedReturnsService).buildSingleYearViewModel(submittedReturnsData, "2024", cisId)
+
+        verify(mockSubmittedReturnsService).buildSingleYearViewModel(submittedReturnsData, "2024")
+        verifyNoInteractions(mockManageService)
       }
     }
 
     "onPageLoadAllYears must return OK using SubmittedReturnsDataPage when present" in new Setup {
-      val userAnswers =
-        emptyUserAnswers
-          .set(CisIdPage, cisId)
-          .success
-          .value
-          .set(SubmittedReturnsDataPage, submittedReturnsData)
-          .success
-          .value
+      val userAnswers = userAnswersWithSubmittedReturnsData
 
-      when(mockSubmittedReturnsService.buildAllYearsViewModel(submittedReturnsData, cisId))
+      when(mockSubmittedReturnsService.buildAllYearsViewModel(submittedReturnsData))
         .thenReturn(Some(viewModel))
 
       val app = application(userAnswers)
@@ -159,19 +261,17 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
-        verify(mockSubmittedReturnsService).buildAllYearsViewModel(submittedReturnsData, cisId)
+
+        verify(mockSubmittedReturnsService).buildAllYearsViewModel(submittedReturnsData)
+        verifyNoInteractions(mockManageService)
       }
     }
 
     "onPageLoadSingleYear must fetch data from manageService when SubmittedReturnsDataPage is missing and CisIdPage exists" in new Setup {
-      val userAnswers =
-        emptyUserAnswers.set(CisIdPage, cisId).success.value
+      val userAnswers = userAnswersWithCisId
 
-      when(mockManageService.getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(submittedReturnsData))
-
-      when(mockSubmittedReturnsService.buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String]))
-        .thenReturn(Some(viewModel))
+      mockManageServiceReturnsData()
+      mockSingleYearViewModelReturns(Some(viewModel))
 
       val app = application(userAnswers)
 
@@ -180,21 +280,17 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(app, request).value
 
         status(result) mustEqual OK
+
         verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
-        verify(mockSubmittedReturnsService)
-          .buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String])
+        verify(mockSubmittedReturnsService).buildSingleYearViewModel(any[SubmittedReturnsData], any[String])
       }
     }
 
     "onPageLoadAllYears must fetch data from manageService when SubmittedReturnsDataPage is missing and CisIdPage exists" in new Setup {
-      val userAnswers =
-        emptyUserAnswers.set(CisIdPage, cisId).success.value
+      val userAnswers = userAnswersWithCisId
 
-      when(mockManageService.getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(submittedReturnsData))
-
-      when(mockSubmittedReturnsService.buildAllYearsViewModel(any[SubmittedReturnsData], any[String]))
-        .thenReturn(Some(viewModel))
+      mockManageServiceReturnsData()
+      mockAllYearsViewModelReturns(Some(viewModel))
 
       val app = application(userAnswers)
 
@@ -203,12 +299,13 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(app, request).value
 
         status(result) mustEqual OK
+
         verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
-        verify(mockSubmittedReturnsService).buildAllYearsViewModel(any[SubmittedReturnsData], any[String])
+        verify(mockSubmittedReturnsService).buildAllYearsViewModel(any[SubmittedReturnsData])
       }
     }
 
-    "onPageLoadSingleYear must redirect to JourneyRecovery when no data can be resolved" in new Setup {
+    "onPageLoadSingleYear must redirect when CisIdPage is missing" in new Setup {
       val app = application(emptyUserAnswers)
 
       running(app) {
@@ -216,13 +313,11 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.UnauthorisedOrganisationAffinityController
-          .onPageLoad()
-          .url
+        redirectLocation(result).value mustEqual unauthorisedUrl
       }
     }
 
-    "onPageLoadAllYears must redirect to JourneyRecovery when no data can be resolved" in new Setup {
+    "onPageLoadAllYears must redirect when CisIdPage is missing" in new Setup {
       val app = application(emptyUserAnswers)
 
       running(app) {
@@ -230,23 +325,14 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.UnauthorisedOrganisationAffinityController
-          .onPageLoad()
-          .url
+        redirectLocation(result).value mustEqual unauthorisedUrl
       }
     }
 
     "onPageLoadSingleYear must redirect to JourneyRecovery when buildSingleYearViewModel returns None" in new Setup {
-      val userAnswers =
-        emptyUserAnswers
-          .set(CisIdPage, cisId)
-          .success
-          .value
-          .set(SubmittedReturnsDataPage, submittedReturnsData)
-          .success
-          .value
+      val userAnswers = userAnswersWithSubmittedReturnsData
 
-      when(mockSubmittedReturnsService.buildSingleYearViewModel(submittedReturnsData, "2024", cisId))
+      when(mockSubmittedReturnsService.buildSingleYearViewModel(submittedReturnsData, "2024"))
         .thenReturn(None)
 
       val app = application(userAnswers)
@@ -256,16 +342,16 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual journeyRecoveryUrl
+
+        verify(mockSubmittedReturnsService).buildSingleYearViewModel(submittedReturnsData, "2024")
       }
     }
 
     "onPageLoadSingleYear must redirect to JourneyRecovery when resolveSubmittedReturnsData fails" in new Setup {
-      val userAnswers =
-        emptyUserAnswers.set(CisIdPage, cisId).success.value
+      val userAnswers = userAnswersWithCisId
 
-      when(mockManageService.getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
-        .thenReturn(Future.failed(new RuntimeException("boom")))
+      mockManageServiceFails()
 
       val app = application(userAnswers)
 
@@ -274,22 +360,16 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual journeyRecoveryUrl
+
         verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
       }
     }
 
     "onPageLoadAllYears must redirect to JourneyRecovery when buildAllYearsViewModel returns None" in new Setup {
-      val userAnswers =
-        emptyUserAnswers
-          .set(CisIdPage, cisId)
-          .success
-          .value
-          .set(SubmittedReturnsDataPage, submittedReturnsData)
-          .success
-          .value
+      val userAnswers = userAnswersWithSubmittedReturnsData
 
-      when(mockSubmittedReturnsService.buildAllYearsViewModel(submittedReturnsData, cisId))
+      when(mockSubmittedReturnsService.buildAllYearsViewModel(submittedReturnsData))
         .thenReturn(None)
 
       val app = application(userAnswers)
@@ -299,17 +379,16 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-        verify(mockSubmittedReturnsService).buildAllYearsViewModel(submittedReturnsData, cisId)
+        redirectLocation(result).value mustEqual journeyRecoveryUrl
+
+        verify(mockSubmittedReturnsService).buildAllYearsViewModel(submittedReturnsData)
       }
     }
 
     "onPageLoadAllYears must redirect to JourneyRecovery when resolveSubmittedReturnsData fails" in new Setup {
-      val userAnswers =
-        emptyUserAnswers.set(CisIdPage, cisId).success.value
+      val userAnswers = userAnswersWithCisId
 
-      when(mockManageService.getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
-        .thenReturn(Future.failed(new RuntimeException("boom")))
+      mockManageServiceFails()
 
       val app = application(userAnswers)
 
@@ -318,136 +397,190 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual journeyRecoveryUrl
+
         verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
       }
     }
 
-    "viewSubmissionReceipt must return OK and render the success view when email is present" in {
-      val receiptViewModel = SubmissionReceiptViewModel(
-        contractorName = "Test Contractor",
-        payeReference = "123/ABC456",
-        taxYear = 2024,
-        taxMonth = 6,
-        returnPeriodEnd = "June 2024",
-        returnType = "Monthly",
-        submissionType = "Monthly return",
-        hmrcMark = Some("HMRC-123"),
-        submittedAt = Some("11:30am on 1 July 2024"),
-        emailRecipient = Some("user@example.com"),
-        instanceId = "INST001",
-        items = Seq(
-          SubcontractorPayment("John Smith", "5000.00", "1000.00", "800.00")
-        )
-      )
+    "startAmendment must create handoff and redirect to confirm amendment URL" in new Setup {
+      val userAnswers = userAnswersWithSubmittedReturnsData
+      val handoffId   = "handoff-123"
 
-      when(mockService.getMonthlyReturnComplete(eqTo("INST001"), eqTo(2024), eqTo(6), eqTo("N"))(any()))
-        .thenReturn(Future.successful(Right(receiptViewModel)))
+      mockCreateAmendmentHandoffReturns(Right(handoffId))
 
-      val userAnswersWithCisId = emptyUserAnswers.set(CisIdPage, "INST001").success.value
+      val app = application(userAnswers)
 
-      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
-        .overrides(bind[SubmittedReturnsService].toInstance(mockService))
-        .build()
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.startAmendment(2024, 3).url)
+        val result  = route(app, request).value
 
-      running(application) {
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual confirmAmendmentUrl(handoffId)
+
+        verify(mockSubmittedReturnsService).createAmendmentHandoff(
+          any[SubmittedReturnsData],
+          any[String],
+          any[Int],
+          any[Int]
+        )(any[HeaderCarrier])
+
+        verifyNoInteractions(mockManageService)
+      }
+    }
+
+    "startAmendment must fetch data from manageService when SubmittedReturnsDataPage is missing" in new Setup {
+      val userAnswers = userAnswersWithCisId
+      val handoffId   = "handoff-123"
+
+      mockManageServiceReturnsData()
+      mockCreateAmendmentHandoffReturns(Right(handoffId))
+
+      val app = application(userAnswers)
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.startAmendment(2024, 3).url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual confirmAmendmentUrl(handoffId)
+
+        verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
+
+        verify(mockSubmittedReturnsService).createAmendmentHandoff(
+          any[SubmittedReturnsData],
+          any[String],
+          any[Int],
+          any[Int]
+        )(any[HeaderCarrier])
+      }
+    }
+
+    "startAmendment must redirect to JourneyRecovery when createAmendmentHandoff returns Left" in new Setup {
+      val userAnswers = userAnswersWithSubmittedReturnsData
+
+      mockCreateAmendmentHandoffReturns(Left("No monthly return found"))
+
+      val app = application(userAnswers)
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.startAmendment(2024, 3).url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual journeyRecoveryUrl
+      }
+    }
+
+    "startAmendment must redirect to JourneyRecovery when createAmendmentHandoff fails" in new Setup {
+      val userAnswers = userAnswersWithSubmittedReturnsData
+
+      mockCreateAmendmentHandoffFails()
+
+      val app = application(userAnswers)
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.startAmendment(2024, 3).url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual journeyRecoveryUrl
+      }
+    }
+
+    "startAmendment must redirect when CisIdPage is missing" in new Setup {
+      val app = application(emptyUserAnswers)
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.startAmendment(2024, 3).url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual unauthorisedUrl
+      }
+    }
+
+    "viewSubmissionReceipt must return OK and render the success view when email is present" in new Setup {
+      val userAnswers = userAnswersWithInstanceId
+
+      mockReceiptReturns(Right(receiptViewModelWithEmail))
+
+      val app = application(userAnswers)
+
+      running(app) {
         val request = FakeRequest(GET, routes.SubmittedReturnsController.viewSubmissionReceipt(2024, 6, "N").url)
-        val result  = route(application, request).value
+        val result  = route(app, request).value
+        val view    = app.injector.instanceOf[SubmissionSuccessView]
 
         status(result) mustEqual OK
-        val view = application.injector.instanceOf[SubmissionSuccessView]
-        contentAsString(result) mustBe view(receiptViewModel)(request, messages(application)).toString
+        contentAsString(result) mustBe view(receiptViewModelWithEmail)(request, messages(app)).toString
+
+        verify(mockSubmittedReturnsService)
+          .getMonthlyReturnComplete(any[String], any[Int], any[Int], any[String])(any[HeaderCarrier])
       }
     }
 
-    "viewSubmissionReceipt must return OK and render the confirmation view when email is absent" in {
-      val receiptViewModel = SubmissionReceiptViewModel(
-        contractorName = "Test Contractor",
-        payeReference = "123/ABC456",
-        taxYear = 2024,
-        taxMonth = 6,
-        returnPeriodEnd = "June 2024",
-        returnType = "Monthly",
-        submissionType = "Monthly return",
-        hmrcMark = Some("HMRC-123"),
-        submittedAt = Some("11:30am on 1 July 2024"),
-        emailRecipient = None,
-        instanceId = "INST001",
-        items = Seq(
-          SubcontractorPayment("John Smith", "5000.00", "1000.00", "800.00")
-        )
-      )
+    "viewSubmissionReceipt must return OK and render the confirmation view when email is absent" in new Setup {
+      val userAnswers = userAnswersWithInstanceId
 
-      when(mockService.getMonthlyReturnComplete(eqTo("INST001"), eqTo(2024), eqTo(6), eqTo("N"))(any()))
-        .thenReturn(Future.successful(Right(receiptViewModel)))
+      mockReceiptReturns(Right(receiptViewModelWithoutEmail))
 
-      val userAnswersWithCisId = emptyUserAnswers.set(CisIdPage, "INST001").success.value
+      val app = application(userAnswers)
 
-      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
-        .overrides(bind[SubmittedReturnsService].toInstance(mockService))
-        .build()
-
-      running(application) {
+      running(app) {
         val request = FakeRequest(GET, routes.SubmittedReturnsController.viewSubmissionReceipt(2024, 6, "N").url)
-        val result  = route(application, request).value
+        val result  = route(app, request).value
+        val view    = app.injector.instanceOf[SubmissionSuccessView]
 
         status(result) mustEqual OK
-        val view = application.injector.instanceOf[SubmissionSuccessView]
-        contentAsString(result) mustBe view(receiptViewModel)(request, messages(application)).toString
+        contentAsString(result) mustBe view(receiptViewModelWithoutEmail)(request, messages(app)).toString
+
+        verify(mockSubmittedReturnsService)
+          .getMonthlyReturnComplete(any[String], any[Int], any[Int], any[String])(any[HeaderCarrier])
       }
     }
 
-    "viewSubmissionReceipt must redirect to JourneyRecovery when service guard fails" in {
-      when(mockService.getMonthlyReturnComplete(eqTo("INST001"), eqTo(2024), eqTo(6), eqTo("N"))(any()))
-        .thenReturn(Future.successful(Left("Submission guard failed: IRMark mismatch")))
+    "viewSubmissionReceipt must redirect to JourneyRecovery when service guard fails" in new Setup {
+      val userAnswers = userAnswersWithInstanceId
 
-      val userAnswersWithCisId = emptyUserAnswers.set(CisIdPage, "INST001").success.value
+      mockReceiptReturns(Left("Submission guard failed: IRMark mismatch"))
 
-      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
-        .overrides(bind[SubmittedReturnsService].toInstance(mockService))
-        .build()
+      val app = application(userAnswers)
 
-      running(application) {
+      running(app) {
         val request = FakeRequest(GET, routes.SubmittedReturnsController.viewSubmissionReceipt(2024, 6, "N").url)
-        val result  = route(application, request).value
+        val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual journeyRecoveryUrl
       }
     }
 
-    "viewSubmissionReceipt must redirect to JourneyRecovery when CisIdPage is missing" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[SubmittedReturnsService].toInstance(mockService))
-        .build()
+    "viewSubmissionReceipt must redirect when CisIdPage is missing" in new Setup {
+      val app = application(emptyUserAnswers)
 
-      running(application) {
+      running(app) {
         val request = FakeRequest(GET, routes.SubmittedReturnsController.viewSubmissionReceipt(2024, 6, "N").url)
-        val result  = route(application, request).value
+        val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.UnauthorisedOrganisationAffinityController
-          .onPageLoad()
-          .url
+        redirectLocation(result).value mustEqual unauthorisedUrl
       }
     }
 
-    "viewSubmissionReceipt must redirect to JourneyRecovery when the service call fails" in {
-      when(mockService.getMonthlyReturnComplete(any(), any(), any(), any())(any()))
-        .thenReturn(Future.failed(new RuntimeException("upstream error")))
+    "viewSubmissionReceipt must redirect to JourneyRecovery when the service call fails" in new Setup {
+      val userAnswers = userAnswersWithInstanceId
 
-      val userAnswersWithCisId = emptyUserAnswers.set(CisIdPage, "INST001").success.value
+      mockReceiptFails()
 
-      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
-        .overrides(bind[SubmittedReturnsService].toInstance(mockService))
-        .build()
+      val app = application(userAnswers)
 
-      running(application) {
+      running(app) {
         val request = FakeRequest(GET, routes.SubmittedReturnsController.viewSubmissionReceipt(2024, 6, "N").url)
-        val result  = route(application, request).value
+        val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual journeyRecoveryUrl
       }
     }
   }

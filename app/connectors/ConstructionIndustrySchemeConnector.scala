@@ -194,4 +194,14 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .post(url"$cisBaseUrl/monthly-returns/submitted-data")
       .withBody(Json.toJson(request))
       .execute[GetSubmittedMonthlyReturnsDataResponse]
+
+  def createJourneyHandoff(journeyType: String, data: JsObject)(implicit
+    hc: HeaderCarrier
+  ): Future[String] =
+    http
+      .post(url"$cisBaseUrl/journey-handoffs/$journeyType")
+      .withBody(data)
+      .execute[JourneyHandoffResponse]
+      .map(_.id)
+
 }
