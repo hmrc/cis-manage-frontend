@@ -50,15 +50,25 @@ class PrintSubmissionDetailsController @Inject() (
           manageService
             .getSubmittedMonthlyReturnsData(instanceId, taxYear, taxMonth, amendment)
             .map { response =>
-              val lang       = messagesApi.preferred(request).lang
-              val viewData   = submittedReturnsService.buildSubmittedReturnPrintViewModel(response, lang)
-              val historyUrl = from match {
-                case "single" =>
-                  controllers.history.routes.SubmittedReturnsController.onPageLoadSingleYear(taxYear.toString).url
-                case _        =>
-                  controllers.history.routes.SubmittedReturnsController.onPageLoadAllYears().url
+              val isSubmittedOrAmendment =
+                response.submission.status == "SUBMITTED" || amendment.equalsIgnoreCase("Y")
+
+              if (!isSubmittedOrAmendment) {
+                logger.warn(
+                  s"[PrintSubmissionDetailsController] Guard failed: status=${response.submission.status}, amendment=$amendment"
+                )
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              } else {
+                val lang       = messagesApi.preferred(request).lang
+                val viewData   = submittedReturnsService.buildSubmittedReturnPrintViewModel(response, lang)
+                val historyUrl = from match {
+                  case "single" =>
+                    controllers.history.routes.SubmittedReturnsController.onPageLoadSingleYear(taxYear.toString).url
+                  case _        =>
+                    controllers.history.routes.SubmittedReturnsController.onPageLoadAllYears().url
+                }
+                Ok(view(viewData, historyUrl))
               }
-              Ok(view(viewData, historyUrl))
             }
             .recover { case ex =>
               logger.error("[PrintSubmissionDetailsController] Failed to get submitted monthly return", ex)
