@@ -23,7 +23,7 @@ import java.time.Instant
 import models.MonthlyReturnItem
 import models.history.*
 import models.history.SubmittedReturnsHistorySource.SingleYear
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import models.response.GetSubmittedMonthlyReturnsDataResponse
 import org.scalatest.matchers.should.Matchers.*
