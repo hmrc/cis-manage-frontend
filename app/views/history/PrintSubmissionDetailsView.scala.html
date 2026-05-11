@@ -19,7 +19,6 @@
 
 @this(
     layout: templates.Layout,
-    govukButton: GovukButton,
     govukSummaryList: GovukSummaryList,
     govukTable: GovukTable,
     h1: components.H1,
@@ -29,7 +28,7 @@
     link: components.Link
 )
 
-@(data: SubmittedReturnPrintViewModel)(implicit request: Request[_], messages: Messages)
+@(data: SubmittedReturnPrintViewModel, historyUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("history.printSubmissionDetails.title", data.monthYear))) {
 
@@ -117,5 +116,8 @@
     }
 
     @printLink(messages("history.printSubmissionDetails.printThisPage.link"))
-    @link("history.printSubmissionDetails.monthlyReturnHistory.link","#")
+    @link(
+        linkTextKey = "history.printSubmissionDetails.monthlyReturnHistory.link",
+        linkUrl = historyUrl
+    )
 }

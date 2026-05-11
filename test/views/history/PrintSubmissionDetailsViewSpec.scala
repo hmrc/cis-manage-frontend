@@ -64,7 +64,7 @@ class PrintSubmissionDetailsViewSpec extends SpecBase {
         subcontractors = subcontractors
       )
 
-      lazy val html: HtmlFormat.Appendable = view(model)
+      lazy val html: HtmlFormat.Appendable = view(model, historyUrl)
 
       val doc: Document = Jsoup.parse(html.toString)
       doc.title must include(messages("history.printSubmissionDetails.title", monthYear))
@@ -161,7 +161,7 @@ class PrintSubmissionDetailsViewSpec extends SpecBase {
         subcontractors = Seq.empty
       )
 
-      lazy val html: HtmlFormat.Appendable = view(model)
+      lazy val html: HtmlFormat.Appendable = view(model, historyUrl)
 
       val doc: Document = Jsoup.parse(html.toString)
       doc.title must include(messages("history.printSubmissionDetails.title", monthYear))
@@ -193,6 +193,7 @@ class PrintSubmissionDetailsViewSpec extends SpecBase {
 
     val app: Application                 = applicationBuilder().build()
     val view: PrintSubmissionDetailsView = app.injector.instanceOf[PrintSubmissionDetailsView]
+    val historyUrl                       = controllers.history.routes.SubmittedReturnsController.onPageLoadAllYears().url
 
     implicit val request: Request[_] = FakeRequest()
 
