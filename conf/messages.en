@@ -510,8 +510,6 @@ incompleteReturns.action.view.hidden = return for {0}
 
 verify.verificationHistorySelectTaxYear.title = Which tax year do you want to view verification requests from?
 verify.verificationHistorySelectTaxYear.heading = Which tax year do you want to view verification requests from?
-verify.verificationHistorySelectTaxYear.2026_to_2027 = 2026 to 2027 (current tax year)
-verify.verificationHistorySelectTaxYear.2025_to_2026 = 2025 to 2026
 verify.verificationHistorySelectTaxYear.or = or
 verify.verificationHistorySelectTaxYear.viewAll = View all tax years
 verify.verificationHistorySelectTaxYear.checkYourAnswersLabel = Which tax year do you want to view verification requests from?

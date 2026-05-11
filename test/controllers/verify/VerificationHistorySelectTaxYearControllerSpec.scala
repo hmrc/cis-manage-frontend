@@ -19,7 +19,6 @@ package controllers.verify
 import base.SpecBase
 import forms.verify.VerificationHistorySelectTaxYearFormProvider
 import models.NormalMode
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -149,7 +148,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
       }
     }
 
-    "must treat 'all' as AllTaxYears and redirect to next page" in {
+    "must treat 'all' as AllTaxYears and redirect back to same page" in {
 
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -157,12 +156,12 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
       val application =
         applicationBuilder(userAnswers = Some(userAnswersWithCisId))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
       running(application) {
+
         val request =
           FakeRequest(POST, verificationHistorySelectTaxYearRoute)
             .withFormUrlEncodedBody("value" -> "all")
@@ -170,11 +169,15 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.VerificationHistorySelectTaxYearController
+            .onPageLoad(mode)
+            .url
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect back to same page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -182,12 +185,12 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
       val application =
         applicationBuilder(userAnswers = Some(userAnswersWithCisId))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
       running(application) {
+
         val request =
           FakeRequest(POST, verificationHistorySelectTaxYearRoute)
             .withFormUrlEncodedBody(
@@ -197,7 +200,11 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+
+        redirectLocation(result).value mustEqual
+          controllers.verify.routes.VerificationHistorySelectTaxYearController
+            .onPageLoad(mode)
+            .url
       }
     }
 
