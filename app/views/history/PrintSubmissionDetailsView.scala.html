@@ -19,7 +19,6 @@
 
 @this(
     layout: templates.Layout,
-    govukButton: GovukButton,
     govukSummaryList: GovukSummaryList,
     govukTable: GovukTable,
     h1: components.H1,
@@ -119,6 +118,6 @@
     @printLink(messages("history.printSubmissionDetails.printThisPage.link"))
     @link(
         linkTextKey = "history.printSubmissionDetails.monthlyReturnHistory.link",
-        linkUrl = historyUrl,
+        linkUrl = historyUrl
     )
 }
