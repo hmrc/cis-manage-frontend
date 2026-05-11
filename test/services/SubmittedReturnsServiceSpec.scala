@@ -594,8 +594,8 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
       val item = vm.items.head
       item.name            shouldBe "John Smith"
-      item.paymentsMade    shouldBe "£5000.00"
-      item.costOfMaterials shouldBe "£1000.00"
+      item.paymentsMade    shouldBe "£5,000.00"
+      item.costOfMaterials shouldBe "£1,000.00"
       item.taxDeducted     shouldBe "£800.00"
     }
 
@@ -839,12 +839,12 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       out.submissionType mustBe "standard"
       out.contractorName mustBe "PAL 355 Scheme"
       out.payeReference mustBe "163/AB0063"
-      out.totalPaymentsMade mustBe "£30000.00"
-      out.totalCostOfMaterials mustBe "£30000.00"
-      out.totalTaxDeducted mustBe "£30000.00"
+      out.totalPaymentsMade mustBe "£30,000.00"
+      out.totalCostOfMaterials mustBe "£30,000.00"
+      out.totalTaxDeducted mustBe "£30,000.00"
       out.subcontractors mustBe Seq(
-        SubcontractorPayment("Contractor 01", "£10000.00", "£10000.00", "£10000.00"),
-        SubcontractorPayment("Contractor 02", "£20000.00", "£20000.00", "£20000.00")
+        SubcontractorPayment("Contractor 01", "£10,000.00", "£10,000.00", "£10,000.00"),
+        SubcontractorPayment("Contractor 02", "£20,000.00", "£20,000.00", "£20,000.00")
       )
 
     }

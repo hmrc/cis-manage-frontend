@@ -34,7 +34,7 @@ object Utils {
   }
 
   def formatCurrency(amount: BigDecimal): String =
-    f"£$amount%.2f"
+    f"£$amount%,.2f"
 
   def toBigDecimal(value: Option[String]): BigDecimal =
     value
