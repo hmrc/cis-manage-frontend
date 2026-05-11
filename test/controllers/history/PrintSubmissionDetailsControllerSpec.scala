@@ -289,6 +289,68 @@ class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must return OK when status is SUBMITTED but amendment is N" in {
+
+      val mockManageService = mock[ManageService]
+
+      val mockResponse = GetSubmittedMonthlyReturnsDataResponse(
+        scheme = SubmittedSchemeData("Scheme Name", "163", "AB0063"),
+        monthlyReturnId = 3000L,
+        taxYear = 2026,
+        taxMonth = 4,
+        nilReturnIndicator = "Y",
+        monthlyReturnItems = Seq.empty,
+        submission = SubmittedSubmissionData(
+          submissionId = 10L,
+          submissionType = Some("Original"),
+          activeObjectId = Some(20L),
+          status = "SUBMITTED",
+          hmrcMarkGenerated = Some("mark1"),
+          hmrcMarkGgis = Some("ggis1"),
+          emailRecipient = Some("test@example.com"),
+          acceptedTime = Some(Instant.now())
+        )
+      )
+
+      when(
+        mockManageService.getSubmittedMonthlyReturnsData(eqTo("1"), eqTo(2026), eqTo(4), eqTo("N"))(any[HeaderCarrier])
+      )
+        .thenReturn(Future.successful(mockResponse))
+
+      val submittedReturnsService = mock[SubmittedReturnsService]
+
+      val model = SubmittedReturnPrintViewModel(
+        monthYear = "April 2026",
+        submittedTime = "8:46am",
+        submittedDate = "16 March 2025",
+        receiptReferenceNumber = "ref123",
+        submissionType = "standard",
+        contractorName = "PAL 355 Scheme",
+        payeReference = "123/AB456",
+        totalPaymentsMade = "£1900",
+        totalCostOfMaterials = "£616",
+        totalTaxDeducted = "£380",
+        subcontractors = Seq.empty
+      )
+
+      when(submittedReturnsService.buildSubmittedReturnPrintViewModel(any(), any())).thenReturn(model)
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+        .overrides(
+          bind[ManageService].toInstance(mockManageService),
+          bind[SubmittedReturnsService].toInstance(submittedReturnsService)
+        )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, printSubmissionDetailsRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+      }
+    }
+
     "must redirect to SystemErrorController when ManageService fails" in {
 
       val submittedReturnsService = mock[SubmittedReturnsService]
