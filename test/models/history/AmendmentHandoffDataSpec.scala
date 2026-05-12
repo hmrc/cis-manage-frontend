@@ -28,7 +28,7 @@ class AmendmentHandoffDataSpec extends SpecBase {
         instanceId = "1",
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Standard",
+        originalReturnType = "Standard",
         acceptedTime = Some("2026-04-20T21:49:19.702Z")
       )
 

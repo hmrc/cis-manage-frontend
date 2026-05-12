@@ -78,11 +78,16 @@ class SubmittedReturnsService @Inject() (
 
     monthlyReturnOpt match {
       case Some(monthlyReturn) =>
-        val payload = AmendmentHandoffData(
+        val originalReturnType = if (monthlyReturn.nilReturnIndicator.equalsIgnoreCase("Nil")) {
+          "MonthlyNilReturn"
+        } else {
+          "MonthlyStandardReturn"
+        }
+        val payload            = AmendmentHandoffData(
           instanceId = instanceId,
           taxYear = taxYear,
           taxMonth = taxMonth,
-          returnType = monthlyReturn.nilReturnIndicator,
+          originalReturnType = originalReturnType,
           acceptedTime = submissionOpt.flatMap(_.acceptedTime).map(_.toString)
         )
 
