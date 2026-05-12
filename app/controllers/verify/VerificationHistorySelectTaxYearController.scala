@@ -82,7 +82,7 @@ class VerificationHistorySelectTaxYearController @Inject() (
 
               case None =>
                 Future.successful(
-                  Redirect(controllers.verify.routes.VerificationHistorySelectTaxYearController.onPageLoad(mode))
+                  Redirect(controllers.verify.routes.VerificationHistorySelectTaxYearController.onPageLoad())
                 )
 
               case Some(ua) =>
@@ -92,7 +92,7 @@ class VerificationHistorySelectTaxYearController @Inject() (
                                     )
                   _              <- sessionRepository.set(updatedAnswers)
                 } yield Redirect(
-                  controllers.verify.routes.VerificationHistorySelectTaxYearController.onPageLoad(mode)
+                  controllers.verify.routes.VerificationHistorySelectTaxYearController.onPageLoad()
                 )
             }
           }

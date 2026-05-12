@@ -39,7 +39,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
   def onwardRoute = Call("GET", "/foo")
 
   lazy val verificationHistorySelectTaxYearRoute =
-    controllers.verify.routes.VerificationHistorySelectTaxYearController.onPageLoad(NormalMode).url
+    controllers.verify.routes.VerificationHistorySelectTaxYearController.onPageLoad().url
 
   val taxYears: Seq[String] =
     Seq(
@@ -172,7 +172,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
 
         redirectLocation(result).value mustEqual
           controllers.verify.routes.VerificationHistorySelectTaxYearController
-            .onPageLoad(mode)
+            .onPageLoad()
             .url
       }
     }
@@ -203,7 +203,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
 
         redirectLocation(result).value mustEqual
           controllers.verify.routes.VerificationHistorySelectTaxYearController
-            .onPageLoad(mode)
+            .onPageLoad()
             .url
       }
     }

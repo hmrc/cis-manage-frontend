@@ -31,7 +31,6 @@ object VerificationTaxYearSelection {
     override def toString: String = "all"
   }
 
-  // 🔹 Stub data
   val taxYears: Seq[TaxYear] = Seq(
     TaxYear("2026 to 2027 (current tax year)"),
     TaxYear("2025 to 2026"),
@@ -39,12 +38,10 @@ object VerificationTaxYearSelection {
     TaxYear("2023 to 2024")
   )
 
-  // ✅ ADD IT HERE (inside the object)
   def fromString(value: String): VerificationTaxYearSelection =
     if (value == "all") AllTaxYears
     else TaxYear(value)
 
-  // JSON formats
   given OFormat[TaxYear] = Json.format[TaxYear]
 
   given OFormat[AllTaxYears.type] = new OFormat[AllTaxYears.type] {

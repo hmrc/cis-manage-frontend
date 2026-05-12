@@ -512,6 +512,4 @@ verify.verificationHistorySelectTaxYear.title = Which tax year do you want to vi
 verify.verificationHistorySelectTaxYear.heading = Which tax year do you want to view verification requests from?
 verify.verificationHistorySelectTaxYear.or = or
 verify.verificationHistorySelectTaxYear.viewAll = View all tax years
-verify.verificationHistorySelectTaxYear.checkYourAnswersLabel = Which tax year do you want to view verification requests from?
 verify.verificationHistorySelectTaxYear.error.required = Select a tax year
-verify.verificationHistorySelectTaxYear.change.hidden = verification history select tax year

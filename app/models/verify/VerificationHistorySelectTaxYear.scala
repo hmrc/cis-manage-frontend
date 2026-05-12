@@ -22,13 +22,6 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
 object VerificationHistorySelectTaxYear {
 
-  val taxYears: Seq[String] = Seq(
-    "2026 to 2027 (current tax year)",
-    "2025 to 2026",
-    "2024 to 2025",
-    "2023 to 2024"
-  )
-
   def options(taxYears: Seq[String])(implicit messages: Messages): Seq[RadioItem] = {
 
     val yearItems = taxYears.zipWithIndex.map { case (year, index) =>
