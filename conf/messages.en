@@ -507,3 +507,9 @@ incompleteReturns.action.view = View
 incompleteReturns.action.continue.hidden = return for {0}
 incompleteReturns.action.delete.hidden = return for {0}
 incompleteReturns.action.view.hidden = return for {0}
+
+verify.verificationHistorySelectTaxYear.title = Which tax year do you want to view verification requests from?
+verify.verificationHistorySelectTaxYear.heading = Which tax year do you want to view verification requests from?
+verify.verificationHistorySelectTaxYear.or = or
+verify.verificationHistorySelectTaxYear.viewAll = View all tax years
+verify.verificationHistorySelectTaxYear.error.required = Select a tax year

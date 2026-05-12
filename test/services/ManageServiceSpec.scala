@@ -25,7 +25,8 @@ import models.requests.*
 import models.response.GetSubmittedMonthlyReturnsDataResponse
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.*
+import org.mockito.Mockito.{mock, times, verify, verifyNoMoreInteractions, when}
+import org.mockito.Mockito.verifyNoInteractions
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
