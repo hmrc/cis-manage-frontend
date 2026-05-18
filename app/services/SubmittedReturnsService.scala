@@ -46,7 +46,7 @@ class SubmittedReturnsService @Inject() (
   private val displayTimeFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("h:mma", Locale.UK)
 
   def buildAllYearsViewModel(data: SubmittedReturnsData): Option[SubmittedReturnsPageViewModel] =
-    val taxYearSections = buildTaxYearSections(data)
+    val taxYearSections = buildTaxYearSections(data, AllYears)
 
     Some(
       SubmittedReturnsPageViewModel(
