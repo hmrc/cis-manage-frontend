@@ -57,6 +57,7 @@ class FrontendAppConfigSpec extends SpecBase {
       appConfig.hmrcOnlineServiceDeskUrl mustBe
         "https://www.gov.uk/find-hmrc-contacts/technical-support-with-hmrc-online-services"
       appConfig.payeCisForAgentsOnlineService mustBe "https://www.gov.uk/guidance/payecis-for-agents-online-service"
+      appConfig.hmrcContactCISUrl mustBe "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/construction-industry-scheme"
 
       appConfig.timeout mustBe 900
       appConfig.countdown mustBe 120
@@ -122,6 +123,19 @@ class FrontendAppConfigSpec extends SpecBase {
       url mustBe
         "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-nil-return" +
         "?instanceId=inst%2Bid%3F%3Dx"
+    }
+  }
+
+  "confirmAmendmentUrl" - {
+
+    "must build a URL with handoffId query param" in new Setup {
+      val url: String = appConfig.confirmAmendmentUrl(
+        handoffId = "28c831a4-8723-4180-b625-a6d10706899f"
+      )
+
+      url mustBe
+        "http://localhost:6993/construction-industry-scheme/manage-cis-return/amend-monthly-return/confirm-amendments" +
+        "?handoffId=28c831a4-8723-4180-b625-a6d10706899f"
     }
   }
 

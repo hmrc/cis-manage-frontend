@@ -18,8 +18,9 @@ package connectors
 
 import models.*
 import models.agent.AgentClientData
-import models.history.SubmittedReturnsData
-import models.requests.DeleteUnsubmittedMonthlyReturnRequest
+import models.history.*
+import models.requests.*
+import models.response.*
 import play.api.Logging
 import play.api.http.Status.{NO_CONTENT, OK}
 import play.api.libs.json.{JsObject, JsValue, Json}
@@ -140,6 +141,24 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .get(url"$cisBaseUrl/monthly-returns/submitted/$instanceId")
       .execute[SubmittedReturnsData]
 
+  def getMonthlyReturnComplete(
+    instanceId: String,
+    taxYear: Int,
+    taxMonth: Int,
+    amendment: String
+  )(implicit hc: HeaderCarrier): Future[MonthlyReturnCompleteResponse] =
+    http
+      .post(url"$cisBaseUrl/monthly-returns-complete")
+      .withBody(
+        Json.obj(
+          "instanceId" -> instanceId,
+          "taxYear"    -> taxYear,
+          "taxMonth"   -> taxMonth,
+          "amendment"  -> amendment
+        )
+      )
+      .execute[MonthlyReturnCompleteResponse]
+
   def saveAgentClient(userId: String, agentClientData: AgentClientData)(implicit
     hc: HeaderCarrier
   ): Future[Unit] =
@@ -167,5 +186,22 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
           case status     => Future.failed(UpstreamErrorResponse(response.body, status, status))
         }
       }
+
+  def getSubmittedMonthlyReturnsData(
+    request: GetSubmittedMonthlyReturnsDataRequest
+  )(implicit hc: HeaderCarrier): Future[GetSubmittedMonthlyReturnsDataResponse] =
+    http
+      .post(url"$cisBaseUrl/monthly-returns/submitted-data")
+      .withBody(Json.toJson(request))
+      .execute[GetSubmittedMonthlyReturnsDataResponse]
+
+  def createJourneyHandoff(journeyType: String, data: JsObject)(implicit
+    hc: HeaderCarrier
+  ): Future[String] =
+    http
+      .post(url"$cisBaseUrl/journey-handoffs/$journeyType")
+      .withBody(data)
+      .execute[JourneyHandoffResponse]
+      .map(_.id)
 
 }

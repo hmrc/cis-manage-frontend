@@ -20,6 +20,16 @@ import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {
 
+  implicit lazy val arbitraryVerificationHistorySelectTaxYear: Arbitrary[String] =
+    Arbitrary {
+      Gen.oneOf(
+        "all",
+        "2026 to 2027 (current tax year)",
+        "2025 to 2026",
+        "2024 to 2025"
+      )
+    }
+
   implicit def arbitrarySubmittedReturnsChooseTaxYear(implicit taxYears: Seq[String]): Arbitrary[String] =
     Arbitrary(Gen.oneOf(taxYears :+ "all"))
 }

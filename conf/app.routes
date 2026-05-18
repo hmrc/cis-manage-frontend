@@ -84,13 +84,19 @@ POST       /delete/delete-amended-nil-monthly-return            controllers.dele
 GET        /history/view-tax-year-submission-history                controllers.history.SubmittedReturnsChooseTaxYearController.onPageLoad()
 POST       /history/view-tax-year-submission-history                controllers.history.SubmittedReturnsChooseTaxYearController.onSubmit()
 
-GET        /history/monthly-return-submission-details               controllers.history.PrintSubmissionDetailsController.onPageLoad()
+GET        /history/monthly-return-submission-details               controllers.history.PrintSubmissionDetailsController.onPageLoad(taxYear: Int, taxMonth: Int, amendment: String, from: String ?= "all")
 
 GET        /history/monthly-return-history-all-tax-years            controllers.history.SubmittedReturnsController.onPageLoadAllYears()
 GET        /history/monthly-return-history-tax-year/:taxYear        controllers.history.SubmittedReturnsController.onPageLoadSingleYear(taxYear)
+GET        /history/amend/:taxYear/:taxMonth                        controllers.history.SubmittedReturnsController.startAmendment(taxYear: Int, taxMonth: Int)
+
+GET        /monthly-return/confirmation-history                     controllers.history.SubmittedReturnsController.viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String)
 
 GET        /manage-your-cis-return/incomplete-returns                                       controllers.history.IncompleteReturnsController.onPageLoad()
 GET        /manage-your-cis-return/incomplete-returns/delete-return/:monthlyReturnId        controllers.history.IncompleteReturnsController.onDeleteRedirect(monthlyReturnId: Long)
 
 GET        /amend-monthly-return/no-return-submitted                    controllers.amend.NoReturnsSubmittedController.onPageLoad()
 GET        /amend-monthly-return/no-incomplete-returns                  controllers.amend.NoIncompleteReturnsController.onPageLoad()
+
+GET        /verify/select-tax-year-for-verification-requests                controllers.verify.VerificationHistorySelectTaxYearController.onPageLoad(mode: Mode = NormalMode)
+POST       /verify/select-tax-year-for-verification-requests                controllers.verify.VerificationHistorySelectTaxYearController.onSubmit(mode: Mode = NormalMode)

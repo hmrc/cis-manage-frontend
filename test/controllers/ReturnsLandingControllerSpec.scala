@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import models.*
-import org.mockito.Mockito.*
+import org.mockito.Mockito.{verify, when}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
@@ -37,7 +37,8 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
   private val context = ReturnsLandingContext(
     contractorName = "ABC Construction Ltd",
     standardReturnLink = "/standard-link",
-    nilReturnLink = "/nil-link"
+    nilReturnLink = "/nil-link",
+    returnToHomeLink = "/example"
   )
 
   "ReturnsLandingController.onPageLoad" - {

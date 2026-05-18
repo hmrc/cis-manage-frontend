@@ -21,7 +21,8 @@ import connectors.ConstructionIndustrySchemeConnector
 import models.*
 import models.agent.AgentClientData
 import models.history.SubmittedReturnsData
-import models.requests.DeleteUnsubmittedMonthlyReturnRequest
+import models.requests.*
+import models.response.*
 import pages.*
 import play.api.Logging
 import play.api.libs.json.Json
@@ -182,24 +183,30 @@ class ManageService @Inject() (
         userAnswers.get(ContractorNamePage)
       }
 
-    val linksOpt: Option[(String, String)] =
+    val linksOpt: Option[(String, String, String)] =
       if (isAgent) {
         for {
           clients <- userAnswers.get(AgentClientsPage)
           client  <- clients.find(_.uniqueId == instanceId)
         } yield (
           appConfig.fileStandardReturnUrl(instanceId),
-          appConfig.fileNilReturnUrl(instanceId)
+          appConfig.fileNilReturnUrl(instanceId),
+          controllers.agent.routes.AgentLandingController.onPageLoad(instanceId).url
         )
       } else {
-        Some((appConfig.fileStandardReturnUrl, appConfig.fileNilReturnUrl))
+        Some(
+          (
+            appConfig.fileStandardReturnUrl,
+            appConfig.fileNilReturnUrl,
+            controllers.contractor.routes.ContractorLandingController.onPageLoad().url
+          )
+        )
       }
 
     (contractorNameOpt, linksOpt) match {
-      case (Some(name), Some((standardLink, nilLink))) =>
-        Future.successful(Some(ReturnsLandingContext(name, standardLink, nilLink)))
-
-      case _ =>
+      case (Some(name), Some((standardLink, nilLink, returnToHomeLink))) =>
+        Future.successful(Some(ReturnsLandingContext(name, standardLink, nilLink, returnToHomeLink)))
+      case _                                                             =>
         Future.successful(None)
     }
   }
@@ -239,6 +246,13 @@ class ManageService @Inject() (
         Future.failed(new RuntimeException("Missing instanceId in user answers"))
     }
 
+  def getSubmittedMonthlyReturnsData(instanceId: String, taxYear: Int, taxMonth: Int, amendment: String)(implicit
+    hc: HeaderCarrier
+  ): Future[GetSubmittedMonthlyReturnsDataResponse] =
+    cisConnector.getSubmittedMonthlyReturnsData(
+      GetSubmittedMonthlyReturnsDataRequest(instanceId, taxYear, taxMonth, amendment)
+    )
+
   private def buildReturnPeriodEnd(taxMonth: Int, taxYear: Int): String =
     YearMonth.of(taxYear, taxMonth).format(shortMonthYearFormatter)
 
@@ -263,7 +277,7 @@ class ManageService @Inject() (
               appConfig
                 .continueReturnJourneyUrl(instanceId, row.taxYear.toString, row.taxMonth.toString)
             },
-            hiddenTextKey = Some("incompleteReturns.action.continue")
+            hiddenTextKey = Some("incompleteReturns.action.continue.hidden")
           ),
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.delete",
@@ -272,7 +286,7 @@ class ManageService @Inject() (
             } else {
               controllers.routes.JourneyRecoveryController.onPageLoad().url
             },
-            hiddenTextKey = Some("incompleteReturns.action.delete")
+            hiddenTextKey = Some("incompleteReturns.action.delete.hidden")
           )
         )
 
@@ -281,7 +295,7 @@ class ManageService @Inject() (
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.view",
             href = appConfig.submissionInProgressUrl(instanceId),
-            hiddenTextKey = Some("incompleteReturns.action.view")
+            hiddenTextKey = Some("incompleteReturns.action.view.hidden")
           )
         )
 
@@ -290,7 +304,7 @@ class ManageService @Inject() (
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.view",
             href = appConfig.submissionUnsuccessfulCannotResubmitUrl(instanceId),
-            hiddenTextKey = Some("incompleteReturns.action.view")
+            hiddenTextKey = Some("incompleteReturns.action.view.hidden")
           )
         )
 

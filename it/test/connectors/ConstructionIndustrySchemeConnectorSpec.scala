@@ -20,13 +20,17 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import itutil.ApplicationWithWiremock
 import models.Scheme
 import models.agent.AgentClientData
-import models.requests.DeleteUnsubmittedMonthlyReturnRequest
+import models.history.{SubmittedSchemeData, SubmittedSubmissionData}
+import models.requests.{DeleteUnsubmittedMonthlyReturnRequest, GetSubmittedMonthlyReturnsDataRequest}
+import models.response.GetSubmittedMonthlyReturnsDataResponse
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpException, UpstreamErrorResponse}
+
+import java.time.Instant
 
 class ConstructionIndustrySchemeConnectorSpec
     extends AnyWordSpec
@@ -669,7 +673,8 @@ class ConstructionIndustrySchemeConnectorSpec
                   |      "taxYear": 2025,
                   |      "taxMonth": 1,
                   |      "nilReturnIndicator": "Y",
-                  |      "status": "SUBMITTED"
+                  |      "status": "SUBMITTED",
+                  |      "amendment": "N"
                   |    }
                   |  ],
                   |  "submissions": [
@@ -688,6 +693,7 @@ class ConstructionIndustrySchemeConnectorSpec
       result.scheme.name mustBe "ABC Construction Ltd"
       result.monthlyReturns.head.taxYear mustBe 2025
       result.monthlyReturns.head.status mustBe "SUBMITTED"
+      result.monthlyReturns.head.amendment mustBe "N"
       result.submissions.head.submissionId mustBe 100L
       result.submissions.head.status mustBe "ACCEPTED"
     }
@@ -703,6 +709,83 @@ class ConstructionIndustrySchemeConnectorSpec
       val ex = intercept[Exception] {
         connector.getSubmittedMonthlyReturns(instanceId).futureValue
       }
+      ex.getMessage must include("returned 500")
+    }
+  }
+
+  "getMonthlyReturnComplete" should {
+
+    "return MonthlyReturnCompleteResponse and post the expected request body" in {
+      stubFor(
+        post(urlPathEqualTo("/cis/monthly-returns-complete"))
+          .withRequestBody(equalToJson("""{
+                                       |  "instanceId": "900063",
+                                       |  "taxYear": 2024,
+                                       |  "taxMonth": 2,
+                                       |  "amendment": "N"
+                                       |}""".stripMargin))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                """{
+                  |  "scheme": [
+                  |    {
+                  |      "schemeId": 123,
+                  |      "instanceId": "900063",
+                  |      "accountsOfficeReference": "123P",
+                  |      "taxOfficeNumber": "123",
+                  |      "taxOfficeReference": "ABC456",
+                  |      "name": "Test Contractor"
+                  |    }
+                  |  ],
+                  |  "monthlyReturn": [
+                  |    {
+                  |      "monthlyReturnId": 100,
+                  |      "taxYear": 2024,
+                  |      "taxMonth": 2,
+                  |      "nilReturnIndicator": "Y",
+                  |      "status": "SUBMITTED",
+                  |      "amendment": "N"
+                  |    }
+                  |  ],
+                  |  "subcontractors": [],
+                  |  "monthlyReturnItems": [],
+                  |  "submission": [
+                  |    {
+                  |      "submissionId": 400,
+                  |      "submissionType": "Nil return",
+                  |      "activeObjectId": 100,
+                  |      "status": "SUBMITTED",
+                  |      "hmrcMarkGenerated": "ABC",
+                  |      "hmrcMarkGgis": "ABC"
+                  |    }
+                  |  ]
+                  |}""".stripMargin
+              )
+          )
+      )
+
+      val result = connector.getMonthlyReturnComplete("900063", 2024, 2, "N").futureValue
+
+      result.scheme.head.instanceId                 mustBe "900063"
+      result.monthlyReturn.head.nilReturnIndicator  mustBe Some("Y")
+      result.submission.head.submissionType         mustBe "Nil return"
+      result.submission.head.hmrcMarkGenerated      mustBe Some("ABC")
+      result.monthlyReturnItems                     mustBe empty
+      result.subcontractors                         mustBe empty
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      stubFor(
+        post(urlPathEqualTo("/cis/monthly-returns-complete"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = intercept[Exception] {
+        connector.getMonthlyReturnComplete("900063", 2024, 2, "N").futureValue
+      }
+
       ex.getMessage must include("returned 500")
     }
   }
@@ -792,6 +875,131 @@ class ConstructionIndustrySchemeConnectorSpec
         connector.deleteUnsubmittedMonthlyReturn(req).futureValue
       }
       ex.getMessage must include("boom")
+    }
+  }
+
+  "getSubmittedMonthlyReturnsData" should {
+
+    "return SubmittedMonthlyReturnsData when BE returns 200 with valid JSON" in {
+
+      val req = GetSubmittedMonthlyReturnsDataRequest(
+        instanceId = "1",
+        taxYear = 2025,
+        taxMonth = 1,
+        amendment = "N"
+      )
+
+      val responseJson = Json.toJson(
+        GetSubmittedMonthlyReturnsDataResponse(
+          scheme = SubmittedSchemeData("Scheme Name", "163", "AB0063"),
+          monthlyReturnId = 3000L,
+          taxYear = 2025,
+          taxMonth = 1,
+          nilReturnIndicator = "N",
+          monthlyReturnItems = Seq.empty,
+          submission = SubmittedSubmissionData(
+            submissionId = 10L,
+            submissionType = Some("Original"),
+            activeObjectId = Some(20L),
+            status = "Accepted",
+            hmrcMarkGenerated = Some("mark1"),
+            hmrcMarkGgis = Some("ggis1"),
+            emailRecipient = Some("test@example.com"),
+            acceptedTime = Some(Instant.now())
+          )
+        )
+      )
+
+      stubFor(
+        post(urlPathEqualTo("/cis/monthly-returns/submitted-data"))
+          .withHeader("Content-Type", equalTo("application/json"))
+          .withRequestBody(equalToJson(Json.toJson(req).toString(), true, true))
+          .willReturn(aResponse().withStatus(200).withBody(responseJson.toString))
+      )
+
+      val out = connector.getSubmittedMonthlyReturnsData(req).futureValue
+      Json.toJson(out) mustBe responseJson
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+
+      val req = GetSubmittedMonthlyReturnsDataRequest(
+        instanceId = "1",
+        taxYear = 2025,
+        taxMonth = 1,
+        amendment = "N"
+      )
+
+      stubFor(
+        post(urlPathEqualTo("/cis/monthly-returns/submitted-data"))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = intercept[Exception] {
+        connector.getSubmittedMonthlyReturnsData(req).futureValue
+      }
+      ex.getMessage must include("boom")
+    }
+  }
+
+  "createJourneyHandoff" should {
+
+    "return handoff id when BE returns 201 with valid JSON" in {
+      val journeyType = "amend-monthly-return"
+
+      val requestBody = Json.obj(
+        "instanceId" -> "1",
+        "taxYear" -> 2026,
+        "taxMonth" -> 4,
+        "returnType" -> "standard",
+        "acceptedTime" -> "2026-04-20T21:49:19.702Z"
+      )
+
+      stubFor(
+        post(urlPathEqualTo(s"/cis/journey-handoffs/$journeyType"))
+          .withRequestBody(equalToJson(requestBody.toString()))
+          .willReturn(
+            aResponse()
+              .withStatus(CREATED)
+              .withHeader("Content-Type", "application/json")
+              .withBody("""{"id":"handoff-123"}""")
+          )
+      )
+
+      val result = connector.createJourneyHandoff(journeyType, requestBody).futureValue
+
+      result mustBe "handoff-123"
+
+      verify(
+        postRequestedFor(urlPathEqualTo(s"/cis/journey-handoffs/$journeyType"))
+          .withRequestBody(equalToJson(requestBody.toString()))
+      )
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      val journeyType = "amend-monthly-return"
+
+      val requestBody = Json.obj(
+        "instanceId" -> "1",
+        "taxYear" -> 2026,
+        "taxMonth" -> 4,
+        "returnType" -> "standard"
+      )
+
+      stubFor(
+        post(urlPathEqualTo(s"/cis/journey-handoffs/$journeyType"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody("boom")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.createJourneyHandoff(journeyType, requestBody).futureValue
+      }
+
+      ex.getMessage must include("returned 500")
     }
   }
 }

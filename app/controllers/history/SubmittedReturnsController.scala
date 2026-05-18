@@ -16,10 +16,12 @@
 
 package controllers.history
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import models.history.SubmittedReturnsData
 import models.requests.CisIdDataRequest
 import pages.history.SubmittedReturnsDataPage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{ManageService, SubmittedReturnsService}
@@ -27,6 +29,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.history.SubmittedReturnsView
+import views.html.monthlyreturns.SubmissionSuccessView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,10 +43,13 @@ class SubmittedReturnsController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: SubmittedReturnsView,
   submittedReturnsService: SubmittedReturnsService,
-  manageService: ManageService
+  manageService: ManageService,
+  confirmationView: SubmissionSuccessView,
+  appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoadSingleYear(taxYear: String): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
@@ -74,7 +80,7 @@ class SubmittedReturnsController @Inject() (
             case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
         }
-        .recover { case e =>
+        .recover { case _ =>
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }
@@ -86,8 +92,52 @@ class SubmittedReturnsController @Inject() (
     request.userAnswers.get(SubmittedReturnsDataPage) match {
       case Some(data) =>
         Future.successful(data)
-
-      case None =>
+      case None       =>
         manageService.getSubmittedMonthlyReturns(request.cisId)
+    }
+
+  def viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
+      submittedReturnsService
+        .getMonthlyReturnComplete(request.cisId, taxYear, taxMonth, amendment)
+        .map {
+          case Right(vm)    => Ok(confirmationView(vm))
+          case Left(reason) =>
+            logger.warn(s"[viewSubmissionReceipt] guard failed: $reason")
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+        .recover { case ex =>
+          logger.error("[viewSubmissionReceipt] failed", ex)
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
+
+  def startAmendment(taxYear: Int, taxMonth: Int): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
+      resolveSubmittedReturnsData
+        .flatMap { data =>
+          submittedReturnsService
+            .createAmendmentHandoff(
+              data = data,
+              instanceId = request.cisId,
+              taxYear = taxYear,
+              taxMonth = taxMonth
+            )
+            .map {
+              case Right(handoffId) =>
+                Redirect(appConfig.confirmAmendmentUrl(handoffId))
+              case Left(reason)     =>
+                logger.warn(s"[startAmendment] start amendment failed: $reason")
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
+        }
+        .recover { case ex =>
+          logger.error("[startAmendment] failed", ex)
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
     }
 }
