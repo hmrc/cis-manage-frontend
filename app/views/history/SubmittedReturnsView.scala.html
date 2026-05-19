@@ -174,11 +174,13 @@
                         }
                     </div>
                 }
-
-                @link(
-                    linkTextKey = "history.returnHistory.backLink",
-                    linkUrl = "#"
-                )
+                
+                @if(viewModel.showReturnToTaxYearsLink) {
+                    @link(
+                        linkTextKey = "history.returnHistory.backLink",
+                        linkUrl = controllers.history.routes.SubmittedReturnsChooseTaxYearController.onPageLoad().url,
+                    )
+                }
             </div>
         </div>
     }
