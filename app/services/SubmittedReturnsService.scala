@@ -70,6 +70,7 @@ class SubmittedReturnsService @Inject() (
     taxYear: Int,
     taxMonth: Int
   )(implicit hc: HeaderCarrier): Future[Either[String, String]] = {
+    val contractorName   = data.scheme.name
     val monthlyReturnOpt = data.monthlyReturns.find(mr => mr.taxYear == taxYear && mr.taxMonth == taxMonth)
 
     val submissionOpt = monthlyReturnOpt.flatMap { monthlyReturn =>
@@ -87,6 +88,7 @@ class SubmittedReturnsService @Inject() (
           instanceId = instanceId,
           taxYear = taxYear,
           taxMonth = taxMonth,
+          contractorName = contractorName,
           originalReturnType = originalReturnType,
           acceptedTime = submissionOpt.flatMap(_.acceptedTime).map(_.toString)
         )
