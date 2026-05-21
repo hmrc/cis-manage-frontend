@@ -51,6 +51,8 @@ class SubmittedReturnsViewModelsSpec extends AnyWordSpec with Matchers {
 
       viewModel.taxYears                       shouldBe Seq(taxYear)
       viewModel.selectedTaxYear                shouldBe Some("2023")
+      viewModel.showReturnToTaxYearsLink       shouldBe false
+      viewModel.showTaxYearHeadings            shouldBe false
       viewModel.taxYears.head.rows.head.status shouldBe StatusViewModel.Text("history.returnHistory.status.amend")
     }
 
@@ -103,14 +105,39 @@ class SubmittedReturnsViewModelsSpec extends AnyWordSpec with Matchers {
       row.status     shouldBe StatusViewModel.Text("UNKNOWN_STATUS")
     }
 
+    "show tax year headings when there is more than one tax year" in {
+      val taxYear1 = TaxYearHistoryViewModel(
+        fromYear = 2023,
+        toYear = 2024,
+        rows = Seq.empty
+      )
+
+      val taxYear2 = TaxYearHistoryViewModel(
+        fromYear = 2024,
+        toYear = 2025,
+        rows = Seq.empty
+      )
+
+      val viewModel = SubmittedReturnsPageViewModel(
+        taxYears = Seq(taxYear1, taxYear2),
+        selectedTaxYear = None,
+        showReturnToTaxYearsLink = true
+      )
+
+      viewModel.showTaxYearHeadings      shouldBe true
+      viewModel.showReturnToTaxYearsLink shouldBe true
+    }
+
     "allow no selected tax year and no tax years" in {
       val viewModel = SubmittedReturnsPageViewModel(
         taxYears = Seq.empty,
         selectedTaxYear = None
       )
 
-      viewModel.taxYears        shouldBe Seq.empty
-      viewModel.selectedTaxYear shouldBe None
+      viewModel.taxYears                 shouldBe Seq.empty
+      viewModel.selectedTaxYear          shouldBe None
+      viewModel.showReturnToTaxYearsLink shouldBe false
+      viewModel.showTaxYearHeadings      shouldBe false
     }
   }
 }

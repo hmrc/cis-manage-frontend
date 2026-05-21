@@ -142,10 +142,10 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         submissions = Seq(submission())
       )
 
-      val result = service.buildSingleYearViewModel(testData, "2023")
+      val result = service.buildSingleYearViewModel(testData, "2022")
 
-      result.value.selectedTaxYear                           shouldBe Some("2023")
-      result.value.taxYears.map(t => (t.fromYear, t.toYear)) shouldBe Seq(2023 -> 2024)
+      result.value.selectedTaxYear                           shouldBe Some("2022")
+      result.value.taxYears.map(t => (t.fromYear, t.toYear)) shouldBe Seq(2022 -> 2023)
 
       result.value.taxYears.head.rows.head.monthlyReturn.url shouldBe
         controllers.history.routes.PrintSubmissionDetailsController

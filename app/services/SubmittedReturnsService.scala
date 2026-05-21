@@ -46,10 +46,13 @@ class SubmittedReturnsService @Inject() (
   private val displayTimeFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("h:mma", Locale.UK)
 
   def buildAllYearsViewModel(data: SubmittedReturnsData): Option[SubmittedReturnsPageViewModel] =
+    val taxYearSections = buildTaxYearSections(data, AllYears)
+
     Some(
       SubmittedReturnsPageViewModel(
-        taxYears = buildTaxYearSections(data, AllYears),
-        selectedTaxYear = None
+        taxYears = taxYearSections,
+        selectedTaxYear = None,
+        showReturnToTaxYearsLink = taxYearSections.size > 1
       )
     )
 
@@ -58,9 +61,12 @@ class SubmittedReturnsService @Inject() (
     taxYear: String
   ): Option[SubmittedReturnsPageViewModel] =
     taxYear.toIntOption.map { taxYearInt =>
+      val taxYearSections = buildTaxYearSections(data, SingleYear)
+
       SubmittedReturnsPageViewModel(
-        taxYears = buildTaxYearSections(data, SingleYear).filter(_.fromYear == taxYearInt),
-        selectedTaxYear = Some(taxYear)
+        taxYears = taxYearSections.filter(_.fromYear == taxYearInt),
+        selectedTaxYear = Some(taxYear),
+        showReturnToTaxYearsLink = taxYearSections.size > 1
       )
     }
 
@@ -175,7 +181,8 @@ class SubmittedReturnsService @Inject() (
           data.submissions
             .find(_.activeObjectId.contains(monthlyReturn.monthlyReturnId))
             .map { submission =>
-              monthlyReturn.taxYear -> toRowViewModel(monthlyReturn, Some(submission), source)
+              val fromYear = taxYearFromYear(monthlyReturn)
+              fromYear -> toRowViewModel(monthlyReturn, Some(submission), source)
             }
         }
 
@@ -191,6 +198,16 @@ class SubmittedReturnsService @Inject() (
         )
       }
   }
+
+  private def taxYearFromYear(monthlyReturn: SubmittedMonthlyReturnData): Int =
+    val returnPeriodDate = LocalDate.of(monthlyReturn.taxYear, monthlyReturn.taxMonth, 5)
+    val taxYearStartDate = LocalDate.of(monthlyReturn.taxYear, 4, 6)
+
+    if (returnPeriodDate.isBefore(taxYearStartDate)) {
+      monthlyReturn.taxYear - 1
+    } else {
+      monthlyReturn.taxYear
+    }
 
   private def toRowViewModel(
     monthlyReturn: SubmittedMonthlyReturnData,

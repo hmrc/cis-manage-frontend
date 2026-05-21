@@ -92,8 +92,11 @@ GET        /history/amend/:taxYear/:taxMonth                        controllers.
 
 GET        /monthly-return/confirmation-history                     controllers.history.SubmittedReturnsController.viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String)
 
-GET        /manage-your-cis-return/incomplete-returns                                       controllers.IncompleteReturnsController.onPageLoad()
-GET        /manage-your-cis-return/incomplete-returns/delete-return/:monthlyReturnId        controllers.IncompleteReturnsController.onDeleteRedirect(monthlyReturnId: Long)
+GET        /manage-your-cis-return/incomplete-returns                                       controllers.history.IncompleteReturnsController.onPageLoad()
+GET        /manage-your-cis-return/incomplete-returns/delete-return/:monthlyReturnId        controllers.history.IncompleteReturnsController.onDeleteRedirect(monthlyReturnId: Long)
 
-GET        /amend-monthly-return/no-return-submitted                controllers.amend.NoReturnsSubmittedController.onPageLoad()
+GET        /amend-monthly-return/no-return-submitted                    controllers.amend.NoReturnsSubmittedController.onPageLoad()
 GET        /amend-monthly-return/no-incomplete-returns                  controllers.amend.NoIncompleteReturnsController.onPageLoad()
+
+GET        /verify/select-tax-year-for-verification-requests                controllers.verify.VerificationHistorySelectTaxYearController.onPageLoad(mode: Mode = NormalMode)
+POST       /verify/select-tax-year-for-verification-requests                controllers.verify.VerificationHistorySelectTaxYearController.onSubmit(mode: Mode = NormalMode)

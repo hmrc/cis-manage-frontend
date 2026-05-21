@@ -53,16 +53,14 @@ class SubmittedReturnsChooseTaxYearController @Inject() (
     implicit request =>
       manageService
         .getSubmittedTaxYears(request.cisId)
-        .map { taxYears =>
-          if (taxYears.isEmpty)
-            logger.info(
-              "[SubmittedReturnsChooseTaxYearController] Error trying to retrieve submitted tax years"
-            )
-            Redirect(controllers.routes.SystemErrorController.onPageLoad())
-          else if (taxYears.length == 1) {
-            // TODO: wire to correct controller once its ready
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          } else
+        .map {
+          case Nil =>
+            Redirect(controllers.amend.routes.NoReturnsSubmittedController.onPageLoad())
+
+          case Seq((start, _)) =>
+            Redirect(controllers.history.routes.SubmittedReturnsController.onPageLoadSingleYear(start.toString))
+
+          case taxYears =>
             val taxYearStrings = taxYears.map((start, end) => s"$start to $end")
 
             val form = formProvider(taxYearStrings)
@@ -102,10 +100,15 @@ class SubmittedReturnsChooseTaxYearController @Inject() (
               }
 
               for {
-                taxYear        <- Future.fromTry(taxYearSelection)
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(SubmittedReturnsChooseTaxYearPage, taxYear))
+                selection      <- Future.fromTry(taxYearSelection)
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(SubmittedReturnsChooseTaxYearPage, selection))
                 _              <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(controllers.history.routes.SubmittedReturnsChooseTaxYearController.onPageLoad())
+              } yield selection match {
+                case TaxYear(start, _) =>
+                  Redirect(controllers.history.routes.SubmittedReturnsController.onPageLoadSingleYear(start.toString))
+                case AllTaxYears       =>
+                  Redirect(controllers.history.routes.SubmittedReturnsController.onPageLoadAllYears())
+              }
             }
           )
       }
