@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package generators
+package forms.verify
 
-import org.scalacheck.{Arbitrary, Gen}
+import forms.mappings.Mappings
+import play.api.data.Form
 
-trait ModelGenerators {
+import javax.inject.Inject
 
-  implicit lazy val arbitraryVerificationHistorySelectTaxYear: Arbitrary[String] =
-    Arbitrary {
-      Gen.oneOf(
-        "all",
-        "2026 to 2027 (current tax year)",
-        "2025 to 2026",
-        "2024 to 2025"
-      )
-    }
+class VerificationHistorySelectTaxYearFormProvider @Inject() extends Mappings {
 
-  implicit def arbitrarySubmittedReturnsChooseTaxYear(implicit taxYears: Seq[String]): Arbitrary[String] =
-    Arbitrary(Gen.oneOf(taxYears :+ "all"))
+  def apply(taxYears: Seq[String]): Form[String] =
+    Form(
+      "value" -> text("verify.verificationHistorySelectTaxYear.error.required")
+        .verifying(
+          "verificationHistorySelectTaxYear.error.invalid",
+          value => taxYears.contains(value) || value == "all"
+        )
+    )
 }

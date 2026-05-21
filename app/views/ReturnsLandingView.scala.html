@@ -76,7 +76,7 @@
         ),
         ptaCard(
             title = messages("returnsLanding.incompleteReturns.h3.link"),
-            link = "#",
+            link = controllers.history.routes.IncompleteReturnsController.onPageLoad().url,
             content = Html(messages("returnsLanding.incompleteReturns.p1")),
             id = Some("incomplete-returns")
         )

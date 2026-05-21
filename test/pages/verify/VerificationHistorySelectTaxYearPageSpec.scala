@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-package generators
+package pages.verify
 
-import org.scalacheck.{Arbitrary, Gen}
+import base.SpecBase
+import play.api.libs.json.JsPath
 
-trait ModelGenerators {
+class VerificationHistorySelectTaxYearPageSpec extends SpecBase {
 
-  implicit lazy val arbitraryVerificationHistorySelectTaxYear: Arbitrary[String] =
-    Arbitrary {
-      Gen.oneOf(
-        "all",
-        "2026 to 2027 (current tax year)",
-        "2025 to 2026",
-        "2024 to 2025"
+  "VerificationHistorySelectTaxYearPage" - {
+
+    "must have the correct path" in {
+      VerificationHistorySelectTaxYearPage.path mustBe (
+        JsPath \ "verificationHistorySelectTaxYear"
       )
     }
 
-  implicit def arbitrarySubmittedReturnsChooseTaxYear(implicit taxYears: Seq[String]): Arbitrary[String] =
-    Arbitrary(Gen.oneOf(taxYears :+ "all"))
+    "must have the correct toString value" in {
+      VerificationHistorySelectTaxYearPage.toString mustBe
+        "verificationHistorySelectTaxYear"
+    }
+  }
 }
