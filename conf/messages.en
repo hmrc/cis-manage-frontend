@@ -17,6 +17,7 @@ site.pagination.next = Next
 site.delete = Delete
 site.or = or
 site.view = View
+site.saveAndContinue = Save and continue
 
 date.day = Day
 date.month = Month
@@ -513,3 +514,11 @@ verify.verificationHistorySelectTaxYear.heading = Which tax year do you want to 
 verify.verificationHistorySelectTaxYear.or = or
 verify.verificationHistorySelectTaxYear.viewAll = View all tax years
 verify.verificationHistorySelectTaxYear.error.required = Select a tax year
+
+clientdetails.changeClientReference.title = What is your client reference?
+clientdetails.changeClientReference.heading = What is your client reference?
+clientdetails.changeClientReference.hint = Enter the reference you are now using to identify your client.
+clientdetails.changeClientReference.checkYourAnswersLabel = Change client reference
+clientdetails.changeClientReference.error.required = Enter your client reference
+clientdetails.changeClientReference.error.invalidCharacters = You have entered a client reference in an incorrect format
+clientdetails.changeClientReference.change.hidden = Change Client Reference
