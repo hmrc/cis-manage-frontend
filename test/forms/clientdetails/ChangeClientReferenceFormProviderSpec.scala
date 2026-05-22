@@ -21,7 +21,7 @@ import play.api.data.FormError
 
 class ChangeClientReferenceFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "clientdetails.changeClientReference.error.required"
+  val requiredKey            = "clientdetails.changeClientReference.error.required"
   val invalidCharactersError = "clientdetails.changeClientReference.error.invalidCharacters"
 
   val form = new ChangeClientReferenceFormProvider()()
@@ -51,7 +51,7 @@ class ChangeClientReferenceFormProviderSpec extends StringFieldBehaviours {
         "Hello!",
         "Name_123",
         "100%329424230948230948902384092384902384234",
-        "Café",
+        "Café"
       )
       invalidChangeClientReferences.foreach { value =>
         val result = form.bind(Map(fieldName -> value))

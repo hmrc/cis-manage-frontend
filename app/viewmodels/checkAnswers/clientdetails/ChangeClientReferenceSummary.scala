@@ -25,19 +25,17 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object ChangeClientReferenceSummary  {
+object ChangeClientReferenceSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ChangeClientReferencePage).map {
-      answer =>
-
-        SummaryListRowViewModel(
-          key     = "clientdetails.changeClientReference.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.ChangeClientReferenceController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("clientdetails.changeClientReference.change.hidden"))
-          )
+    answers.get(ChangeClientReferencePage).map { answer =>
+      SummaryListRowViewModel(
+        key = "clientdetails.changeClientReference.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.ChangeClientReferenceController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("clientdetails.changeClientReference.change.hidden"))
         )
+      )
     }
 }

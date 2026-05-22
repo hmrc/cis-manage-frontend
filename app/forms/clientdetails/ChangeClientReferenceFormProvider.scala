@@ -27,6 +27,8 @@ class ChangeClientReferenceFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("clientdetails.changeClientReference.error.required")
-        .verifying(regexp(changeClientReferencePattern.toString(), "clientdetails.changeClientReference.error.invalidCharacters"))
+        .verifying(
+          regexp(changeClientReferencePattern.toString(), "clientdetails.changeClientReference.error.invalidCharacters")
+        )
     )
 }

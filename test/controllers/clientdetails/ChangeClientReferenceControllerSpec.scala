@@ -39,9 +39,10 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new ChangeClientReferenceFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
-  lazy val changeClientReferenceRoute: String = controllers.clientdetails.routes.ChangeClientReferenceController.onPageLoad(NormalMode).url
+  lazy val changeClientReferenceRoute: String =
+    controllers.clientdetails.routes.ChangeClientReferenceController.onPageLoad(NormalMode).url
 
   "ChangeClientReference Controller" - {
 
