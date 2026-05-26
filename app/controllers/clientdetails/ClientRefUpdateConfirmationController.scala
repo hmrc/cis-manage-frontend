@@ -24,17 +24,17 @@ import views.html.clientdetails.ClientRefUpdateConfirmationView
 
 import javax.inject.Inject
 
-class ClientRefUpdateConfirmationController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: ClientRefUpdateConfirmationView
-                                     ) extends FrontendBaseController with I18nSupport {
+class ClientRefUpdateConfirmationController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: ClientRefUpdateConfirmationView
+) extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      Ok(view(oldClientReference = "ABC123", newClientReference = "XYZ456"))
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    Ok(view(oldClientReference = "ABC123", newClientReference = "XYZ456"))
   }
 }
