@@ -39,7 +39,7 @@ class ClientRefUpdateConfirmationViewSpec extends SpecBase {
       doc.select("h2").text() must include(messages("clientdetails.clientRefUpdateConfirmation.h2"))
       doc.select("p").text()  must include(messages("clientdetails.clientRefUpdateConfirmation.p2"))
 
-      val dashboardHref = controllers.contractor.routes.ContractorLandingController.onPageLoad().url
+      val dashboardHref = controllers.agent.routes.ClientListSearchController.onPageLoad().url
       val dashboardLink = doc.select(s"a.govuk-link[href='$dashboardHref']")
       dashboardLink.text() mustBe messages("clientdetails.clientRefUpdateConfirmation.p2.link")
       dashboardLink.attr("href") mustBe dashboardHref
