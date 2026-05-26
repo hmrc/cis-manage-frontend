@@ -516,6 +516,7 @@ verify.verificationHistorySelectTaxYear.error.required = Select a tax year
 
 clientdetails.manageClientDetails.title = Client details
 clientdetails.manageClientDetails.heading = {0} details
-clientdetails.manageClientDetails.employerRef.key = Employers Reference
-clientdetails.manageClientDetails.clientRef.key = Client Reference
-clientdetails.manageClientDetails.clientRef.link = Change
+clientdetails.manageClientDetails.employerRef.key = Employers reference
+clientdetails.manageClientDetails.clientRef.key = Client reference
+clientdetails.manageClientDetails.clientRef.key.hidden = client reference
+clientdetails.manageClientDetails.clientRef.link = change

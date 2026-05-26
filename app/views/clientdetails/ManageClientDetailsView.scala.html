@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import viewmodels.govuk.{summarylist => sl}
 
@@ -22,7 +23,7 @@
     layout: templates.Layout,
     govukSummaryList: GovukSummaryList,
     govukButton: GovukButton,
-    h1: components.H1,
+    h1: H1,
     h2: components.H2
 )
 
@@ -30,7 +31,7 @@
 
 @layout(pageTitle = titleNoForm(messages("clientdetails.manageClientDetails.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("clientdetails.manageClientDetails.heading", clientName)</h1>
+    @h1(messages("clientdetails.manageClientDetails.heading", clientName))
 
     @govukSummaryList(SummaryList(
         rows = Seq(
@@ -53,8 +54,8 @@
                     items = Seq(
                         ActionItem(
                             href = "#",
-                            content = Text(messages("clientdetails.manageClientDetails.clientRef.link")),
-                            visuallyHiddenText = Some(messages("clientdetails.manageClientDetails.clientRef.key"))
+                            content = Text(messages("site.change")),
+                            visuallyHiddenText = Some(messages("clientdetails.manageClientDetails.clientRef.key.hidden"))
                         )
                     )
                 ))

@@ -67,7 +67,7 @@ class ManageClientDetailsViewSpec extends SpecBase {
       val (doc, _) = render()
 
       doc.text() should include(messages(app).apply("clientdetails.manageClientDetails.clientRef.key"))
-      doc.text() should include(messages(app).apply("clientdetails.manageClientDetails.clientRef.link"))
+      doc.text() should include(messages(app).apply("site.change"))
     }
 
   }
