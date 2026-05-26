@@ -410,11 +410,11 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       )
 
       val expectedPayload = Json.obj(
-        "instanceId"   -> instanceId,
-        "taxYear"      -> 2023,
-        "taxMonth"     -> 3,
-        "returnType"   -> "Standard",
-        "acceptedTime" -> "2024-04-01T10:15:30Z"
+        "instanceId"         -> instanceId,
+        "taxYear"            -> 2023,
+        "taxMonth"           -> 3,
+        "originalReturnType" -> "MonthlyStandardReturn",
+        "acceptedTime"       -> "2024-04-01T10:15:30Z"
       )
 
       when(
@@ -463,10 +463,10 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       )
 
       val expectedPayload = Json.obj(
-        "instanceId" -> instanceId,
-        "taxYear"    -> 2023,
-        "taxMonth"   -> 3,
-        "returnType" -> "Nil"
+        "instanceId"         -> instanceId,
+        "taxYear"            -> 2023,
+        "taxMonth"           -> 3,
+        "originalReturnType" -> "MonthlyNilReturn"
       )
 
       when(
