@@ -18,7 +18,7 @@ package controllers.clientdetails
 
 import controllers.actions.*
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -26,7 +26,7 @@ import views.html.clientdetails.ManageClientDetailsView
 
 class ManageClientDetailsController @Inject() (
   override val messagesApi: MessagesApi,
-  identify: IdentifierAction,
+  @Named("AgentIdentifier") identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
