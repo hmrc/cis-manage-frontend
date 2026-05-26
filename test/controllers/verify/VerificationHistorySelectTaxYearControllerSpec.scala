@@ -148,7 +148,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
       }
     }
 
-    "must treat 'all' as AllTaxYears and redirect back to same page" in {
+    "must treat 'all' as AllTaxYears and redirect to all tax years verification history" in {
 
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -171,13 +171,13 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.verify.routes.VerificationHistorySelectTaxYearController
-            .onPageLoad()
+          controllers.verify.routes.VerificationHistoryController
+            .onPageLoadAllYears()
             .url
       }
     }
 
-    "must redirect back to same page when valid data is submitted" in {
+    "must redirect to single year verification history when a tax year is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -202,8 +202,8 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.verify.routes.VerificationHistorySelectTaxYearController
-            .onPageLoad()
+          controllers.verify.routes.VerificationHistoryController
+            .onPageLoadSingleYear("2026")
             .url
       }
     }

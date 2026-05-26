@@ -1,0 +1,144 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import viewmodels.{VerificationHistoryPageViewModel, VerificationHistoryRowViewModel}
+@import views.html.components.*
+
+@this(
+    layout: templates.Layout,
+    govukTable: GovukTable,
+    govukSummaryList: GovukSummaryList,
+    h1: H1,
+    paragraph: Paragraph,
+    link: Link
+)
+
+@(viewModel: VerificationHistoryPageViewModel)(implicit request: Request[_], messages: Messages)
+
+@pageHeading = @{
+    viewModel.selectedTaxYear match {
+        case Some(taxYear) => messages("verify.verificationHistory.singleYear.heading", taxYear, (taxYear.toInt + 1).toString)
+        case None          => messages("verify.verificationHistory.allYears.heading")
+    }
+}
+
+@pageTitleText = @{
+    viewModel.selectedTaxYear match {
+        case Some(taxYear) => messages("verify.verificationHistory.singleYear.title", taxYear, (taxYear.toInt + 1).toString)
+        case None          => messages("verify.verificationHistory.allYears.title")
+    }
+}
+
+@renderViewLink(href: String, hiddenText: String) = @{
+    Html(
+        link(
+            linkTextKey = "site.view",
+            linkUrl = href,
+            paragraphWrapped = false,
+            visuallyHiddenText = Some(hiddenText)
+        ).body
+    )
+}
+
+@layout(
+    pageTitle = titleNoForm(pageTitleText)
+) {
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            @h1(pageHeading)
+
+            @if(viewModel.taxYears.isEmpty) {
+                @paragraph(messages("verify.verificationHistory.noHistory"))
+            }
+        </div>
+    </div>
+
+    @if(viewModel.taxYears.nonEmpty) {
+        <div class="govuk-grid-row govuk-!-margin-top-5">
+            <div class="govuk-grid-column-full">
+                @for(taxYear <- viewModel.taxYears) {
+
+                    @if(viewModel.showTaxYearHeadings) {
+                        <h2 class="govuk-heading-m govuk-!-margin-bottom-4">
+                            @messages(
+                                "verify.verificationHistory.taxYear.heading",
+                                taxYear.fromYear.toString,
+                                taxYear.toYear.toString
+                            )
+                        </h2>
+                    }
+
+                    <div class="verification-history-desktop">
+                        @govukTable(
+                            Table(
+                                classes = "govuk-!-margin-bottom-8",
+                                firstCellIsHeader = true,
+                                head = Some(
+                                    Seq(
+                                        HeadCell(content = Text(messages("verify.verificationHistory.table.verificationNumber"))),
+                                        HeadCell(content = Text(messages("verify.verificationHistory.table.dateSubmitted"))),
+                                        HeadCell(content = Text(messages("verify.verificationHistory.table.verificationRequest"))),
+                                        HeadCell(content = Text(messages("verify.verificationHistory.table.submissionReceipt")))
+                                    )
+                                ),
+                                rows = taxYear.rows.map { row =>
+                                    Seq(
+                                        TableRow(content = Text(row.verificationNumber)),
+                                        TableRow(content = Text(row.dateSubmitted)),
+                                        TableRow(content = HtmlContent(renderViewLink(row.verificationRequestLink, messages("verify.verificationHistory.hidden.verificationRequest", row.verificationNumber)))),
+                                        TableRow(content = HtmlContent(renderViewLink(row.submissionReceiptLink, messages("verify.verificationHistory.hidden.submissionReceipt", row.verificationNumber))))
+                                    )
+                                }
+                            )
+                        )
+                    </div>
+
+                    <div class="verification-history-mobile govuk-!-margin-bottom-8">
+                        @for(row <- taxYear.rows) {
+                            @govukSummaryList(
+                                SummaryList(
+                                    classes = "govuk-!-margin-bottom-4",
+                                    card = Some(Card(title = Some(CardTitle(content = Text(row.verificationNumber))))
+                                    ),
+                                    rows = Seq(
+                                        SummaryListRow(
+                                            key = Key(content = Text(messages("verify.verificationHistory.table.dateSubmitted"))),
+                                            value = Value(content = Text(row.dateSubmitted))
+                                        ),
+                                        SummaryListRow(
+                                            key = Key(content = Text(messages("verify.verificationHistory.table.verificationRequest"))),
+                                            value = Value(content = HtmlContent(renderViewLink(row.verificationRequestLink, messages("verify.verificationHistory.hidden.verificationRequest", row.verificationNumber))))
+                                        ),
+                                        SummaryListRow(
+                                            key = Key(content = Text(messages("verify.verificationHistory.table.submissionReceipt"))),
+                                            value = Value(content = HtmlContent(renderViewLink(row.submissionReceiptLink, messages("verify.verificationHistory.hidden.submissionReceipt", row.verificationNumber))))
+                                        )
+                                    )
+                                )
+                            )
+                        }
+                    </div>
+                }
+
+                @link(
+                    linkTextKey = "verify.verificationHistory.backToManage",
+                    linkUrl = controllers.routes.SubcontractorsLandingPageController.onPageLoad(viewModel.instanceId).url,
+                    hasFullStop = false
+                )
+            </div>
+        </div>
+    }
+}

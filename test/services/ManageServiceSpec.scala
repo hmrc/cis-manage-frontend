@@ -23,6 +23,7 @@ import models.agent.AgentClientData
 import models.history.*
 import models.requests.*
 import models.response.GetSubmittedMonthlyReturnsDataResponse
+import models.verify.{VerificationHistoryData, VerificationRequestData}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{mock, times, verify, verifyNoMoreInteractions, when}
@@ -37,7 +38,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel}
 import viewmodels.agent.AgentLandingViewModel
 
-import java.time.{Instant, LocalDateTime}
+import java.time.{Instant, LocalDate, LocalDateTime}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Failure
@@ -991,6 +992,43 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       ex mustBe boom
 
       verify(connector).getSubmittedMonthlyReturnsData(eqTo(expectedRequest))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+  }
+
+  "getVerificationHistory" should {
+
+    "delegate to connector and return response (happy path)" in {
+      val (service, connector, sessionRepo) = newService()
+      val instanceId                        = "900063"
+
+      val resp = VerificationHistoryData(
+        verificationRequests = Seq(
+          VerificationRequestData("V001", LocalDate.of(2026, 4, 6), 2026)
+        )
+      )
+
+      when(connector.getVerificationHistory(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(resp))
+
+      service.getVerificationHistory(instanceId).futureValue mustBe resp
+
+      verify(connector).getVerificationHistory(eqTo(instanceId))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+
+    "propagate failure from connector" in {
+      val (service, connector, sessionRepo) = newService()
+      val instanceId                        = "900063"
+      val boom                              = new RuntimeException("Backend error")
+
+      when(connector.getVerificationHistory(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(boom))
+
+      val ex = service.getVerificationHistory(instanceId).failed.futureValue
+      ex mustBe boom
+
+      verify(connector).getVerificationHistory(eqTo(instanceId))(any[HeaderCarrier])
       verifyNoInteractions(sessionRepo)
     }
   }
