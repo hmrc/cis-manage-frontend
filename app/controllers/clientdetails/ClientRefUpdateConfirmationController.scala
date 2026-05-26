@@ -22,11 +22,11 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.clientdetails.ClientRefUpdateConfirmationView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 
 class ClientRefUpdateConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
-  identify: IdentifierAction,
+  @Named("AgentIdentifier") identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
