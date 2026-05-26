@@ -101,4 +101,4 @@ GET        /amend-monthly-return/no-incomplete-returns                  controll
 GET        /verify/select-tax-year-for-verification-requests                controllers.verify.VerificationHistorySelectTaxYearController.onPageLoad(mode: Mode = NormalMode)
 POST       /verify/select-tax-year-for-verification-requests                controllers.verify.VerificationHistorySelectTaxYearController.onSubmit(mode: Mode = NormalMode)
 
-GET        /client-details/manage-client-details                       controllers.ManageClientDetailsController.onPageLoad()
+GET        /client-details/manage-client-details                       controllers.clientdetails.ManageClientDetailsController.onPageLoad()

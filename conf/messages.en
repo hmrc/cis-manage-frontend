@@ -514,8 +514,8 @@ verify.verificationHistorySelectTaxYear.or = or
 verify.verificationHistorySelectTaxYear.viewAll = View all tax years
 verify.verificationHistorySelectTaxYear.error.required = Select a tax year
 
-manageClientDetails.title = Client details
-manageClientDetails.heading = {0} details
-manageClientDetails.employerRef.key = Employers Reference
-manageClientDetails.clientRef.key = Client Reference
-manageClientDetails.clientRef.link = Change
+clientdetails.manageClientDetails.title = Client details
+clientdetails.manageClientDetails.heading = {0} details
+clientdetails.manageClientDetails.employerRef.key = Employers Reference
+clientdetails.manageClientDetails.clientRef.key = Client Reference
+clientdetails.manageClientDetails.clientRef.link = Change

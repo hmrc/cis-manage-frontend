@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.clientdetails
 
 import controllers.actions.*
 
@@ -22,7 +22,7 @@ import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.ManageClientDetailsView
+import views.html.clientdetails.ManageClientDetailsView
 
 class ManageClientDetailsController @Inject() (
   override val messagesApi: MessagesApi,

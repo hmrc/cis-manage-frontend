@@ -28,15 +28,15 @@
 
 @(clientName: String, employerRef: String, clientRef: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("manageClientDetails.title"))) {
+@layout(pageTitle = titleNoForm(messages("clientdetails.manageClientDetails.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("manageClientDetails.heading", clientName)</h1>
+    <h1 class="govuk-heading-xl">@messages("clientdetails.manageClientDetails.heading", clientName)</h1>
 
     @govukSummaryList(SummaryList(
         rows = Seq(
             SummaryListRow(
                 key = Key(
-                    content = Text(messages("manageClientDetails.employerRef.key"))
+                    content = Text(messages("clientdetails.manageClientDetails.employerRef.key"))
                 ),
                 value = Value(
                     content = Text(employerRef)
@@ -44,7 +44,7 @@
             ),
             SummaryListRow(
                 key = Key(
-                    content = Text(messages("manageClientDetails.clientRef.key"))
+                    content = Text(messages("clientdetails.manageClientDetails.clientRef.key"))
                 ),
                 value = Value(
                     content = Text(clientRef)
@@ -53,8 +53,8 @@
                     items = Seq(
                         ActionItem(
                             href = "#",
-                            content = Text(messages("manageClientDetails.clientRef.link")),
-                            visuallyHiddenText = Some(messages("manageClientDetails.clientRef.key"))
+                            content = Text(messages("clientdetails.manageClientDetails.clientRef.link")),
+                            visuallyHiddenText = Some(messages("clientdetails.manageClientDetails.clientRef.key"))
                         )
                     )
                 ))

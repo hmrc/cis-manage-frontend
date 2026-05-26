@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views
+package views.clientdetails
 
 import base.SpecBase
 import org.jsoup.Jsoup
@@ -22,7 +22,7 @@ import org.jsoup.nodes.Document
 import org.scalatest.matchers.should.Matchers.*
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.ManageClientDetailsView
+import views.html.clientdetails.ManageClientDetailsView
 import config.FrontendAppConfig
 
 class ManageClientDetailsViewSpec extends SpecBase {
@@ -37,13 +37,13 @@ class ManageClientDetailsViewSpec extends SpecBase {
       val (doc, appConfig) = render()
 
       doc
-        .title() shouldBe s"${messages(app)("manageClientDetails.title")} - Construction Industry Scheme - GOV.UK"
+        .title() shouldBe s"${messages(app)("clientdetails.manageClientDetails.title")} - Construction Industry Scheme - GOV.UK"
 
       val back = doc.select("a.govuk-back-link")
       back.size() shouldBe 1
 
       val h1 = doc.selectFirst("h1")
-      h1.text() shouldBe s"${messages(app)("manageClientDetails.heading", clientName)}"
+      h1.text() shouldBe s"${messages(app)("clientdetails.manageClientDetails.heading", clientName)}"
     }
 
     "show employerRef and clientRef in a summary list" in {
@@ -54,20 +54,20 @@ class ManageClientDetailsViewSpec extends SpecBase {
 
       val employerKey   = rows.get(0).selectFirst(".govuk-summary-list__key").text()
       val employerValue = rows.get(0).selectFirst(".govuk-summary-list__value").text()
-      employerKey   shouldBe messages(app).apply("manageClientDetails.employerRef.key")
+      employerKey   shouldBe messages(app).apply("clientdetails.manageClientDetails.employerRef.key")
       employerValue shouldBe employerRef
 
       val clientKey   = rows.get(1).selectFirst(".govuk-summary-list__key").text()
       val clientValue = rows.get(1).selectFirst(".govuk-summary-list__value").text()
-      clientKey   shouldBe messages(app).apply("manageClientDetails.clientRef.key")
+      clientKey   shouldBe messages(app).apply("clientdetails.manageClientDetails.clientRef.key")
       clientValue shouldBe clientRef
     }
 
     "render Change link alongside Client Reference" in {
       val (doc, _) = render()
 
-      doc.text() should include(messages(app).apply("manageClientDetails.clientRef.key"))
-      doc.text() should include(messages(app).apply("manageClientDetails.clientRef.link"))
+      doc.text() should include(messages(app).apply("clientdetails.manageClientDetails.clientRef.key"))
+      doc.text() should include(messages(app).apply("clientdetails.manageClientDetails.clientRef.link"))
     }
 
   }
