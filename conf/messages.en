@@ -521,4 +521,4 @@ clientdetails.changeClientReference.hint = Enter the reference you are now using
 clientdetails.changeClientReference.checkYourAnswersLabel = Change client reference
 clientdetails.changeClientReference.error.required = Enter your client reference
 clientdetails.changeClientReference.error.invalidCharacters = You have entered a client reference in an incorrect format
-clientdetails.changeClientReference.change.hidden = Change Client Reference
+clientdetails.changeClientReference.change.hidden = client Reference

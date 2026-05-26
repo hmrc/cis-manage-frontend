@@ -40,8 +40,10 @@
                 field = form("value"),
                 label = LabelViewModel(messages("clientdetails.changeClientReference.heading")).asPageHeading(LabelSize.Large)
             )
-            .withWidth(Full)
+            .withWidth(Fixed20)
             .withHint(HintViewModel(content = Text(messages("clientdetails.changeClientReference.hint"))))
+            .withSpellcheck(false)
+            .withAutocomplete("off")
         )
 
         @govukButton(

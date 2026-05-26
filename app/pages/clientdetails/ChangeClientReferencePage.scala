@@ -21,7 +21,7 @@ import play.api.libs.json.JsPath
 
 case object ChangeClientReferencePage extends QuestionPage[String] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = JsPath \ "clientdetails" \ toString
 
   override def toString: String = "changeClientReference"
 }

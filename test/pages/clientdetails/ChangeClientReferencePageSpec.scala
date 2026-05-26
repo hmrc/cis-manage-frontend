@@ -23,7 +23,7 @@ class ChangeClientReferencePageSpec extends SpecBase {
 
   "ChangeClientReferencePage" - {
     "have the correct path" in {
-      ChangeClientReferencePage.path mustBe (JsPath \ "changeClientReference")
+      ChangeClientReferencePage.path mustBe (JsPath \ "clientdetails" \ "changeClientReference")
     }
 
     "have the correct toString" in {
