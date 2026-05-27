@@ -527,3 +527,11 @@ verify.verificationHistory.backToManage = Back to Manage your subcontractors
 verify.verificationHistory.noHistory = No verification requests found.
 verify.verificationHistory.hidden.verificationRequest = verification request for {0}
 verify.verificationHistory.hidden.submissionReceipt = submission receipt for {0}
+
+clientdetails.clientRemoved.title = Client removed
+clientdetails.clientRemoved.heading = Client removed
+clientdetails.clientRemoved.h2 = What happens next
+clientdetails.clientRemoved.p1 = It may take up to half an hour for this change to take place.
+clientdetails.clientRemoved.return.link = Return to your client list
+clientdetails.clientRemoved.survey.link = what did you think of this service?
+clientdetails.clientRemoved.survey.suffix = (takes 30 seconds)

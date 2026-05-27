@@ -103,3 +103,5 @@ POST       /verify/select-tax-year-for-verification-requests                cont
 
 GET        /verify/verification-history-all-tax-years                        controllers.verify.VerificationHistoryController.onPageLoadAllYears()
 GET        /verify/verification-history-tax-year/:taxYear                    controllers.verify.VerificationHistoryController.onPageLoadSingleYear(taxYear: String)
+
+GET        /client-details/client-removed                       controllers.clientdetails.ClientRemovedController.onPageLoad()
