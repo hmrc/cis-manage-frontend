@@ -513,3 +513,9 @@ verify.verificationHistorySelectTaxYear.heading = Which tax year do you want to 
 verify.verificationHistorySelectTaxYear.or = or
 verify.verificationHistorySelectTaxYear.viewAll = View all tax years
 verify.verificationHistorySelectTaxYear.error.required = Select a tax year
+
+clientdetails.removeClient.title = Are you sure you want to remove {0}?
+clientdetails.removeClient.heading = Are you sure you want to remove {0}?
+clientdetails.removeClient.checkYourAnswersLabel = Remove Client
+clientdetails.removeClient.error.required = Select yes to remove this client
+clientdetails.removeClient.change.hidden = remove Client

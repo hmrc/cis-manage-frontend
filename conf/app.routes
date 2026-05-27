@@ -100,3 +100,8 @@ GET        /amend-monthly-return/no-incomplete-returns                  controll
 
 GET        /verify/select-tax-year-for-verification-requests                controllers.verify.VerificationHistorySelectTaxYearController.onPageLoad(mode: Mode = NormalMode)
 POST       /verify/select-tax-year-for-verification-requests                controllers.verify.VerificationHistorySelectTaxYearController.onSubmit(mode: Mode = NormalMode)
+
+GET        /client-details/remove-client                                    controllers.clientdetails.RemoveClientController.onPageLoad(mode: Mode = NormalMode)
+POST       /client-details/remove-client                                    controllers.clientdetails.RemoveClientController.onSubmit(mode: Mode = NormalMode)
+GET        /client-details/change-remove-client                             controllers.clientdetails.RemoveClientController.onPageLoad(mode: Mode = CheckMode)
+POST       /client-details/change-remove-client                             controllers.clientdetails.RemoveClientController.onSubmit(mode: Mode = CheckMode)
