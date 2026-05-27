@@ -16,17 +16,12 @@
 
 package pages.clientdetails
 
-import base.SpecBase
+import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-class RemoveClientPageSpec extends SpecBase {
-  "SubmittedReturnsChooseTaxYearPage" - {
-    "have the correct path" in {
-      RemoveClientPage.path mustBe (JsPath \ "removeClient")
-    }
+case object RemoveClientYesNoPage extends QuestionPage[Boolean] {
 
-    "have the correct toString" in {
-      RemoveClientPage.toString mustBe "removeClient"
-    }
-  }
+  override def path: JsPath = JsPath \ "clientdetails" \ toString
+
+  override def toString: String = "removeClient"
 }

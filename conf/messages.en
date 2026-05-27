@@ -524,6 +524,4 @@ clientdetails.clientRemoved.survey.suffix = (takes 30 seconds)
 
 clientdetails.removeClient.title = Are you sure you want to remove {0}?
 clientdetails.removeClient.heading = Are you sure you want to remove {0}?
-clientdetails.removeClient.checkYourAnswersLabel = Remove Client
 clientdetails.removeClient.error.required = Select yes to remove this client
-clientdetails.removeClient.change.hidden = remove Client

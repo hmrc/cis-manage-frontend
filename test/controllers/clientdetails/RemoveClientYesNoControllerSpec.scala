@@ -18,13 +18,13 @@ package controllers.clientdetails
 
 import base.SpecBase
 import controllers.routes
-import forms.clientdetails.RemoveClientFormProvider
+import forms.clientdetails.RemoveClientYesNoFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.clientdetails.RemoveClientPage
+import pages.clientdetails.RemoveClientYesNoPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -34,11 +34,11 @@ import views.html.clientdetails.RemoveClientView
 
 import scala.concurrent.Future
 
-class RemoveClientControllerSpec extends SpecBase with MockitoSugar {
-  val clientName  = "Fake name"
+class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
+  val clientName  = "clientName"
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new RemoveClientFormProvider()
+  val formProvider = new RemoveClientYesNoFormProvider()
   val form         = formProvider()
 
   lazy val removeClientRoute = controllers.clientdetails.routes.RemoveClientController.onPageLoad(NormalMode).url
@@ -63,7 +63,7 @@ class RemoveClientControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(RemoveClientPage, true).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(RemoveClientYesNoPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 

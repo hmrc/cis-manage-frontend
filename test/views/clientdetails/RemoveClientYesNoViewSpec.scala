@@ -17,17 +17,17 @@
 package views.clientdetails
 
 import base.SpecBase
-import forms.clientdetails.RemoveClientFormProvider
+import forms.clientdetails.RemoveClientYesNoFormProvider
 import models.NormalMode
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import views.html.clientdetails.RemoveClientView
 
-class RemoveClientViewSpec extends SpecBase {
+class RemoveClientYesNoViewSpec extends SpecBase {
   "RemoveClientView" - {
     "must render the content on the page" in new Setup {
-      val clientName = "Fake name"
+      val clientName = "clientName"
       val html       = view(clientName, form, NormalMode)
       val doc        = Jsoup.parse(html.body)
 
@@ -40,7 +40,7 @@ class RemoveClientViewSpec extends SpecBase {
   trait Setup {
     val app                                       = applicationBuilder().build()
     val view                                      = app.injector.instanceOf[RemoveClientView]
-    val formProvider                              = app.injector.instanceOf[RemoveClientFormProvider]
+    val formProvider                              = app.injector.instanceOf[RemoveClientYesNoFormProvider]
     val form                                      = formProvider()
     implicit val request: play.api.mvc.Request[_] = FakeRequest()
     implicit val messages: Messages               = play.api.i18n.MessagesImpl(

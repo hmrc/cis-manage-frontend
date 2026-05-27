@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package pages.clientdetails
+package forms.clientdetails
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import forms.mappings.Mappings
+import play.api.data.Form
 
-case object RemoveClientPage extends QuestionPage[Boolean] {
+import javax.inject.Inject
 
-  override def path: JsPath = JsPath \ toString
+class RemoveClientYesNoFormProvider @Inject() extends Mappings {
 
-  override def toString: String = "removeClient"
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("clientdetails.removeClient.error.required")
+    )
 }
