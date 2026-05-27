@@ -39,7 +39,7 @@ class ChangeClientReferenceFormProviderSpec extends StringFieldBehaviours {
     "must bind valid data" in {
       val validChangeClientReferences: Seq[String] = Seq(
         "Alpha",
-        "A&B"
+        "A&B CD"
       )
       validChangeClientReferences.foreach { value =>
         val result = form.bind(Map(fieldName -> value))
