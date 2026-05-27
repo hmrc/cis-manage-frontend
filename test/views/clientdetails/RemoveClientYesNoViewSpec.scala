@@ -22,7 +22,7 @@ import models.NormalMode
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
-import views.html.clientdetails.RemoveClientView
+import views.html.clientdetails.RemoveClientYesNoView
 
 class RemoveClientYesNoViewSpec extends SpecBase {
   "RemoveClientView" - {
@@ -39,7 +39,7 @@ class RemoveClientYesNoViewSpec extends SpecBase {
 
   trait Setup {
     val app                                       = applicationBuilder().build()
-    val view                                      = app.injector.instanceOf[RemoveClientView]
+    val view                                      = app.injector.instanceOf[RemoveClientYesNoView]
     val formProvider                              = app.injector.instanceOf[RemoveClientYesNoFormProvider]
     val form                                      = formProvider()
     implicit val request: play.api.mvc.Request[_] = FakeRequest()

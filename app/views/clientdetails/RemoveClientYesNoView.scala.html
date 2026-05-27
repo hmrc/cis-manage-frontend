@@ -28,7 +28,7 @@
 
 @layout(pageTitle = title(form, messages("clientdetails.removeClient.title", clientName))) {
 
-    @formHelper(action = controllers.clientdetails.routes.RemoveClientController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.clientdetails.routes.RemoveClientYesNoController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

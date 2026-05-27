@@ -30,7 +30,7 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.clientdetails.RemoveClientView
+import views.html.clientdetails.RemoveClientYesNoView
 
 import scala.concurrent.Future
 
@@ -41,7 +41,7 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new RemoveClientYesNoFormProvider()
   val form         = formProvider()
 
-  lazy val removeClientRoute = controllers.clientdetails.routes.RemoveClientController.onPageLoad(NormalMode).url
+  lazy val removeClientRoute = controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode).url
 
   "RemoveClient Controller" - {
 
@@ -54,7 +54,7 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[RemoveClientView]
+        val view = application.injector.instanceOf[RemoveClientYesNoView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(clientName, form, NormalMode)(request, messages(application)).toString
@@ -70,7 +70,7 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, removeClientRoute)
 
-        val view = application.injector.instanceOf[RemoveClientView]
+        val view = application.injector.instanceOf[RemoveClientYesNoView]
 
         val result = route(application, request).value
 
@@ -119,7 +119,7 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[RemoveClientView]
+        val view = application.injector.instanceOf[RemoveClientYesNoView]
 
         val result = route(application, request).value
 

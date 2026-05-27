@@ -103,7 +103,7 @@ POST       /verify/select-tax-year-for-verification-requests                cont
 
 GET        /client-details/client-removed                       controllers.clientdetails.ClientRemovedController.onPageLoad()
 
-GET        /client-details/remove-client                                    controllers.clientdetails.RemoveClientController.onPageLoad(mode: Mode = NormalMode)
-POST       /client-details/remove-client                                    controllers.clientdetails.RemoveClientController.onSubmit(mode: Mode = NormalMode)
-GET        /client-details/change-remove-client                             controllers.clientdetails.RemoveClientController.onPageLoad(mode: Mode = CheckMode)
-POST       /client-details/change-remove-client                             controllers.clientdetails.RemoveClientController.onSubmit(mode: Mode = CheckMode)
+GET        /client-details/remove-client                                    controllers.clientdetails.RemoveClientYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /client-details/remove-client                                    controllers.clientdetails.RemoveClientYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /client-details/change-remove-client                             controllers.clientdetails.RemoveClientYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /client-details/change-remove-client                             controllers.clientdetails.RemoveClientYesNoController.onSubmit(mode: Mode = CheckMode)
