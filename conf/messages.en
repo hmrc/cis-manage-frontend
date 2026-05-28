@@ -1,527 +1,584 @@
-service.name = Construction Industry Scheme
+# Infrastructure
+service.name                              =  Construction Industry Scheme
 
-site.back = Back
-site.remove = Remove
-site.change = Change
-site.no = No
-site.yes = Yes
-site.continue = Continue
-site.search = Search
-site.start = Start now
-site.startAgain = Start again
-site.signIn = Sign in
-site.govuk = GOV.UK
-site.pagination.landmark = Pagination
-site.pagination.previous = Previous
-site.pagination.next = Next
-site.delete = Delete
-site.or = or
-site.view = View
-site.saveAndContinue = Save and continue
+site.back                                 =  Back
+site.remove                               =  Remove
+site.change                               =  Change
+site.no                                   =  No
+site.yes                                  =  Yes
+site.continue                             =  Continue
+site.search                               =  Search
+site.start                                =  Start now
+site.startAgain                           =  Start again
+site.signIn                               =  Sign in
+site.govuk                                =  GOV.UK
 
-date.day = Day
-date.month = Month
-date.year = Year
-date.error.day = day
-date.error.month = month
-date.error.year = year
+site.pagination.landmark                  =  Pagination
+site.pagination.previous                  =  Previous
+site.pagination.next                      =  Next
 
-timeout.title = You’re about to be signed out
-timeout.message = For security reasons, you will be signed out of this service in
-timeout.keepAlive = Stay signed in
-timeout.signOut = Sign out
+site.delete                               =  Delete
+site.or                                   =  or
+site.view                                 =  View
+site.saveAndContinue                      = Save and continue
 
-error.title.prefix = Error:
-error.prefix = Error
-error.summary.title = There is a problem
+date.day                                  =  Day
+date.month                                =  Month
+date.year                                 =  Year
 
-index.title = Construction Industry Scheme
-index.heading = Construction Industry Scheme
-index.guidance = Welcome to cis-manage-frontend. Please see the README file for a guide to getting started.
+date.error.day                            =  day
+date.error.month                          =  month
+date.error.year                           =  year
 
-checkYourAnswers.title = Check your answers
-checkYourAnswers.heading = Check your answers
+timeout.title                             =  You’re about to be signed out
+timeout.message                           =  For security reasons, you will be signed out of this service in
+timeout.keepAlive                         =  Stay signed in
+timeout.signOut                           =  Sign out
 
-journeyRecovery.continue.title = Sorry, there is a problem with this service
-journeyRecovery.continue.heading = Sorry, there is a problem with this service
-journeyRecovery.continue.guidance.p1 = There is problem with this service. You can return to
-journeyRecovery.continue.guidance.link = Construction Industry Scheme
-journeyRecovery.continue.guidance.p2 = or try again later.
+error.title.prefix                        =  Error:
 
-journeyRecovery.startAgain.title = Sorry, there is a problem with this service
-journeyRecovery.startAgain.heading = Sorry, there is a problem with this service
-journeyRecovery.startAgain.guidance.p1 = There is problem with this service. You can return to
-journeyRecovery.startAgain.guidance.link = Construction Industry Scheme
-journeyRecovery.startAgain.guidance.p2 = or try again later.
+error.prefix                              =  Error
 
-signedOut.title = For your security, we signed you out
-signedOut.heading = For your security, we signed you out
-signedOut.guidance = We did not save your answers.
+error.summary.title                       =  There is a problem
 
-pageNotFound.title      = Page not found
-pageNotFound.heading    = Page not found
-pageNotFound.p1         = If you typed the web address, check it is correct.
-pageNotFound.p2         = If you pasted the web address, check you copied the entire address.
-pageNotFound.p3         = If the web address is correct or you selected a link or button, contact the
-pageNotFound.link       = HMRC Online Services Helpdesk
-pageNotFound.p4         = if you need to speak to someone.
+index.title                               =  Construction Industry Scheme
+index.heading                             =  Construction Industry Scheme
+index.guidance                            =  Welcome to cis-manage-frontend. Please see the README file for a guide to getting started.
 
-systemError.title       = Sorry, there is a problem with this service
-systemError.heading     = Sorry, there is a problem with this service
-systemError.p1          = Try again later.
-systemError.p2          = Contact the
-systemError.link        = HMRC Online Services Helpdesk
-systemError.p3          = if you need to speak to someone about Construction Industry Scheme and quote the reference number:
+checkYourAnswers.title                    =  Check your answers
+checkYourAnswers.heading                  =  Check your answers
 
-accessDenied.title      = Sorry, there is a problem with the service
-accessDenied.heading    = Sorry, there is a problem with the service
-accessDenied.link       = Return to the Construction Industry Scheme start page.
+journeyRecovery.continue.title            =  Sorry, there is a problem with this service
+journeyRecovery.continue.heading          =  Sorry, there is a problem with this service
+journeyRecovery.continue.guidance.p1      =  There is problem with this service. You can return to
+journeyRecovery.continue.guidance.link    =  Construction Industry Scheme
+journeyRecovery.continue.guidance.p2      =  or try again later.
 
-unauthorised.title = You can’t access this service with this account
-unauthorised.heading = You can’t access this service with this account
-unauthorised.guidance.org.p1.prefix = If you are a contractor or subcontractor, you will need to register with
-unauthorised.guidance.org.p1.link = Construction Industry Scheme
-unauthorised.guidance.org.p1.suffix = to access this service.
-unauthorised.guidance.agent.p2.prefix = If you are an agent, you will need to request access to
-unauthorised.guidance.agent.p2.link = PAYE for Agents
-unauthorised.guidance.agent.p2.suffix = to use this service.
+journeyRecovery.startAgain.title          =  Sorry, there is a problem with this service
+journeyRecovery.startAgain.heading        =  Sorry, there is a problem with this service
+journeyRecovery.startAgain.guidance.p1    =  There is problem with this service. You can return to
+journeyRecovery.startAgain.guidance.link  =  Construction Industry Scheme
+journeyRecovery.startAgain.guidance.p2    =  or try again later.
 
-unauthorised.org.title = You need to register to use this service
-unauthorised.org.heading = You need to register to use this service
-unauthorised.org.p1 = You are signed in with an organisation account.
-unauthorised.org.guidance.p2.prefix = Register with the
-unauthorised.org.guidance.p2.link = Construction Industry Scheme
-unauthorised.org.guidance.p2.suffix = to access this service.
+signedOut.title                           =  For your security, we signed you out
+signedOut.heading                         =  For your security, we signed you out
+signedOut.guidance                        =  We did not save your answers.
 
-unauthorised.org.standard.title = Sorry, you are unable to use this service
-unauthorised.org.standard.heading = Sorry, you are unable to use this service
-unauthorised.org.standard.paragraph = Return to
-unauthorised.org.standard.guidance.link = Construction Industry Scheme
+# Errors & Auth
+pageNotFound.title                       =  Page not found
+pageNotFound.heading                     =  Page not found
+pageNotFound.p1                          =  If you typed the web address, check it is correct.
+pageNotFound.p2                          =  If you pasted the web address, check you copied the entire address.
+pageNotFound.p3                          =  If the web address is correct or you selected a link or button, contact the
+pageNotFound.link                        =  HMRC Online Services Helpdesk
+pageNotFound.p4                          =  if you need to speak to someone.
 
-unauthorised.individual.title = Sorry, you are unable to use this service
-unauthorised.individual.heading = Sorry, you are unable to use this service
-unauthorised.individual.p1 = You are signed in with an individual account. Only users with an organisation or agent services accounts can use this service.
+systemError.title                        =  Sorry, there is a problem with this service
+systemError.heading                      =  Sorry, there is a problem with this service
+systemError.p1                           =  Try again later.
+systemError.p2                           =  Contact the
+systemError.link                         =  HMRC Online Services Helpdesk
+systemError.p3                           =  if you need to speak to someone about Construction Industry Scheme and quote the reference number:
 
-unauthorised.agent.title = Sorry, you are unable to use this service
-unauthorised.agent.heading = Sorry, you are unable to use this service
-unauthorised.agent.p1 = You are signed in with an agent account.
-unauthorised.agent.p2.prefix = You need to request access to
-unauthorised.agent.p2.link = PAYE for Agents
-unauthorised.agent.p2.suffix = to use this service.
+accessDenied.title                       =  Sorry, there is a problem with the service
+accessDenied.heading                     =  Sorry, there is a problem with the service
+accessDenied.link                        =  Return to the Construction Industry Scheme start page.
 
-agent.retrievingClient.title = Retrieving your client list
-agent.retrievingClient.h1 = Retrieving your client list
-agent.retrievingClient.p1 = Please wait while we retrieve your authorised clients. This should only take a few moments.
-agent.retrievingClient.p2 = Do not refresh this page or use the back button.
-agent.retrievingClient.inset.h2 = Filing only service
-agent.retrievingClient.inset.p3 = You can send CIS monthly returns on behalf of a client without completing an authorisation online or form FBI-2.
-agent.retrievingClient.inset.p4 = This service is only available using commercial software.
-agent.retrievingClient.inset.link = Find commercial software for CIS returns
+unauthorised.title                       =  You can’t access this service with this account
+unauthorised.heading                     =  You can’t access this service with this account
 
-agent.failedToRetrieveClient.title = We could not retrieve your client list
-agent.failedToRetrieveClient.heading = We could not retrieve your client list
-agent.failedToRetrieveClient.p1 = This could be because:
-agent.failedToRetrieveClient.listItem1 = there is a temporary problem with the service
-agent.failedToRetrieveClient.listItem2 = your authorisations are still being processed
-agent.failedToRetrieveClient.listItem3 = you do not have any authorised clients for CIS
-agent.failedToRetrieveClient.p2 = If the problem continues, contact the
-agent.failedToRetrieveClient.link = HMRC Online Services Helpdesk
-agent.failedToRetrieveClient.inset.h2 = Filing only service
-agent.failedToRetrieveClient.inset.p3 = You can send CIS monthly returns on behalf of a client without completing an authorisation online or form FBI-2.
-agent.failedToRetrieveClient.inset.p4 = This service is only available using commercial software.
-agent.failedToRetrieveClient.inset.link = Find commercial software for CIS returns
+unauthorised.guidance.org.p1.prefix      =  If you are a contractor or subcontractor, you will need to register with
+unauthorised.guidance.org.p1.link        =  Construction Industry Scheme
+unauthorised.guidance.org.p1.suffix      =  to access this service.
+unauthorised.guidance.agent.p2.prefix    =  If you are an agent, you will need to request access to
+unauthorised.guidance.agent.p2.link      =  PAYE for Agents
+unauthorised.guidance.agent.p2.suffix    =  to use this service.
 
-agent.noAuthorisedClients.title = You have no authorised clients
-agent.noAuthorisedClients.heading = You have no authorised clients
-agent.noAuthorisedClients.p1 = You do not have any clients authorised to use the Construction Industry Scheme (CIS) service.
-agent.noAuthorisedClients.p2 = To file returns for a client, they must authorise you to act on their behalf.
-agent.noAuthorisedClients.h2 = What you need to do
-agent.noAuthorisedClients.p3 =Ask your client to authorise you. They can do this by either:
-agent.noAuthorisedClients.listItem1 = authorising you through their
-agent.noAuthorisedClients.listItem1.link = HMRC online account
-agent.noAuthorisedClients.listItem2 = downloading and completing
-agent.noAuthorisedClients.listItem2.link = form 64-8
-agent.noAuthorisedClients.listItem2.afterLinkText = to authorise you by post
-agent.noAuthorisedClients.p4 = It can take up to 5 working days for new authorisations to appear in your account.
-agent.noAuthorisedClients.returnToHome.link = Return to home
+unauthorised.org.title                   =  You need to register to use this service
+unauthorised.org.heading                 =  You need to register to use this service
+unauthorised.org.p1                      =  You are signed in with an organisation account.
+unauthorised.org.guidance.p2.prefix      =  Register with the
+unauthorised.org.guidance.p2.link        =  Construction Industry Scheme
+unauthorised.org.guidance.p2.suffix      =  to access this service.
+unauthorised.org.standard.title          =  Sorry, you are unable to use this service
+unauthorised.org.standard.heading        =  Sorry, you are unable to use this service
+unauthorised.org.standard.paragraph      =  Return to
+unauthorised.org.standard.guidance.link  =  Construction Industry Scheme
 
-agent.clientListSearch.title = Select a client to file CIS returns
-agent.clientListSearch.heading = File monthly CIS returns
-agent.clientListSearch.p1 = There are three potential ways to search for, and then file, a monthly CIS return.
+unauthorised.individual.title            =  Sorry, you are unable to use this service
+unauthorised.individual.heading          =  Sorry, you are unable to use this service
+unauthorised.individual.p1               =  You are signed in with an individual account. Only users with an organisation or agent services accounts can use this service.
 
-agent.clientListSearch.searchBy.label = What do you want to search by?
-agent.clientListSearch.searchBy.error.required = Enter Client name, Employer reference or Client reference from the dropdown list
-agent.clientListSearch.searchBy.placeholder = Select an option
+unauthorised.agent.title                 =  Sorry, you are unable to use this service
+unauthorised.agent.heading               =  Sorry, you are unable to use this service
+unauthorised.agent.p1                    =  You are signed in with an agent account.
+unauthorised.agent.p2.prefix             =  You need to request access to
+unauthorised.agent.p2.link               =  PAYE for Agents
+unauthorised.agent.p2.suffix             =  to use this service.
 
-agent.clientListSearch.searchFilter.label = Enter your search
-agent.clientListSearch.searchFilter.label.hint = This is the client name (ABC Construction), employer reference (123/AB45678), or client reference (ABC-001)
-agent.clientListSearch.searchFilter.error.required = Enter either a Client name, Employer reference or your Client reference
-agent.clientListSearch.searchFilter.error.length = Search value must be 35 characters or less
-agent.clientListSearch.searchFilter.error.format = Search value must only include letters, numbers, hyphens, spaces, commas, full stops, exclamation marks, ampersands, underscores, parentheses and apostrophes
+# Introduction & Landing
+contractorLanding.title                       =  CIS return dashboard
+contractorLanding.heading                     =  CIS return dashboard
+contractorLanding.paragraph                   =  You can manage {0}&#8217;s monthly CIS returns – including dates and statements.
 
-agent.clientListSearch.searchFilter.cn.error.required = Enter the client name in the correct format, like ABC Construction
-agent.clientListSearch.searchFilter.er.error.required = Enter the employer reference in the correct format, like 123/AB45678 (three numbers, '/', then seven alphanumeric characters)
-agent.clientListSearch.searchFilter.cr.error.required = Enter the client reference in the correct format, like ABC-001
+contractorLanding.label.employerReference     =  Employer reference
+contractorLanding.label.utr                   =  Unique Taxpayer Reference (UTR)
 
-agent.clientListSearch.searchFilter.cn.error.format = Enter the client name in the correct format, like ABC Construction
-agent.clientListSearch.searchFilter.er.error.format = Enter the employer reference in the correct format, like 123/AB45678 (three numbers, '/', then seven alphanumeric characters)
-agent.clientListSearch.searchFilter.cr.error.format = Enter the client reference in the correct format, like ABC-001
+contractorLanding.subheading.actionRequired   =  Action required
+contractorLanding.subheading.manage           =  Manage your CIS
+contractorLanding.subheading.activity         =  Recent activity
 
-agent.clientListSearch.searchFilter.cn.error.length = Enter a client name shorter than 56 characters
-agent.clientListSearch.searchFilter.er.error.length = Enter an employer reference using up to 14 characters, or fewer
-agent.clientListSearch.searchFilter.cr.error.length = Enter a client reference shorter than 20 characters
+contractorLanding.label.dueBy                 =  Due by {0}
+contractorLanding.label.newNotices            =  Notices to view
+contractorLanding.label.subcontractors        =  View, verify or manage your subcontractors.
+contractorLanding.label.history               =  View your previously submitted CIS returns.
+contractorLanding.label.notices               =  View HMRC notices, penalty warnings and confirmation statements.
+contractorLanding.label.amend                 =  Make changes to a return you’ve already submitted.
 
-agent.clientListSearch.table.caption = Your clients
-agent.clientListSearch.th.clientName = Client name
-agent.clientListSearch.th.employersReference = Employer reference
-agent.clientListSearch.th.clientReference = Client reference
-agent.clientListSearch.th.actions = Actions
-agent.clientListSearch.td.actions.remove = Remove
+contractorLanding.link.returnDue              =  Return due
+contractorLanding.link.newNotices             =  New notices
+contractorLanding.link.subcontractors         =  Subcontractors
+contractorLanding.link.history                =  Return history
+contractorLanding.link.notices                =  Notices and statements
+contractorLanding.link.amend                  =  Amend a return
 
-agent.clientListSearch.clearSearch = Clear search
-agent.clientListSearch.noResults = No search results found
-agent.clientListSearch.details.1.summary = Download your client list
-agent.clientListSearch.details.1.p1 = You can download a list of all your clients as a CSV file. This may take some time if you have many clients.
-agent.clientListSearch.details.1.link = Download client list (CSV)
-agent.clientListSearch.details.2.summary = Filing only service
-agent.clientListSearch.details.2.p1 = You can send CIS monthly returns on behalf of a client without completing an authorisation online or form 64-8.
-agent.clientListSearch.details.2.p2 = This service is only available using commercial software.
-agent.clientListSearch.details.2.link = Find commercial software for CIS returns (opens in new tab)
+contractorLanding.paragraph.activity          =  Last return submitted: {0} for tax month {1}
 
-contractorLanding.title = CIS return dashboard
-contractorLanding.heading = CIS return dashboard
-contractorLanding.paragraph = You can manage {0}&#8217;s monthly CIS returns – including dates and statements.
-contractorLanding.label.employerReference = Employer reference
-contractorLanding.label.utr = Unique Taxpayer Reference (UTR)
-contractorLanding.subheading.actionRequired = Action required
-contractorLanding.link.returnDue = Return due
-contractorLanding.label.dueBy = Due by {0}
-contractorLanding.link.newNotices = New notices
-contractorLanding.label.newNotices = Notices to view
-contractorLanding.subheading.manage = Manage your CIS
-contractorLanding.link.subcontractors = Subcontractors
-contractorLanding.label.subcontractors = View, verify or manage your subcontractors.
-contractorLanding.link.history = Return history
-contractorLanding.label.history = View your previously submitted CIS returns.
-contractorLanding.link.notices = Notices and statements
-contractorLanding.label.notices = View HMRC notices, penalty warnings and confirmation statements.
-contractorLanding.link.amend = Amend a return
-contractorLanding.label.amend = Make changes to a return you’ve already submitted.
-contractorLanding.subheading.activity = Recent activity
-contractorLanding.paragraph.activity = Last return submitted: {0} for tax month {1}
-contractorLanding.sidebar.title = Help and guidance
-contractorLanding.sidebar.nav.whatIs.text = What is the Construction Industry Scheme
-contractorLanding.sidebar.nav.guidance.text = CIS monthly returns guidance
-contractorLanding.sidebar.nav.penalties.text = CIS 340: Penalties for late returns
+contractorLanding.sidebar.title               =  Help and guidance
+contractorLanding.sidebar.nav.whatIs.text     =  What is the Construction Industry Scheme
+contractorLanding.sidebar.nav.guidance.text   =  CIS monthly returns guidance
+contractorLanding.sidebar.nav.penalties.text  =  CIS 340: Penalties for late returns
 
-agent.landing.title = CIS return dashboard for {0}
-agent.landing.h1 = CIS return dashboard
-agent.landing.intro = You can manage {0}&#8217;s monthly CIS returns – including dates and statements.
-agent.landing.employerRef.key = Employer reference
-agent.landing.utr.key = Unique Taxpayer Reference (UTR)
-agent.landing.h2.actionRequired = Action required
-agent.landing.h2.manageClient = Manage this client
-agent.landing.h2.recentActivity = Recent activity
-agent.landing.h2.help = Help and guidance
-agent.landing.card.returnDue.title = Return due
-agent.landing.card.returnDue.dueBy = Due by {0}
-agent.landing.card.notices.title = New notices
-agent.landing.card.notices.subtitle = Notices to view
-agent.landing.manage.subcontractors = Subcontractors
-agent.landing.manage.subcontractors.blurb = View, verify or manage subcontractors for this client.
-agent.landing.manage.returnHistory = Return history
-agent.landing.manage.returnHistory.blurb = View previously submitted CIS returns for this client.
-agent.landing.manage.notices = Notices and statements
-agent.landing.manage.notices.blurb = View HMRC notices, penalty warnings and confirmation statements.
-agent.landing.manage.amend = Amend a return
-agent.landing.manage.amend.blurb = Make changes to a return you&#8217;ve already submitted.
-agent.landing.manage.clientDetails = Client details
-agent.landing.manage.clientDetails.blurb = Update client information and authorisation settings.
-agent.landing.recentActivity.line = Last return submitted: {0} for tax month {1} {2}
-agent.landing.help.link1 = What is the Construction Industry Scheme
-agent.landing.help.link2 = CIS monthly returns guidance
-agent.landing.help.link3 = CIS 340: Penalties for late returns
-agent.landing.back = Back to clients
+introduction.title                            =  Construction Industry Scheme (CIS)
+introduction.heading                          =  Construction Industry Scheme (CIS)
+introduction.p1                               =  Use this service to:
+introduction.listItem1                        =  file monthly CIS returns
+introduction.listItem2                        =  file nil returns (when you have made no payments)
+introduction.listItem3                        =  view and manage subcontractors
+introduction.listItem4                        =  amend returns you have already submitted
+introduction.listItem5                        =  view notices and statements
+introduction.listItem6                        =  appeal against late-filing penalties
+introduction.listItem7                        =  save incomplete returns
+introduction.inset                            =  You must file CIS returns for each tax month, by the 19th of the following month.
+introduction.h2                               =  Before you start
+introduction.p2                               =  To use this service, you need:
+introduction.listItem8                        =  to be authorised to act for your clients
+introduction.listItem9                        =  a tax office reference or Unique Taxpayer Reference (UTR)
+introduction.listItem10                       =  details of payments made to subcontractors during the tax month
 
-introduction.title = Construction Industry Scheme (CIS)
-introduction.heading = Construction Industry Scheme (CIS)
-introduction.p1 = Use this service to:
-introduction.listItem1 = file monthly CIS returns
-introduction.listItem2 = file nil returns (when you have made no payments)
-introduction.listItem3 = view and manage subcontractors
-introduction.listItem4 = amend returns you have already submitted
-introduction.listItem5 = view notices and statements
-introduction.listItem6 = appeal against late-filing penalties
-introduction.listItem7 = save incomplete returns
-introduction.inset = You must file CIS returns for each tax month, by the 19th of the following month.
-introduction.h2 = Before you start
-introduction.p2 = To use this service, you need:
-introduction.listItem8 = to be authorised to act for your clients
-introduction.listItem9 = a tax office reference or Unique Taxpayer Reference (UTR)
-introduction.listItem10 = details of payments made to subcontractors during the tax month
-introduction.details.summary = Other ways to file CIS returns
-introduction.details.h3 = Filing only service
-introduction.details.p1 = You can send CIS monthly returns without completing an authorisation online or form FBI-2.
-introduction.details.p2 = This service is only available using commercial software.
-introduction.details.link = Find commercial software for CIS returns
-introduction.sidebar.h2 = Related content
-introduction.sidebar.link1 = What is the Construction Industry Scheme
-introduction.sidebar.link2 = CIS monthly returns guidance
-introduction.sidebar.link3 = CIS 340: Penalties for late returns
-introduction.sidebar.link4 = Client authorisation guidance
+introduction.details.summary                  =  Other ways to file CIS returns
+introduction.details.h3                       =  Filing only service
+introduction.details.p1                       =  You can send CIS monthly returns without completing an authorisation online or form FBI-2.
+introduction.details.p2                       =  This service is only available using commercial software.
+introduction.details.link                     =  Find commercial software for CIS returns
 
-retrievingSubcontractors.title = Your subcontractors
-retrievingSubcontractors.heading = Your subcontractors
-retrievingSubcontractors.p1 = We are locating your subcontractor records.
-retrievingSubcontractors.p2 = This should only take a few moments.
-retrievingSubcontractors.p3.bold = Do not refresh this page or use the back button.
+introduction.sidebar.h2                       =  Related content
+introduction.sidebar.link1                    =  What is the Construction Industry Scheme
+introduction.sidebar.link2                    =  CIS monthly returns guidance
+introduction.sidebar.link3                    =  CIS 340: Penalties for late returns
+introduction.sidebar.link4                    =  Client authorisation guidance
 
-checkSubcontractorRecords.title = Check subcontractor records
-checkSubcontractorRecords.heading = Check subcontractor records
-checkSubcontractorRecords.p1 = We will now check if there are any subcontractor records you have recently paid/verified.
-checkSubcontractorRecords.p2 = Any record we find will be automatically added to your subcontractor list, which will be available to view.
+returnsLanding.title                          =  Manage your CIS return
+returnsLanding.heading                        =  Manage your CIS return
 
-unsuccessfulAutomaticSubcontractorUpdate.title = Unsuccessful automatic subcontractor update
-unsuccessfulAutomaticSubcontractorUpdate.heading = Unsuccessful automatic subcontractor update
-unsuccessfulAutomaticSubcontractorUpdate.p1 = The subcontractor automatic check was unsuccessful. CIS Online will perform this update again the next time you enter the application,
-unsuccessfulAutomaticSubcontractorUpdate.p2 = unless you choose to add subcontractor details yourself.
-unsuccessfulAutomaticSubcontractorUpdate.p3 = Before adding a subcontractor, you will need to add their details.
+returnsLanding.fileMonthlyReturn.h3.link      =  File a monthly return
+returnsLanding.fileMonthlyReturn.p1           =  File a CIS return for any subcontractors paid in a tax month.
 
-successfulAutomaticSubcontractorUpdate.title = Successful automatic subcontractor update
-successfulAutomaticSubcontractorUpdate.heading = Successful automatic subcontractor update
-successfulAutomaticSubcontractorUpdate.p1 = The subcontractors below have been added to your subcontractor list.
-successfulAutomaticSubcontractorUpdate.th.name = Name
-successfulAutomaticSubcontractorUpdate.th.uniqueTaxReference = Unique Tax Reference
-successfulAutomaticSubcontractorUpdate.th.verificationNumber = Verification number
-successfulAutomaticSubcontractorUpdate.th.dateAdded = Date added
+returnsLanding.fileNilReturn.h3.link          =  File a nil return
+returnsLanding.fileNilReturn.p1               =  File a nil return when no payments were made to subcontractors in a tax month.
 
-successfulNoRecordsFound.title = Successful automatic subcontractor update
-successfulNoRecordsFound.heading = Successful automatic subcontractor update
-successfulNoRecordsFound.p1 = No subcontractor records were found.
-successfulNoRecordsFound.p2 = You can
-successfulNoRecordsFound.p2.link = add a subcontractor
+returnsLanding.viewSubmittedReturns.h3.link   =  View submitted returns
+returnsLanding.viewSubmittedReturns.p1        =  View a return to make amendments, change payment details you entered, or check progress.
 
-returnsLanding.title = Manage your CIS return
-returnsLanding.heading = Manage your CIS return
-returnsLanding.fileMonthlyReturn.h3.link = File a monthly return
-returnsLanding.fileMonthlyReturn.p1 = File a CIS return for any subcontractors paid in a tax month.
-returnsLanding.fileNilReturn.h3.link = File a nil return
-returnsLanding.fileNilReturn.p1 = File a nil return when no payments were made to subcontractors in a tax month.
-returnsLanding.viewSubmittedReturns.h3.link = View submitted returns
-returnsLanding.viewSubmittedReturns.p1 = View a return to make amendments, change payment details you entered, or check progress.
-returnsLanding.incompleteReturns.h3.link = Incomplete returns
-returnsLanding.incompleteReturns.p1 = Submit or delete a return in progress. You can also resubmit a return that was not initially accepted.
-returnsLanding.aside.h2 = Help and guidance
-returnsLanding.aside.link1 = What is the Construction Industry Scheme?
-returnsLanding.aside.link2 = CIS monthly returns guidance
-returnsLanding.aside.link3 = CIS 340: penalties for late returns
-returnsLanding.aside.link4 = Understanding CIS penalties
-returnsLanding.returnToHome.link = Return to home
+returnsLanding.incompleteReturns.h3.link      =  Incomplete returns
+returnsLanding.incompleteReturns.p1           =  Submit or delete a return in progress. You can also resubmit a return that was not initially accepted.
 
-subcontractorsLandingPage.title = Manage your CIS return subcontractor
-subcontractorsLandingPage.heading = Manage your CIS return subcontractor
-subcontractorsLandingPage.p1 = You can use this service to manage your subcontractors list.
-subcontractorsLandingPage.hint = You will need HMRC free software to access the links below.
-subcontractorsLandingPage.addSubcontractors = Add subcontractor
-subcontractorsLandingPage.addSubcontractors.p1 = Add subcontractors to your list
-subcontractorsLandingPage.verifySubcontractors = Verify subcontractor
-subcontractorsLandingPage.verifySubcontractors.p1 = View, verify or manage subcontractors
-subcontractorsLandingPage.subcontractorList = Subcontractor list
-subcontractorsLandingPage.subcontractorList.p1 = View subcontractor list
-subcontractorsLandingPage.h2 = What you need to know
-subcontractorsLandingPage.p2 = You should include subcontractors ‐ with or without gross payment status ‐ on your subcontractor list. For more information
-subcontractorsLandingPage.p2.link = on gross payment status
-subcontractorsLandingPage.p3 = Subcontractors from your list must be included in your monthly return if you pay them during the month. To submit a return, your selected subcontractors must be verified.
-subcontractorsLandingPage.aside.h2 = Help and guidance
-subcontractorsLandingPage.aside.link1 = What is the Construction Industry Scheme
-subcontractorsLandingPage.aside.link2 = CIS monthly returns guidance
-subcontractorsLandingPage.aside.link3 = CIS 340: Penalties for late returns
+returnsLanding.aside.h2                       =  Help and guidance
+returnsLanding.aside.link1                    =  What is the Construction Industry Scheme?
+returnsLanding.aside.link2                    =  CIS monthly returns guidance
+returnsLanding.aside.link3                    =  CIS 340: penalties for late returns
+returnsLanding.aside.link4                    =  Understanding CIS penalties
 
-manageNoticesStatements.title = Manage your CIS return notices and statements
-manageNoticesStatements.heading = Manage your CIS return notices and statements
-manageNoticesStatements.intro = View confirmation statements, penalty warnings and HMRC notices for your CIS returns.
-manageNoticesStatements.link.understandingNotices = Understanding your notices
-manageNoticesStatements.search.heading = Search notices
-manageNoticesStatements.search.description = Select notice type, and then a time period.
-manageNoticesStatements.noticeType.label = Notice type
-manageNoticesStatements.noticeType.all = All notices
-manageNoticesStatements.noticeType.general = General notices
-manageNoticesStatements.noticeType.penaltyWarnings = Penalty warnings
-manageNoticesStatements.noticeType.confirmationStatements = Confirmation
-manageNoticesStatements.readStatus.label = Read/unread notices
-manageNoticesStatements.status.read = Read
-manageNoticesStatements.status.unread = Unread
-manageNoticesStatements.status.all = All
-manageNoticesStatements.dateFilter.last7Days = Last 7 days
-manageNoticesStatements.dateFilter.lastMonth = Last month
-manageNoticesStatements.dateFilter.dateRange = Date Range
-manageNoticesStatements.dateFilter.all = All
-manageNoticesStatements.search.button = Search
-manageNoticesStatements.searchResults.heading = Search results
-manageNoticesStatements.searchResults.summary = Displaying {0} out of {1} records
-manageNoticesStatements.recentNotices.heading = Recent notices
-manageNoticesStatements.details.confirmationStatements.heading = Confirmation statements
-manageNoticesStatements.details.confirmationStatements.body = You’ll receive a confirmation statement when HMRC accepts your CIS return. This confirms the return has been processed.
-manageNoticesStatements.details.penaltyWarnings.heading = Penalty warnings
-manageNoticesStatements.details.penaltyWarnings.body = HMRC will send you a penalty warning if your return is late or if there are errors. The notice will explain what you need to do.
-manageNoticesStatements.details.generalNotices.heading = General notices
-manageNoticesStatements.details.generalNotices.body = HMRC may send you general notices about changes to CIS, important reminders, or requests for additional information.
-manageNoticesStatements.details.howLong.heading = How long to keep notices
-manageNoticesStatements.details.howLong.body = You should keep all CIS notices and statements for at least 3 years after the end of the tax year they relate to.
-manageNoticesStatements.table.date = Date
-manageNoticesStatements.table.type = Type
-manageNoticesStatements.table.description = Description
-manageNoticesStatements.table.status = Status
-manageNoticesStatements.table.action = Action
-manageNoticesStatements.table.action.view = View
-manageNoticesStatements.description.penaltyWarning = You need to file a CIS return for the tax month ending {0}
-manageNoticesStatements.description.confirmation = Return accepted for {0}
-manageNoticesStatements.sidebar.heading = Help and guidance
-manageNoticesStatements.sidebar.link1 = What is the Construction Industry Scheme
-manageNoticesStatements.sidebar.link2 = CIS monthly returns guidance
-manageNoticesStatements.sidebar.link3 = CIS 340: Penalties for late returns
-manageNoticesStatements.searchResults.viewAll = View all notices
+returnsLanding.returnToHome.link              =  Return to home
 
-addContractorDetails.title = Add contractor details
-addContractorDetails.heading = Add contractor details
-addContractorDetails.p1 = This is a placeholder page for adding contractor details.
+# Agent
+agent.retrievingClient.title                           =  Retrieving your client list
+agent.retrievingClient.h1                              =  Retrieving your client list
+agent.retrievingClient.p1                              =  Please wait while we retrieve your authorised clients. This should only take a few moments.
+agent.retrievingClient.p2                              =  Do not refresh this page or use the back button.
+agent.retrievingClient.inset.h2                        =  Filing only service
+agent.retrievingClient.inset.p3                        =  You can send CIS monthly returns on behalf of a client without completing an authorisation online or form FBI-2.
+agent.retrievingClient.inset.p4                        =  This service is only available using commercial software.
+agent.retrievingClient.inset.link                      =  Find commercial software for CIS returns
 
-delete.deleteMonthlyReturn.title = Are you sure you want to delete the monthly return for {0}?
-delete.deleteMonthlyReturn.heading = Are you sure you want to delete the monthly return for {0}?
-delete.deleteMonthlyReturn.error.required = Select yes to delete this return
+agent.failedToRetrieveClient.title                     =  We could not retrieve your client list
+agent.failedToRetrieveClient.heading                   =  We could not retrieve your client list
+agent.failedToRetrieveClient.p1                        =  This could be because:
+agent.failedToRetrieveClient.listItem1                 =  there is a temporary problem with the service
+agent.failedToRetrieveClient.listItem2                 =  your authorisations are still being processed
+agent.failedToRetrieveClient.listItem3                 =  you do not have any authorised clients for CIS
+agent.failedToRetrieveClient.p2                        =  If the problem continues, contact the
+agent.failedToRetrieveClient.link                      =  HMRC Online Services Helpdesk
+agent.failedToRetrieveClient.inset.h2                  =  Filing only service
+agent.failedToRetrieveClient.inset.p3                  =  You can send CIS monthly returns on behalf of a client without completing an authorisation online or form FBI-2.
+agent.failedToRetrieveClient.inset.p4                  =  This service is only available using commercial software.
+agent.failedToRetrieveClient.inset.link                =  Find commercial software for CIS returns
 
-delete.deleteNilMonthlyReturn.title = Are you sure you want to delete the nil monthly return for {0}?
-delete.deleteNilMonthlyReturn.heading = Are you sure you want to delete the nil monthly return for {0}?
-delete.deleteNilMonthlyReturn.error.required = Select yes to delete this nil monthly return
+agent.noAuthorisedClients.title                        =  You have no authorised clients
+agent.noAuthorisedClients.heading                      =  You have no authorised clients
+agent.noAuthorisedClients.p1                           =  You do not have any clients authorised to use the Construction Industry Scheme (CIS) service.
+agent.noAuthorisedClients.p2                           =  To file returns for a client, they must authorise you to act on their behalf.
+agent.noAuthorisedClients.h2                           =  What you need to do
+agent.noAuthorisedClients.p3                           =  Ask your client to authorise you. They can do this by either:
+agent.noAuthorisedClients.listItem1                    =  authorising you through their
+agent.noAuthorisedClients.listItem1.link               =  HMRC online account
+agent.noAuthorisedClients.listItem2                    =  downloading and completing
+agent.noAuthorisedClients.listItem2.link               =  form 64-8
+agent.noAuthorisedClients.listItem2.afterLinkText      =  to authorise you by post
+agent.noAuthorisedClients.p4                           =  It can take up to 5 working days for new authorisations to appear in your account.
+agent.noAuthorisedClients.returnToHome.link            =  Return to home
 
-delete.deleteAmendedMonthlyReturn.title = Are you sure you want to delete the amended monthly return for {0}?
-delete.deleteAmendedMonthlyReturn.heading = Are you sure you want to delete the amended monthly return for {0}?
-delete.deleteAmendedMonthlyReturn.error.required = Select yes to delete this amended monthly return
+agent.clientListSearch.title                           =  Select a client to file CIS returns
+agent.clientListSearch.heading                         =  File monthly CIS returns
+agent.clientListSearch.p1                              =  There are three potential ways to search for, and then file, a monthly CIS return.
+agent.clientListSearch.searchBy.label                  =  What do you want to search by?
+agent.clientListSearch.searchBy.error.required         =  Enter Client name, Employer reference or Client reference from the dropdown list
+agent.clientListSearch.searchBy.placeholder            =  Select an option
+agent.clientListSearch.searchFilter.label              =  Enter your search
+agent.clientListSearch.searchFilter.label.hint         =  This is the client name (ABC Construction), employer reference (123/AB45678), or client reference (ABC-001)
+agent.clientListSearch.searchFilter.error.required     =  Enter either a Client name, Employer reference or your Client reference
+agent.clientListSearch.searchFilter.error.length       =  Search value must be 35 characters or less
+agent.clientListSearch.searchFilter.error.format       =  Search value must only include letters, numbers, hyphens, spaces, commas, full stops, exclamation marks, ampersands, underscores, parentheses and apostrophes
+agent.clientListSearch.searchFilter.cn.error.required  =  Enter the client name in the correct format, like ABC Construction
+agent.clientListSearch.searchFilter.er.error.required  =  Enter the employer reference in the correct format, like 123/AB45678 (three numbers, '/', then seven alphanumeric characters)
+agent.clientListSearch.searchFilter.cr.error.required  =  Enter the client reference in the correct format, like ABC-001
+agent.clientListSearch.searchFilter.cn.error.format    =  Enter the client name in the correct format, like ABC Construction
+agent.clientListSearch.searchFilter.er.error.format    =  Enter the employer reference in the correct format, like 123/AB45678 (three numbers, '/', then seven alphanumeric characters)
+agent.clientListSearch.searchFilter.cr.error.format    =  Enter the client reference in the correct format, like ABC-001
+agent.clientListSearch.searchFilter.cn.error.length    =  Enter a client name shorter than 56 characters
+agent.clientListSearch.searchFilter.er.error.length    =  Enter an employer reference using up to 14 characters, or fewer
+agent.clientListSearch.searchFilter.cr.error.length    =  Enter a client reference shorter than 20 characters
+agent.clientListSearch.table.caption                   =  Your clients
+agent.clientListSearch.th.clientName                   =  Client name
+agent.clientListSearch.th.employersReference           =  Employer reference
+agent.clientListSearch.th.clientReference              =  Client reference
+agent.clientListSearch.th.actions                      =  Actions
+agent.clientListSearch.td.actions.remove               =  Remove
+agent.clientListSearch.clearSearch                     =  Clear search
+agent.clientListSearch.noResults                       =  No search results found
+agent.clientListSearch.details.1.summary               =  Download your client list
+agent.clientListSearch.details.1.p1                    =  You can download a list of all your clients as a CSV file. This may take some time if you have many clients.
+agent.clientListSearch.details.1.link                  =  Download client list (CSV)
+agent.clientListSearch.details.2.summary               =  Filing only service
+agent.clientListSearch.details.2.p1                    =  You can send CIS monthly returns on behalf of a client without completing an authorisation online or form 64-8.
+agent.clientListSearch.details.2.p2                    =  This service is only available using commercial software.
+agent.clientListSearch.details.2.link                  =  Find commercial software for CIS returns (opens in new tab)
 
-delete.deleteAmendedNilMonthlyReturn.title = Are you sure you want to delete the amended nil monthly return for {0}?
-delete.deleteAmendedNilMonthlyReturn.heading = Are you sure you want to delete the amended nil monthly return for {0}?
-delete.deleteAmendedNilMonthlyReturn.error.required = Select yes to delete this amended nil monthly return
+agent.landing.title                                    =  CIS return dashboard for {0}
+agent.landing.h1                                       =  CIS return dashboard
+agent.landing.intro                                    =  You can manage {0}&#8217;s monthly CIS returns – including dates and statements.
+agent.landing.employerRef.key                          =  Employer reference
+agent.landing.utr.key                                  =  Unique Taxpayer Reference (UTR)
+agent.landing.h2.actionRequired                        =  Action required
+agent.landing.h2.manageClient                          =  Manage this client
+agent.landing.h2.recentActivity                        =  Recent activity
+agent.landing.h2.help                                  =  Help and guidance
+agent.landing.card.returnDue.title                     =  Return due
+agent.landing.card.returnDue.dueBy                     =  Due by {0}
+agent.landing.card.notices.title                       =  New notices
+agent.landing.card.notices.subtitle                    =  Notices to view
+agent.landing.manage.subcontractors                    =  Subcontractors
+agent.landing.manage.subcontractors.blurb              =  View, verify or manage subcontractors for this client.
+agent.landing.manage.returnHistory                     =  Return history
+agent.landing.manage.returnHistory.blurb               =  View previously submitted CIS returns for this client.
+agent.landing.manage.notices                           =  Notices and statements
+agent.landing.manage.notices.blurb                     =  View HMRC notices, penalty warnings and confirmation statements.
+agent.landing.manage.amend                             =  Amend a return
+agent.landing.manage.amend.blurb                       =  Make changes to a return you&#8217;ve already submitted.
+agent.landing.manage.clientDetails                     =  Client details
+agent.landing.manage.clientDetails.blurb               =  Update client information and authorisation settings.
+agent.landing.recentActivity.line                      =  Last return submitted: {0} for tax month {1} {2}
+agent.landing.help.link1                               =  What is the Construction Industry Scheme
+agent.landing.help.link2                               =  CIS monthly returns guidance
+agent.landing.help.link3                               =  CIS 340: Penalties for late returns
+agent.landing.back                                     =  Back to clients
 
-history.submittedReturnsChooseTaxYear.title = Which tax year do you want to view?
-history.submittedReturnsChooseTaxYear.heading = Which tax year do you want to view?
-history.submittedReturnsChooseTaxYear.caption = Submitted returns
-history.submittedReturnsChooseTaxYear.viewAll = View all tax years
-history.submittedReturnsChooseTaxYear.error.required = Select a tax year or all tax years
+# Subcontractors
+retrievingSubcontractors.title                                =  Your subcontractors
+retrievingSubcontractors.heading                              =  Your subcontractors
+retrievingSubcontractors.p1                                   =  We are locating your subcontractor records.
+retrievingSubcontractors.p2                                   =  This should only take a few moments.
 
-history.printSubmissionDetails.title = Monthly return for period ending {0}
-history.printSubmissionDetails.heading = Monthly return for period ending {0}
-history.printSubmissionDetails.submissionDetails.heading = Submission details
-history.printSubmissionDetails.submissionDetails.p = Submitted at {0} on {1}.
-history.printSubmissionDetails.submissionDetails.referenceNumber = Receipt reference number
-history.printSubmissionDetails.submissionDetails.submissionType = Submission type
-history.printSubmissionDetails.submissionDetails.submissionType.nil = Monthly nil return
-history.printSubmissionDetails.submissionDetails.submissionType.standard = Monthly return
-history.printSubmissionDetails.submissionDetails.contractorName = Contractor name
-history.printSubmissionDetails.submissionDetails.payeReference = PAYE reference
-history.printSubmissionDetails.paymentDetails.heading = Payment details
-history.printSubmissionDetails.paymentDetails.numberOfSubcontractorAdded = Number of subcontractors added
-history.printSubmissionDetails.paymentDetails.totalPaymentsMade = Total payments made
-history.printSubmissionDetails.paymentDetails.totalCostOfMaterials = Total cost of materials
-history.printSubmissionDetails.paymentDetails.totalTaxDeducted = Total tax deducted
-history.printSubmissionDetails.paymentsMadeToSubcontractors.heading = Payments made to subcontractors
-history.printSubmissionDetails.paymentsMadeToSubcontractors.subcontractor = Subcontractor
-history.printSubmissionDetails.paymentsMadeToSubcontractors.paymentsMade = Payments made
-history.printSubmissionDetails.paymentsMadeToSubcontractors.costOfMaterials = Cost of materials
-history.printSubmissionDetails.paymentsMadeToSubcontractors.taxDeducted = Tax deducted
-history.printSubmissionDetails.printThisPage.link = Print this page
-history.printSubmissionDetails.monthlyReturnHistory.link = Return to Monthly return history
+retrievingSubcontractors.p3.bold                              =  Do not refresh this page or use the back button.
 
-history.returnHistory.allYears.title = Monthly return history for all tax years
-history.returnHistory.allYears.heading = Monthly return history for all tax years
-history.returnHistory.singleYear.title = Monthly return history for tax year {0} to {1}
-history.returnHistory.singleYear.heading = Monthly return history for tax year {0} to {1}
-history.returnHistory.caption = Submitted returns
-history.returnHistory.noSubmittedReturns = You have not submitted any monthly returns. // TODO: confirm if this message is needed
-history.returnHistory.taxYear.caption = Tax year {0} to {1}
-history.returnHistory.table.returnPeriodEnd = Return period ended
-history.returnHistory.table.returnType = Type
-history.returnHistory.table.dateSubmitted = Date submitted
-history.returnHistory.table.monthlyReturn = Monthly return
-history.returnHistory.table.submissionReceipt = Submission receipt
-history.returnHistory.table.status = Status
-history.returnHistory.returnType.standard = Standard
-history.returnHistory.returnType.nil = Nil
-history.returnHistory.backLink = Return to View tax year
-history.returnHistory.status.awaitingConfirmation = Awaiting confirmation
-history.returnHistory.status.amend = Amend
-history.returnHistory.status.notAvailable = Not available
-history.returnHistory.status.awaitingConfirmation = Awaiting confirmation
-history.returnHistory.status.inProgress = In progress
-history.returnHistory.hidden.status.amend = amend return for {0}
-history.returnHistory.hidden.status.inProgress = submission return for {0}
-history.returnHistory.hidden.monthlyReturn = monthly return for {0}
-history.returnHistory.hidden.submissionReceipt = submission receipt for {0}
+checkSubcontractorRecords.title                               =  Check subcontractor records
+checkSubcontractorRecords.heading                             =  Check subcontractor records
+checkSubcontractorRecords.p1                                  =  We will now check if there are any subcontractor records you have recently paid/verified.
+checkSubcontractorRecords.p2                                  =  Any record we find will be automatically added to your subcontractor list, which will be available to view.
 
+unsuccessfulAutomaticSubcontractorUpdate.title                =  Unsuccessful automatic subcontractor update
+unsuccessfulAutomaticSubcontractorUpdate.heading              =  Unsuccessful automatic subcontractor update
+unsuccessfulAutomaticSubcontractorUpdate.p1                   =  The subcontractor automatic check was unsuccessful. CIS Online will perform this update again the next time you enter the application,
+unsuccessfulAutomaticSubcontractorUpdate.p2                   =  unless you choose to add subcontractor details yourself.
+unsuccessfulAutomaticSubcontractorUpdate.p3                   =  Before adding a subcontractor, you will need to add their details.
 
-amend.noReturnsSubmitted.title = You have not submitted any returns
-amend.noReturnsSubmitted.heading = You have not submitted any returns
-amend.noReturnsSubmitted.p1 = To view a monthly return, or make any amendments, you must file one first.
-amend.noReturnsSubmitted.p2 = You can do this in
-amend.noReturnsSubmitted.p2.link = Manage your CIS return
-amend.noReturnsSubmitted.p3 = Find out more about
-amend.noReturnsSubmitted.p3.link = what you must do as a CIS contractor
+successfulAutomaticSubcontractorUpdate.title                  =  Successful automatic subcontractor update
+successfulAutomaticSubcontractorUpdate.heading                =  Successful automatic subcontractor update
+successfulAutomaticSubcontractorUpdate.p1                     =  The subcontractors below have been added to your subcontractor list.
 
-submissionConfirmation.title = {0} return successfully submitted
-submissionConfirmation.panel.heading = {0} return successfully submitted
-submissionConfirmation.panel.referenceLabel = Your receipt reference number
-submissionConfirmation.details.heading = Submission details
-submissionConfirmation.submittedOn = Submitted on
-submissionConfirmation.contractorName = Contractor name
-submissionConfirmation.payeReference = PAYE reference
-submissionConfirmation.returnPeriod = Return period ended
-submissionConfirmation.email = Email
-submissionConfirmation.whatYouCanDo.heading = What you can do
-submissionConfirmation.noEmail =  If you want to provide an email, you need to change your contacts in ‘About your organisation/firm’, under ‘Your HMRC Services’.
-submissionConfirmation.inset = You can save this page or print a copy for your records.
-submissionConfirmation.print = Print this page
-submissionConfirmation.backToManage = Back to Manage your CIS return
-submissionConfirmation.needHelp.heading = Need help?
-submissionConfirmation.needHelp.p1 = For any questions about your return submission, contact the
-submissionConfirmation.needHelp.link = Construction Industry Scheme general enquiries (opens in new tab).
-submissionConfirmation.returnType.monthly = Monthly
-submissionConfirmation.returnType.nil = Nil
+successfulAutomaticSubcontractorUpdate.th.name                =  Name
+successfulAutomaticSubcontractorUpdate.th.uniqueTaxReference  =  Unique Tax Reference
+successfulAutomaticSubcontractorUpdate.th.verificationNumber  =  Verification number
+successfulAutomaticSubcontractorUpdate.th.dateAdded           =  Date added
 
-amend.noIncompleteReturns.title = You do not have any incomplete returns
-amend.noIncompleteReturns.heading = You do not have any incomplete returns
-amend.noIncompleteReturns.p1 = To view a monthly return, or make any amendments, you must file one first.
-amend.noIncompleteReturns.p2 = You can do this in
-amend.noIncompleteReturns.p2.link = Manage your CIS return
-amend.noIncompleteReturns.p3 = Find out more about
-amend.noIncompleteReturns.p3.link = what you must do as a CIS contractor
+successfulNoRecordsFound.title                                =  Successful automatic subcontractor update
+successfulNoRecordsFound.heading                              =  Successful automatic subcontractor update
+successfulNoRecordsFound.p1                                   =  No subcontractor records were found.
+successfulNoRecordsFound.p2                                   =  You can
 
-incompleteReturns.title = Incomplete returns
-incompleteReturns.heading = Incomplete returns
-incompleteReturns.message = A tax month cannot be changed if it is incorrect and the return is in progress. You must delete it and file a new return with the correct tax month.
-incompleteReturns.table.returnPeriodEnd = Return period ended
-incompleteReturns.table.returnType = Type
-incompleteReturns.table.lastUpdate = Last updated
-incompleteReturns.table.status = Status
-incompleteReturns.table.action = Action
-incompleteReturns.action.continue = Continue
-incompleteReturns.action.delete = Delete
-incompleteReturns.action.view = View
-incompleteReturns.action.continue.hidden = return for {0}
-incompleteReturns.action.delete.hidden = return for {0}
-incompleteReturns.action.view.hidden = return for {0}
+successfulNoRecordsFound.p2.link                              =  add a subcontractor
 
-verify.verificationHistorySelectTaxYear.title = Which tax year do you want to view verification requests from?
-verify.verificationHistorySelectTaxYear.heading = Which tax year do you want to view verification requests from?
-verify.verificationHistorySelectTaxYear.or = or
-verify.verificationHistorySelectTaxYear.viewAll = View all tax years
-verify.verificationHistorySelectTaxYear.error.required = Select a tax year
+subcontractorsLandingPage.title                               =  Manage your CIS return subcontractor
+subcontractorsLandingPage.heading                             =  Manage your CIS return subcontractor
+subcontractorsLandingPage.p1                                  =  You can use this service to manage your subcontractors list.
+subcontractorsLandingPage.hint                                =  You will need HMRC free software to access the links below.
+subcontractorsLandingPage.addSubcontractors                   =  Add subcontractor
 
-clientdetails.clientRemoved.title = Client removed
-clientdetails.clientRemoved.heading = Client removed
-clientdetails.clientRemoved.h2 = What happens next
-clientdetails.clientRemoved.p1 = It may take up to half an hour for this change to take place.
-clientdetails.clientRemoved.return.link = Return to your client list
-clientdetails.clientRemoved.survey.link = what did you think of this service?
-clientdetails.clientRemoved.survey.suffix = (takes 30 seconds)
+subcontractorsLandingPage.addSubcontractors.p1                =  Add subcontractors to your list
+
+subcontractorsLandingPage.verifySubcontractors                =  Verify subcontractor
+
+subcontractorsLandingPage.verifySubcontractors.p1             =  View, verify or manage subcontractors
+
+subcontractorsLandingPage.subcontractorList                   =  Subcontractor list
+
+subcontractorsLandingPage.subcontractorList.p1                =  View subcontractor list
+
+subcontractorsLandingPage.h2                                  =  What you need to know
+subcontractorsLandingPage.p2                                  =  You should include subcontractors ‐ with or without gross payment status ‐ on your subcontractor list. For more information
+
+subcontractorsLandingPage.p2.link                             =  on gross payment status
+
+subcontractorsLandingPage.p3                                  =  Subcontractors from your list must be included in your monthly return if you pay them during the month. To submit a return, your selected subcontractors must be verified.
+
+subcontractorsLandingPage.aside.h2                            =  Help and guidance
+subcontractorsLandingPage.aside.link1                         =  What is the Construction Industry Scheme
+subcontractorsLandingPage.aside.link2                         =  CIS monthly returns guidance
+subcontractorsLandingPage.aside.link3                         =  CIS 340: Penalties for late returns
+
+# Returns & Submissions
+addContractorDetails.title                   =  Add contractor details
+addContractorDetails.heading                 =  Add contractor details
+addContractorDetails.p1                      =  This is a placeholder page for adding contractor details.
+
+submissionConfirmation.title                 =  {0} return successfully submitted
+
+submissionConfirmation.panel.heading         =  {0} return successfully submitted
+submissionConfirmation.panel.referenceLabel  =  Your receipt reference number
+
+submissionConfirmation.details.heading       =  Submission details
+
+submissionConfirmation.submittedOn           =  Submitted on
+submissionConfirmation.contractorName        =  Contractor name
+submissionConfirmation.payeReference         =  PAYE reference
+submissionConfirmation.returnPeriod          =  Return period ended
+submissionConfirmation.email                 =  Email
+
+submissionConfirmation.whatYouCanDo.heading  =  What you can do
+
+submissionConfirmation.noEmail               =  If you want to provide an email, you need to change your contacts in ‘About your organisation/firm’, under ‘Your HMRC Services’.
+submissionConfirmation.inset                 =  You can save this page or print a copy for your records.
+submissionConfirmation.print                 =  Print this page
+submissionConfirmation.backToManage          =  Back to Manage your CIS return
+
+submissionConfirmation.needHelp.heading      =  Need help?
+submissionConfirmation.needHelp.p1           =  For any questions about your return submission, contact the
+submissionConfirmation.needHelp.link         =  Construction Industry Scheme general enquiries (opens in new tab).
+
+submissionConfirmation.returnType.monthly    =  Monthly
+submissionConfirmation.returnType.nil        =  Nil
+
+incompleteReturns.title                      =  Incomplete returns
+incompleteReturns.heading                    =  Incomplete returns
+incompleteReturns.message                    =  A tax month cannot be changed if it is incorrect and the return is in progress. You must delete it and file a new return with the correct tax month.
+
+incompleteReturns.table.returnPeriodEnd      =  Return period ended
+incompleteReturns.table.returnType           =  Type
+incompleteReturns.table.lastUpdate           =  Last updated
+incompleteReturns.table.status               =  Status
+incompleteReturns.table.action               =  Action
+
+incompleteReturns.action.continue            =  Continue
+incompleteReturns.action.delete              =  Delete
+incompleteReturns.action.view                =  View
+incompleteReturns.action.continue.hidden     =  return for {0}
+incompleteReturns.action.delete.hidden       =  return for {0}
+incompleteReturns.action.view.hidden         =  return for {0}
+
+# History
+history.submittedReturnsChooseTaxYear.title                                  =  Which tax year do you want to view?
+history.submittedReturnsChooseTaxYear.heading                                =  Which tax year do you want to view?
+history.submittedReturnsChooseTaxYear.caption                                =  Submitted returns
+history.submittedReturnsChooseTaxYear.viewAll                                =  View all tax years
+history.submittedReturnsChooseTaxYear.error.required                         =  Select a tax year or all tax years
+
+history.printSubmissionDetails.title                                         =  Monthly return for period ending {0}
+history.printSubmissionDetails.heading                                       =  Monthly return for period ending {0}
+history.printSubmissionDetails.submissionDetails.heading                     =  Submission details
+history.printSubmissionDetails.submissionDetails.p                           =  Submitted at {0} on {1}.
+history.printSubmissionDetails.submissionDetails.referenceNumber             =  Receipt reference number
+history.printSubmissionDetails.submissionDetails.submissionType              =  Submission type
+history.printSubmissionDetails.submissionDetails.submissionType.nil          =  Monthly nil return
+history.printSubmissionDetails.submissionDetails.submissionType.standard     =  Monthly return
+history.printSubmissionDetails.submissionDetails.contractorName              =  Contractor name
+history.printSubmissionDetails.submissionDetails.payeReference               =  PAYE reference
+history.printSubmissionDetails.paymentDetails.heading                        =  Payment details
+history.printSubmissionDetails.paymentDetails.numberOfSubcontractorAdded     =  Number of subcontractors added
+history.printSubmissionDetails.paymentDetails.totalPaymentsMade              =  Total payments made
+history.printSubmissionDetails.paymentDetails.totalCostOfMaterials           =  Total cost of materials
+history.printSubmissionDetails.paymentDetails.totalTaxDeducted               =  Total tax deducted
+history.printSubmissionDetails.paymentsMadeToSubcontractors.heading          =  Payments made to subcontractors
+history.printSubmissionDetails.paymentsMadeToSubcontractors.subcontractor    =  Subcontractor
+history.printSubmissionDetails.paymentsMadeToSubcontractors.paymentsMade     =  Payments made
+history.printSubmissionDetails.paymentsMadeToSubcontractors.costOfMaterials  =  Cost of materials
+history.printSubmissionDetails.paymentsMadeToSubcontractors.taxDeducted      =  Tax deducted
+history.printSubmissionDetails.printThisPage.link                            =  Print this page
+history.printSubmissionDetails.monthlyReturnHistory.link                     =  Return to Monthly return history
+
+history.returnHistory.allYears.title                                         =  Monthly return history for all tax years
+history.returnHistory.allYears.heading                                       =  Monthly return history for all tax years
+history.returnHistory.singleYear.title                                       =  Monthly return history for tax year {0} to {1}
+history.returnHistory.singleYear.heading                                     =  Monthly return history for tax year {0} to {1}
+history.returnHistory.caption                                                =  Submitted returns
+history.returnHistory.noSubmittedReturns                                     =  You have not submitted any monthly returns. // TODO: confirm if this message is needed
+history.returnHistory.taxYear.caption                                        =  Tax year {0} to {1}
+history.returnHistory.table.returnPeriodEnd                                  =  Return period ended
+history.returnHistory.table.returnType                                       =  Type
+history.returnHistory.table.dateSubmitted                                    =  Date submitted
+history.returnHistory.table.monthlyReturn                                    =  Monthly return
+history.returnHistory.table.submissionReceipt                                =  Submission receipt
+history.returnHistory.table.status                                           =  Status
+history.returnHistory.returnType.standard                                    =  Standard
+history.returnHistory.returnType.nil                                         =  Nil
+history.returnHistory.backLink                                               =  Return to View tax year
+history.returnHistory.status.awaitingConfirmation                            =  Awaiting confirmation
+history.returnHistory.status.amend                                           =  Amend
+history.returnHistory.status.notAvailable                                    =  Not available
+history.returnHistory.status.inProgress                                      =  In progress
+history.returnHistory.hidden.status.amend                                    =  amend return for {0}
+history.returnHistory.hidden.status.inProgress                               =  submission return for {0}
+history.returnHistory.hidden.monthlyReturn                                   =  monthly return for {0}
+history.returnHistory.hidden.submissionReceipt                               =  submission receipt for {0}
+
+# Delete
+delete.deleteMonthlyReturn.title                     =  Are you sure you want to delete the monthly return for {0}?
+delete.deleteMonthlyReturn.heading                   =  Are you sure you want to delete the monthly return for {0}?
+delete.deleteMonthlyReturn.error.required            =  Select yes to delete this return
+
+delete.deleteNilMonthlyReturn.title                  =  Are you sure you want to delete the nil monthly return for {0}?
+delete.deleteNilMonthlyReturn.heading                =  Are you sure you want to delete the nil monthly return for {0}?
+delete.deleteNilMonthlyReturn.error.required         =  Select yes to delete this nil monthly return
+
+delete.deleteAmendedMonthlyReturn.title              =  Are you sure you want to delete the amended monthly return for {0}?
+delete.deleteAmendedMonthlyReturn.heading            =  Are you sure you want to delete the amended monthly return for {0}?
+delete.deleteAmendedMonthlyReturn.error.required     =  Select yes to delete this amended monthly return
+
+delete.deleteAmendedNilMonthlyReturn.title           =  Are you sure you want to delete the amended nil monthly return for {0}?
+delete.deleteAmendedNilMonthlyReturn.heading         =  Are you sure you want to delete the amended nil monthly return for {0}?
+delete.deleteAmendedNilMonthlyReturn.error.required  =  Select yes to delete this amended nil monthly return
+
+# Amend
+amend.noReturnsSubmitted.title     =  You have not submitted any returns
+amend.noReturnsSubmitted.heading   =  You have not submitted any returns
+amend.noReturnsSubmitted.p1        =  To view a monthly return, or make any amendments, you must file one first.
+amend.noReturnsSubmitted.p2        =  You can do this in
+amend.noReturnsSubmitted.p2.link   =  Manage your CIS return
+amend.noReturnsSubmitted.p3        =  Find out more about
+amend.noReturnsSubmitted.p3.link   =  what you must do as a CIS contractor
+
+amend.noIncompleteReturns.title    =  You do not have any incomplete returns
+amend.noIncompleteReturns.heading  =  You do not have any incomplete returns
+amend.noIncompleteReturns.p1       =  To view a monthly return, or make any amendments, you must file one first.
+amend.noIncompleteReturns.p2       =  You can do this in
+amend.noIncompleteReturns.p2.link  =  Manage your CIS return
+amend.noIncompleteReturns.p3       =  Find out more about
+amend.noIncompleteReturns.p3.link  =  what you must do as a CIS contractor
+
+# Notices & Statements
+manageNoticesStatements.title                                   =  Manage your CIS return notices and statements
+manageNoticesStatements.heading                                 =  Manage your CIS return notices and statements
+manageNoticesStatements.intro                                   =  View confirmation statements, penalty warnings and HMRC notices for your CIS returns.
+
+manageNoticesStatements.link.understandingNotices               =  Understanding your notices
+
+manageNoticesStatements.search.heading                          =  Search notices
+manageNoticesStatements.search.description                      =  Select notice type, and then a time period.
+
+manageNoticesStatements.noticeType.label                        =  Notice type
+manageNoticesStatements.noticeType.all                          =  All notices
+manageNoticesStatements.noticeType.general                      =  General notices
+manageNoticesStatements.noticeType.penaltyWarnings              =  Penalty warnings
+manageNoticesStatements.noticeType.confirmationStatements       =  Confirmation
+
+manageNoticesStatements.readStatus.label                        =  Read/unread notices
+
+manageNoticesStatements.status.read                             =  Read
+manageNoticesStatements.status.unread                           =  Unread
+manageNoticesStatements.status.all                              =  All
+
+manageNoticesStatements.dateFilter.last7Days                    =  Last 7 days
+manageNoticesStatements.dateFilter.lastMonth                    =  Last month
+manageNoticesStatements.dateFilter.dateRange                    =  Date Range
+manageNoticesStatements.dateFilter.all                          =  All
+
+manageNoticesStatements.search.button                           =  Search
+
+manageNoticesStatements.searchResults.heading                   =  Search results
+manageNoticesStatements.searchResults.summary                   =  Displaying {0} out of {1} records
+
+manageNoticesStatements.recentNotices.heading                   =  Recent notices
+
+manageNoticesStatements.details.confirmationStatements.heading  =  Confirmation statements
+manageNoticesStatements.details.confirmationStatements.body     =  You’ll receive a confirmation statement when HMRC accepts your CIS return. This confirms the return has been processed.
+manageNoticesStatements.details.penaltyWarnings.heading         =  Penalty warnings
+manageNoticesStatements.details.penaltyWarnings.body            =  HMRC will send you a penalty warning if your return is late or if there are errors. The notice will explain what you need to do.
+manageNoticesStatements.details.generalNotices.heading          =  General notices
+manageNoticesStatements.details.generalNotices.body             =  HMRC may send you general notices about changes to CIS, important reminders, or requests for additional information.
+manageNoticesStatements.details.howLong.heading                 =  How long to keep notices
+manageNoticesStatements.details.howLong.body                    =  You should keep all CIS notices and statements for at least 3 years after the end of the tax year they relate to.
+
+manageNoticesStatements.table.date                              =  Date
+manageNoticesStatements.table.type                              =  Type
+manageNoticesStatements.table.description                       =  Description
+manageNoticesStatements.table.status                            =  Status
+manageNoticesStatements.table.action                            =  Action
+manageNoticesStatements.table.action.view                       =  View
+
+manageNoticesStatements.description.penaltyWarning              =  You need to file a CIS return for the tax month ending {0}
+manageNoticesStatements.description.confirmation                =  Return accepted for {0}
+
+manageNoticesStatements.sidebar.heading                         =  Help and guidance
+manageNoticesStatements.sidebar.link1                           =  What is the Construction Industry Scheme
+manageNoticesStatements.sidebar.link2                           =  CIS monthly returns guidance
+manageNoticesStatements.sidebar.link3                           =  CIS 340: Penalties for late returns
+
+manageNoticesStatements.searchResults.viewAll                   =  View all notices
+
+# Verify
+verify.verificationHistorySelectTaxYear.title           =  Which tax year do you want to view verification requests from?
+verify.verificationHistorySelectTaxYear.heading         =  Which tax year do you want to view verification requests from?
+verify.verificationHistorySelectTaxYear.or              =  or
+verify.verificationHistorySelectTaxYear.viewAll         =  View all tax years
+verify.verificationHistorySelectTaxYear.error.required  =  Select a tax year
+
+# Client Details
+clientdetails.clientRemoved.title          =  Client removed
+clientdetails.clientRemoved.heading        =  Client removed
+clientdetails.clientRemoved.h2             =  What happens next
+clientdetails.clientRemoved.p1             =  It may take up to half an hour for this change to take place.
+clientdetails.clientRemoved.return.link    =  Return to your client list
+clientdetails.clientRemoved.survey.link    =  what did you think of this service?
+clientdetails.clientRemoved.survey.suffix  =  (takes 30 seconds)
 
 clientdetails.changeClientReference.title = What is your client reference?
 clientdetails.changeClientReference.heading = What is your client reference?
