@@ -128,5 +128,10 @@ GET   /verify/verification-history-tax-year/:taxYear     controllers.verify.Veri
 # Client Details
 GET  /client-details/client-removed  controllers.clientdetails.ClientRemovedController.onPageLoad()
 
+GET        /client-details/change-client-reference                      controllers.clientdetails.ChangeClientReferenceController.onPageLoad(mode: Mode = NormalMode)
+POST       /client-details/change-client-reference                      controllers.clientdetails.ChangeClientReferenceController.onSubmit(mode: Mode = NormalMode)
+GET        /client-details/change-change-client-reference               controllers.clientdetails.ChangeClientReferenceController.onPageLoad(mode: Mode = CheckMode)
+POST       /client-details/change-change-client-reference               controllers.clientdetails.ChangeClientReferenceController.onSubmit(mode: Mode = CheckMode)
+
 # Add Contractor Details
 GET  /add-contractor-details  controllers.AddContractorDetailsController.onPageLoad()
