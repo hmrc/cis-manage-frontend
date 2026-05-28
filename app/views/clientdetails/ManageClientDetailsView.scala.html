@@ -24,10 +24,11 @@
     govukSummaryList: GovukSummaryList,
     govukButton: GovukButton,
     h1: H1,
-    h2: components.H2
+    h2: components.H2,
+    link: Link
 )
 
-@(clientName: String, employerRef: String, clientRef: String)(implicit request: Request[_], messages: Messages)
+@(uniqueId: String, clientName: String, employerRef: String, clientRef: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("clientdetails.manageClientDetails.title"))) {
 
@@ -62,4 +63,10 @@
             ),
         )
     ))
+
+    @link(
+        linkTextKey = "clientdetails.manageClientDetails.return.link",
+        linkUrl = controllers.agent.routes.AgentLandingController.onPageLoad(uniqueId: String).url
+    )
+
 }

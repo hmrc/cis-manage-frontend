@@ -520,3 +520,4 @@ clientdetails.manageClientDetails.employerRef.key = Employers reference
 clientdetails.manageClientDetails.clientRef.key = Client reference
 clientdetails.manageClientDetails.clientRef.key.hidden = client reference
 clientdetails.manageClientDetails.clientRef.link = change
+clientdetails.manageClientDetails.return.link = Return to the client dashboard

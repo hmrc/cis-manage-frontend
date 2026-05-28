@@ -27,6 +27,7 @@ import config.FrontendAppConfig
 
 class ManageClientDetailsViewSpec extends SpecBase {
 
+  private val uniqueId    = "1"
   private val clientName  = "ABC Construction Ltd"
   private val employerRef = "123/AB45678"
   private val clientRef   = "AOR1"
@@ -70,6 +71,12 @@ class ManageClientDetailsViewSpec extends SpecBase {
       doc.text() should include(messages(app).apply("site.change"))
     }
 
+    "render Return to client dashboard link" in {
+      val (doc, _) = render()
+
+      doc.text() should include(messages(app).apply("clientdetails.manageClientDetails.return.link"))
+    }
+
   }
 
   private def render(): (Document, FrontendAppConfig) = {
@@ -82,6 +89,7 @@ class ManageClientDetailsViewSpec extends SpecBase {
 
     val view = application.injector.instanceOf[ManageClientDetailsView]
     val html = view(
+      uniqueId = uniqueId,
       clientName = clientName,
       employerRef = employerRef,
       clientRef = clientRef

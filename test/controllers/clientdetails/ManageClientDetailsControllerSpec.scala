@@ -36,12 +36,13 @@ class ManageClientDetailsControllerSpec extends SpecBase {
 
         val view = application.injector.instanceOf[ManageClientDetailsView]
 
+        val fakeUniqueId: String    = "1"
         val fakeClientName: String  = "{Client}"
         val fakeEmployerRef: String = "{123/ab4}"
         val fakeClientRef: String   = "{AOR1}"
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(fakeClientName, fakeEmployerRef, fakeClientRef)(
+        contentAsString(result) mustEqual view(fakeUniqueId, fakeClientName, fakeEmployerRef, fakeClientRef)(
           request,
           messages(application)
         ).toString

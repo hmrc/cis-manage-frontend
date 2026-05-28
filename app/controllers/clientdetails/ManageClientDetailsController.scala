@@ -35,9 +35,10 @@ class ManageClientDetailsController @Inject() (
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    val uniqueId: String          = "1"
     val clientName: String        = "{Client}"
     val employerReference: String = "{123/ab4}"
     val clientReference: String   = "{AOR1}"
-    Ok(view(clientName, employerReference, clientReference))
+    Ok(view(uniqueId, clientName, employerReference, clientReference))
   }
 }
