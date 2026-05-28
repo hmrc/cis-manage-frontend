@@ -130,5 +130,10 @@ POST       /client-details/remove-client                                    cont
 GET        /client-details/change-remove-client                             controllers.clientdetails.RemoveClientYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /client-details/change-remove-client                             controllers.clientdetails.RemoveClientYesNoController.onSubmit(mode: Mode = CheckMode)
 
+GET        /client-details/change-client-reference                      controllers.clientdetails.ChangeClientReferenceController.onPageLoad(mode: Mode = NormalMode)
+POST       /client-details/change-client-reference                      controllers.clientdetails.ChangeClientReferenceController.onSubmit(mode: Mode = NormalMode)
+GET        /client-details/change-change-client-reference               controllers.clientdetails.ChangeClientReferenceController.onPageLoad(mode: Mode = CheckMode)
+POST       /client-details/change-change-client-reference               controllers.clientdetails.ChangeClientReferenceController.onSubmit(mode: Mode = CheckMode)
+
 # Add Contractor Details
 GET  /add-contractor-details  controllers.AddContractorDetailsController.onPageLoad()

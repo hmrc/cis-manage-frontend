@@ -20,6 +20,7 @@ site.pagination.next                      =  Next
 site.delete                               =  Delete
 site.or                                   =  or
 site.view                                 =  View
+site.saveAndContinue                      = Save and continue
 
 date.day                                  =  Day
 date.month                                =  Month
@@ -582,3 +583,11 @@ clientdetails.clientRemoved.survey.suffix  =  (takes 30 seconds)
 clientdetails.removeClient.title = Are you sure you want to remove {0}?
 clientdetails.removeClient.heading = Are you sure you want to remove {0}?
 clientdetails.removeClient.error.required = Select yes to remove this client
+
+clientdetails.changeClientReference.title = What is your client reference?
+clientdetails.changeClientReference.heading = What is your client reference?
+clientdetails.changeClientReference.hint = Enter the reference you are now using to identify your client.
+clientdetails.changeClientReference.checkYourAnswersLabel = Change client reference
+clientdetails.changeClientReference.error.required = Enter your client reference
+clientdetails.changeClientReference.error.invalidCharacters = You have entered a client reference in an incorrect format
+clientdetails.changeClientReference.change.hidden = client Reference
