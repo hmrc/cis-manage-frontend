@@ -577,7 +577,7 @@ clientdetails.clientRemoved.heading        =  Client removed
 clientdetails.clientRemoved.h2             =  What happens next
 clientdetails.clientRemoved.p1             =  It may take up to half an hour for this change to take place.
 clientdetails.clientRemoved.return.link    =  Return to your client list
-clientdetails.clientRemoved.survey.link    =  what did you think of this service?
+clientdetails.clientRemoved.survey.link    =  What did you think of this service?
 clientdetails.clientRemoved.survey.suffix  =  (takes 30 seconds)
 
 clientdetails.changeClientReference.title = What is your client reference?
