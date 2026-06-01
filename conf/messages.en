@@ -572,6 +572,14 @@ verify.verificationHistorySelectTaxYear.viewAll         =  View all tax years
 verify.verificationHistorySelectTaxYear.error.required  =  Select a tax year
 
 # Client Details
+clientdetails.manageClientDetails.title = Client details
+clientdetails.manageClientDetails.heading = {0} details
+clientdetails.manageClientDetails.employerRef.key = Employers reference
+clientdetails.manageClientDetails.clientRef.key = Client reference
+clientdetails.manageClientDetails.clientRef.key.hidden = client reference
+clientdetails.manageClientDetails.clientRef.link = change
+clientdetails.manageClientDetails.return.link = Return to the client dashboard
+
 clientdetails.clientRemoved.title          =  Client removed
 clientdetails.clientRemoved.heading        =  Client removed
 clientdetails.clientRemoved.h2             =  What happens next

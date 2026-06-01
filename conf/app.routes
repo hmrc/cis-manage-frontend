@@ -123,7 +123,10 @@ GET   /verify/select-tax-year-for-verification-requests  controllers.verify.Veri
 POST  /verify/select-tax-year-for-verification-requests  controllers.verify.VerificationHistorySelectTaxYearController.onSubmit(mode: Mode = NormalMode)
 
 # Client Details
+GET  /client-details/manage-client-details    controllers.clientdetails.ManageClientDetailsController.onPageLoad()
+
 GET  /client-details/client-removed                               controllers.clientdetails.ClientRemovedController.onPageLoad()
+
 GET  /client-details/client-reference-updated                     controllers.clientdetails.ClientRefUpdateConfirmationController.onPageLoad()
 
 GET        /client-details/change-client-reference                      controllers.clientdetails.ChangeClientReferenceController.onPageLoad(mode: Mode = NormalMode)
