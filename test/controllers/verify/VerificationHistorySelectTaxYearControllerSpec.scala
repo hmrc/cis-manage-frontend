@@ -203,7 +203,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
 
         redirectLocation(result).value mustEqual
           controllers.verify.routes.VerificationHistoryController
-            .onPageLoadSingleYear("2026")
+            .onPageLoadSingleYear()
             .url
       }
     }

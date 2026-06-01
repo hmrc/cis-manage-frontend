@@ -94,9 +94,8 @@ class VerificationHistorySelectTaxYearController @Inject() (
                 } yield selection match {
                   case AllTaxYears =>
                     Redirect(controllers.verify.routes.VerificationHistoryController.onPageLoadAllYears())
-                  case TaxYear(v)  =>
-                    val yearStart = v.takeWhile(_ != ' ')
-                    Redirect(controllers.verify.routes.VerificationHistoryController.onPageLoadSingleYear(yearStart))
+                  case TaxYear(_)  =>
+                    Redirect(controllers.verify.routes.VerificationHistoryController.onPageLoadSingleYear())
                 }
             }
           }

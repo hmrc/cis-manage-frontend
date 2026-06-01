@@ -18,12 +18,13 @@ package controllers.verify
 
 import base.SpecBase
 import models.UserAnswers
-import models.verify.{VerificationHistoryData, VerificationRequestData}
+import models.verify.{VerificationHistoryData, VerificationRequestData, VerificationTaxYearSelection}
+import models.verify.VerificationTaxYearSelection.TaxYear
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify as mockVerify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CisIdPage
-import pages.verify.VerificationHistoryDataPage
+import pages.verify.{VerificationHistoryDataPage, VerificationHistorySelectTaxYearPage}
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -84,8 +85,14 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
         .success
         .value
 
-    def userAnswersWithVerificationHistoryData: UserAnswers =
+    def userAnswersWithCisIdAndTaxYearSelection: UserAnswers =
       userAnswersWithCisId
+        .set(VerificationHistorySelectTaxYearPage, TaxYear("2026 to 2027 (current tax year)"))
+        .success
+        .value
+
+    def userAnswersWithVerificationHistoryData: UserAnswers =
+      userAnswersWithCisIdAndTaxYearSelection
         .set(VerificationHistoryDataPage, verificationHistoryData)
         .success
         .value
@@ -133,7 +140,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
       val app = application(userAnswers)
 
       running(app) {
-        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadSingleYear("2026").url)
+        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadSingleYear().url)
         val result  = route(app, request).value
         val view    = app.injector.instanceOf[VerificationHistoryView]
 
@@ -167,7 +174,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "onPageLoadSingleYear must fetch data from manageService when VerificationHistoryDataPage is missing and CisIdPage exists" in new Setup {
-      val userAnswers = userAnswersWithCisId
+      val userAnswers = userAnswersWithCisIdAndTaxYearSelection
 
       mockManageServiceReturnsData()
       mockSingleYearViewModelReturns(Some(viewModel))
@@ -175,7 +182,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
       val app = application(userAnswers)
 
       running(app) {
-        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadSingleYear("2026").url)
+        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadSingleYear().url)
         val result  = route(app, request).value
 
         status(result) mustEqual OK
@@ -209,7 +216,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
       val app = application(emptyUserAnswers)
 
       running(app) {
-        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadSingleYear("2026").url)
+        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadSingleYear().url)
         val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -238,7 +245,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
       val app = application(userAnswers)
 
       running(app) {
-        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadSingleYear("2026").url)
+        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadSingleYear().url)
         val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -267,15 +274,32 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "onPageLoadSingleYear must redirect to JourneyRecovery when resolveVerificationHistoryData fails" in new Setup {
+    "onPageLoadSingleYear must redirect to JourneyRecovery when tax year selection is missing from session" in new Setup {
       val userAnswers = userAnswersWithCisId
+
+      val app = application(userAnswers)
+
+      running(app) {
+        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadSingleYear().url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual journeyRecoveryUrl
+
+        verifyNoInteractions(mockManageService)
+        verifyNoInteractions(mockVerificationHistoryService)
+      }
+    }
+
+    "onPageLoadSingleYear must redirect to JourneyRecovery when resolveVerificationHistoryData fails" in new Setup {
+      val userAnswers = userAnswersWithCisIdAndTaxYearSelection
 
       mockManageServiceFails()
 
       val app = application(userAnswers)
 
       running(app) {
-        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadSingleYear("2026").url)
+        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadSingleYear().url)
         val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER

@@ -18,8 +18,9 @@ package controllers.verify
 
 import controllers.actions.*
 import models.requests.CisIdDataRequest
-import models.verify.VerificationHistoryData
-import pages.verify.VerificationHistoryDataPage
+import models.verify.{VerificationHistoryData, VerificationTaxYearSelection}
+import models.verify.VerificationTaxYearSelection.TaxYear
+import pages.verify.{VerificationHistoryDataPage, VerificationHistorySelectTaxYearPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -47,21 +48,27 @@ class VerificationHistoryController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoadSingleYear(taxYear: String): Action[AnyContent] =
+  def onPageLoadSingleYear(): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
 
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-      resolveVerificationHistoryData
-        .map { data =>
-          verificationHistoryService.buildSingleYearViewModel(data, taxYear, request.cisId) match {
-            case Some(vm) => Ok(view(vm))
-            case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          }
-        }
-        .recover { case _ =>
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
+      request.userAnswers.get(VerificationHistorySelectTaxYearPage) match {
+        case Some(TaxYear(v)) =>
+          val taxYear = v.takeWhile(_ != ' ')
+          resolveVerificationHistoryData
+            .map { data =>
+              verificationHistoryService.buildSingleYearViewModel(data, taxYear, request.cisId) match {
+                case Some(vm) => Ok(view(vm))
+                case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              }
+            }
+            .recover { case _ =>
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
+        case _                =>
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
     }
 
   def onPageLoadAllYears: Action[AnyContent] =

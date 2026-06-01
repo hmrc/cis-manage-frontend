@@ -90,10 +90,10 @@ class VerificationHistoryViewSpec extends SpecBase {
       val doc = render(singleYearViewModel)
 
       doc.title() shouldBe
-        s"${messages(app)("verify.verificationHistory.singleYear.title", "2026", "2027")} - ${messages(app)("service.name")} - GOV.UK"
+        s"${messages(app)("verify.verificationHistory.singleYear.title")} - ${messages(app)("service.name")} - GOV.UK"
 
       doc.selectFirst("h1").text() shouldBe
-        messages(app)("verify.verificationHistory.singleYear.heading", "2026", "2027")
+        messages(app)("verify.verificationHistory.singleYear.heading")
     }
 
     "render the page with expected title and heading for all years" in {
@@ -167,6 +167,13 @@ class VerificationHistoryViewSpec extends SpecBase {
       doc.text()                                            should include(messages(app)("verify.verificationHistory.noHistory"))
       doc.select(".verification-history-desktop").isEmpty shouldBe true
       doc.select(".verification-history-mobile").isEmpty  shouldBe true
+    }
+
+    "render the back to manage subcontractors link in the empty state" in {
+      val doc = render(emptyViewModel)
+
+      val manageLink = doc.select("a:contains(Back to Manage your subcontractors)")
+      manageLink should not be empty
     }
   }
 

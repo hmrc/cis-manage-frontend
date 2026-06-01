@@ -119,28 +119,28 @@ GET  /amend-monthly-return/no-incomplete-returns  controllers.amend.NoIncomplete
 GET  /manage-notices-statements/:instanceId  controllers.notices.ManageNoticesStatementsController.onPageLoad(instanceId: String)
 
 # Verify
-GET   /verify/select-tax-year-for-verification-requests  controllers.verify.VerificationHistorySelectTaxYearController.onPageLoad(mode: Mode = NormalMode)
-POST  /verify/select-tax-year-for-verification-requests  controllers.verify.VerificationHistorySelectTaxYearController.onSubmit(mode: Mode = NormalMode)
+GET   /verify/select-tax-year-for-verification-requests     controllers.verify.VerificationHistorySelectTaxYearController.onPageLoad(mode: Mode = NormalMode)
+POST  /verify/select-tax-year-for-verification-requests     controllers.verify.VerificationHistorySelectTaxYearController.onSubmit(mode: Mode = NormalMode)
 
-GET   /verify/verification-history-all-tax-years         controllers.verify.VerificationHistoryController.onPageLoadAllYears()
-GET   /verify/verification-history-tax-year/:taxYear     controllers.verify.VerificationHistoryController.onPageLoadSingleYear(taxYear: String)
+GET   /verify/history/verification-history-all-tax-years    controllers.verify.VerificationHistoryController.onPageLoadAllYears()
+GET   /verify/history/verification-history-single-tax-year  controllers.verify.VerificationHistoryController.onPageLoadSingleYear()
 
 # Client Details
-GET  /client-details/manage-client-details    controllers.clientdetails.ManageClientDetailsController.onPageLoad()
+GET   /client-details/manage-client-details           controllers.clientdetails.ManageClientDetailsController.onPageLoad()
 
-GET  /client-details/client-removed                               controllers.clientdetails.ClientRemovedController.onPageLoad()
+GET   /client-details/client-removed                  controllers.clientdetails.ClientRemovedController.onPageLoad()
 
-GET  /client-details/client-reference-updated                     controllers.clientdetails.ClientRefUpdateConfirmationController.onPageLoad()
+GET   /client-details/client-reference-updated        controllers.clientdetails.ClientRefUpdateConfirmationController.onPageLoad()
 
-GET        /client-details/remove-client                                    controllers.clientdetails.RemoveClientYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST       /client-details/remove-client                                    controllers.clientdetails.RemoveClientYesNoController.onSubmit(mode: Mode = NormalMode)
-GET        /client-details/change-remove-client                             controllers.clientdetails.RemoveClientYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST       /client-details/change-remove-client                             controllers.clientdetails.RemoveClientYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /client-details/remove-client                   controllers.clientdetails.RemoveClientYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST  /client-details/remove-client                   controllers.clientdetails.RemoveClientYesNoController.onSubmit(mode: Mode = NormalMode)
+GET   /client-details/change-remove-client            controllers.clientdetails.RemoveClientYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST  /client-details/change-remove-client            controllers.clientdetails.RemoveClientYesNoController.onSubmit(mode: Mode = CheckMode)
 
-GET        /client-details/change-client-reference                      controllers.clientdetails.ChangeClientReferenceController.onPageLoad(mode: Mode = NormalMode)
-POST       /client-details/change-client-reference                      controllers.clientdetails.ChangeClientReferenceController.onSubmit(mode: Mode = NormalMode)
-GET        /client-details/change-change-client-reference               controllers.clientdetails.ChangeClientReferenceController.onPageLoad(mode: Mode = CheckMode)
-POST       /client-details/change-change-client-reference               controllers.clientdetails.ChangeClientReferenceController.onSubmit(mode: Mode = CheckMode)
+GET   /client-details/change-client-reference         controllers.clientdetails.ChangeClientReferenceController.onPageLoad(mode: Mode = NormalMode)
+POST  /client-details/change-client-reference         controllers.clientdetails.ChangeClientReferenceController.onSubmit(mode: Mode = NormalMode)
+GET   /client-details/change-change-client-reference  controllers.clientdetails.ChangeClientReferenceController.onPageLoad(mode: Mode = CheckMode)
+POST  /client-details/change-change-client-reference  controllers.clientdetails.ChangeClientReferenceController.onSubmit(mode: Mode = CheckMode)
 
 # Add Contractor Details
 GET  /add-contractor-details  controllers.AddContractorDetailsController.onPageLoad()

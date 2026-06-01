@@ -30,15 +30,15 @@
 
 @pageHeading = @{
     viewModel.selectedTaxYear match {
-        case Some(taxYear) => messages("verify.verificationHistory.singleYear.heading", taxYear, (taxYear.toInt + 1).toString)
-        case None          => messages("verify.verificationHistory.allYears.heading")
+        case Some(_) => messages("verify.verificationHistory.singleYear.heading")
+        case None    => messages("verify.verificationHistory.allYears.heading")
     }
 }
 
 @pageTitleText = @{
     viewModel.selectedTaxYear match {
-        case Some(taxYear) => messages("verify.verificationHistory.singleYear.title", taxYear, (taxYear.toInt + 1).toString)
-        case None          => messages("verify.verificationHistory.allYears.title")
+        case Some(_) => messages("verify.verificationHistory.singleYear.title")
+        case None    => messages("verify.verificationHistory.allYears.title")
     }
 }
 
@@ -132,13 +132,13 @@
                         }
                     </div>
                 }
-
-                @link(
-                    linkTextKey = "verify.verificationHistory.backToManage",
-                    linkUrl = controllers.routes.SubcontractorsLandingPageController.onPageLoad(viewModel.instanceId).url,
-                    hasFullStop = false
-                )
             </div>
         </div>
     }
+
+    @link(
+        linkTextKey = "verify.verificationHistory.backToManage",
+        linkUrl = controllers.routes.SubcontractorsLandingPageController.onPageLoad(viewModel.instanceId).url,
+        hasFullStop = true
+    )
 }
