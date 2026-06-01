@@ -129,6 +129,11 @@ GET  /client-details/client-removed                               controllers.cl
 
 GET  /client-details/client-reference-updated                     controllers.clientdetails.ClientRefUpdateConfirmationController.onPageLoad()
 
+GET        /client-details/remove-client                                    controllers.clientdetails.RemoveClientYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /client-details/remove-client                                    controllers.clientdetails.RemoveClientYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /client-details/change-remove-client                             controllers.clientdetails.RemoveClientYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /client-details/change-remove-client                             controllers.clientdetails.RemoveClientYesNoController.onSubmit(mode: Mode = CheckMode)
+
 GET        /client-details/change-client-reference                      controllers.clientdetails.ChangeClientReferenceController.onPageLoad(mode: Mode = NormalMode)
 POST       /client-details/change-client-reference                      controllers.clientdetails.ChangeClientReferenceController.onSubmit(mode: Mode = NormalMode)
 GET        /client-details/change-change-client-reference               controllers.clientdetails.ChangeClientReferenceController.onPageLoad(mode: Mode = CheckMode)
