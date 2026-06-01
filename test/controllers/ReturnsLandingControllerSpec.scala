@@ -24,6 +24,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import repositories.SessionRepository
 import services.ManageService
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.ReturnsLandingContext
@@ -149,6 +150,43 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
 
         status(res) mustBe SEE_OTHER
         redirectLocation(res).value mustBe controllers.routes.SystemErrorController.onPageLoad().url
+      }
+    }
+
+    "must update contractor name from query param before building landing context" in {
+      val mockManageService     = mock[ManageService]
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      when(
+        mockManageService.buildReturnsLandingContext(
+          eqTo(instanceId),
+          any[UserAnswers],
+          eqTo(false)
+        )(using any[HeaderCarrier])
+      ).thenReturn(Future.successful(Some(context)))
+
+      val app =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithCisId),
+          additionalBindings = Seq(
+            bind[ManageService].toInstance(mockManageService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+        ).build()
+
+      running(app) {
+        val req = FakeRequest(
+          GET,
+          controllers.routes.ReturnsLandingController
+            .onPageLoad(instanceId)
+            .url + "?contractorName=New%20Contractor%20Ltd"
+        )
+
+        val res = route(app, req).value
+        status(res) mustBe OK
       }
     }
   }
