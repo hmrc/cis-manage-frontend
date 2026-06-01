@@ -20,6 +20,7 @@ site.pagination.next                      =  Next
 site.delete                               =  Delete
 site.or                                   =  or
 site.view                                 =  View
+site.saveAndContinue                      = Save and continue
 
 date.day                                  =  Day
 date.month                                =  Month
@@ -584,5 +585,20 @@ clientdetails.clientRemoved.heading        =  Client removed
 clientdetails.clientRemoved.h2             =  What happens next
 clientdetails.clientRemoved.p1             =  It may take up to half an hour for this change to take place.
 clientdetails.clientRemoved.return.link    =  Return to your client list
-clientdetails.clientRemoved.survey.link    =  what did you think of this service?
+clientdetails.clientRemoved.survey.link    =  What did you think of this service?
 clientdetails.clientRemoved.survey.suffix  =  (takes 30 seconds)
+
+clientdetails.changeClientReference.title = What is your client reference?
+clientdetails.changeClientReference.heading = What is your client reference?
+clientdetails.changeClientReference.hint = Enter the reference you are now using to identify your client.
+clientdetails.changeClientReference.checkYourAnswersLabel = Change client reference
+clientdetails.changeClientReference.error.required = Enter your client reference
+clientdetails.changeClientReference.error.invalidCharacters = You have entered a client reference in an incorrect format
+clientdetails.changeClientReference.change.hidden = client Reference
+
+clientdetails.clientRefUpdateConfirmation.title = Client reference updated
+clientdetails.clientRefUpdateConfirmation.heading = Client reference updated
+clientdetails.clientRefUpdateConfirmation.p1 = You changed this client reference from {0} to {1}.
+clientdetails.clientRefUpdateConfirmation.p2 = It may take up to 1 day for this change to take place. You can
+clientdetails.clientRefUpdateConfirmation.p2.link = view the change on your client dashboard
+clientdetails.clientRefUpdateConfirmation.h2 = What happens next

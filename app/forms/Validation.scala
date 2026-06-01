@@ -22,6 +22,7 @@ object Validation {
 
   val clientNameInputPattern: Regex        = """[a-zA-Z0-9 .()/\-',&]+""".r.anchored
   val clientReferenceInputPattern: Regex   = """[a-zA-Z0-9 .()/\-',&]+""".r.anchored
+  val changeClientReferencePattern: Regex  = """^[a-zA-Z0-9 .()/\-',&]{1,20}$""".r.anchored
   val employerReferenceInputPattern: Regex = """[a-zA-Z0-9/]+""".r.anchored
   val clientNameInputMaxLength: Int        = 56
   val clientReferenceInputMaxLength: Int   = 20
