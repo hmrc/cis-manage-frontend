@@ -572,12 +572,20 @@ verify.verificationHistorySelectTaxYear.viewAll         =  View all tax years
 verify.verificationHistorySelectTaxYear.error.required  =  Select a tax year
 
 # Client Details
+clientdetails.manageClientDetails.title = Client details
+clientdetails.manageClientDetails.heading = {0} details
+clientdetails.manageClientDetails.employerRef.key = Employers reference
+clientdetails.manageClientDetails.clientRef.key = Client reference
+clientdetails.manageClientDetails.clientRef.key.hidden = client reference
+clientdetails.manageClientDetails.clientRef.link = change
+clientdetails.manageClientDetails.return.link = Return to the client dashboard
+
 clientdetails.clientRemoved.title          =  Client removed
 clientdetails.clientRemoved.heading        =  Client removed
 clientdetails.clientRemoved.h2             =  What happens next
 clientdetails.clientRemoved.p1             =  It may take up to half an hour for this change to take place.
 clientdetails.clientRemoved.return.link    =  Return to your client list
-clientdetails.clientRemoved.survey.link    =  what did you think of this service?
+clientdetails.clientRemoved.survey.link    =  What did you think of this service?
 clientdetails.clientRemoved.survey.suffix  =  (takes 30 seconds)
 
 clientdetails.removeClient.title = Are you sure you want to remove your client?
@@ -591,3 +599,10 @@ clientdetails.changeClientReference.checkYourAnswersLabel = Change client refere
 clientdetails.changeClientReference.error.required = Enter your client reference
 clientdetails.changeClientReference.error.invalidCharacters = You have entered a client reference in an incorrect format
 clientdetails.changeClientReference.change.hidden = client Reference
+
+clientdetails.clientRefUpdateConfirmation.title = Client reference updated
+clientdetails.clientRefUpdateConfirmation.heading = Client reference updated
+clientdetails.clientRefUpdateConfirmation.p1 = You changed this client reference from {0} to {1}.
+clientdetails.clientRefUpdateConfirmation.p2 = It may take up to 1 day for this change to take place. You can
+clientdetails.clientRefUpdateConfirmation.p2.link = view the change on your client dashboard
+clientdetails.clientRefUpdateConfirmation.h2 = What happens next
