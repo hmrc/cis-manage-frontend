@@ -580,7 +580,7 @@ clientdetails.clientRemoved.return.link    =  Return to your client list
 clientdetails.clientRemoved.survey.link    =  what did you think of this service?
 clientdetails.clientRemoved.survey.suffix  =  (takes 30 seconds)
 
-clientdetails.removeClient.title = Are you sure you want to remove {0}?
+clientdetails.removeClient.title = Are you sure you want to remove your client?
 clientdetails.removeClient.heading = Are you sure you want to remove {0}?
 clientdetails.removeClient.error.required = Select yes to remove this client
 
