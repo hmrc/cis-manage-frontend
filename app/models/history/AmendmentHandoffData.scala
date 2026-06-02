@@ -22,6 +22,7 @@ case class AmendmentHandoffData(
   instanceId: String,
   taxYear: Int,
   taxMonth: Int,
+  contractorName: String,
   originalReturnType: String,
   acceptedTime: Option[String]
 )
