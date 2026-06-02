@@ -80,6 +80,13 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
         row.verificationRequestLink mustBe "#"
         row.submissionReceiptLink mustBe "#"
       }
+
+      "must return None when there are no verification requests" in {
+        val emptyData = VerificationHistoryData(verificationRequests = Seq.empty)
+        val result    = service.buildAllYearsViewModel(emptyData, instanceId)
+
+        result mustBe None
+      }
     }
 
     "buildSingleYearViewModel" - {
@@ -103,13 +110,10 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
         result mustBe None
       }
 
-      "must return a view model with empty tax years for a year with no data" in {
+      "must return None for a year with no data" in {
         val result = service.buildSingleYearViewModel(data, "2020", instanceId)
 
-        result mustBe defined
-
-        val vm = result.get
-        vm.taxYears mustBe empty
+        result mustBe None
       }
     }
   }

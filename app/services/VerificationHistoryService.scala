@@ -32,14 +32,16 @@ class VerificationHistoryService @Inject() () {
     instanceId: String
   ): Option[VerificationHistoryPageViewModel] = {
     val taxYearSections = buildTaxYearSections(data)
-
-    Some(
-      VerificationHistoryPageViewModel(
-        taxYears = taxYearSections,
-        selectedTaxYear = None,
-        instanceId = instanceId
+    if (taxYearSections.isEmpty) None
+    else {
+      Some(
+        VerificationHistoryPageViewModel(
+          taxYears = taxYearSections,
+          selectedTaxYear = None,
+          instanceId = instanceId
+        )
       )
-    )
+    }
   }
 
   def buildSingleYearViewModel(
@@ -47,14 +49,18 @@ class VerificationHistoryService @Inject() () {
     taxYear: String,
     instanceId: String
   ): Option[VerificationHistoryPageViewModel] =
-    taxYear.toIntOption.map { taxYearInt =>
-      val taxYearSections = buildTaxYearSections(data)
-
-      VerificationHistoryPageViewModel(
-        taxYears = taxYearSections.filter(_.fromYear == taxYearInt),
-        selectedTaxYear = Some(taxYear),
-        instanceId = instanceId
-      )
+    taxYear.toIntOption.flatMap { taxYearInt =>
+      val taxYearSections = buildTaxYearSections(data).filter(_.fromYear == taxYearInt)
+      if (taxYearSections.isEmpty) None
+      else {
+        Some(
+          VerificationHistoryPageViewModel(
+            taxYears = taxYearSections,
+            selectedTaxYear = Some(taxYear),
+            instanceId = instanceId
+          )
+        )
+      }
     }
 
   private def buildTaxYearSections(
@@ -63,7 +69,7 @@ class VerificationHistoryService @Inject() () {
     val rowsWithTaxYear = data.verificationRequests
       .sortBy(_.dateSubmitted)(Ordering[java.time.LocalDate].reverse)
       .map { request =>
-        val fromYear = taxYearFromYear(request)
+        val fromYear = request.taxYear
         fromYear -> toRowViewModel(request)
       }
 
@@ -79,9 +85,6 @@ class VerificationHistoryService @Inject() () {
         )
       }
   }
-
-  private def taxYearFromYear(request: VerificationRequestData): Int =
-    request.taxYear
 
   private def toRowViewModel(
     request: VerificationRequestData
