@@ -413,6 +413,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         "instanceId"         -> instanceId,
         "taxYear"            -> 2023,
         "taxMonth"           -> 3,
+        "contractorName"     -> "Test Scheme",
         "originalReturnType" -> "MonthlyStandardReturn",
         "acceptedTime"       -> "2024-04-01T10:15:30Z"
       )
@@ -466,6 +467,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         "instanceId"         -> instanceId,
         "taxYear"            -> 2023,
         "taxMonth"           -> 3,
+        "contractorName"     -> "Test Scheme",
         "originalReturnType" -> "MonthlyNilReturn"
       )
 
