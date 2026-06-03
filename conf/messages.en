@@ -573,8 +573,8 @@ verify.verificationHistorySelectTaxYear.error.required  =  Select a tax year
 
 verify.verificationHistory.allYears.title               =  Verification request history for all tax years
 verify.verificationHistory.allYears.heading             =  Verification request history for all tax years
-verify.verificationHistory.singleYear.title             =  Verification request history for a single tax year
-verify.verificationHistory.singleYear.heading           =  Verification request history for a single tax year
+verify.verificationHistory.singleYear.title             =  Verification request history
+verify.verificationHistory.singleYear.heading           =  Verification request history for {0} to {1} tax year
 verify.verificationHistory.taxYear.heading              =  {0} to {1} tax year
 verify.verificationHistory.table.verificationNumber     =  Verification number
 verify.verificationHistory.table.dateSubmitted          =  Date submitted

@@ -93,7 +93,7 @@ class VerificationHistoryViewSpec extends SpecBase {
         s"${messages(app)("verify.verificationHistory.singleYear.title")} - ${messages(app)("service.name")} - GOV.UK"
 
       doc.selectFirst("h1").text() shouldBe
-        messages(app)("verify.verificationHistory.singleYear.heading")
+        messages(app)("verify.verificationHistory.singleYear.heading", "2026", "2027")
     }
 
     "render the page with expected title and heading for all years" in {
