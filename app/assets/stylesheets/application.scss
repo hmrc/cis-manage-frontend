@@ -85,6 +85,14 @@
     display: none;
 }
 
+.verification-history-desktop {
+    display: block;
+}
+
+.verification-history-mobile {
+    display: none;
+}
+
 .return-history-table-wrapper {
   width: 100%;
 }
@@ -115,6 +123,12 @@
         display: none;
     }
     .return-history-mobile {
+        display: block;
+    }
+    .verification-history-desktop {
+        display: none;
+    }
+    .verification-history-mobile {
         display: block;
     }
 }

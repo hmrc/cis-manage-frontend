@@ -91,9 +91,12 @@ class VerificationHistorySelectTaxYearController @Inject() (
                                       ua.set(VerificationHistorySelectTaxYearPage, selection)
                                     )
                   _              <- sessionRepository.set(updatedAnswers)
-                } yield Redirect(
-                  controllers.verify.routes.VerificationHistorySelectTaxYearController.onPageLoad()
-                )
+                } yield selection match {
+                  case AllTaxYears =>
+                    Redirect(controllers.verify.routes.VerificationHistoryController.onPageLoadAllYears())
+                  case TaxYear(_)  =>
+                    Redirect(controllers.verify.routes.VerificationHistoryController.onPageLoadSingleYear())
+                }
             }
           }
         )
