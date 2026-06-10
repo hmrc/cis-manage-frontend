@@ -32,12 +32,10 @@
 ) {
 
     @h1(messages("unsuccessfulAutomaticSubcontractorUpdate.heading"))
-    @paragraph(
-        message = "unsuccessfulAutomaticSubcontractorUpdate.p1",
-        boldSuffix = "unsuccessfulAutomaticSubcontractorUpdate.p2"
-    )
+    @paragraph(message = "unsuccessfulAutomaticSubcontractorUpdate.p1")
 
-    @paragraph(messages("unsuccessfulAutomaticSubcontractorUpdate.p3"))
+    @paragraph(messages("unsuccessfulAutomaticSubcontractorUpdate.p2"))
+
     @formHelper(
         action = controllers.routes.UnsuccessfulAutomaticSubcontractorUpdateController.onSubmit(instanceId)
         ) {
