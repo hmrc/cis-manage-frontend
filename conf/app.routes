@@ -144,3 +144,5 @@ POST  /client-details/change-change-client-reference  controllers.clientdetails.
 
 # Add Contractor Details
 GET  /add-contractor-details  controllers.AddContractorDetailsController.onPageLoad()
+
+GET        /noSubcontractorsExist                       controllers.NoSubcontractorsExistController.onPageLoad()
