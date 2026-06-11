@@ -1,9 +1,9 @@
-package controllers
+package controllers.subcontractors
 
 import base.SpecBase
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import views.html.NoSubcontractorsExistView
+import play.api.test.Helpers.*
+import views.html.subcontractors.NoSubcontractorsExistView
 
 class NoSubcontractorsExistControllerSpec extends SpecBase {
 
@@ -14,7 +14,8 @@ class NoSubcontractorsExistControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.NoSubcontractorsExistController.onPageLoad().url)
+        val request =
+          FakeRequest(GET, controllers.subcontractors.routes.NoSubcontractorsExistController.onPageLoad().url)
 
         val result = route(application, request).value
 

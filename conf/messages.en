@@ -621,5 +621,5 @@ clientdetails.clientRefUpdateConfirmation.p2                 =  It may take up t
 clientdetails.clientRefUpdateConfirmation.p2.link            =  view the change on your client dashboard
 clientdetails.clientRefUpdateConfirmation.h2                 =  What happens next
 
-noSubcontractorsExist.title = noSubcontractorsExist
-noSubcontractorsExist.heading = noSubcontractorsExist
+noSubcontractorsExist.title = No subcontractors to view
+noSubcontractorsExist.heading = Your subcontractors
