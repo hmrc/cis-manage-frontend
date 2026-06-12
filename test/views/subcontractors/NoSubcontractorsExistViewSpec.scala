@@ -41,14 +41,14 @@ class NoSubcontractorsExistViewSpec extends SpecBase {
       doc.select("p.govuk-body").text must include(messages("subcontractors.noSubcontractorsExist.p2.prefix"))
       doc.select("a.govuk-link").text must include(messages("subcontractors.noSubcontractorsExist.p2.link"))
       doc.select("p.govuk-body").text must include(messages("subcontractors.noSubcontractorsExist.p2.suffix"))
-      
+
       doc.select("p.govuk-body").text must include(messages("subcontractors.noSubcontractorsExist.p3.prefix"))
       doc.select("a.govuk-link").text must include(messages("subcontractors.noSubcontractorsExist.p3.link"))
     }
   }
 
   trait Setup {
-    val app: Application             = applicationBuilder().build()
+    val app: Application                = applicationBuilder().build()
     val view: NoSubcontractorsExistView = app.injector.instanceOf[NoSubcontractorsExistView]
 
     implicit val request: play.api.mvc.Request[_] = FakeRequest()
