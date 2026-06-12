@@ -31,17 +31,15 @@ class NoSubcontractorsExistController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  requireCisId: CisIdRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: NoSubcontractorsExistView
 ) extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val cisId = request.userAnswers.get(CisIdPage).getOrElse {
-      logger.error("[NoSubcontractorsExistController] cisId missing from userAnswers")
-      throw new IllegalStateException("cisId missing from userAnswers")
+  def onPageLoad: Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId) { implicit request =>
+      Ok(view(request.cisId))
     }
-    Ok(view(cisId))
-  }
 }
