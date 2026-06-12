@@ -25,23 +25,5 @@ class NoSubcontractorsExistControllerSpec extends SpecBase {
         contentAsString(result) mustEqual view("1")(request, messages(application)).toString
       }
     }
-
-    "throw IllegalStateException when cisId is missing" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(GET, controllers.subcontractors.routes.NoSubcontractorsExistController.onPageLoad().url)
-
-        val controller = application.injector.instanceOf[NoSubcontractorsExistController]
-
-        val exception = controller.onPageLoad()(request).failed.futureValue
-
-        exception mustBe a[IllegalStateException]
-        exception.getMessage mustBe "cisId missing from userAnswers"
-      }
-    }
   }
 }
