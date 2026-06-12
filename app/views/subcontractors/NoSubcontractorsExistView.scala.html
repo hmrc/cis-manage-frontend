@@ -14,14 +14,37 @@
  * limitations under the License.
  *@
 
+@import config.FrontendAppConfig
+
 @this(
         layout: templates.Layout,
-        govukButton: GovukButton
+        govukButton: GovukButton,
+        h1: components.H1,
+        paragraph: components.Paragraph,
+        link: components.Link,
+        appConfig: FrontendAppConfig
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(cisId: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("noSubcontractorsExist.title"))) {
+@layout(pageTitle = titleNoForm(messages("subcontractors.noSubcontractorsExist.title"))) {
+    @h1(messages("subcontractors.noSubcontractorsExist.heading"))
 
-    <h1 class="govuk-heading-xl">@messages("noSubcontractorsExist.heading")</h1>
+@paragraph(
+    message = "subcontractors.noSubcontractorsExist.p1"
+)
+
+@link(
+    linkUrl = appConfig.addSubcontractorsUrl,
+    prefixTextKey = "subcontractors.noSubcontractorsExist.p2.prefix",
+    linkTextKey = "subcontractors.noSubcontractorsExist.p2.link",
+    suffixTextKey = "subcontractors.noSubcontractorsExist.p2.suffix"
+)
+
+@link(
+    linkUrl = controllers.routes.SubcontractorsLandingPageController.onPageLoad(cisId).url,
+    prefixTextKey = "subcontractors.noSubcontractorsExist.p3.prefix",
+    linkTextKey = "subcontractors.noSubcontractorsExist.p3.link",
+    hasFullStop = true
+)
 }

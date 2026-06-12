@@ -123,4 +123,5 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     s"$cisFrontendBaseUrl$submissionUnsuccessfulCannotResubmitPath?cisId=$cisId"
 
   lazy val cisTypeOfSubcontractorUrl: String = configuration.get[String]("urls.cis-contractor-frontend")
+  lazy val addSubcontractorsUrl: String      = s"$cisTypeOfSubcontractorUrl/add/type-of-subcontractor"
 }
