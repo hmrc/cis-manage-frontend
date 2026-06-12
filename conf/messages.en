@@ -624,7 +624,7 @@ clientdetails.clientRefUpdateConfirmation.h2                 =  What happens nex
 # Subcontractors
 subcontractors.noSubcontractorsExist.title = No subcontractors to view
 subcontractors.noSubcontractorsExist.heading = Your subcontractors
-subcontractors.noSubcontractorsExist.p1 = You don't have any subcontractors at the moment.
+subcontractors.noSubcontractorsExist.p1 = You don’t have any subcontractors at the moment.
 subcontractors.noSubcontractorsExist.p2.prefix = You will need to
 subcontractors.noSubcontractorsExist.p2.link = add some subcontractors first
 subcontractors.noSubcontractorsExist.p2.suffix = before you can create a verification request or monthly return.
