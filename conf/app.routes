@@ -137,6 +137,8 @@ GET   /verify/history/submission-receipt                    controllers.verify.S
 
 GET   /verify/verification-request                          controllers.verify.VerificationRequestController.onPageLoad(verificationNumber: String)
 
+GET   /subcontractor/verify/verification-request            controllers.verify.VerificationRequestController.onPageLoad(verificationNumber: String)
+
 # Client Details
 GET   /client-details/manage-client-details           controllers.clientdetails.ManageClientDetailsController.onPageLoad()
 
