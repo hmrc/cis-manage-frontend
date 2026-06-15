@@ -647,3 +647,8 @@ subcontractors.cannotDeleteSubcontractor.p1                  = This subcontracto
 subcontractors.cannotDeleteSubcontractor.p2                  = You must wait until that monthly return or verification request has been completed before you can delete them.
 subcontractors.cannotDeleteSubcontractor.p3.text             = Back to
 subcontractors.cannotDeleteSubcontractor.p3.link             = Your subcontractors
+
+subcontractors.deleteSubcontractorYesNo.title                = Are you sure you want to delete this subcontractor?
+subcontractors.deleteSubcontractorYesNo.heading              = Are you sure you want to delete {0}?
+subcontractors.deleteSubcontractorYesNo.p                    = This subcontractor will also be removed from any monthly return that you have not submitted yet.
+subcontractors.deleteSubcontractorYesNo.error.required       = Select yes if you want to delete this subcontractor
