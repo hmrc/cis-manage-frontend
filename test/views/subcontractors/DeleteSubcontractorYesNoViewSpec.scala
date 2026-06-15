@@ -40,6 +40,10 @@ class DeleteSubcontractorYesNoViewSpec extends SpecBase {
       )
       doc.select("p").text()  must include(messages("subcontractors.deleteSubcontractorYesNo.p"))
       doc.select(".govuk-radios__item").size() mustBe 2
+
+      doc
+        .select("legend.govuk-visually-hidden")
+        .text() must include(messages("subcontractors.deleteSubcontractorYesNo.heading", subcontractorName))
     }
   }
 
