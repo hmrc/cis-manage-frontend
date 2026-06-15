@@ -134,9 +134,9 @@ class VerificationHistoryViewSpec extends SpecBase {
         messages(app)("verify.verificationHistory.table.submissionReceipt")
       )
 
-      desktop.text()                     should include("V0004528765")
-      desktop.text()                     should include("6 Apr 2026")
-      desktop.select("a[href=#]").text() should include(messages(app)("site.view"))
+      desktop.text()                        should include("V0004528765")
+      desktop.text()                        should include("6 Apr 2026")
+      desktop.select("a.govuk-link").text() should include(messages(app)("site.view"))
     }
 
     "render the mobile stacked version" in {
@@ -150,7 +150,7 @@ class VerificationHistoryViewSpec extends SpecBase {
       mobile.text()                                 should include("6 Apr 2026")
       mobile.text()                                 should include(messages(app)("verify.verificationHistory.table.verificationRequest"))
       mobile.text()                                 should include(messages(app)("verify.verificationHistory.table.submissionReceipt"))
-      mobile.select("a[href=#]").text()             should include(messages(app)("site.view"))
+      mobile.select("a.govuk-link").text()          should include(messages(app)("site.view"))
       mobile.select(".govuk-summary-list").size() shouldBe 1
     }
 
