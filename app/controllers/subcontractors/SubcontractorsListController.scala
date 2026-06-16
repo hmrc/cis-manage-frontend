@@ -28,23 +28,22 @@ import views.html.subcontractors.SubcontractorsListView
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
-
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class SubcontractorsListController @Inject()(
-                                              override val messagesApi: MessagesApi,
-                                              identify: IdentifierAction,
-                                              getData: DataRetrievalAction,
-                                              requireData: DataRequiredAction,
-                                              formProvider: SubcontractorsListFormProvider,
-                                              paginationService: PaginationSubcontractorsListService,
-                                              val controllerComponents: MessagesControllerComponents,
-                                              view: SubcontractorsListView
-                                    ) extends FrontendBaseController with I18nSupport {
+class SubcontractorsListController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: SubcontractorsListFormProvider,
+  paginationService: PaginationSubcontractorsListService,
+  val controllerComponents: MessagesControllerComponents,
+  view: SubcontractorsListView
+) extends FrontendBaseController
+    with I18nSupport {
 
   val form = formProvider()
-
 
   private def encode(value: String): String =
     URLEncoder.encode(value, StandardCharsets.UTF_8.toString)
@@ -61,7 +60,6 @@ class SubcontractorsListController @Inject()(
       s"$url$separator${filteredParams.mkString("&")}"
     }
   }
-
 
   def onPageLoad(instanceId: String, mode: Mode, page: Int = 1): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
@@ -85,11 +83,12 @@ class SubcontractorsListController @Inject()(
 
       val searchFiltered =
         if (searchTerm.isEmpty) allRows
-        else allRows.filter { row =>
-          row.name.toLowerCase.contains(searchTerm.toLowerCase) ||
+        else
+          allRows.filter { row =>
+            row.name.toLowerCase.contains(searchTerm.toLowerCase) ||
             row.utr.contains(searchTerm) ||
             row.verificationNumber.contains(searchTerm)
-        }
+          }
 
       val verificationFiltered =
         verificationStatus match {
@@ -145,7 +144,6 @@ class SubcontractorsListController @Inject()(
       println(s"Tax rows: ${taxFiltered.size}")
 
       Ok(
-
         view(
           filledForm,
           mode,
@@ -162,7 +160,6 @@ class SubcontractorsListController @Inject()(
         )
       )
     }
-
 
   def onSubmit(instanceId: String, mode: Mode, page: Int = 1): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
@@ -197,9 +194,9 @@ class SubcontractorsListController @Inject()(
         appendQueryParams(
           baseUrl,
           Seq(
-            "searchTerm" -> searchTerm,
+            "searchTerm"         -> searchTerm,
             "verificationStatus" -> verificationStatus,
-            "taxTreatment" -> taxTreatment
+            "taxTreatment"       -> taxTreatment
           )
         )
 

@@ -53,7 +53,7 @@ class PageNavigatorSubcontractorsListSpec extends SpecBase with Matchers {
         )
 
       val html = view(pagination)
-      val doc = Jsoup.parse(html.body)
+      val doc  = Jsoup.parse(html.body)
 
       doc.select(".govuk-pagination__prev a").attr("href") mustBe "/page/1"
       doc.select(".govuk-pagination__prev a").attr("rel") mustBe "prev"
@@ -74,7 +74,7 @@ class PageNavigatorSubcontractorsListSpec extends SpecBase with Matchers {
         )
 
       val html = view(pagination)
-      val doc = Jsoup.parse(html.body)
+      val doc  = Jsoup.parse(html.body)
 
       val pageLinks = doc.select(".govuk-pagination__list .govuk-pagination__link")
 
@@ -101,7 +101,7 @@ class PageNavigatorSubcontractorsListSpec extends SpecBase with Matchers {
         )
 
       val html = view(pagination)
-      val doc = Jsoup.parse(html.body)
+      val doc  = Jsoup.parse(html.body)
 
       val currentItem = doc.select(".govuk-pagination__item--current a")
 
@@ -122,7 +122,7 @@ class PageNavigatorSubcontractorsListSpec extends SpecBase with Matchers {
         )
 
       val html = view(pagination)
-      val doc = Jsoup.parse(html.body)
+      val doc  = Jsoup.parse(html.body)
 
       val ellipsis = doc.select(".govuk-pagination__item--ellipses")
 
@@ -141,7 +141,7 @@ class PageNavigatorSubcontractorsListSpec extends SpecBase with Matchers {
         )
 
       val html = view(pagination)
-      val doc = Jsoup.parse(html.body)
+      val doc  = Jsoup.parse(html.body)
 
       val pageLinks = doc.select(".govuk-pagination__list .govuk-pagination__link")
 
@@ -160,7 +160,7 @@ class PageNavigatorSubcontractorsListSpec extends SpecBase with Matchers {
         )
 
       val html = view(pagination)
-      val doc = Jsoup.parse(html.body)
+      val doc  = Jsoup.parse(html.body)
 
       doc.select("nav.govuk-pagination").attr("aria-label") mustBe messages(pagination.landmarkLabel)
     }

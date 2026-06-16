@@ -19,14 +19,14 @@ package viewmodels.subcontractors
 import play.api.libs.json.{Json, OFormat}
 
 case class SubcontractorsListRow(
-                                     id: String,
-                                     name: String,
-                                     utr: String,
-                                     verified: String,
-                                     verificationNumber: String,
-                                     taxTreatment: String,
-                                     dateAdded: String
-                                   )
+  id: String,
+  name: String,
+  utr: String,
+  verified: String,
+  verificationNumber: String,
+  taxTreatment: String,
+  dateAdded: String
+)
 
 object SubcontractorsListRow {
   given OFormat[SubcontractorsListRow] = Json.format[SubcontractorsListRow]

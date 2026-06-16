@@ -20,7 +20,7 @@ import forms.behaviours.StringFieldBehaviours
 
 class SubcontractorsListFormProviderSpec extends StringFieldBehaviours {
 
-  private val form = new SubcontractorsListFormProvider()()
+  private val form      = new SubcontractorsListFormProvider()()
   private val fieldName = "searchTerm"
 
   ".searchTerm" - {

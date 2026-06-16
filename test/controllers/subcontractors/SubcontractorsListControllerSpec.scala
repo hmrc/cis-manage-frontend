@@ -29,16 +29,16 @@ import views.html.subcontractors.SubcontractorsListView
 class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider = new SubcontractorsListFormProvider()
-  private val form = formProvider()
+  private val form         = formProvider()
 
   private val instanceId = "test-instance-id"
   private val mode: Mode = NormalMode
 
   private def filterRows(
-                          searchTerm: String,
-                          verificationStatus: String,
-                          taxTreatment: String
-                        ): Seq[SubcontractorsListRow] = {
+    searchTerm: String,
+    verificationStatus: String,
+    taxTreatment: String
+  ): Seq[SubcontractorsListRow] = {
 
     val allRows = SubcontractorsListData.rows
 
@@ -48,32 +48,32 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
         val lowerSearch = searchTerm.toLowerCase
         allRows.filter { row =>
           row.name.toLowerCase.contains(lowerSearch) ||
-            row.utr.contains(searchTerm) ||
-            row.verificationNumber.contains(searchTerm)
+          row.utr.contains(searchTerm) ||
+          row.verificationNumber.contains(searchTerm)
         }
       }
 
     val verificationFiltered =
       verificationStatus match {
-        case "verified" =>
+        case "verified"    =>
           searchFiltered.filter(_.verified.equalsIgnoreCase("Yes"))
         case "notVerified" =>
           searchFiltered.filter(_.verified.equalsIgnoreCase("No"))
-        case _ =>
+        case _             =>
           searchFiltered
       }
 
     val taxFiltered =
       taxTreatment match {
-        case "gross" =>
+        case "gross"        =>
           verificationFiltered.filter(_.taxTreatment.equalsIgnoreCase("Gross"))
-        case "higherRate" =>
+        case "higherRate"   =>
           verificationFiltered.filter(_.taxTreatment.equalsIgnoreCase("Higher rate"))
         case "standardRate" =>
           verificationFiltered.filter(_.taxTreatment.equalsIgnoreCase("Standard rate"))
-        case "unknown" =>
+        case "unknown"      =>
           verificationFiltered.filter(_.taxTreatment.equalsIgnoreCase("Unknown"))
-        case _ =>
+        case _              =>
           verificationFiltered
       }
 
@@ -96,7 +96,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[SubcontractorsListView]
+        val view              = application.injector.instanceOf[SubcontractorsListView]
         val paginationService = application.injector.instanceOf[PaginationSubcontractorsListService]
 
         val filteredRows = filterRows("", "all", "all")
@@ -143,12 +143,12 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[SubcontractorsListView]
+        val view              = application.injector.instanceOf[SubcontractorsListView]
         val paginationService = application.injector.instanceOf[PaginationSubcontractorsListService]
 
-        val searchTerm = "Alan"
+        val searchTerm         = "Alan"
         val verificationStatus = "verified"
-        val taxTreatment = "gross"
+        val taxTreatment       = "gross"
 
         val filteredRows =
           filterRows(searchTerm, verificationStatus, taxTreatment)
@@ -198,10 +198,10 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
             POST,
             routes.SubcontractorsListController.onSubmit(instanceId, mode, 1).url
           ).withFormUrlEncodedBody(
-            "gotoPage" -> "2",
-            "searchTerm" -> "Alan",
+            "gotoPage"           -> "2",
+            "searchTerm"         -> "Alan",
             "verificationStatus" -> "verified",
-            "taxTreatment" -> "gross"
+            "taxTreatment"       -> "gross"
           )
 
         val result = route(application, request).value
@@ -228,9 +228,9 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
             POST,
             routes.SubcontractorsListController.onSubmit(instanceId, mode, 1).url
           ).withFormUrlEncodedBody(
-            "searchTerm" -> "Alan",
+            "searchTerm"         -> "Alan",
             "verificationStatus" -> "verified",
-            "taxTreatment" -> "gross"
+            "taxTreatment"       -> "gross"
           )
 
         val result = route(application, request).value
@@ -276,7 +276,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
             POST,
             routes.SubcontractorsListController.onSubmit(instanceId, mode, 1).url
           ).withFormUrlEncodedBody(
-            "gotoPage" -> "2",
+            "gotoPage"   -> "2",
             "searchTerm" -> "Alan"
           )
 

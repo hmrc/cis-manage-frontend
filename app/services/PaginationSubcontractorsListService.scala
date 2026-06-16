@@ -20,43 +20,43 @@ import javax.inject.{Inject, Singleton}
 import viewmodels.govuk.PaginationFluency._
 
 @Singleton
-class PaginationSubcontractorsListService @Inject()() {
+class PaginationSubcontractorsListService @Inject() () {
 
   private val defaultRecordsPerPage = 8
 
   case class PaginatedResult[T](
-                                 items: Seq[T],
-                                 pagination: PaginationViewModel,
-                                 currentPage: Int,
-                                 totalPages: Int,
-                                 startIndex: Int,
-                                 totalCount: Int
-                               )
+    items: Seq[T],
+    pagination: PaginationViewModel,
+    currentPage: Int,
+    totalPages: Int,
+    startIndex: Int,
+    totalCount: Int
+  )
 
   private def buildUrl(
-                        baseUrl: String,
-                        pageParam: String,
-                        page: Int,
-                        queryString: String
-                      ): String = {
+    baseUrl: String,
+    pageParam: String,
+    page: Int,
+    queryString: String
+  ): String = {
     val separator =
       if (baseUrl.contains("?")) "&" else "?"
 
     val withPage =
-      s"$baseUrl${separator}${pageParam}=$page"
+      s"$baseUrl$separator$pageParam=$page"
 
     if (queryString.trim.isEmpty) withPage
     else s"$withPage&$queryString"
   }
 
   def paginate[T](
-                   allItems: Seq[T],
-                   currentPage: Int,
-                   recordsPerPage: Int = defaultRecordsPerPage,
-                   baseUrl: String,
-                   pageParam: String = "page",
-                   queryString: String = ""
-                 ): PaginatedResult[T] = {
+    allItems: Seq[T],
+    currentPage: Int,
+    recordsPerPage: Int = defaultRecordsPerPage,
+    baseUrl: String,
+    pageParam: String = "page",
+    queryString: String = ""
+  ): PaginatedResult[T] = {
 
     val totalCount =
       allItems.size
@@ -87,13 +87,12 @@ class PaginationSubcontractorsListService @Inject()() {
   }
 
   private def buildPagination(
-                               page: Int,
-                               totalPages: Int,
-                               baseUrl: String,
-                               pageParam: String,
-                               queryString: String
-                             ): PaginationViewModel = {
-
+    page: Int,
+    totalPages: Int,
+    baseUrl: String,
+    pageParam: String,
+    queryString: String
+  ): PaginationViewModel =
     if (totalPages <= 1) {
       PaginationViewModel()
     } else {
@@ -143,19 +142,16 @@ class PaginationSubcontractorsListService @Inject()() {
       PaginationViewModel()
         .withItems(items)
         .copy(
-          previous =
-            if (page > 1) {
-              Some(PaginationLinkViewModel(url(page - 1)).withText("site.pagination.previous"))
-            } else {
-              None
-            },
-          next =
-            if (page < totalPages) {
-              Some(PaginationLinkViewModel(url(page + 1)).withText("site.pagination.next"))
-            } else {
-              None
-            }
+          previous = if (page > 1) {
+            Some(PaginationLinkViewModel(url(page - 1)).withText("site.pagination.previous"))
+          } else {
+            None
+          },
+          next = if (page < totalPages) {
+            Some(PaginationLinkViewModel(url(page + 1)).withText("site.pagination.next"))
+          } else {
+            None
+          }
         )
     }
-  }
 }

@@ -24,20 +24,21 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object SubcontractorsListSummary  {
+object SubcontractorsListSummary {
 
   def row(instanceId: String, answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(SubcontractorsListPage).map {
-      answer =>
-
-        SummaryListRowViewModel(
-          key     = "SubcontractorsList.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId, CheckMode, 1).url)
-              .withVisuallyHiddenText(messages("subcontractorsList.change.hidden"))
-              .withAttribute("id", "your-subcontractors-list")
+    answers.get(SubcontractorsListPage).map { answer =>
+      SummaryListRowViewModel(
+        key = "SubcontractorsList.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId, CheckMode, 1).url
           )
+            .withVisuallyHiddenText(messages("subcontractorsList.change.hidden"))
+            .withAttribute("id", "your-subcontractors-list")
         )
+      )
     }
 }

@@ -73,7 +73,9 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
         messages("subcontractors.subcontractorsList.searchAndFilter")
 
       val clearFiltersLink =
-        doc.select(s"a[href='${controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId, mode).url}']")
+        doc.select(
+          s"a[href='${controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId, mode).url}']"
+        )
 
       clearFiltersLink.size() mustBe 1
       clearFiltersLink.text() mustBe messages("subcontractors.subcontractorsList.clearFilters")
