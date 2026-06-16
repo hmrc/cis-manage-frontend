@@ -144,3 +144,8 @@ POST  /client-details/change-change-client-reference  controllers.clientdetails.
 
 # Add Contractor Details
 GET  /add-contractor-details  controllers.AddContractorDetailsController.onPageLoad()
+
+GET   /subcontractors/:instanceId/your-subcontractors             controllers.subcontractors.SubcontractorsListController.onPageLoad(instanceId: String, mode: Mode = NormalMode, page: Int ?= 1)
+POST  /subcontractors/:instanceId/your-subcontractors             controllers.subcontractors.SubcontractorsListController.onSubmit(instanceId: String, mode: Mode = NormalMode, page: Int ?= 1)
+GET   /subcontractors/:instanceId/change-your-subcontractors      controllers.subcontractors.SubcontractorsListController.onPageLoad(instanceId: String, mode: Mode = CheckMode, page: Int ?= 1)
+POST  /subcontractors/:instanceId/change-your-subcontractors      controllers.subcontractors.SubcontractorsListController.onSubmit(instanceId: String, mode: Mode = CheckMode, page: Int ?= 1)

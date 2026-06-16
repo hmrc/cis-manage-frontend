@@ -1,0 +1,201 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
+@import viewmodels.subcontractors.SubcontractorsListRow
+@import viewmodels.govuk.PaginationFluency._
+@import views.html.components._
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukTable: GovukTable,
+    govukInput: GovukInput,
+    govukSelect: GovukSelect,
+    govukButton: GovukButton,
+    link: Link,
+    pageNavigator: components.PageNavigatorSubcontractorsList
+)
+
+@(form: Form[_], mode: Mode, rows: Seq[SubcontractorsListRow], paginationViewModel: PaginationViewModel, page: Int, totalPages: Int, startIndex: Int, totalCount: Int, instanceId: String,
+searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, messages("subcontractors.subcontractorsList.title"))) {
+
+    @formHelper(action = controllers.subcontractors.routes.SubcontractorsListController.onSubmit(instanceId, mode, page)) {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+            <h1 class="govuk-heading-l">
+                @messages("subcontractors.subcontractorsList.heading")
+            </h1>
+
+            <h2 class="govuk-heading-m">
+                @messages("subcontractors.subcontractorsList.h2")
+            </h2>
+
+                <p class="govuk-hint">
+                    @messages("subcontractors.subcontractorsList.hint")
+                </p>
+
+                @govukInput(
+                InputViewModel(
+                field = form("searchTerm"),
+                label = Label(
+                content = Empty,
+                classes = "govuk-visually-hidden"
+                )
+                ).withCssClass("search-term-input")
+                )
+
+           <div class="govuk-grid-row govuk-!-margin-bottom-4">
+
+                <div class="govuk-grid-column-one-half">
+
+                    @govukSelect(
+                    Select(
+                    id = "verificationStatus",
+                    name = "verificationStatus",
+                    label = Label(content = Text(messages("subcontractors.subcontractorsList.filter.verificationStatus"))),
+                    items = Seq(
+                    SelectItem(value = Some("all"), text = "All", selected = verificationStatus == "all"),
+                    SelectItem(value = Some("verified"), text = "Verified", selected = verificationStatus == "verified"),
+                    SelectItem(value = Some("notVerified"), text = "Not verified", selected = verificationStatus == "notVerified")
+                    )
+                    )
+                    )
+
+                </div>
+
+                <div class="govuk-grid-column-one-half">
+
+                    @govukSelect(
+                    Select(
+                    id = "taxTreatment",
+                    name = "taxTreatment",
+                    label = Label(content = Text(messages("subcontractors.subcontractorsList.filter.taxTreatment"))),
+                    items = Seq(
+                    SelectItem(value = Some("all"), text = "All", selected = taxTreatment == "all"),
+                    SelectItem(value = Some("gross"), text = "Gross", selected = taxTreatment == "gross"),
+                    SelectItem(value = Some("higherRate"), text = "Higher rate", selected = taxTreatment == "higherRate"),
+                    SelectItem(value = Some("standardRate"), text = "Standard rate", selected = taxTreatment == "standardRate"),
+                    SelectItem(value = Some("unknown"), text = "Unknown", selected = taxTreatment == "unknown")
+                    )
+                    )
+                    )
+
+                </div>
+
+            </div>
+
+            <div class="govuk-button-group">
+
+                @govukButton(
+                ButtonViewModel(
+                messages("subcontractors.subcontractorsList.searchAndFilter")
+                )
+                )
+
+                <a class="govuk-link"
+                   href="@controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId, mode)">
+                    @messages("subcontractors.subcontractorsList.clearFilters")
+                </a>
+
+            </div>
+
+            @if(paginationViewModel.items.nonEmpty) {
+            <p class="govuk-body govuk-!-margin-bottom-4 govuk-!-margin-top-5">
+                @messages(
+                "subcontractors.subcontractorsList.showingResults",
+                startIndex,
+                startIndex + rows.size - 1,
+                totalCount
+                )
+            </p>
+            }
+
+            <div class="govuk-table__container">
+
+                @govukTable(
+                Table(
+
+                head = Some(
+                Seq(
+                HeadCell(Text(messages("subcontractors.subcontractorsList.name"))),
+                HeadCell(Text(messages("subcontractors.subcontractorsList.utr"))),
+                HeadCell(Text(messages("subcontractors.subcontractorsList.verified"))),
+                HeadCell(Text(messages("subcontractors.subcontractorsList.verificationNumber"))),
+                HeadCell(Text(messages("subcontractors.subcontractorsList.taxTreatment"))),
+                HeadCell(Text(messages("subcontractors.subcontractorsList.dateAdded"))),
+                HeadCell(Text(messages("subcontractors.subcontractorsList.action")))
+                )
+                ),
+
+                rows = rows.map { row =>
+                Seq(
+                TableRow(
+                HtmlContent(
+                s"""
+                <a class="govuk-link" href="#">
+                    ${row.name}
+                </a>
+                """
+                )
+                ),
+                TableRow(Text(row.utr)),
+                TableRow(Text(row.verified)),
+                TableRow(Text(row.verificationNumber)),
+                TableRow(Text(row.taxTreatment)),
+                TableRow(Text(row.dateAdded)),
+                TableRow(
+                HtmlContent(
+                s"""
+                <a class="govuk-link" href="#">
+                    Delete
+                    <span class="govuk-visually-hidden">
+                      @messages("subcontractors.subcontractorsList.deleteHidden", row.name)
+                    </span>
+                </a>
+                """
+                )
+                )
+                )
+                },
+
+                attributes = Map(
+                "id" -> "subcontractors-table",
+                "class" -> "govuk-table govuk-table--small-text-until-tablet"
+                )
+                )
+                )
+
+            </div>
+
+      @pageNavigator(paginationViewModel)
+
+        <p class="govuk-body">
+            @messages("subcontractors.subcontractorsList.backTo")
+            <a class="govuk-link"
+               href="@controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId).url">
+                @messages("subcontractors.subcontractorsList.manage")
+            </a>.
+        </p>
+    }
+}

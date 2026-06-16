@@ -5,6 +5,119 @@
  */
 @import "pta-card";
 
+.govuk-input.search-term-input {
+  width: 465px;
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  .govuk-input.search-term-input {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .govuk-table__container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+  }
+
+  #subcontractors-table {
+    min-width: 900px;
+  }
+}
+
+@media (min-width: 769px) {
+
+  .govuk-table__container {
+    overflow-x: visible;
+  }
+
+  #subcontractors-table {
+    min-width: auto;
+  }
+}
+
+@media (min-width: 970px) {
+
+  #subcontractors-table th {
+    white-space: nowrap !important;
+  }
+
+  #subcontractors-table td {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 1024px) {
+
+  #subcontractors-table th {
+    white-space: normal;
+  }
+}
+
+
+.govuk-pagination .govuk-pagination__link {
+  color: #1d70b8 !important;
+  text-decoration: underline;
+}
+
+.govuk-pagination .govuk-pagination__link:link,
+.govuk-pagination .govuk-pagination__link:visited {
+  color: #1d70b8 !important;
+}
+
+.govuk-pagination .govuk-pagination__link:hover {
+  color: #003078 !important;
+}
+
+.govuk-pagination .govuk-pagination__link:focus {
+  color: #0b0c0c !important;
+  background-color: #ffdd00;
+  text-decoration: none;
+}
+
+/* ✅ FIXED current page */
+.govuk-pagination__item--current .govuk-pagination__link,
+.govuk-pagination__item--current .govuk-pagination__link:link,
+.govuk-pagination__item--current .govuk-pagination__link:visited {
+  color: #ffffff !important;
+}
+
+#subcontractors-table th,
+#subcontractors-table td {
+  padding-right: 25px;
+  vertical-align: middle;
+}
+
+
+/* Add horizontal space between Name and UTR columns */
+#subcontractors-table th:nth-child(1),
+#subcontractors-table td:nth-child(1) {
+  min-width: 120px;
+  padding-right: 20px !important;
+}
+
+#subcontractors-table th:nth-child(2),
+#subcontractors-table td:nth-child(2) {
+  padding-left: 10px !important;
+}
+
+
+
+#subcontractors-table th {
+  overflow-wrap: break-word;
+  line-height: 1.2;
+}
+
+#subcontractors-table th:first-child,
+#subcontractors-table td:first-child {
+  width: 40px;
+  padding-right: 10px;
+}
+
 .js-visible {
   display: none !important;
 }
