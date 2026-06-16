@@ -149,3 +149,5 @@ GET   /subcontractors/:instanceId/your-subcontractors             controllers.su
 POST  /subcontractors/:instanceId/your-subcontractors             controllers.subcontractors.SubcontractorsListController.onSubmit(instanceId: String, mode: Mode = NormalMode, page: Int ?= 1)
 GET   /subcontractors/:instanceId/change-your-subcontractors      controllers.subcontractors.SubcontractorsListController.onPageLoad(instanceId: String, mode: Mode = CheckMode, page: Int ?= 1)
 POST  /subcontractors/:instanceId/change-your-subcontractors      controllers.subcontractors.SubcontractorsListController.onSubmit(instanceId: String, mode: Mode = CheckMode, page: Int ?= 1)
+
+GET  /subcontractors/no-subcontractors-to-view      controllers.subcontractors.NoSubcontractorsExistController.onPageLoad()

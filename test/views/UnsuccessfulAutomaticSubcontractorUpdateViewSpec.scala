@@ -38,7 +38,6 @@ class UnsuccessfulAutomaticSubcontractorUpdateViewSpec extends SpecBase {
       doc.select("h1").text                       must include(messages("unsuccessfulAutomaticSubcontractorUpdate.heading"))
       doc.select("p").text                        must include(messages("unsuccessfulAutomaticSubcontractorUpdate.p1"))
       doc.select("p").text                        must include(messages("unsuccessfulAutomaticSubcontractorUpdate.p2"))
-      doc.select("p").text                        must include(messages("unsuccessfulAutomaticSubcontractorUpdate.p3"))
       doc.getElementsByClass("govuk-button").text must include(messages("site.continue"))
     }
   }

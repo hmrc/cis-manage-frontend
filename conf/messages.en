@@ -318,9 +318,8 @@ checkSubcontractorRecords.p2                                  =  Any record we f
 
 unsuccessfulAutomaticSubcontractorUpdate.title                =  Unsuccessful automatic subcontractor update
 unsuccessfulAutomaticSubcontractorUpdate.heading              =  Unsuccessful automatic subcontractor update
-unsuccessfulAutomaticSubcontractorUpdate.p1                   =  The subcontractor automatic check was unsuccessful. CIS Online will perform this update again the next time you enter the application,
-unsuccessfulAutomaticSubcontractorUpdate.p2                   =  unless you choose to add subcontractor details yourself.
-unsuccessfulAutomaticSubcontractorUpdate.p3                   =  Before adding a subcontractor, you will need to add their details.
+unsuccessfulAutomaticSubcontractorUpdate.p1                   =  CIS Online will check this again the next time you enter the application.
+unsuccessfulAutomaticSubcontractorUpdate.p2                   =  You can also add subcontractor details, but you must complete your contractor details first.
 
 successfulAutomaticSubcontractorUpdate.title                  =  Successful automatic subcontractor update
 successfulAutomaticSubcontractorUpdate.heading                =  Successful automatic subcontractor update
@@ -621,6 +620,7 @@ clientdetails.clientRefUpdateConfirmation.p2                 =  It may take up t
 clientdetails.clientRefUpdateConfirmation.p2.link            =  view the change on your client dashboard
 clientdetails.clientRefUpdateConfirmation.h2                 =  What happens next
 
+# Subcontractors
 subcontractors.subcontractorsList.title                                     = Your subcontractors
 subcontractors.subcontractorsList.heading                                   = Your subcontractors
 subcontractors.subcontractorsList.h2                                        = Search subcontractors
@@ -650,3 +650,12 @@ subcontractors.subcontractorsList.backTo                                    = Ba
 subcontractors.subcontractorsList.manage                                    = Manage your subcontractors
 subcontractors.subcontractorsList.searchAndFilter                           = Search and filter
 subcontractors.subcontractorsList.clearFilters                              = Clear
+
+subcontractors.noSubcontractorsExist.title = No subcontractors to view
+subcontractors.noSubcontractorsExist.heading = Your subcontractors
+subcontractors.noSubcontractorsExist.p1 = You don’t have any subcontractors at the moment.
+subcontractors.noSubcontractorsExist.p2.prefix = You will need to
+subcontractors.noSubcontractorsExist.p2.link = add some subcontractors first
+subcontractors.noSubcontractorsExist.p2.suffix = before you can create a verification request or monthly return.
+subcontractors.noSubcontractorsExist.p3.prefix = Back to
+subcontractors.noSubcontractorsExist.p3.link = Manage your subcontractors
