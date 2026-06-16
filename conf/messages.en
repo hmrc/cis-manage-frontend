@@ -619,3 +619,13 @@ clientdetails.clientRefUpdateConfirmation.p1                 =  You changed this
 clientdetails.clientRefUpdateConfirmation.p2                 =  It may take up to 1 day for this change to take place. You can
 clientdetails.clientRefUpdateConfirmation.p2.link            =  view the change on your client dashboard
 clientdetails.clientRefUpdateConfirmation.h2                 =  What happens next
+
+# Subcontractors
+subcontractors.noSubcontractorsExist.title = No subcontractors to view
+subcontractors.noSubcontractorsExist.heading = Your subcontractors
+subcontractors.noSubcontractorsExist.p1 = You don’t have any subcontractors at the moment.
+subcontractors.noSubcontractorsExist.p2.prefix = You will need to
+subcontractors.noSubcontractorsExist.p2.link = add some subcontractors first
+subcontractors.noSubcontractorsExist.p2.suffix = before you can create a verification request or monthly return.
+subcontractors.noSubcontractorsExist.p3.prefix = Back to
+subcontractors.noSubcontractorsExist.p3.link = Manage your subcontractors
