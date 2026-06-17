@@ -36,8 +36,11 @@ class SubcontractorSubmissionReceiptController @Inject() (
 
   private val submissionTime = "12:00"
   private val submissionDate = "18 May 2025"
+  private val contractorName = "John Doe"
+  private val employerRef    = "ABC12345"
+  private val IRNumber       = "123456"
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    Ok(view(submissionTime, submissionDate))
+    Ok(view(submissionTime, submissionDate, contractorName, employerRef, IRNumber))
   }
 }

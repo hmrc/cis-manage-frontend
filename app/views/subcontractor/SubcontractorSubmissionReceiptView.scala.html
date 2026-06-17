@@ -15,6 +15,9 @@
  *@
 
 @import views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
+
 @import config.FrontendAppConfig
 
 @this(
@@ -22,13 +25,40 @@
         h1: H1,
         h2: H2,
         paragraph: Paragraph,
+        link: Link,
+        govukSummaryList: GovukSummaryList,
         govukButton: GovukButton
 )
 
-@(submissionTime: String, submissionDate: String)(implicit request: Request[_], messages: Messages)
+@(
+    submissionTime: String,
+    submissionDate: String,
+    contractorName: String,
+    EmployerRef: String,
+    IRNumber: String,
+)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("subcontractor.subcontractorSubmissionReceipt.title"))) {
     @h1(messages("subcontractor.subcontractorSubmissionReceipt.heading"))
     @h2(messages("subcontractor.subcontractorSubmissionReceipt.subheading"))
-    @paragraph(messages("subcontractor.subcontractorSubmissionReceipt.p",submissionTime, submissionDate))
+    @paragraph(messages("subcontractor.subcontractorSubmissionReceipt.p1",submissionTime, submissionDate))
+
+    @govukSummaryList(
+        SummaryListViewModel(rows = Seq(
+            SummaryListRowViewModel(Key("subcontractor.subcontractorSubmissionReceipt.summaryList.key1"), Value(contractorName)),
+            SummaryListRowViewModel(Key("subcontractor.subcontractorSubmissionReceipt.summaryList.key2"), Value(EmployerRef)),
+            SummaryListRowViewModel(Key("subcontractor.subcontractorSubmissionReceipt.summaryList.key3"), Value(IRNumber)),
+        ))
+    )
+
+    @paragraph(messages("subcontractor.subcontractorSubmissionReceipt.p2"))
+    @paragraph(messages("subcontractor.subcontractorSubmissionReceipt.p3"))
+
+    @link("subcontractor.subcontractorSubmissionReceipt.link1","/")
+    @link(
+        linkTextKey = "subcontractor.subcontractorSubmissionReceipt.link2.link",
+        linkUrl = "",
+        prefixTextKey = "subcontractor.subcontractorSubmissionReceipt.link2.prefix",
+        hasFullStop = true
+    )
 }

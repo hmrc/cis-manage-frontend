@@ -622,7 +622,15 @@ clientdetails.clientRefUpdateConfirmation.p2.link            =  view the change 
 clientdetails.clientRefUpdateConfirmation.h2                 =  What happens next
 
 # Subcontractor
-subcontractor.subcontractorSubmissionReceipt.title           = Submission receipt
-subcontractor.subcontractorSubmissionReceipt.heading         = Submission receipt
-subcontractor.subcontractorSubmissionReceipt.subheading      = Submission details
-subcontractor.subcontractorSubmissionReceipt.p               = Submitted at {0} on {1}
+subcontractor.subcontractorSubmissionReceipt.title              = Submission receipt
+subcontractor.subcontractorSubmissionReceipt.heading            = Submission receipt
+subcontractor.subcontractorSubmissionReceipt.subheading         = Submission details
+subcontractor.subcontractorSubmissionReceipt.p1                 = Submitted at {0} on {1}
+subcontractor.subcontractorSubmissionReceipt.p2                 = Your verification request has been successfully submitted to HMRC.
+subcontractor.subcontractorSubmissionReceipt.p3                 = Please keep this receipt for your records.
+subcontractor.subcontractorSubmissionReceipt.link1              = Print this receipt
+subcontractor.subcontractorSubmissionReceipt.link2.prefix       = Back to
+subcontractor.subcontractorSubmissionReceipt.link2.link         = Manage your subcontractors
+subcontractor.subcontractorSubmissionReceipt.summaryList.key1   = Contractor name
+subcontractor.subcontractorSubmissionReceipt.summaryList.key2   = Employer reference
+subcontractor.subcontractorSubmissionReceipt.summaryList.key3   = Receipt reference number
