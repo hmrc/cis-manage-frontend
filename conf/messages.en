@@ -655,3 +655,21 @@ subcontractors.noSubcontractorsExist.p2.link = add some subcontractors first
 subcontractors.noSubcontractorsExist.p2.suffix = before you can create a verification request or monthly return.
 subcontractors.noSubcontractorsExist.p3.prefix = Back to
 subcontractors.noSubcontractorsExist.p3.link = Manage your subcontractors
+
+subcontractors.subcontractorDeletedConfirmation.title = Subcontractor deleted
+subcontractors.subcontractorDeletedConfirmation.heading = Subcontractor deleted
+subcontractors.subcontractorDeletedConfirmation.p1 = You have deleted {0} from your list of subcontractors.
+subcontractors.subcontractorDeletedConfirmation.p2.text = Back to
+subcontractors.subcontractorDeletedConfirmation.p2.link = Your subcontractors
+subcontractors.subcontractorDeletedConfirmation.h2 = Before you go
+subcontractors.subcontractorDeletedConfirmation.p3 = Your feedback helps us make our service better.
+subcontractors.subcontractorDeletedConfirmation.p4.text = to share your feedback on this service.
+subcontractors.subcontractorDeletedConfirmation.p4.link = Take a short survey
+
+
+subcontractors.cannotDeleteSubcontractor.title               = You cannot delete this subcontractor
+subcontractors.cannotDeleteSubcontractor.heading             = You cannot delete {0}
+subcontractors.cannotDeleteSubcontractor.p1                  = This subcontractor is currently part of a monthly return or verification request that is in progress.
+subcontractors.cannotDeleteSubcontractor.p2                  = You must wait until that monthly return or verification request has been completed before you can delete them.
+subcontractors.cannotDeleteSubcontractor.p3.text             = Back to
+subcontractors.cannotDeleteSubcontractor.p3.link             = Your subcontractors
