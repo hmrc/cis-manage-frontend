@@ -33,7 +33,7 @@
     @formHelper(action = controllers.subcontractors.routes.DeleteSubcontractorYesNoController.onSubmit(), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
+            @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
     @h1(messages("subcontractors.deleteSubcontractorYesNo.heading", subcontractorName))
