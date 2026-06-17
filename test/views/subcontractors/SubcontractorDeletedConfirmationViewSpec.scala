@@ -40,7 +40,7 @@ class SubcontractorDeletedConfirmationViewSpec extends SpecBase {
 
       val doc: Document = Jsoup.parse(html.body)
 
-      doc.title must include(messages("subcontractorDeletedConfirmation.title"))
+      doc.title must include(messages("subcontractors.subcontractorDeletedConfirmation.title"))
 
       doc.select(".govuk-panel__title").text must include(
         messages("subcontractors.subcontractorDeletedConfirmation.heading")
