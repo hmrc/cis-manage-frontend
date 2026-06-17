@@ -37,8 +37,8 @@ class CannotDeleteSubcontractorController @Inject() (
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     // TODO: subcontractorName to be retrieved from F8 - Retrieve Subcontractor for Delete business function
     // TODO: Once the SL-01-01 - Subcontractor List page is implemented, the url should be updated to point to the subcontractor details page
-    val url               = "#"
-    val subcontractorName = "subcontractor Name"
-    Ok(view(subcontractorName, url))
+    val subcontractorsPageUrl = "#"
+    val subcontractorName     = "subcontractor Name"
+    Ok(view(subcontractorName, subcontractorsPageUrl))
   }
 }

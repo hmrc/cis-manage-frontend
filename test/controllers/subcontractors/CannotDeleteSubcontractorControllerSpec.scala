@@ -39,11 +39,11 @@ class CannotDeleteSubcontractorControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[CannotDeleteSubcontractorView]
 
         val expectedSubcontractorName = "subcontractor Name"
-        val expectedUrl               = "#"
+        val subcontractorsPageUrl     = "#"
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(expectedSubcontractorName, expectedUrl)(request, messages(application)).toString
+          view(expectedSubcontractorName, subcontractorsPageUrl)(request, messages(application)).toString
       }
     }
   }
