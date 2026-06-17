@@ -145,6 +145,8 @@ POST  /client-details/change-change-client-reference  controllers.clientdetails.
 # Add Contractor Details
 GET  /add-contractor-details  controllers.AddContractorDetailsController.onPageLoad()
 
+GET   /subcontractors/subcontractor-deleted                       controllers.subcontractors.SubcontractorDeletedConfirmationController.onPageLoad()
+
 GET  /subcontractors/cannot-delete-subcontractor-warning                       controllers.subcontractors.CannotDeleteSubcontractorController.onPageLoad()
 
 GET  /subcontractors/no-subcontractors-to-view      controllers.subcontractors.NoSubcontractorsExistController.onPageLoad()
