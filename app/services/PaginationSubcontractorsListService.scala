@@ -17,12 +17,13 @@
 package services
 
 import javax.inject.{Inject, Singleton}
-import viewmodels.govuk.PaginationFluency._
+import viewmodels.govuk.PaginationFluency.*
+import viewmodels.subcontractors.SubcontractorsListConstants
 
 @Singleton
 class PaginationSubcontractorsListService @Inject() () {
 
-  private val defaultRecordsPerPage = 8
+  private val defaultRecordsPerPage = SubcontractorsListConstants.RecordsPerPage
 
   case class PaginatedResult[T](
     items: Seq[T],

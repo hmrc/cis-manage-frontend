@@ -23,7 +23,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.PaginationSubcontractorsListService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.subcontractors.{SubcontractorsListData, SubcontractorsListRow}
+import viewmodels.subcontractors.*
 import views.html.subcontractors.SubcontractorsListView
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -64,9 +64,6 @@ class SubcontractorsListController @Inject() (
   def onPageLoad(instanceId: String, mode: Mode, page: Int = 1): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
 
-      println(s"REQUEST URI = ${request.uri}")
-      println(s"instanceId = $instanceId")
-
       val searchTerm =
         request.getQueryString("searchTerm").getOrElse("").trim
 
@@ -74,10 +71,14 @@ class SubcontractorsListController @Inject() (
         form.fill(searchTerm)
 
       val verificationStatus =
-        request.getQueryString("verificationStatus").getOrElse("all")
+        VerificationStatusFilter.fromString(
+          request.getQueryString("verificationStatus").getOrElse(VerificationStatusFilter.All.value)
+        )
 
       val taxTreatment =
-        request.getQueryString("taxTreatment").getOrElse("all")
+        TaxTreatmentFilter.fromString(
+          request.getQueryString("taxTreatment").getOrElse(TaxTreatmentFilter.All.value)
+        )
 
       val allRows = SubcontractorsListData.rows
 
@@ -92,31 +93,31 @@ class SubcontractorsListController @Inject() (
 
       val verificationFiltered =
         verificationStatus match {
-          case "verified" =>
-            searchFiltered.filter(_.verified.equalsIgnoreCase("Yes"))
+          case VerificationStatusFilter.Verified =>
+            searchFiltered.filter(_.verified)
 
-          case "notVerified" =>
-            searchFiltered.filter(_.verified.equalsIgnoreCase("No"))
+          case VerificationStatusFilter.NotVerified =>
+            searchFiltered.filter(!_.verified)
 
-          case _ =>
+          case VerificationStatusFilter.All =>
             searchFiltered
         }
 
       val taxFiltered =
         taxTreatment match {
-          case "gross" =>
-            verificationFiltered.filter(_.taxTreatment.equalsIgnoreCase("Gross"))
+          case TaxTreatmentFilter.Gross =>
+            verificationFiltered.filter(_.taxTreatment == TaxTreatment.Gross)
 
-          case "higherRate" =>
-            verificationFiltered.filter(_.taxTreatment.equalsIgnoreCase("Higher rate"))
+          case TaxTreatmentFilter.HigherRate =>
+            verificationFiltered.filter(_.taxTreatment == TaxTreatment.HigherRate)
 
-          case "standardRate" =>
-            verificationFiltered.filter(_.taxTreatment.equalsIgnoreCase("Standard rate"))
+          case TaxTreatmentFilter.StandardRate =>
+            verificationFiltered.filter(_.taxTreatment == TaxTreatment.StandardRate)
 
-          case "unknown" =>
-            verificationFiltered.filter(_.taxTreatment.equalsIgnoreCase("Unknown"))
+          case TaxTreatmentFilter.Unknown =>
+            verificationFiltered.filter(_.taxTreatment == TaxTreatment.Unknown)
 
-          case _ =>
+          case TaxTreatmentFilter.All =>
             verificationFiltered
         }
 
@@ -126,22 +127,22 @@ class SubcontractorsListController @Inject() (
       val queryString =
         Seq(
           Option(searchTerm).filter(_.nonEmpty).map("searchTerm=" + _),
-          Option(verificationStatus).filter(_ != "all").map("verificationStatus=" + _),
-          Option(taxTreatment).filter(_ != "all").map("taxTreatment=" + _)
+          Option(verificationStatus.value)
+            .filter(_ != VerificationStatusFilter.All.value)
+            .map("verificationStatus=" + _),
+          Option(taxTreatment.value)
+            .filter(_ != TaxTreatmentFilter.All.value)
+            .map("taxTreatment=" + _)
         ).flatten.mkString("&")
 
       val result =
         paginationService.paginate(
           allItems = sortedRows,
           currentPage = page,
-          recordsPerPage = 8,
+          recordsPerPage = SubcontractorsListConstants.RecordsPerPage,
           baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
           queryString = queryString
         )
-
-      println(s"Search rows: ${searchFiltered.size}")
-      println(s"Verification rows: ${verificationFiltered.size}")
-      println(s"Tax rows: ${taxFiltered.size}")
 
       Ok(
         view(
@@ -155,8 +156,8 @@ class SubcontractorsListController @Inject() (
           result.totalCount,
           instanceId,
           searchTerm,
-          verificationStatus,
-          taxTreatment
+          verificationStatus.value,
+          taxTreatment.value
         )
       )
     }
@@ -177,10 +178,14 @@ class SubcontractorsListController @Inject() (
         formData.get("searchTerm").flatMap(_.headOption).getOrElse("").trim
 
       val verificationStatus =
-        formData.get("verificationStatus").flatMap(_.headOption).getOrElse("all")
+        VerificationStatusFilter.fromString(
+          formData.get("verificationStatus").flatMap(_.headOption).getOrElse(VerificationStatusFilter.All.value)
+        )
 
       val taxTreatment =
-        formData.get("taxTreatment").flatMap(_.headOption).getOrElse("all")
+        TaxTreatmentFilter.fromString(
+          formData.get("taxTreatment").flatMap(_.headOption).getOrElse(TaxTreatmentFilter.All.value)
+        )
 
       val targetPage =
         gotoPage.getOrElse(1)
@@ -195,8 +200,8 @@ class SubcontractorsListController @Inject() (
           baseUrl,
           Seq(
             "searchTerm"         -> searchTerm,
-            "verificationStatus" -> verificationStatus,
-            "taxTreatment"       -> taxTreatment
+            "verificationStatus" -> verificationStatus.value,
+            "taxTreatment"       -> taxTreatment.value
           )
         )
 

@@ -17,6 +17,9 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
 @import viewmodels.subcontractors.SubcontractorsListRow
+@import viewmodels.subcontractors.VerificationStatusFilter
+@import viewmodels.subcontractors.TaxTreatmentFilter
+@import viewmodels.subcontractors.TaxTreatment
 @import views.html.templates.Layout
 @import viewmodels.govuk.PaginationFluency._
 @import views.html.components._
@@ -78,9 +81,21 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
                     name = "verificationStatus",
                     label = Label(content = Text(messages("subcontractors.subcontractorsList.filter.verificationStatus"))),
                     items = Seq(
-                    SelectItem(value = Some("all"), text = "All", selected = verificationStatus == "all"),
-                    SelectItem(value = Some("verified"), text = "Verified", selected = verificationStatus == "verified"),
-                    SelectItem(value = Some("notVerified"), text = "Not verified", selected = verificationStatus == "notVerified")
+                    SelectItem(
+                    value = Some(VerificationStatusFilter.All.value),
+                    text = messages("subcontractors.subcontractorsList.filter.all"),
+                    selected = verificationStatus == VerificationStatusFilter.All.value
+                    ),
+                    SelectItem(
+                    value = Some(VerificationStatusFilter.Verified.value),
+                    text = messages("subcontractors.subcontractorsList.filter.verificationStatus.verified"),
+                    selected = verificationStatus == VerificationStatusFilter.Verified.value
+                    ),
+                    SelectItem(
+                    value = Some(VerificationStatusFilter.NotVerified.value),
+                    text = messages("subcontractors.subcontractorsList.filter.verificationStatus.notVerified"),
+                    selected = verificationStatus == VerificationStatusFilter.NotVerified.value
+                    )
                     )
                     )
                     )
@@ -95,11 +110,31 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
                     name = "taxTreatment",
                     label = Label(content = Text(messages("subcontractors.subcontractorsList.filter.taxTreatment"))),
                     items = Seq(
-                    SelectItem(value = Some("all"), text = "All", selected = taxTreatment == "all"),
-                    SelectItem(value = Some("gross"), text = "Gross", selected = taxTreatment == "gross"),
-                    SelectItem(value = Some("higherRate"), text = "Higher rate", selected = taxTreatment == "higherRate"),
-                    SelectItem(value = Some("standardRate"), text = "Standard rate", selected = taxTreatment == "standardRate"),
-                    SelectItem(value = Some("unknown"), text = "Unknown", selected = taxTreatment == "unknown")
+                    SelectItem(
+                    value = Some(TaxTreatmentFilter.All.value),
+                    text = messages("subcontractors.subcontractorsList.filter.all"),
+                    selected = taxTreatment == TaxTreatmentFilter.All.value
+                    ),
+                    SelectItem(
+                    value = Some(TaxTreatmentFilter.Gross.value),
+                    text = messages("subcontractors.subcontractorsList.filter.taxTreatment.gross"),
+                    selected = taxTreatment == TaxTreatmentFilter.Gross.value
+                    ),
+                    SelectItem(
+                    value = Some(TaxTreatmentFilter.HigherRate.value),
+                    text = messages("subcontractors.subcontractorsList.filter.taxTreatment.higherRate"),
+                    selected = taxTreatment == TaxTreatmentFilter.HigherRate.value
+                    ),
+                    SelectItem(
+                    value = Some(TaxTreatmentFilter.StandardRate.value),
+                    text = messages("subcontractors.subcontractorsList.filter.taxTreatment.standardRate"),
+                    selected = taxTreatment == TaxTreatmentFilter.StandardRate.value
+                    ),
+                    SelectItem(
+                    value = Some(TaxTreatmentFilter.Unknown.value),
+                    text = messages("subcontractors.subcontractorsList.filter.taxTreatment.unknown"),
+                    selected = taxTreatment == TaxTreatmentFilter.Unknown.value
+                    )
                     )
                     )
                     )
@@ -163,9 +198,22 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
                 )
                 ),
                 TableRow(Text(row.utr)),
-                TableRow(Text(row.verified)),
+                TableRow(
+                Text(
+                if (row.verified) "Yes" else "No"
+                )
+                ),
                 TableRow(Text(row.verificationNumber)),
-                TableRow(Text(row.taxTreatment)),
+                TableRow(
+                Text(
+                row.taxTreatment match {
+                case TaxTreatment.Gross        => "Gross"
+                case TaxTreatment.StandardRate => "Standard rate"
+                case TaxTreatment.HigherRate   => "Higher rate"
+                case TaxTreatment.Unknown      => "Unknown"
+                }
+                )
+                ),
                 TableRow(Text(row.dateAdded)),
                 TableRow(
                 HtmlContent(
@@ -173,7 +221,7 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
                 <a class="govuk-link" href="#">
                     Delete
                     <span class="govuk-visually-hidden">
-                        for ${row.name}
+                        ${row.name}
                       </span>
                 </a>
                 """
@@ -193,12 +241,11 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
 
       @pageNavigator(paginationViewModel)
 
-        <p class="govuk-body">
-            @messages("subcontractors.subcontractorsList.backTo")
-            <a class="govuk-link"
-               href="@controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId).url">
-                @messages("subcontractors.subcontractorsList.manage")
-            </a>
-        </p>
+        @link(
+        linkUrl = controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId).url,
+        prefixTextKey = "subcontractors.subcontractorsList.backTo",
+        linkTextKey = "subcontractors.subcontractorsList.manage",
+        hasFullStop = true
+        )
     }
 }

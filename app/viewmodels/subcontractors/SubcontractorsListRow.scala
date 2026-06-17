@@ -16,15 +16,35 @@
 
 package viewmodels.subcontractors
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.*
+
+enum TaxTreatment:
+  case Gross
+  case StandardRate
+  case HigherRate
+  case Unknown
+
+object TaxTreatment {
+
+  given Format[TaxTreatment] = Format(
+    Reads {
+      case JsString("Gross")        => JsSuccess(TaxTreatment.Gross)
+      case JsString("StandardRate") => JsSuccess(TaxTreatment.StandardRate)
+      case JsString("HigherRate")   => JsSuccess(TaxTreatment.HigherRate)
+      case JsString("Unknown")      => JsSuccess(TaxTreatment.Unknown)
+      case _                        => JsError("Invalid TaxTreatment")
+    },
+    Writes(t => JsString(t.toString))
+  )
+}
 
 case class SubcontractorsListRow(
   id: String,
   name: String,
   utr: String,
-  verified: String,
+  verified: Boolean,
   verificationNumber: String,
-  taxTreatment: String,
+  taxTreatment: TaxTreatment,
   dateAdded: String
 )
 
