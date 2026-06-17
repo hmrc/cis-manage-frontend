@@ -22,6 +22,7 @@ import models.{Mode, NormalMode}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import viewmodels.subcontractors.TaxTreatment
 import services.PaginationSubcontractorsListService
 import viewmodels.subcontractors.{SubcontractorsListData, SubcontractorsListRow}
 import views.html.subcontractors.SubcontractorsListView
@@ -56,24 +57,28 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
     val verificationFiltered =
       verificationStatus match {
         case "verified"    =>
-          searchFiltered.filter(_.verified.equalsIgnoreCase("Yes"))
+          searchFiltered.filter(_.verified)
         case "notVerified" =>
-          searchFiltered.filter(_.verified.equalsIgnoreCase("No"))
+          searchFiltered.filter(!_.verified)
         case _             =>
           searchFiltered
       }
 
     val taxFiltered =
       taxTreatment match {
-        case "gross"        =>
-          verificationFiltered.filter(_.taxTreatment.equalsIgnoreCase("Gross"))
-        case "higherRate"   =>
-          verificationFiltered.filter(_.taxTreatment.equalsIgnoreCase("Higher rate"))
+        case "gross" =>
+          verificationFiltered.filter(_.taxTreatment == TaxTreatment.Gross)
+
+        case "higherRate" =>
+          verificationFiltered.filter(_.taxTreatment == TaxTreatment.HigherRate)
+
         case "standardRate" =>
-          verificationFiltered.filter(_.taxTreatment.equalsIgnoreCase("Standard rate"))
-        case "unknown"      =>
-          verificationFiltered.filter(_.taxTreatment.equalsIgnoreCase("Unknown"))
-        case _              =>
+          verificationFiltered.filter(_.taxTreatment == TaxTreatment.StandardRate)
+
+        case "unknown" =>
+          verificationFiltered.filter(_.taxTreatment == TaxTreatment.Unknown)
+
+        case _ =>
           verificationFiltered
       }
 
