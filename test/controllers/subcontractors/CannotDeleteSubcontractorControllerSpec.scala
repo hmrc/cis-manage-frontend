@@ -19,26 +19,31 @@ package controllers.subcontractors
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.subcontractors.NoSubcontractorsExistView
+import views.html.subcontractors.CannotDeleteSubcontractorView
 
-class NoSubcontractorsExistControllerSpec extends SpecBase {
+class CannotDeleteSubcontractorControllerSpec extends SpecBase {
 
-  "NoSubcontractorsExist Controller" - {
+  "CannotDeleteSubcontractorController" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
+
         val request =
-          FakeRequest(GET, controllers.subcontractors.routes.NoSubcontractorsExistController.onPageLoad().url)
+          FakeRequest(GET, controllers.subcontractors.routes.CannotDeleteSubcontractorController.onPageLoad().url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[NoSubcontractorsExistView]
+        val view = application.injector.instanceOf[CannotDeleteSubcontractorView]
+
+        val expectedSubcontractorName = "subcontractor Name"
+        val subcontractorsPageUrl     = "#"
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view("1")(request, messages(application)).toString
+        contentAsString(result) mustEqual
+          view(expectedSubcontractorName, subcontractorsPageUrl)(request, messages(application)).toString
       }
     }
   }
