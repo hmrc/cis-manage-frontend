@@ -58,7 +58,6 @@
   }
 }
 
-
 .govuk-pagination .govuk-pagination__link {
   color: #1d70b8 !important;
   text-decoration: underline;
@@ -92,7 +91,6 @@
   vertical-align: middle;
 }
 
-
 /* Add horizontal space between Name and UTR columns */
 #subcontractors-table th:nth-child(1),
 #subcontractors-table td:nth-child(1) {
@@ -105,17 +103,40 @@
   padding-left: 10px !important;
 }
 
+@media (max-width: 640px) {
 
+  .govuk-pagination__item--ellipses {
+    display: inline-block !important;
+  }
+
+  .govuk-pagination__item {
+    display: inline-block !important;
+  }
+}
 
 #subcontractors-table th {
   overflow-wrap: break-word;
   line-height: 1.2;
 }
 
-#subcontractors-table th:first-child,
-#subcontractors-table td:first-child {
-  width: 40px;
-  padding-right: 10px;
+@media (min-width: 970px) {
+  #subcontractors-table td {
+    white-space: nowrap;
+  }
+
+  #subcontractors-table td:first-child,
+  #subcontractors-table th:first-child {
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+}
+
+@media (max-width: 768px) {
+  #subcontractors-table td:first-child,
+  #subcontractors-table th:first-child {
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
 }
 
 .js-visible {

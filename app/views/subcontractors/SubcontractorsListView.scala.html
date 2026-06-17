@@ -17,11 +17,12 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
 @import viewmodels.subcontractors.SubcontractorsListRow
+@import views.html.templates.Layout
 @import viewmodels.govuk.PaginationFluency._
 @import views.html.components._
 
 @this(
-    layout: templates.Layout,
+    layout: Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukTable: GovukTable,
@@ -51,19 +52,21 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
                 @messages("subcontractors.subcontractorsList.h2")
             </h2>
 
-                <p class="govuk-hint">
-                    @messages("subcontractors.subcontractorsList.hint")
-                </p>
-
-                @govukInput(
-                InputViewModel(
-                field = form("searchTerm"),
-                label = Label(
-                content = Empty,
-                classes = "govuk-visually-hidden"
-                )
-                ).withCssClass("search-term-input")
-                )
+            @govukInput(
+            InputViewModel(
+            field = form("searchTerm"),
+            label = Label(
+            content = Text(messages("subcontractors.subcontractorsList.search.label")),
+            classes = "govuk-visually-hidden"
+            )
+            )
+            .withHint(
+            Hint(
+            content = Text(messages("subcontractors.subcontractorsList.hint"))
+            )
+            )
+            .withCssClass("search-term-input")
+            )
 
            <div class="govuk-grid-row govuk-!-margin-bottom-4">
 
@@ -170,8 +173,8 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
                 <a class="govuk-link" href="#">
                     Delete
                     <span class="govuk-visually-hidden">
-                      @messages("subcontractors.subcontractorsList.deleteHidden", row.name)
-                    </span>
+                        for ${row.name}
+                      </span>
                 </a>
                 """
                 )
@@ -195,7 +198,7 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
             <a class="govuk-link"
                href="@controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId).url">
                 @messages("subcontractors.subcontractorsList.manage")
-            </a>.
+            </a>
         </p>
     }
 }
