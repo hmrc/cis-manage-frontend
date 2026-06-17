@@ -143,4 +143,7 @@ GET   /client-details/change-change-client-reference  controllers.clientdetails.
 POST  /client-details/change-change-client-reference  controllers.clientdetails.ChangeClientReferenceController.onSubmit(mode: Mode = CheckMode)
 
 # Add Contractor Details
-GET  /add-contractor-details  controllers.AddContractorDetailsController.onPageLoad()
+GET   /add-contractor-details  controllers.AddContractorDetailsController.onPageLoad()
+
+# Subcontractor
+GET   /subcontractor/verify/submission-receipt        controllers.subcontractor.SubcontractorSubmissionReceiptController.onPageLoad()

@@ -620,3 +620,9 @@ clientdetails.clientRefUpdateConfirmation.p1                 =  You changed this
 clientdetails.clientRefUpdateConfirmation.p2                 =  It may take up to 1 day for this change to take place. You can
 clientdetails.clientRefUpdateConfirmation.p2.link            =  view the change on your client dashboard
 clientdetails.clientRefUpdateConfirmation.h2                 =  What happens next
+
+# Subcontractor
+subcontractor.subcontractorSubmissionReceipt.title           = Submission receipt
+subcontractor.subcontractorSubmissionReceipt.heading         = Submission receipt
+subcontractor.subcontractorSubmissionReceipt.subheading      = Submission details
+subcontractor.subcontractorSubmissionReceipt.p               = Submitted at {0} on {1}
