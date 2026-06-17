@@ -25,7 +25,7 @@
 
 @(subcontractorName: String, subcontractorsPageUrl: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("subcontractors.cannotDeleteSubcontractor.title"))) {
+@layout(pageTitle = titleNoForm(messages("subcontractors.cannotDeleteSubcontractor.title")), showBackLink= false) {
     @header(messages("subcontractors.cannotDeleteSubcontractor.heading", subcontractorName))
     @paragraph(messages("subcontractors.cannotDeleteSubcontractor.p1"))
     @paragraph(messages("subcontractors.cannotDeleteSubcontractor.p2"))
