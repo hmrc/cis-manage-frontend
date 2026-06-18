@@ -151,6 +151,10 @@ POST  /subcontractors/:instanceId/your-subcontractors             controllers.su
 GET   /subcontractors/:instanceId/change-your-subcontractors      controllers.subcontractors.SubcontractorsListController.onPageLoad(instanceId: String, mode: Mode = CheckMode, page: Int ?= 1)
 POST  /subcontractors/:instanceId/change-your-subcontractors      controllers.subcontractors.SubcontractorsListController.onSubmit(instanceId: String, mode: Mode = CheckMode, page: Int ?= 1)
 
+# Delete Subcontractor
+GET     /subcontractors/delete-subcontractor                        controllers.subcontractors.DeleteSubcontractorYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST    /subcontractors/delete-subcontractor                        controllers.subcontractors.DeleteSubcontractorYesNoController.onSubmit(mode: Mode = NormalMode)
+
 GET   /subcontractors/subcontractor-deleted                       controllers.subcontractors.SubcontractorDeletedConfirmationController.onPageLoad()
 
 GET  /subcontractors/cannot-delete-subcontractor-warning                       controllers.subcontractors.CannotDeleteSubcontractorController.onPageLoad()
