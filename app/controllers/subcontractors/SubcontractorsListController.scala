@@ -29,7 +29,6 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 import javax.inject.Inject
-import scala.concurrent.Future
 
 class SubcontractorsListController @Inject() (
   override val messagesApi: MessagesApi,
@@ -163,7 +162,7 @@ class SubcontractorsListController @Inject() (
     }
 
   def onSubmit(instanceId: String, mode: Mode, page: Int = 1): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData) { implicit request =>
 
       val formData =
         request.body.asFormUrlEncoded.getOrElse(Map.empty)
@@ -205,6 +204,6 @@ class SubcontractorsListController @Inject() (
           )
         )
 
-      Future.successful(Redirect(redirectUrl))
+      Redirect(redirectUrl)
     }
 }

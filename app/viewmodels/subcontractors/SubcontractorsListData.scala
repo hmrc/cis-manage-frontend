@@ -93,7 +93,7 @@ object SubcontractorsListData {
     ),
     SubcontractorsListRow(
       "alphaBuild",
-      "Alpha Build Ltd mnsbjhawbck kwckqwfk wkqfkhfk",
+      "Alpha Build Ltd",
       "1111111111",
       false,
       "V0009000001",

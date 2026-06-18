@@ -33,6 +33,9 @@
     govukSelect: GovukSelect,
     govukButton: GovukButton,
     link: Link,
+    h1: H1,
+    h2: H2,
+    paragraph: Paragraph,
     pageNavigator: components.PageNavigatorSubcontractorsList
 )
 
@@ -47,96 +50,92 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-            <h1 class="govuk-heading-l">
-                @messages("subcontractors.subcontractorsList.heading")
-            </h1>
+        @h1(messages("subcontractors.subcontractorsList.heading"))
 
-            <h2 class="govuk-heading-m">
-                @messages("subcontractors.subcontractorsList.h2")
-            </h2>
+        @h2(messages("subcontractors.subcontractorsList.h2"))
 
-            @govukInput(
-            InputViewModel(
-            field = form("searchTerm"),
+        @govukInput(
+          InputViewModel(
+           field = form("searchTerm"),
             label = Label(
-            content = Text(messages("subcontractors.subcontractorsList.search.label")),
-            classes = "govuk-visually-hidden"
-            )
+              content = Text(messages("subcontractors.subcontractorsList.search.label")),
+              classes = "govuk-visually-hidden"
+              )
             )
             .withHint(
-            Hint(
-            content = Text(messages("subcontractors.subcontractorsList.hint"))
-            )
+              Hint(
+                content = Text(messages("subcontractors.subcontractorsList.hint"))
+               )
             )
             .withCssClass("search-term-input")
-            )
+          )
 
            <div class="govuk-grid-row govuk-!-margin-bottom-4">
 
                 <div class="govuk-grid-column-one-half">
 
-                    @govukSelect(
+                  @govukSelect(
                     Select(
-                    id = "verificationStatus",
-                    name = "verificationStatus",
-                    label = Label(content = Text(messages("subcontractors.subcontractorsList.filter.verificationStatus"))),
-                    items = Seq(
-                    SelectItem(
-                    value = Some(VerificationStatusFilter.All.value),
-                    text = messages("subcontractors.subcontractorsList.filter.all"),
-                    selected = verificationStatus == VerificationStatusFilter.All.value
-                    ),
-                    SelectItem(
-                    value = Some(VerificationStatusFilter.Verified.value),
-                    text = messages("subcontractors.subcontractorsList.filter.verificationStatus.verified"),
-                    selected = verificationStatus == VerificationStatusFilter.Verified.value
-                    ),
-                    SelectItem(
-                    value = Some(VerificationStatusFilter.NotVerified.value),
-                    text = messages("subcontractors.subcontractorsList.filter.verificationStatus.notVerified"),
-                    selected = verificationStatus == VerificationStatusFilter.NotVerified.value
-                    )
-                    )
-                    )
+                      id = "verificationStatus",
+                      name = "verificationStatus",
+                      label = Label(content = Text(messages("subcontractors.subcontractorsList.filter.verificationStatus"))),
+                      items = Seq(
+                          SelectItem(
+                            value = Some(VerificationStatusFilter.All.value),
+                            text = messages("subcontractors.subcontractorsList.filter.all"),
+                            selected = verificationStatus == VerificationStatusFilter.All.value
+                          ),
+                          SelectItem(
+                            value = Some(VerificationStatusFilter.Verified.value),
+                            text = messages("subcontractors.subcontractorsList.filter.verificationStatus.verified"),
+                            selected = verificationStatus == VerificationStatusFilter.Verified.value
+                          ),
+                          SelectItem(
+                            value = Some(VerificationStatusFilter.NotVerified.value),
+                            text = messages("subcontractors.subcontractorsList.filter.verificationStatus.notVerified"),
+                            selected = verificationStatus == VerificationStatusFilter.NotVerified.value
+                              )
+                            )
+                         )
                     )
 
                 </div>
 
                 <div class="govuk-grid-column-one-half">
 
-                    @govukSelect(
+                  @govukSelect(
                     Select(
-                    id = "taxTreatment",
-                    name = "taxTreatment",
-                    label = Label(content = Text(messages("subcontractors.subcontractorsList.filter.taxTreatment"))),
-                    items = Seq(
-                    SelectItem(
-                    value = Some(TaxTreatmentFilter.All.value),
-                    text = messages("subcontractors.subcontractorsList.filter.all"),
-                    selected = taxTreatment == TaxTreatmentFilter.All.value
-                    ),
-                    SelectItem(
-                    value = Some(TaxTreatmentFilter.Gross.value),
-                    text = messages("subcontractors.subcontractorsList.filter.taxTreatment.gross"),
-                    selected = taxTreatment == TaxTreatmentFilter.Gross.value
-                    ),
-                    SelectItem(
-                    value = Some(TaxTreatmentFilter.HigherRate.value),
-                    text = messages("subcontractors.subcontractorsList.filter.taxTreatment.higherRate"),
-                    selected = taxTreatment == TaxTreatmentFilter.HigherRate.value
-                    ),
-                    SelectItem(
-                    value = Some(TaxTreatmentFilter.StandardRate.value),
-                    text = messages("subcontractors.subcontractorsList.filter.taxTreatment.standardRate"),
-                    selected = taxTreatment == TaxTreatmentFilter.StandardRate.value
-                    ),
-                    SelectItem(
-                    value = Some(TaxTreatmentFilter.Unknown.value),
-                    text = messages("subcontractors.subcontractorsList.filter.taxTreatment.unknown"),
-                    selected = taxTreatment == TaxTreatmentFilter.Unknown.value
-                    )
-                    )
-                    )
+                        id = "taxTreatment",
+                        name = "taxTreatment",
+                        label = Label(content = Text(messages("subcontractors.subcontractorsList.filter.taxTreatment"))),
+                        items = Seq(
+                            SelectItem(
+                                value = Some(TaxTreatmentFilter.All.value),
+                                text = messages("subcontractors.subcontractorsList.filter.all"),
+                                selected = taxTreatment == TaxTreatmentFilter.All.value
+                            ),
+                            SelectItem(
+                                value = Some(TaxTreatmentFilter.Gross.value),
+                                text = messages("subcontractors.subcontractorsList.filter.taxTreatment.gross"),
+                                selected = taxTreatment == TaxTreatmentFilter.Gross.value
+                            ),
+                            SelectItem(
+                                value = Some(TaxTreatmentFilter.HigherRate.value),
+                                text = messages("subcontractors.subcontractorsList.filter.taxTreatment.higherRate"),
+                                selected = taxTreatment == TaxTreatmentFilter.HigherRate.value
+                            ),
+                            SelectItem(
+                                value = Some(TaxTreatmentFilter.StandardRate.value),
+                                text = messages("subcontractors.subcontractorsList.filter.taxTreatment.standardRate"),
+                                selected = taxTreatment == TaxTreatmentFilter.StandardRate.value
+                            ),
+                            SelectItem(
+                                value = Some(TaxTreatmentFilter.Unknown.value),
+                                text = messages("subcontractors.subcontractorsList.filter.taxTreatment.unknown"),
+                                selected = taxTreatment == TaxTreatmentFilter.Unknown.value
+                                      )
+                                )
+                            )
                     )
 
                 </div>
@@ -145,89 +144,91 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
 
             <div class="govuk-button-group">
 
-                @govukButton(
-                ButtonViewModel(
-                messages("subcontractors.subcontractorsList.searchAndFilter")
-                )
-                )
+               @govukButton(
+                  ButtonViewModel(
+                      messages("subcontractors.subcontractorsList.searchAndFilter")
+                  )
+               )
 
-                <a class="govuk-link"
-                   href="@controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId, mode)">
-                    @messages("subcontractors.subcontractorsList.clearFilters")
-                </a>
+                @link(
+                linkTextKey = "subcontractors.subcontractorsList.clearFilters",
+                linkUrl = controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
+                )
 
             </div>
 
-            @if(paginationViewModel.items.nonEmpty) {
-            <p class="govuk-body govuk-!-margin-bottom-4 govuk-!-margin-top-5">
-                @messages(
-                "subcontractors.subcontractorsList.showingResults",
-                startIndex,
-                startIndex + rows.size - 1,
-                totalCount
-                )
-            </p>
-            }
+             @if(paginationViewModel.items.nonEmpty) {
+                @paragraph(
+                  messages(
+                    "subcontractors.subcontractorsList.showingResults",
+                      startIndex,
+                      startIndex + rows.size - 1,
+                      totalCount
+                ),
+                extraClasses = "govuk-!-margin-top-5 govuk-!-margin-bottom-4"
+               )
+             }
 
             <div class="govuk-table__container">
 
-                @govukTable(
-                Table(
+             @govukTable(
+               Table(
+                 head = Some(
+                   Seq(
+                        HeadCell(Text(messages("subcontractors.subcontractorsList.name"))),
+                        HeadCell(Text(messages("subcontractors.subcontractorsList.utr"))),
+                        HeadCell(Text(messages("subcontractors.subcontractorsList.verified"))),
+                        HeadCell(Text(messages("subcontractors.subcontractorsList.verificationNumber"))),
+                        HeadCell(Text(messages("subcontractors.subcontractorsList.taxTreatment"))),
+                        HeadCell(Text(messages("subcontractors.subcontractorsList.dateAdded"))),
+                        HeadCell(Text(messages("subcontractors.subcontractorsList.action")))
+                   )
+                 ),
 
-                head = Some(
-                Seq(
-                HeadCell(Text(messages("subcontractors.subcontractorsList.name"))),
-                HeadCell(Text(messages("subcontractors.subcontractorsList.utr"))),
-                HeadCell(Text(messages("subcontractors.subcontractorsList.verified"))),
-                HeadCell(Text(messages("subcontractors.subcontractorsList.verificationNumber"))),
-                HeadCell(Text(messages("subcontractors.subcontractorsList.taxTreatment"))),
-                HeadCell(Text(messages("subcontractors.subcontractorsList.dateAdded"))),
-                HeadCell(Text(messages("subcontractors.subcontractorsList.action")))
-                )
-                ),
+                 rows = rows.map { row =>
+                   Seq(
+                    TableRow(
+                      HtmlContent(
+                        "<a class=\"govuk-link\" href=\"#\">" +
+                        HtmlFormat.escape(row.name) +
+                        "</a>"
+                      )
+                     ),
+                     TableRow(Text(row.utr)),
+                       TableRow(
+                           Text(
+                             messages(if (row.verified) "site.yes" else "site.no")
+                           )
+                       ),
+                     TableRow(Text(row.verificationNumber)),
+                       TableRow(
+                            Text(
+                            row.taxTreatment match {
+                                case TaxTreatment.Gross =>
+                                    messages("subcontractors.subcontractorsList.filter.taxTreatment.gross")
 
-                rows = rows.map { row =>
-                Seq(
-                TableRow(
-                HtmlContent(
-                s"""
-                <a class="govuk-link" href="#">
-                    ${row.name}
-                </a>
-                """
-                )
-                ),
-                TableRow(Text(row.utr)),
-                TableRow(
-                Text(
-                if (row.verified) "Yes" else "No"
-                )
-                ),
-                TableRow(Text(row.verificationNumber)),
-                TableRow(
-                Text(
-                row.taxTreatment match {
-                case TaxTreatment.Gross        => "Gross"
-                case TaxTreatment.StandardRate => "Standard rate"
-                case TaxTreatment.HigherRate   => "Higher rate"
-                case TaxTreatment.Unknown      => "Unknown"
-                }
-                )
-                ),
-                TableRow(Text(row.dateAdded)),
-                TableRow(
-                HtmlContent(
-                s"""
-                <a class="govuk-link" href="#">
-                    Delete
-                    <span class="govuk-visually-hidden">
-                        ${row.name}
-                      </span>
-                </a>
-                """
-                )
-                )
-                )
+                                case TaxTreatment.StandardRate =>
+                                     messages("subcontractors.subcontractorsList.filter.taxTreatment.standardRate")
+
+                                case TaxTreatment.HigherRate =>
+                                     messages("subcontractors.subcontractorsList.filter.taxTreatment.higherRate")
+
+                                case TaxTreatment.Unknown =>
+                                     messages("subcontractors.subcontractorsList.filter.taxTreatment.unknown")
+                            }
+                       )
+                    ),
+                       TableRow(Text(row.dateAdded)),
+                       TableRow(
+                           HtmlContent(
+                            "<a class=\"govuk-link\" href=\"#\">" +
+                            "Delete" +
+                            "<span class=\"govuk-visually-hidden\"> " +
+                              HtmlFormat.escape(row.name) +
+                              "</span></a>"
+                            )
+                       )
+                    )
                 },
 
                 attributes = Map(
@@ -235,7 +236,7 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
                 "class" -> "govuk-table govuk-table--small-text-until-tablet"
                 )
                 )
-                )
+             )
 
             </div>
 

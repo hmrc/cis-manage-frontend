@@ -25,7 +25,14 @@
   }
 
   #subcontractors-table {
-    min-width: 900px;
+    min-width: 700px;
+  }
+
+  #subcontractors-table td:first-child,
+  #subcontractors-table th:first-child {
+    min-width: 140px;
+    max-width: 140px;
+    white-space: normal;
   }
 }
 
@@ -48,6 +55,11 @@
 
   #subcontractors-table td {
     white-space: nowrap;
+  }
+
+  #subcontractors-table td:first-child,
+  #subcontractors-table th:first-child {
+    white-space: normal;
   }
 }
 
@@ -119,42 +131,9 @@
   line-height: 1.2;
 }
 
-@media (min-width: 970px) {
-  #subcontractors-table td {
-    white-space: nowrap;
-  }
-
-  /* Only name column can wrap, but naturally */
-  #subcontractors-table td:first-child,
-  #subcontractors-table th:first-child {
-    white-space: normal;
-  }
-}
-
-
 #subcontractors-table td:first-child a {
   display: inline;
   white-space: normal;
-}
-
-@media (max-width: 768px) {
-
-  .govuk-table__container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    margin-bottom: 20px;
-  }
-
-  #subcontractors-table {
-    min-width: 700px;
-  }
-
-  #subcontractors-table td:first-child,
-  #subcontractors-table th:first-child {
-    min-width: 140px;
-    max-width: 140px;
-    white-space: normal;
-  }
 }
 
 .js-visible {

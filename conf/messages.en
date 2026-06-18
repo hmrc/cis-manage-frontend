@@ -666,7 +666,6 @@ subcontractors.subcontractorDeletedConfirmation.p3 = Your feedback helps us make
 subcontractors.subcontractorDeletedConfirmation.p4.text = to share your feedback on this service.
 subcontractors.subcontractorDeletedConfirmation.p4.link = Take a short survey
 
-
 subcontractors.cannotDeleteSubcontractor.title               = You cannot delete this subcontractor
 subcontractors.cannotDeleteSubcontractor.heading             = You cannot delete {0}
 subcontractors.cannotDeleteSubcontractor.p1                  = This subcontractor is currently part of a monthly return or verification request that is in progress.
