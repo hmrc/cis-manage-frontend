@@ -145,6 +145,10 @@ POST  /client-details/change-change-client-reference  controllers.clientdetails.
 # Add Contractor Details
 GET  /add-contractor-details  controllers.AddContractorDetailsController.onPageLoad()
 
+# Delete Subcontractor
+GET     /subcontractors/delete-subcontractor                        controllers.subcontractors.DeleteSubcontractorYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST    /subcontractors/delete-subcontractor                        controllers.subcontractors.DeleteSubcontractorYesNoController.onSubmit(mode: Mode = NormalMode)
+
 GET   /subcontractors/subcontractor-deleted                       controllers.subcontractors.SubcontractorDeletedConfirmationController.onPageLoad()
 
 GET  /subcontractors/cannot-delete-subcontractor-warning                       controllers.subcontractors.CannotDeleteSubcontractorController.onPageLoad()
