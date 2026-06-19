@@ -18,7 +18,7 @@ package forms.subcontractors
 
 import javax.inject.Inject
 import play.api.data.Form
-import play.api.data.Forms.single
+import play.api.data.Forms.{optional, single}
 import forms.Validation
 import forms.mappings.Mappings
 
@@ -28,13 +28,16 @@ class SubcontractorsListFormProvider @Inject() extends Mappings {
     Form(
       single(
         "searchTerm" ->
-          text()
-            .verifying(
-              maxLength(
-                Validation.subcontractorSearchMaxLength,
-                "subcontractors.subcontractorsList.search.error.length"
+          optional(
+            play.api.data.Forms
+              .text()
+              .verifying(
+                maxLength(
+                  Validation.subcontractorSearchMaxLength,
+                  "subcontractors.subcontractorsList.search.error.length"
+                )
               )
-            )
+          ).transform(_.getOrElse(""), s => Option(s))
       )
     )
 }

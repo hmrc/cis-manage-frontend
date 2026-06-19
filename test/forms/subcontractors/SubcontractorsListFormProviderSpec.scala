@@ -33,12 +33,11 @@ class SubcontractorsListFormProviderSpec extends StringFieldBehaviours {
       result.value mustBe Some("ABC Contractor")
     }
 
-    "not bind empty string" in {
+    "bind empty string" in {
       val result = form.bind(Map(fieldName -> ""))
 
-      result.errors must have length 1
-      result.errors.head.key mustBe fieldName
-      result.errors.head.message mustBe "error.required"
+      result.errors mustBe empty
+      result.value mustBe Some("")
     }
 
     s"not bind when length exceeds ${Validation.subcontractorSearchMaxLength} characters" in {
