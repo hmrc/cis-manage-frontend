@@ -19,14 +19,22 @@ package forms.subcontractors
 import javax.inject.Inject
 import play.api.data.Form
 import play.api.data.Forms.single
-import play.api.data.Forms.text
+import forms.Validation
+import forms.mappings.Mappings
 
-class SubcontractorsListFormProvider @Inject() {
+class SubcontractorsListFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
       single(
-        "searchTerm" -> text
+        "searchTerm" ->
+          text()
+            .verifying(
+              maxLength(
+                Validation.subcontractorSearchMaxLength,
+                "subcontractors.subcontractorsList.search.error.length"
+              )
+            )
       )
     )
 }

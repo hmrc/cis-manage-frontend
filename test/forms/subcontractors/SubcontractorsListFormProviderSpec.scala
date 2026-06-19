@@ -16,6 +16,7 @@
 
 package forms.subcontractors
 
+import forms.Validation
 import forms.behaviours.StringFieldBehaviours
 
 class SubcontractorsListFormProviderSpec extends StringFieldBehaviours {
@@ -32,11 +33,31 @@ class SubcontractorsListFormProviderSpec extends StringFieldBehaviours {
       result.value mustBe Some("ABC Contractor")
     }
 
-    "bind empty string" in {
+    "not bind empty string" in {
       val result = form.bind(Map(fieldName -> ""))
 
+      result.errors must have length 1
+      result.errors.head.key mustBe fieldName
+      result.errors.head.message mustBe "error.required"
+    }
+
+    s"not bind when length exceeds ${Validation.subcontractorSearchMaxLength} characters" in {
+      val invalidValue = "a" * (Validation.subcontractorSearchMaxLength + 1)
+
+      val result = form.bind(Map(fieldName -> invalidValue))
+
+      result.errors must have length 1
+      result.errors.head.key mustBe fieldName
+      result.errors.head.message mustBe "subcontractors.subcontractorsList.search.error.length"
+    }
+
+    "bind when length is exactly 35 characters" in {
+      val validValue = "a" * Validation.subcontractorSearchMaxLength
+
+      val result = form.bind(Map(fieldName -> validValue))
+
       result.errors mustBe empty
-      result.value mustBe Some("")
+      result.value mustBe Some(validValue)
     }
 
     "fill and unbind correctly" in {

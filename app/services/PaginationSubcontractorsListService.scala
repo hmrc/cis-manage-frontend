@@ -20,11 +20,7 @@ import javax.inject.{Inject, Singleton}
 import viewmodels.govuk.PaginationFluency.*
 import viewmodels.subcontractors.SubcontractorsListConstants
 
-@Singleton
-class PaginationSubcontractorsListService @Inject() () {
-
-  private val defaultRecordsPerPage = SubcontractorsListConstants.RecordsPerPage
-
+object PaginationSubcontractorsListService {
   case class PaginatedResult[T](
     items: Seq[T],
     pagination: PaginationViewModel,
@@ -33,6 +29,13 @@ class PaginationSubcontractorsListService @Inject() () {
     startIndex: Int,
     totalCount: Int
   )
+}
+
+@Singleton
+class PaginationSubcontractorsListService @Inject() () {
+  import PaginationSubcontractorsListService.*
+
+  private val defaultRecordsPerPage = SubcontractorsListConstants.RecordsPerPage
 
   private def buildUrl(
     baseUrl: String,

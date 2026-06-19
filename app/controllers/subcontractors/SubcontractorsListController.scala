@@ -125,13 +125,13 @@ class SubcontractorsListController @Inject() (
 
       val queryString =
         Seq(
-          Option(searchTerm).filter(_.nonEmpty).map("searchTerm=" + _),
+          Option(searchTerm).filter(_.nonEmpty).map(v => "searchTerm=" + encode(v)),
           Option(verificationStatus.value)
             .filter(_ != VerificationStatusFilter.All.value)
-            .map("verificationStatus=" + _),
+            .map(v => "verificationStatus=" + encode(v)),
           Option(taxTreatment.value)
             .filter(_ != TaxTreatmentFilter.All.value)
-            .map("taxTreatment=" + _)
+            .map(v => "taxTreatment=" + encode(v))
         ).flatten.mkString("&")
 
       val result =
@@ -163,47 +163,149 @@ class SubcontractorsListController @Inject() (
 
   def onSubmit(instanceId: String, mode: Mode, page: Int = 1): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => {
 
-      val formData =
-        request.body.asFormUrlEncoded.getOrElse(Map.empty)
+            val formData =
+              request.body.asFormUrlEncoded.getOrElse(Map.empty)
 
-      val gotoPage =
-        formData
-          .get("gotoPage")
-          .flatMap(_.headOption)
-          .flatMap(_.toIntOption)
+            val searchTerm =
+              formData.get("searchTerm").flatMap(_.headOption).getOrElse("").trim
 
-      val searchTerm =
-        formData.get("searchTerm").flatMap(_.headOption).getOrElse("").trim
+            val verificationStatus =
+              VerificationStatusFilter.fromString(
+                formData.get("verificationStatus").flatMap(_.headOption).getOrElse(VerificationStatusFilter.All.value)
+              )
 
-      val verificationStatus =
-        VerificationStatusFilter.fromString(
-          formData.get("verificationStatus").flatMap(_.headOption).getOrElse(VerificationStatusFilter.All.value)
+            val taxTreatment =
+              TaxTreatmentFilter.fromString(
+                formData.get("taxTreatment").flatMap(_.headOption).getOrElse(TaxTreatmentFilter.All.value)
+              )
+
+            val allRows = SubcontractorsListData.rows
+
+            val searchFiltered =
+              if (searchTerm.isEmpty) allRows
+              else
+                allRows.filter { row =>
+                  row.name.toLowerCase.contains(searchTerm.toLowerCase) ||
+                  row.utr.contains(searchTerm) ||
+                  row.verificationNumber.contains(searchTerm)
+                }
+
+            val verificationFiltered =
+              verificationStatus match {
+                case VerificationStatusFilter.Verified =>
+                  searchFiltered.filter(_.verified)
+
+                case VerificationStatusFilter.NotVerified =>
+                  searchFiltered.filter(!_.verified)
+
+                case VerificationStatusFilter.All =>
+                  searchFiltered
+              }
+
+            val taxFiltered =
+              taxTreatment match {
+                case TaxTreatmentFilter.Gross =>
+                  verificationFiltered.filter(_.taxTreatment == TaxTreatment.Gross)
+
+                case TaxTreatmentFilter.HigherRate =>
+                  verificationFiltered.filter(_.taxTreatment == TaxTreatment.HigherRate)
+
+                case TaxTreatmentFilter.StandardRate =>
+                  verificationFiltered.filter(_.taxTreatment == TaxTreatment.StandardRate)
+
+                case TaxTreatmentFilter.Unknown =>
+                  verificationFiltered.filter(_.taxTreatment == TaxTreatment.Unknown)
+
+                case TaxTreatmentFilter.All =>
+                  verificationFiltered
+              }
+
+            val sortedRows =
+              taxFiltered.sortBy(_.name.toLowerCase)
+
+            val queryString =
+              Seq(
+                Option(searchTerm).filter(_.nonEmpty).map(v => "searchTerm=" + encode(v)),
+                Option(verificationStatus.value)
+                  .filter(_ != VerificationStatusFilter.All.value)
+                  .map(v => "verificationStatus=" + encode(v)),
+                Option(taxTreatment.value)
+                  .filter(_ != TaxTreatmentFilter.All.value)
+                  .map(v => "taxTreatment=" + encode(v))
+              ).flatten.mkString("&")
+
+            val result =
+              paginationService.paginate(
+                allItems = sortedRows,
+                currentPage = page,
+                recordsPerPage = SubcontractorsListConstants.RecordsPerPage,
+                baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
+                queryString = queryString
+              )
+
+            BadRequest(
+              view(
+                formWithErrors,
+                mode,
+                result.items,
+                result.pagination,
+                result.currentPage,
+                result.totalPages,
+                result.startIndex,
+                result.totalCount,
+                instanceId,
+                searchTerm,
+                verificationStatus.value,
+                taxTreatment.value
+              )
+            )
+          },
+          searchTerm => {
+
+            val formData =
+              request.body.asFormUrlEncoded.getOrElse(Map.empty)
+
+            val gotoPage =
+              formData
+                .get("gotoPage")
+                .flatMap(_.headOption)
+                .flatMap(_.toIntOption)
+
+            val verificationStatus =
+              VerificationStatusFilter.fromString(
+                formData.get("verificationStatus").flatMap(_.headOption).getOrElse(VerificationStatusFilter.All.value)
+              )
+
+            val taxTreatment =
+              TaxTreatmentFilter.fromString(
+                formData.get("taxTreatment").flatMap(_.headOption).getOrElse(TaxTreatmentFilter.All.value)
+              )
+
+            val targetPage =
+              gotoPage.getOrElse(1)
+
+            val baseUrl =
+              routes.SubcontractorsListController
+                .onPageLoad(instanceId, mode, targetPage)
+                .url
+
+            val redirectUrl =
+              appendQueryParams(
+                baseUrl,
+                Seq(
+                  "searchTerm"         -> searchTerm.trim,
+                  "verificationStatus" -> verificationStatus.value,
+                  "taxTreatment"       -> taxTreatment.value
+                )
+              )
+
+            Redirect(redirectUrl)
+          }
         )
-
-      val taxTreatment =
-        TaxTreatmentFilter.fromString(
-          formData.get("taxTreatment").flatMap(_.headOption).getOrElse(TaxTreatmentFilter.All.value)
-        )
-
-      val targetPage =
-        gotoPage.getOrElse(1)
-
-      val baseUrl =
-        routes.SubcontractorsListController
-          .onPageLoad(instanceId, mode, targetPage)
-          .url
-
-      val redirectUrl =
-        appendQueryParams(
-          baseUrl,
-          Seq(
-            "searchTerm"         -> searchTerm,
-            "verificationStatus" -> verificationStatus.value,
-            "taxTreatment"       -> taxTreatment.value
-          )
-        )
-
-      Redirect(redirectUrl)
     }
 }

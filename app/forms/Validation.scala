@@ -27,5 +27,6 @@ object Validation {
   val clientNameInputMaxLength: Int        = 56
   val clientReferenceInputMaxLength: Int   = 20
   val employerReferenceInputMaxLength: Int = 14
+  val subcontractorSearchMaxLength: Int    = 35
 
 }
