@@ -37,6 +37,7 @@
     contractorName: String,
     EmployerRef: String,
     IRNumber: String,
+    cisId: String,
 )(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("verify.subcontractorSubmissionReceipt.title"))) {
@@ -58,7 +59,7 @@
     @printLink("verify.subcontractorSubmissionReceipt.link1")
     @link(
         linkTextKey = "verify.subcontractorSubmissionReceipt.link2.link",
-        linkUrl = "",
+        linkUrl = controllers.routes.SubcontractorsLandingPageController.onPageLoad(cisId).url,
         prefixTextKey = "verify.subcontractorSubmissionReceipt.link2.prefix",
         hasFullStop = true
     )

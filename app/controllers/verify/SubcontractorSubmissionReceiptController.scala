@@ -29,6 +29,7 @@ class SubcontractorSubmissionReceiptController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  requireCisId: CisIdRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: SubcontractorSubmissionReceiptView
 ) extends FrontendBaseController
@@ -40,7 +41,8 @@ class SubcontractorSubmissionReceiptController @Inject() (
   private val employerRef    = "ABC12345"
   private val IRNumber       = "123456"
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    Ok(view(submissionTime, submissionDate, contractorName, employerRef, IRNumber))
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData andThen requireCisId) {
+    implicit request =>
+      Ok(view(submissionTime, submissionDate, contractorName, employerRef, IRNumber, request.cisId))
   }
 }
