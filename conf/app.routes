@@ -124,6 +124,7 @@ POST  /verify/select-tax-year-for-verification-requests     controllers.verify.V
 
 GET   /verify/history/verification-history-all-tax-years    controllers.verify.VerificationHistoryController.onPageLoadAllYears()
 GET   /verify/history/verification-history-single-tax-year  controllers.verify.VerificationHistoryController.onPageLoadSingleYear()
+GET   /verify/history/submission-receipt                    controllers.verify.SubcontractorSubmissionReceiptController.onPageLoad()
 
 # Client Details
 GET   /client-details/manage-client-details           controllers.clientdetails.ManageClientDetailsController.onPageLoad()
@@ -145,5 +146,3 @@ POST  /client-details/change-change-client-reference  controllers.clientdetails.
 # Add Contractor Details
 GET   /add-contractor-details  controllers.AddContractorDetailsController.onPageLoad()
 
-# Subcontractor
-GET   /subcontractor/verify/submission-receipt        controllers.subcontractor.SubcontractorSubmissionReceiptController.onPageLoad()

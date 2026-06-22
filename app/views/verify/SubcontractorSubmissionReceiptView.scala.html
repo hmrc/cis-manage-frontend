@@ -39,27 +39,27 @@
     IRNumber: String,
 )(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("subcontractor.subcontractorSubmissionReceipt.title"))) {
-    @h1(messages("subcontractor.subcontractorSubmissionReceipt.heading"))
-    @h2(messages("subcontractor.subcontractorSubmissionReceipt.subheading"))
-    @paragraph(messages("subcontractor.subcontractorSubmissionReceipt.p1",submissionTime, submissionDate))
+@layout(pageTitle = titleNoForm(messages("verify.subcontractorSubmissionReceipt.title"))) {
+    @h1(messages("verify.subcontractorSubmissionReceipt.heading"))
+    @h2(messages("verify.subcontractorSubmissionReceipt.subheading"))
+    @paragraph(messages("verify.subcontractorSubmissionReceipt.p1",submissionTime, submissionDate))
 
     @govukSummaryList(
         SummaryListViewModel(rows = Seq(
-            SummaryListRowViewModel(Key("subcontractor.subcontractorSubmissionReceipt.summaryList.key1"), Value(contractorName)),
-            SummaryListRowViewModel(Key("subcontractor.subcontractorSubmissionReceipt.summaryList.key2"), Value(EmployerRef)),
-            SummaryListRowViewModel(Key("subcontractor.subcontractorSubmissionReceipt.summaryList.key3"), Value(IRNumber)),
+            SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key1"), Value(contractorName)),
+            SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key2"), Value(EmployerRef)),
+            SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key3"), Value(IRNumber)),
         ))
     )
 
-    @paragraph(messages("subcontractor.subcontractorSubmissionReceipt.p2"))
-    @paragraph(messages("subcontractor.subcontractorSubmissionReceipt.p3"))
+    @paragraph(messages("verify.subcontractorSubmissionReceipt.p2"))
+    @paragraph(messages("verify.subcontractorSubmissionReceipt.p3"))
 
-    @printLink("subcontractor.subcontractorSubmissionReceipt.link1")
+    @printLink("verify.subcontractorSubmissionReceipt.link1")
     @link(
-        linkTextKey = "subcontractor.subcontractorSubmissionReceipt.link2.link",
+        linkTextKey = "verify.subcontractorSubmissionReceipt.link2.link",
         linkUrl = "",
-        prefixTextKey = "subcontractor.subcontractorSubmissionReceipt.link2.prefix",
+        prefixTextKey = "verify.subcontractorSubmissionReceipt.link2.prefix",
         hasFullStop = true
     )
 }

@@ -1,9 +1,9 @@
-package controllers.subcontractor
+package controllers.verify
 
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.subcontractor.SubcontractorSubmissionReceiptView
+import views.html.verify.SubcontractorSubmissionReceiptView
 
 class SubcontractorSubmissionReceiptControllerSpec extends SpecBase {
 
@@ -15,7 +15,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(GET, controllers.subcontractor.routes.SubcontractorSubmissionReceiptController.onPageLoad().url)
+          FakeRequest(GET, controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad().url)
 
         val result = route(application, request).value
 
