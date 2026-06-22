@@ -26,6 +26,7 @@
         h2: H2,
         paragraph: Paragraph,
         link: Link,
+        printLink: PrintLink,
         govukSummaryList: GovukSummaryList,
         govukButton: GovukButton
 )
@@ -54,7 +55,7 @@
     @paragraph(messages("subcontractor.subcontractorSubmissionReceipt.p2"))
     @paragraph(messages("subcontractor.subcontractorSubmissionReceipt.p3"))
 
-    @link("subcontractor.subcontractorSubmissionReceipt.link1","/")
+    @printLink("subcontractor.subcontractorSubmissionReceipt.link1")
     @link(
         linkTextKey = "subcontractor.subcontractorSubmissionReceipt.link2.link",
         linkUrl = "",
