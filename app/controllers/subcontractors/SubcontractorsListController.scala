@@ -186,14 +186,21 @@ class SubcontractorsListController @Inject() (
 
             val allRows = SubcontractorsListData.rows
 
+            val hasSearchTermError =
+              formWithErrors.error("searchTerm").isDefined
+
             val searchFiltered =
-              if (searchTerm.isEmpty) allRows
-              else
+              if (hasSearchTermError) {
+                allRows
+              } else if (searchTerm.isEmpty) {
+                allRows
+              } else {
                 allRows.filter { row =>
                   row.name.toLowerCase.contains(searchTerm.toLowerCase) ||
                   row.utr.contains(searchTerm) ||
                   row.verificationNumber.contains(searchTerm)
                 }
+              }
 
             val verificationFiltered =
               verificationStatus match {
