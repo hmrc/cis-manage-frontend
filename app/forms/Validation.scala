@@ -28,5 +28,6 @@ object Validation {
   val clientReferenceInputMaxLength: Int   = 20
   val employerReferenceInputMaxLength: Int = 14
   val subcontractorSearchMaxLength: Int    = 35
+  val subcontractorSearchList: Regex       = """^[A-Za-z0-9\s,]*$""".r.anchored
 
 }

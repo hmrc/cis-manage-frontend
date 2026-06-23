@@ -64,5 +64,32 @@ class SubcontractorsListFormProviderSpec extends StringFieldBehaviours {
 
       filledForm(fieldName).value mustBe Some("Test search")
     }
+
+    "bind valid characters allowed by regex" in {
+      val result =
+        form.bind(Map(fieldName -> "ABC Contractor 123, Ltd"))
+
+      result.errors mustBe empty
+      result.value mustBe Some("ABC Contractor 123, Ltd")
+    }
+
+    "not bind when search term contains invalid characters" in {
+      val result =
+        form.bind(Map(fieldName -> "ABC@Contractor"))
+
+      result.errors must have length 1
+      result.errors.head.key mustBe fieldName
+      result.errors.head.message mustBe
+        "subcontractors.subcontractorsList.search.error.invalid"
+    }
+
+    "not bind when search term contains special characters" in {
+      val result =
+        form.bind(Map(fieldName -> "ABC#Contractor"))
+
+      result.errors must have length 1
+      result.errors.head.message mustBe
+        "subcontractors.subcontractorsList.search.error.invalid"
+    }
   }
 }

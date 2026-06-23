@@ -37,6 +37,12 @@ class SubcontractorsListFormProvider @Inject() extends Mappings {
                   "subcontractors.subcontractorsList.search.error.length"
                 )
               )
+              .verifying(
+                regexp(
+                  Validation.subcontractorSearchList.toString(),
+                  "subcontractors.subcontractorsList.search.error.invalid"
+                )
+              )
           ).transform(_.getOrElse(""), s => Option(s))
       )
     )
