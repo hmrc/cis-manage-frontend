@@ -31,7 +31,7 @@
 @(viewModel: VerificationRequestPageViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(
-    pageTitle = titleNoForm(messages("verify.verificationRequest.title"))
+    pageTitle = titleNoForm(messages("verify.verificationRequest.title")), useFullWidth= true
 ) {
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
