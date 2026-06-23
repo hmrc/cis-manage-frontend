@@ -35,7 +35,7 @@
     submissionTime: String,
     submissionDate: String,
     contractorName: String,
-    EmployerRef: String,
+    employerRef: String,
     IRNumber: String,
     cisId: String,
 )(implicit request: Request[_], messages: Messages)
@@ -48,7 +48,7 @@
     @govukSummaryList(
         SummaryListViewModel(rows = Seq(
             SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key1"), Value(contractorName)),
-            SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key2"), Value(EmployerRef)),
+            SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key2"), Value(employerRef)),
             SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key3"), Value(IRNumber)),
         ))
     )

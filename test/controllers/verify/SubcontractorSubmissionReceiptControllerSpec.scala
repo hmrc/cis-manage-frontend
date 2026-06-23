@@ -11,7 +11,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId)).build()
 
       running(application) {
         val request =
@@ -21,8 +21,22 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase {
 
         val view = application.injector.instanceOf[SubcontractorSubmissionReceiptView]
 
+        val testSubmissionTime = "12:00"
+        val testSubmissionDate = "18 May 2025"
+        val testContractorName = "John Doe"
+        val testEmployerRef    = "ABC12345"
+        val testIRNumber       = "123456"
+        val testCisId          = "1"
+
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          testSubmissionTime,
+          testSubmissionDate,
+          testContractorName,
+          testEmployerRef,
+          testIRNumber,
+          testCisId
+        )(request, messages(application)).toString
       }
     }
   }
