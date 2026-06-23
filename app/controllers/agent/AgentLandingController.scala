@@ -67,7 +67,8 @@ class AgentLandingController @Inject() (
           uniqueId = uniqueId,
           clientName = viewModel.clientName,
           employerRef = viewModel.employerRef,
-          utr = viewModel.utr.getOrElse(""),
+          schemeName = "Scheme name hardcoded",
+//          utr = viewModel.utr.getOrElse(""),
           // still hard-coded, mocked for now
           returnsDueCount = 1,
           returnsDueBy = java.time.LocalDate.of(2025, 10, 19),

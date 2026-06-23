@@ -118,7 +118,7 @@ class ManageService @Inject() (
               } yield AgentLandingViewModel(
                 clientName = updatedClient.schemeName.getOrElse(""),
                 employerRef = s"${updatedClient.taxOfficeNumber}/${updatedClient.taxOfficeRef}",
-                utr = utrOpt
+                utr = utrOpt // TODO: REMOVE UTR AND ADD CLIENT NAME
               )
             }
         }

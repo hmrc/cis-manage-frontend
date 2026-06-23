@@ -33,6 +33,7 @@ case class CisTaxpayer(
   employerName2: Option[String],
   agentOwnRef: Option[String],
   schemeName: Option[String],
+  // TODO: REMOVE UTR AND ADD SCHEME NAME?
   utr: Option[String],
   enrolledSig: Option[String]
 )
@@ -46,7 +47,8 @@ case class CisTaxpayerSearchResult(
   taxOfficeNumber: String,
   taxOfficeRef: String,
   agentOwnRef: Option[String],
-  schemeName: Option[String],
+  schemeName: Option[String], // THIS IS THE CLIENT NAME?
+  // TODO: REMOVE UTR AND ADD SCHEME NAME?
   utr: Option[String]
 )
 
