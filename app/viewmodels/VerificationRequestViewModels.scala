@@ -20,12 +20,13 @@ case class VerificationRequestPageViewModel(
   submittedTime: String,
   submittedDate: String,
   verificationNumber: String,
-  totalSubcontractors: Int,
   subcontractorsToVerify: Seq[SubcontractorRowViewModel],
   subcontractorsToReverify: Seq[SubcontractorRowViewModel],
   manageSubcontractorsUrl: String
 ) {
+  def totalSubcontractors: Int    = subcontractorsToVerify.size + subcontractorsToReverify.size
   val hasReverifications: Boolean = subcontractorsToReverify.nonEmpty
+  val hasVerifications: Boolean   = subcontractorsToVerify.nonEmpty
 }
 
 case class SubcontractorRowViewModel(

@@ -32,7 +32,6 @@ class VerificationRequestViewSpec extends SpecBase {
     submittedTime = "14:30",
     submittedDate = "6 February 2027",
     verificationNumber = "V0004528765",
-    totalSubcontractors = 7,
     subcontractorsToVerify = Seq(
       SubcontractorRowViewModel("Amity Marine Contractors", "V0004528765"),
       SubcontractorRowViewModel("Brody, Martin", "V0004528765")
@@ -44,8 +43,11 @@ class VerificationRequestViewSpec extends SpecBase {
   )
 
   private val viewModelWithoutReverify = viewModelWithReverify.copy(
-    subcontractorsToReverify = Seq.empty,
-    totalSubcontractors = 2
+    subcontractorsToReverify = Seq.empty
+  )
+
+  private val viewModelWithoutVerify = viewModelWithReverify.copy(
+    subcontractorsToVerify = Seq.empty
   )
 
   "VerificationRequestView" - {
@@ -119,6 +121,16 @@ class VerificationRequestViewSpec extends SpecBase {
         messages(app)("verify.verificationRequest.subcontractorsToReverify.heading")
       )
       doc.text()                  should include("Orca Industrial")
+    }
+
+    "not render the Subcontractors to verify section when no verifications exist" in {
+      val doc = render(viewModelWithoutVerify)
+
+      doc.select("h2").eachText() should not contain messages(app)(
+        "verify.verificationRequest.subcontractorsToVerify.heading"
+      )
+
+      doc.select("table").text() should not include "Amity Marine Contractors"
     }
 
     "not render the Subcontractors to reverify section when no reverifications exist" in {

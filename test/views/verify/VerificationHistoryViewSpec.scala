@@ -37,7 +37,8 @@ class VerificationHistoryViewSpec extends SpecBase {
           VerificationHistoryRowViewModel(
             verificationNumber = "V0004528765",
             dateSubmitted = "6 Apr 2026",
-            verificationRequestLink = "#",
+            verificationRequestLink =
+              controllers.verify.routes.VerificationRequestController.onPageLoad("V0004528765").url,
             submissionReceiptLink = "#"
           )
         )
@@ -56,7 +57,8 @@ class VerificationHistoryViewSpec extends SpecBase {
           VerificationHistoryRowViewModel(
             verificationNumber = "V0004528765",
             dateSubmitted = "6 Apr 2026",
-            verificationRequestLink = "#",
+            verificationRequestLink =
+              controllers.verify.routes.VerificationRequestController.onPageLoad("V0004528765").url,
             submissionReceiptLink = "#"
           )
         )
@@ -134,9 +136,11 @@ class VerificationHistoryViewSpec extends SpecBase {
         messages(app)("verify.verificationHistory.table.submissionReceipt")
       )
 
-      desktop.text()                        should include("V0004528765")
-      desktop.text()                        should include("6 Apr 2026")
-      desktop.select("a.govuk-link").text() should include(messages(app)("site.view"))
+      desktop.text()                                                                                should include("V0004528765")
+      desktop.text()                                                                                should include("6 Apr 2026")
+      desktop.select(s"a[href=/verify/verification-request?verificationNumber=V0004528765]").text() should include(
+        messages(app)("site.view")
+      )
     }
 
     "render the mobile stacked version" in {
@@ -145,13 +149,15 @@ class VerificationHistoryViewSpec extends SpecBase {
       val mobile = doc.selectFirst(".verification-history-mobile")
       mobile should not be null
 
-      mobile.text()                                 should include("V0004528765")
-      mobile.text()                                 should include(messages(app)("verify.verificationHistory.table.dateSubmitted"))
-      mobile.text()                                 should include("6 Apr 2026")
-      mobile.text()                                 should include(messages(app)("verify.verificationHistory.table.verificationRequest"))
-      mobile.text()                                 should include(messages(app)("verify.verificationHistory.table.submissionReceipt"))
-      mobile.select("a.govuk-link").text()          should include(messages(app)("site.view"))
-      mobile.select(".govuk-summary-list").size() shouldBe 1
+      mobile.text()                                                                                should include("V0004528765")
+      mobile.text()                                                                                should include(messages(app)("verify.verificationHistory.table.dateSubmitted"))
+      mobile.text()                                                                                should include("6 Apr 2026")
+      mobile.text()                                                                                should include(messages(app)("verify.verificationHistory.table.verificationRequest"))
+      mobile.text()                                                                                should include(messages(app)("verify.verificationHistory.table.submissionReceipt"))
+      mobile.select(s"a[href=/verify/verification-request?verificationNumber=V0004528765]").text() should include(
+        messages(app)("site.view")
+      )
+      mobile.select(".govuk-summary-list").size()                                                shouldBe 1
     }
 
     "render the back to manage subcontractors link" in {

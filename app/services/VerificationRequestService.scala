@@ -36,7 +36,6 @@ class VerificationRequestService @Inject() () {
       submittedTime = data.dateTimeSubmitted.format(timeFormatter),
       submittedDate = data.dateTimeSubmitted.format(dateFormatter),
       verificationNumber = data.verificationNumber,
-      totalSubcontractors = data.subcontractorsToVerify.size + data.subcontractorsToReverify.size,
       subcontractorsToVerify =
         data.subcontractorsToVerify.map(s => SubcontractorRowViewModel(s.name, s.verificationNumber)),
       subcontractorsToReverify =

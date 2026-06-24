@@ -56,7 +56,6 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
     submittedTime = "14:30",
     submittedDate = "6 February 2027",
     verificationNumber = verificationNumber,
-    totalSubcontractors = 3,
     subcontractorsToVerify = Seq(
       SubcontractorRowViewModel("Amity Marine Contractors", "V0004528765"),
       SubcontractorRowViewModel("Brody, Martin", "V0004528765")

@@ -31,10 +31,8 @@
 @(viewModel: VerificationRequestPageViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(
-    pageTitle = titleNoForm(messages("verify.verificationRequest.title")), useFullWidth= true
+    pageTitle = titleNoForm(messages("verify.verificationRequest.title"))
 ) {
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
             @h1("verify.verificationRequest.heading")
 
             @h2("verify.verificationRequest.submissionDetails.heading")
@@ -59,23 +57,24 @@
                 )
             )
 
-            @h2("verify.verificationRequest.subcontractorsToVerify.heading", classes = "govuk-heading-m govuk-!-margin-top-8 govuk-!-margin-bottom-6")
+            @if(viewModel.hasVerifications) {
+                @h2("verify.verificationRequest.subcontractorsToVerify.heading", classes = "govuk-heading-m govuk-!-margin-top-8 govuk-!-margin-bottom-6")
 
-            @govukTable(
-                Table(
-                    head = Some(Seq(
-                        HeadCell(content = Text(messages("verify.verificationRequest.table.name"))),
-                        HeadCell(content = Text(messages("verify.verificationRequest.table.verificationNumber")))
-                    )),
-                    rows = viewModel.subcontractorsToVerify.map { row =>
-                        Seq(
-                            TableRow(content = Text(row.name)),
-                            TableRow(content = Text(row.verificationNumber))
-                        )
-                    }
+                @govukTable(
+                    Table(
+                        head = Some(Seq(
+                            HeadCell(content = Text(messages("verify.verificationRequest.table.name"))),
+                            HeadCell(content = Text(messages("verify.verificationRequest.table.verificationNumber")))
+                        )),
+                        rows = viewModel.subcontractorsToVerify.map { row =>
+                            Seq(
+                                TableRow(content = Text(row.name)),
+                                TableRow(content = Text(row.verificationNumber))
+                            )
+                        }
+                    )
                 )
-            )
-
+            }
             @if(viewModel.hasReverifications) {
                 @h2("verify.verificationRequest.subcontractorsToReverify.heading", classes = "govuk-heading-m govuk-!-margin-top-8 govuk-!-margin-bottom-6")
 
@@ -102,6 +101,4 @@
                 linkUrl = viewModel.manageSubcontractorsUrl,
                 hasFullStop = true
             )
-        </div>
-    </div>
 }
