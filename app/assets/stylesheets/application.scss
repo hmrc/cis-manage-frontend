@@ -54,6 +54,18 @@
   }
 }
 
+@media (max-width: 1200px) {
+
+  .govuk-table__container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #subcontractors-table {
+    min-width: 1200px;
+  }
+}
+
 @media (min-width: 970px) {
 
   #subcontractors-table th {

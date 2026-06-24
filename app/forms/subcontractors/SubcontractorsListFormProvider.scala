@@ -31,16 +31,17 @@ class SubcontractorsListFormProvider @Inject() extends Mappings {
           optional(
             play.api.data.Forms
               .text()
+              .transform[String](_.trim, identity)
               .verifying(
-                maxLength(
-                  Validation.subcontractorSearchMaxLength,
-                  "subcontractors.subcontractorsList.search.error.length"
-                )
-              )
-              .verifying(
-                regexp(
-                  Validation.subcontractorSearchList.toString(),
-                  "subcontractors.subcontractorsList.search.error.invalid"
+                firstError(
+                  maxLength(
+                    Validation.subcontractorSearchMaxLength,
+                    "subcontractors.subcontractorsList.search.error.length"
+                  ),
+                  regexp(
+                    Validation.subcontractorSearchList.toString(),
+                    "subcontractors.subcontractorsList.search.error.invalid"
+                  )
                 )
               )
           ).transform(_.getOrElse(""), s => Option(s))
