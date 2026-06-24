@@ -621,6 +621,34 @@ clientdetails.clientRefUpdateConfirmation.p2.link            =  view the change 
 clientdetails.clientRefUpdateConfirmation.h2                 =  What happens next
 
 # Subcontractors
+subcontractors.subcontractorsList.title                                     = Your subcontractors
+subcontractors.subcontractorsList.heading                                   = Your subcontractors
+subcontractors.subcontractorsList.h2                                        = Search subcontractors
+subcontractors.subcontractorsList.filter.verificationStatus                 = Filter by verification status
+subcontractors.subcontractorsList.filter.taxTreatment                       = Filter by tax treatment
+subcontractors.subcontractorsList.filter.all                                = All
+subcontractors.subcontractorsList.filter.verificationStatus.verified        = Verified
+subcontractors.subcontractorsList.filter.verificationStatus.notVerified     = Not verified
+subcontractors.subcontractorsList.filter.taxTreatment.gross                 = Gross
+subcontractors.subcontractorsList.filter.taxTreatment.higherRate            = Higher rate
+subcontractors.subcontractorsList.filter.taxTreatment.standardRate          = Standard rate
+subcontractors.subcontractorsList.filter.taxTreatment.unknown               = Unknown
+subcontractors.subcontractorsList.hint                                      = Search by name, UTR or verification number
+subcontractors.subcontractorsList.showingResults                            = Showing {0} to {1} of {2} results
+subcontractors.subcontractorsList.search.error.length                       = Search value must be 35 characters or less
+subcontractors.subcontractorsList.search.error.invalid                      = Search terms must only contain letters a-z, numbers, commas, and spaces
+subcontractors.subcontractorsList.name                                      = Name
+subcontractors.subcontractorsList.utr                                       = UTR
+subcontractors.subcontractorsList.verified                                  = Verified
+subcontractors.subcontractorsList.verificationNumber                        = Verification number
+subcontractors.subcontractorsList.taxTreatment                              = Tax treatment
+subcontractors.subcontractorsList.dateAdded                                 = Date added
+subcontractors.subcontractorsList.action                                    = Action
+subcontractors.subcontractorsList.backTo                                    = Back to
+subcontractors.subcontractorsList.manage                                    = Manage your subcontractors
+subcontractors.subcontractorsList.searchAndFilter                           = Search and filter
+subcontractors.subcontractorsList.clearFilters                              = Clear
+
 subcontractors.noSubcontractorsExist.title = No subcontractors to view
 subcontractors.noSubcontractorsExist.heading = Your subcontractors
 subcontractors.noSubcontractorsExist.p1 = You don’t have any subcontractors at the moment.
@@ -639,7 +667,6 @@ subcontractors.subcontractorDeletedConfirmation.h2 = Before you go
 subcontractors.subcontractorDeletedConfirmation.p3 = Your feedback helps us make our service better.
 subcontractors.subcontractorDeletedConfirmation.p4.text = to share your feedback on this service.
 subcontractors.subcontractorDeletedConfirmation.p4.link = Take a short survey
-
 
 subcontractors.cannotDeleteSubcontractor.title               = You cannot delete this subcontractor
 subcontractors.cannotDeleteSubcontractor.heading             = You cannot delete {0}
