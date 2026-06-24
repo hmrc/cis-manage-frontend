@@ -77,7 +77,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
 
         val vm  = result.get
         val row = vm.taxYears.head.rows.head
-        row.verificationRequestLink must include("/subcontractor/verify/verification-request")
+        row.verificationRequestLink must include("/verify/verification-request")
         row.verificationRequestLink must include("verificationNumber=V002")
       }
 
