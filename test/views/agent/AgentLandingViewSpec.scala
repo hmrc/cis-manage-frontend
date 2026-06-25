@@ -76,10 +76,10 @@ class AgentLandingViewSpec extends SpecBase {
 
       val rows = doc.select(".govuk-summary-list .govuk-summary-list__row")
 
-      val schemeNameKey = rows.get(1).selectFirst(".govuk-summary-list__key").text()
+      val schemeNameKey   = rows.get(1).selectFirst(".govuk-summary-list__key").text()
       val schemeNameValue = rows.get(1).selectFirst(".govuk-summary-list__value").text()
 
-      schemeNameKey shouldBe messages(app).apply("agent.landing.schemeName.key")
+      schemeNameKey   shouldBe messages(app).apply("agent.landing.schemeName.key")
       schemeNameValue shouldBe messages(app).apply("agent.landing.schemeName.key.notProvided")
     }
 
@@ -87,9 +87,9 @@ class AgentLandingViewSpec extends SpecBase {
       val (doc, _) = render()
 
       doc.select("#subsection-title").text() should include(messages(app).apply("agent.landing.h2.help"))
-      doc.select(".govuk-link").text() should include(messages(app).apply("agent.landing.help.link1"))
-      doc.select(".govuk-link").text() should include(messages(app).apply("agent.landing.help.link2"))
-      doc.select(".govuk-link").text() should include(messages(app).apply("agent.landing.help.link3"))
+      doc.select(".govuk-link").text()       should include(messages(app).apply("agent.landing.help.link1"))
+      doc.select(".govuk-link").text()       should include(messages(app).apply("agent.landing.help.link2"))
+      doc.select(".govuk-link").text()       should include(messages(app).apply("agent.landing.help.link3"))
 
       doc.text() should include(messages(app).apply("agent.landing.card.manageYourCisReturns.title"))
       doc.text() should include(messages(app).apply("p"))
