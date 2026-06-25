@@ -278,6 +278,7 @@ agent.landing.title                                    =  Manage Construction In
 agent.landing.h1                                       =  Manage Construction Industry Service account
 agent.landing.agentName.key                            =  Agent name
 agent.landing.schemeName.key                           =  Scheme name
+agent.landing.schemeName.key.notProvided               =  Not provided
 agent.landing.employerRef.key                          =  Employer reference
 agent.landing.h2.help                                  =  Help and guidance
 agent.landing.card.manageYourCisReturns.title          =  Manage your CIS return
@@ -297,7 +298,7 @@ agent.landing.card.noticesAndStatements.p              =  View HMRC notices, pen
 agent.landing.help.link1                               =  What is the Construction Industry Scheme
 agent.landing.help.link2                               =  CIS monthly returns guidance
 agent.landing.help.link3                               =  CIS 340: Penalties for late returns
-agent.landing.back                                     =  Back to clients
+agent.landing.back                                     =  Back to client list
 
 # Subcontractors
 retrievingSubcontractors.title                                =  Your subcontractors

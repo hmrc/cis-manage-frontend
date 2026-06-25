@@ -51,18 +51,18 @@
     clientName: String,
     schemeName: String,
     employerRef: String,
-    returnsDueCount: Int,
-    returnsDueBy: java.time.LocalDate,
-    newNoticesCount: Int,
-    lastSubmittedDate: java.time.LocalDate,
-    lastSubmittedTaxMonth: java.time.YearMonth
     )(implicit request: RequestHeader,
     appConfig: FrontendAppConfig,
     messages: Messages
 )
 
+@schemeNameDisplay = @{
+    if (schemeName.trim.isEmpty) messages("agent.landing.schemeName.key.notProvided")
+    else schemeName
+}
+
 @layout(
-    pageTitle     = titleNoForm(messages("agent.landing.title", clientName)),
+    pageTitle     = titleNoForm(messages("agent.landing.title")),
     showBackLink  = false,
     beforeContent = Some(
     backNavigation(
@@ -80,7 +80,7 @@
             ),
             sl.SummaryListRowViewModel(
                 key   = sl.KeyViewModel(Text(messages("agent.landing.schemeName.key"))),
-                value = sl.ValueViewModel(Text(schemeName))
+                value = sl.ValueViewModel(Text(schemeNameDisplay))
             ),
             sl.SummaryListRowViewModel(
                 key   = sl.KeyViewModel(Text(messages("agent.landing.employerRef.key"))),

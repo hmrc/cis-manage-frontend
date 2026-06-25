@@ -17,142 +17,118 @@
 package views.agent
 
 import base.SpecBase
+import config.FrontendAppConfig
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.jsoup.parser.Parser
 import org.scalatest.matchers.should.Matchers.*
+import play.api.i18n.Messages
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.agent.AgentLandingView
-import config.FrontendAppConfig
-import java.time.{LocalDate, YearMonth}
-import java.time.format.DateTimeFormatter
 
 class AgentLandingViewSpec extends SpecBase {
 
-  private val uniqueId              = "1"
-  private val clientName            = "ABC Construction Ltd"
-  private val employerRef           = "123/AB45678"
-  private val utr                   = "1234567890"
-  private val returnsDueCount       = 1
-  private val returnsDueBy          = LocalDate.of(2025, 10, 19)
-  private val newNoticesCount       = 2
-  private val lastSubmittedDate     = LocalDate.of(2025, 9, 19)
-  private val lastSubmittedTaxMonth = YearMonth.of(2025, 8)
+  private val uniqueId    = "1"
+  private val clientName  = "UHD Contractor Control Group"
+  private val schemeName  = "Scheme name"
+  private val employerRef = "123/AB45678"
 
   "AgentLandingView" - {
 
-    "render the page with expected header, caption and title" in {
+    "render the page with expected header and title" in {
       val (doc, appConfig) = render()
 
       doc
-        .title() shouldBe s"${messages(app)("agent.landing.title", clientName)} - Construction Industry Scheme - GOV.UK"
+        .title() shouldBe s"${messages(app)("agent.landing.title")} - Construction Industry Scheme - GOV.UK"
 
       val back = doc.select("a.govuk-back-link")
       back.size() shouldBe 1
-
-      val caption = doc.selectFirst("span.govuk-caption-l")
-      caption.text() shouldBe clientName
 
       val h1 = doc.selectFirst("h1")
       h1.text() shouldBe messages(app).apply("agent.landing.h1")
     }
 
-    "show employerRef and UTR in a summary list" in {
+    "show employerRef, scheme name and client name in a summary list" in {
       val (doc, _) = render()
 
       val rows = doc.select(".govuk-summary-list .govuk-summary-list__row")
-      rows.size() shouldBe 2
+      rows.size() shouldBe 3
 
-      val employerKey   = rows.get(0).selectFirst(".govuk-summary-list__key").text()
-      val employerValue = rows.get(0).selectFirst(".govuk-summary-list__value").text()
+      val clientNameKey   = rows.get(0).selectFirst(".govuk-summary-list__key").text()
+      val clientNameValue = rows.get(0).selectFirst(".govuk-summary-list__value").text()
+      clientNameKey   shouldBe messages(app).apply("agent.landing.agentName.key")
+      clientNameValue shouldBe clientName
+
+      val schemeNameKey   = rows.get(1).selectFirst(".govuk-summary-list__key").text()
+      val schemeNameValue = rows.get(1).selectFirst(".govuk-summary-list__value").text()
+      schemeNameKey   shouldBe messages(app).apply("agent.landing.schemeName.key")
+      schemeNameValue shouldBe schemeName
+
+      val employerKey   = rows.get(2).selectFirst(".govuk-summary-list__key").text()
+      val employerValue = rows.get(2).selectFirst(".govuk-summary-list__value").text()
       employerKey   shouldBe messages(app).apply("agent.landing.employerRef.key")
       employerValue shouldBe employerRef
-
-      val utrKey   = rows.get(1).selectFirst(".govuk-summary-list__key").text()
-      val utrValue = rows.get(1).selectFirst(".govuk-summary-list__value").text()
-      utrKey   shouldBe messages(app).apply("agent.landing.utr.key")
-      utrValue shouldBe utr
     }
 
-    "render the Action required cards with counts and dates" in {
-      val (doc, _) = render()
+    "show 'Not provided' when scheme name is empty" in {
+      val (doc, _) = render(schemeName = "")
 
-      doc.selectFirst("h2.govuk-heading-m").text() shouldBe messages(app).apply("agent.landing.h2.actionRequired")
+      val rows = doc.select(".govuk-summary-list .govuk-summary-list__row")
 
-      val halves = doc.select(".govuk-grid-row .govuk-grid-column-one-half")
-      halves.size() should be >= 2
+      val schemeNameKey = rows.get(1).selectFirst(".govuk-summary-list__key").text()
+      val schemeNameValue = rows.get(1).selectFirst(".govuk-summary-list__value").text()
 
-      val card1 = halves.get(0)
-      card1.getElementsByClass("govuk-!-font-size-36").first().text() shouldBe returnsDueCount.toString
-      val expectedDueBy = messages(app).apply(
-        "agent.landing.card.returnDue.dueBy",
-        returnsDueBy.format(DateTimeFormatter.ofPattern("d MMMM yyyy"))
-      )
-      card1.text() should include(expectedDueBy)
-
-      val card2 = halves.get(1)
-      card2.getElementsByClass("govuk-!-font-size-36").first().text() shouldBe newNoticesCount.toString
-      card2.text()                                                      should include(messages(app).apply("agent.landing.card.notices.subtitle"))
+      schemeNameKey shouldBe messages(app).apply("agent.landing.schemeName.key")
+      schemeNameValue shouldBe messages(app).apply("agent.landing.schemeName.key.notProvided")
     }
 
-    "render Manage client links and blurbs across grid rows" in {
+    "render Manage client links and key value pairs across grid rows" in {
       val (doc, _) = render()
 
-      doc.select("h2.govuk-heading-m").eachText() should contain(messages(app).apply("agent.landing.h2.manageClient"))
+      doc.select("#subsection-title").text() should include(messages(app).apply("agent.landing.h2.help"))
+      doc.select(".govuk-link").text() should include(messages(app).apply("agent.landing.help.link1"))
+      doc.select(".govuk-link").text() should include(messages(app).apply("agent.landing.help.link2"))
+      doc.select(".govuk-link").text() should include(messages(app).apply("agent.landing.help.link3"))
 
-      doc.text() should include(messages(app).apply("agent.landing.manage.subcontractors"))
-      doc.text() should include(messages(app).apply("agent.landing.manage.subcontractors.blurb"))
+      doc.text() should include(messages(app).apply("agent.landing.card.manageYourCisReturns.title"))
+      doc.text() should include(messages(app).apply("p"))
 
-      doc.text() should include(messages(app).apply("agent.landing.manage.returnHistory"))
-      doc.text() should include(messages(app).apply("agent.landing.manage.returnHistory.blurb"))
+      doc.text() should include(messages(app).apply("agent.landing.card.manageYourSubcontractors.title"))
+      doc.text() should include(messages(app).apply("agent.landing.card.manageYourSubcontractors.p"))
 
-      doc.text() should include(messages(app).apply("agent.landing.manage.notices"))
-      doc.text() should include(messages(app).apply("agent.landing.manage.notices.blurb"))
+      doc.text() should include(messages(app).apply("agent.landing.card.manageYourContractorDetails.title"))
+      doc.text() should include(messages(app).apply("agent.landing.card.manageYourContractorDetails.p"))
 
-      doc.text() should include(messages(app).apply("agent.landing.manage.amend"))
-      val amendBlurb = Parser.unescapeEntities(messages(app)("agent.landing.manage.amend.blurb"), true)
-      doc.text() should include(amendBlurb)
+      doc.text() should include(messages(app).apply("agent.landing.card.appealPenalty.title"))
+      doc.text() should include(messages(app).apply("agent.landing.card.appealPenalty.p"))
 
-      doc.text() should include(messages(app).apply("agent.landing.manage.clientDetails"))
-      doc.text() should include(messages(app).apply("agent.landing.manage.clientDetails.blurb"))
-    }
+      doc.text() should include(messages(app).apply("agent.landing.card.manageClientDetails.title"))
+      doc.text() should include(messages(app).apply("agent.landing.card.manageClientDetails.p"))
 
-    "render Recent activity with formatted date and tax month" in {
-      val (doc, _) = render()
+      doc.text() should include(messages(app).apply("agent.landing.card.removeClient.title"))
+      doc.text() should include(messages(app).apply("agent.landing.card.removeClient.p"))
 
-      doc.select("h2.govuk-heading-m").eachText() should contain(messages(app).apply("agent.landing.h2.recentActivity"))
-
-      val line = messages(app).apply(
-        "agent.landing.recentActivity.line",
-        lastSubmittedDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy")),
-        lastSubmittedTaxMonth.getMonth.getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.UK),
-        lastSubmittedTaxMonth.getYear.toString
-      )
-
-      doc.select("p.govuk-body").eachText().toArray.map(_.toString) should contain(line)
+      doc.text() should include(messages(app).apply("agent.landing.card.noticesAndStatements.title"))
+      doc.text() should include(messages(app).apply("agent.landing.card.noticesAndStatements.p"))
     }
   }
 
-  private def render(): (Document, FrontendAppConfig) = {
+  private def render(schemeName: String = this.schemeName): (Document, FrontendAppConfig) = {
     val application                           = app
     implicit val appConfig: FrontendAppConfig =
       application.injector.instanceOf[FrontendAppConfig]
 
-    implicit val request = FakeRequest(GET, "/agent/authorised-client-manage-CIS-returns")
-    implicit val msgs    = messages(application)
+    implicit val request: FakeRequest[AnyContentAsEmpty.type] =
+      FakeRequest(GET, "/agent/authorised-client-manage-CIS-returns")
+    implicit val msgs: Messages                               = messages(application)
 
     val view = application.injector.instanceOf[AgentLandingView]
     val html = view(
       uniqueId = uniqueId,
       clientName = clientName,
       employerRef = employerRef,
-      utr = utr,
-      returnsDueCount = returnsDueCount,
-      returnsDueBy = returnsDueBy,
-      newNoticesCount = newNoticesCount,
-      lastSubmittedDate = lastSubmittedDate,
-      lastSubmittedTaxMonth = lastSubmittedTaxMonth
+      schemeName = schemeName
     )
 
     (Jsoup.parse(html.body), appConfig)

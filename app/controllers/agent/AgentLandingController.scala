@@ -67,14 +67,8 @@ class AgentLandingController @Inject() (
           uniqueId = uniqueId,
           clientName = viewModel.clientName,
           employerRef = viewModel.employerRef,
-          schemeName = "Scheme name hardcoded",
+          schemeName = "Scheme name hardcoded"
 //          utr = viewModel.utr.getOrElse(""),
-          // still hard-coded, mocked for now
-          returnsDueCount = 1,
-          returnsDueBy = java.time.LocalDate.of(2025, 10, 19),
-          newNoticesCount = 2,
-          lastSubmittedDate = java.time.LocalDate.of(2025, 9, 19),
-          lastSubmittedTaxMonth = java.time.YearMonth.of(2025, 8)
         )
       )).recover { case e =>
         logger.error(s"[AgentLandingController][onPageLoad] Failed for uniqueId=$uniqueId", e)
