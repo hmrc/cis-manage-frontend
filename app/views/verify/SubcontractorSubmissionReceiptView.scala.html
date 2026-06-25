@@ -36,7 +36,7 @@
     submissionDate: String,
     contractorName: String,
     employerRef: String,
-    IRNumber: String,
+    irNumber: String,
     cisId: String,
 )(implicit request: Request[_], messages: Messages)
 
@@ -49,7 +49,7 @@
         SummaryListViewModel(rows = Seq(
             SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key1"), Value(contractorName)),
             SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key2"), Value(employerRef)),
-            SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key3"), Value(IRNumber)),
+            SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key3"), Value(irNumber)),
         ))
     )
 

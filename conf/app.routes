@@ -1,17 +1,26 @@
 # Routes
 
 # Infrastructure
-->   /hmrc-frontend       hmrcfrontend.Routes
+->    /hmrc-frontend                                       hmrcfrontend.Routes
 
-GET  /                    controllers.IndexController.onPageLoad()
+GET   /                                                    controllers.IndexController.onPageLoad()
 
-GET  /assets/*file        controllers.Assets.versioned(path="/public", file: Asset)
+GET   /assets/*file                                        controllers.Assets.versioned(path="/public", file: Asset)
 
-GET  /language/:lang      controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET   /language/:lang                                      controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET  /refresh-session     controllers.KeepAliveController.keepAlive()
+GET   /refresh-session                                     controllers.KeepAliveController.keepAlive()
 
-GET  /check-your-answers  controllers.CheckYourAnswersController.onPageLoad()
+GET   /check-your-answers                                  controllers.CheckYourAnswersController.onPageLoad()
+
+GET   /subcontractors/delete-subcontractor                 controllers.subcontractors.DeleteSubcontractorYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractors/delete-subcontractor                 controllers.subcontractors.DeleteSubcontractorYesNoController.onSubmit(mode: Mode = NormalMode)
+
+GET   /subcontractors/subcontractor-deleted                controllers.subcontractors.SubcontractorDeletedConfirmationController.onPageLoad()
+
+GET   /subcontractors/cannot-delete-subcontractor-warning  controllers.subcontractors.CannotDeleteSubcontractorController.onPageLoad()
+
+GET   /subcontractors/no-subcontractors-to-view            controllers.subcontractors.NoSubcontractorsExistController.onPageLoad()
 
 # Errors & Auth
 GET  /there-is-a-problem               controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
@@ -124,6 +133,7 @@ POST  /verify/select-tax-year-for-verification-requests     controllers.verify.V
 
 GET   /verify/history/verification-history-all-tax-years    controllers.verify.VerificationHistoryController.onPageLoadAllYears()
 GET   /verify/history/verification-history-single-tax-year  controllers.verify.VerificationHistoryController.onPageLoadSingleYear()
+
 GET   /verify/history/submission-receipt                    controllers.verify.SubcontractorSubmissionReceiptController.onPageLoad()
 
 # Client Details
@@ -144,15 +154,4 @@ GET   /client-details/change-change-client-reference  controllers.clientdetails.
 POST  /client-details/change-change-client-reference  controllers.clientdetails.ChangeClientReferenceController.onSubmit(mode: Mode = CheckMode)
 
 # Add Contractor Details
-GET   /add-contractor-details  controllers.AddContractorDetailsController.onPageLoad()
-
-# Delete Subcontractor
-GET     /subcontractors/delete-subcontractor                        controllers.subcontractors.DeleteSubcontractorYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST    /subcontractors/delete-subcontractor                        controllers.subcontractors.DeleteSubcontractorYesNoController.onSubmit(mode: Mode = NormalMode)
-
-GET   /subcontractors/subcontractor-deleted                       controllers.subcontractors.SubcontractorDeletedConfirmationController.onPageLoad()
-
-GET  /subcontractors/cannot-delete-subcontractor-warning                       controllers.subcontractors.CannotDeleteSubcontractorController.onPageLoad()
-
-GET  /subcontractors/no-subcontractors-to-view      controllers.subcontractors.NoSubcontractorsExistController.onPageLoad()
-
+GET  /add-contractor-details  controllers.AddContractorDetailsController.onPageLoad()

@@ -34,7 +34,7 @@ class SubcontractorSubmissionReceiptViewSpec extends SpecBase {
       val submissionDate = "18 May 2025"
       val contractorName = "John Doe"
       val employerRef    = "ABC12345"
-      val IRNumber       = "123456"
+      val irNumber       = "123456"
       val cisId          = "1"
 
       val html: HtmlFormat.Appendable = view(
@@ -42,7 +42,7 @@ class SubcontractorSubmissionReceiptViewSpec extends SpecBase {
         submissionDate,
         contractorName,
         employerRef,
-        IRNumber,
+        irNumber,
         cisId
       )
       val doc: Document               = Jsoup.parse(html.toString)
@@ -73,7 +73,7 @@ class SubcontractorSubmissionReceiptViewSpec extends SpecBase {
       summaryText must include(messages("verify.subcontractorSubmissionReceipt.summaryList.key2"))
       summaryText must include(employerRef)
       summaryText must include(messages("verify.subcontractorSubmissionReceipt.summaryList.key3"))
-      summaryText must include(IRNumber)
+      summaryText must include(irNumber)
 
       doc.select("p.govuk-body").text must include(
         messages("verify.subcontractorSubmissionReceipt.p2")

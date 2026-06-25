@@ -584,18 +584,18 @@ verify.verificationHistory.noHistory                    =  No verification reque
 verify.verificationHistory.hidden.verificationRequest   =  verification request for {0}
 verify.verificationHistory.hidden.submissionReceipt     =  submission receipt for {0}
 
-verify.subcontractorSubmissionReceipt.title              = Submission receipt
-verify.subcontractorSubmissionReceipt.heading            = Submission receipt
-verify.subcontractorSubmissionReceipt.subheading         = Submission details
-verify.subcontractorSubmissionReceipt.p1                 = Submitted at {0} on {1}
-verify.subcontractorSubmissionReceipt.p2                 = Your verification request has been successfully submitted to HMRC.
-verify.subcontractorSubmissionReceipt.p3                 = Please keep this receipt for your records.
-verify.subcontractorSubmissionReceipt.link1              = Print this receipt
-verify.subcontractorSubmissionReceipt.link2.prefix       = Back to
-verify.subcontractorSubmissionReceipt.link2.link         = Manage your subcontractors
-verify.subcontractorSubmissionReceipt.summaryList.key1   = Contractor name
-verify.subcontractorSubmissionReceipt.summaryList.key2   = Employer reference
-verify.subcontractorSubmissionReceipt.summaryList.key3   = Receipt reference number
+verify.subcontractorSubmissionReceipt.title             =  Submission receipt
+verify.subcontractorSubmissionReceipt.heading           =  Submission receipt
+verify.subcontractorSubmissionReceipt.subheading        =  Submission details
+verify.subcontractorSubmissionReceipt.p1                =  Submitted at {0} on {1}
+verify.subcontractorSubmissionReceipt.p2                =  Your verification request has been successfully submitted to HMRC.
+verify.subcontractorSubmissionReceipt.p3                =  Please keep this receipt for your records.
+verify.subcontractorSubmissionReceipt.link1             =  Print this receipt
+verify.subcontractorSubmissionReceipt.link2.prefix      =  Back to
+verify.subcontractorSubmissionReceipt.link2.link        =  Manage your subcontractors
+verify.subcontractorSubmissionReceipt.summaryList.key1  =  Contractor name
+verify.subcontractorSubmissionReceipt.summaryList.key2  =  Employer reference
+verify.subcontractorSubmissionReceipt.summaryList.key3  =  Receipt reference number
 
 # Client Details
 clientdetails.manageClientDetails.title                      =  Client details
@@ -633,36 +633,33 @@ clientdetails.clientRefUpdateConfirmation.p2                 =  It may take up t
 clientdetails.clientRefUpdateConfirmation.p2.link            =  view the change on your client dashboard
 clientdetails.clientRefUpdateConfirmation.h2                 =  What happens next
 
-# Subcontractors
-subcontractors.noSubcontractorsExist.title = No subcontractors to view
-subcontractors.noSubcontractorsExist.heading = Your subcontractors
-subcontractors.noSubcontractorsExist.p1 = You don’t have any subcontractors at the moment.
-subcontractors.noSubcontractorsExist.p2.prefix = You will need to
-subcontractors.noSubcontractorsExist.p2.link = add some subcontractors first
-subcontractors.noSubcontractorsExist.p2.suffix = before you can create a verification request or monthly return.
-subcontractors.noSubcontractorsExist.p3.prefix = Back to
-subcontractors.noSubcontractorsExist.p3.link = Manage your subcontractors
+subcontractors.noSubcontractorsExist.title                   =  No subcontractors to view
+subcontractors.noSubcontractorsExist.heading                 =  Your subcontractors
+subcontractors.noSubcontractorsExist.p1                      =  You don’t have any subcontractors at the moment.
+subcontractors.noSubcontractorsExist.p2.prefix               =  You will need to
+subcontractors.noSubcontractorsExist.p2.link                 =  add some subcontractors first
+subcontractors.noSubcontractorsExist.p2.suffix               =  before you can create a verification request or monthly return.
+subcontractors.noSubcontractorsExist.p3.prefix               =  Back to
+subcontractors.noSubcontractorsExist.p3.link                 =  Manage your subcontractors
 
-subcontractors.subcontractorDeletedConfirmation.title = Subcontractor deleted
-subcontractors.subcontractorDeletedConfirmation.heading = Subcontractor deleted
-subcontractors.subcontractorDeletedConfirmation.p1 = You have deleted {0} from your list of subcontractors.
-subcontractors.subcontractorDeletedConfirmation.p2.text = Back to
-subcontractors.subcontractorDeletedConfirmation.p2.link = Your subcontractors
-subcontractors.subcontractorDeletedConfirmation.h2 = Before you go
-subcontractors.subcontractorDeletedConfirmation.p3 = Your feedback helps us make our service better.
-subcontractors.subcontractorDeletedConfirmation.p4.text = to share your feedback on this service.
-subcontractors.subcontractorDeletedConfirmation.p4.link = Take a short survey
+subcontractors.subcontractorDeletedConfirmation.title        =  Subcontractor deleted
+subcontractors.subcontractorDeletedConfirmation.heading      =  Subcontractor deleted
+subcontractors.subcontractorDeletedConfirmation.p1           =  You have deleted {0} from your list of subcontractors.
+subcontractors.subcontractorDeletedConfirmation.p2.text      =  Back to
+subcontractors.subcontractorDeletedConfirmation.p2.link      =  Your subcontractors
+subcontractors.subcontractorDeletedConfirmation.h2           =  Before you go
+subcontractors.subcontractorDeletedConfirmation.p3           =  Your feedback helps us make our service better.
+subcontractors.subcontractorDeletedConfirmation.p4.text      =  to share your feedback on this service.
+subcontractors.subcontractorDeletedConfirmation.p4.link      =  Take a short survey
 
+subcontractors.cannotDeleteSubcontractor.title               =  You cannot delete this subcontractor
+subcontractors.cannotDeleteSubcontractor.heading             =  You cannot delete {0}
+subcontractors.cannotDeleteSubcontractor.p1                  =  This subcontractor is currently part of a monthly return or verification request that is in progress.
+subcontractors.cannotDeleteSubcontractor.p2                  =  You must wait until that monthly return or verification request has been completed before you can delete them.
+subcontractors.cannotDeleteSubcontractor.p3.text             =  Back to
+subcontractors.cannotDeleteSubcontractor.p3.link             =  Your subcontractors
 
-subcontractors.cannotDeleteSubcontractor.title               = You cannot delete this subcontractor
-subcontractors.cannotDeleteSubcontractor.heading             = You cannot delete {0}
-subcontractors.cannotDeleteSubcontractor.p1                  = This subcontractor is currently part of a monthly return or verification request that is in progress.
-subcontractors.cannotDeleteSubcontractor.p2                  = You must wait until that monthly return or verification request has been completed before you can delete them.
-subcontractors.cannotDeleteSubcontractor.p3.text             = Back to
-subcontractors.cannotDeleteSubcontractor.p3.link             = Your subcontractors
-
-subcontractors.deleteSubcontractorYesNo.title                = Are you sure you want to delete this subcontractor?
-subcontractors.deleteSubcontractorYesNo.heading              = Are you sure you want to delete {0}?
-subcontractors.deleteSubcontractorYesNo.p                    = This subcontractor will also be removed from any monthly return that you have not submitted yet.
-subcontractors.deleteSubcontractorYesNo.error.required       = Select yes if you want to delete this subcontractor
-
+subcontractors.deleteSubcontractorYesNo.title                =  Are you sure you want to delete this subcontractor?
+subcontractors.deleteSubcontractorYesNo.heading              =  Are you sure you want to delete {0}?
+subcontractors.deleteSubcontractorYesNo.p                    =  This subcontractor will also be removed from any monthly return that you have not submitted yet.
+subcontractors.deleteSubcontractorYesNo.error.required       =  Select yes if you want to delete this subcontractor
