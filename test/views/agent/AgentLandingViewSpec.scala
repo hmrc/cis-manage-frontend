@@ -92,7 +92,7 @@ class AgentLandingViewSpec extends SpecBase {
       doc.select(".govuk-link").text()       should include(messages(app).apply("agent.landing.help.link3"))
 
       doc.text() should include(messages(app).apply("agent.landing.card.manageYourCisReturns.title"))
-      doc.text() should include(messages(app).apply("p"))
+      doc.text() should include(messages(app).apply("agent.landing.card.manageYourCisReturns.p"))
 
       doc.text() should include(messages(app).apply("agent.landing.card.manageYourSubcontractors.title"))
       doc.text() should include(messages(app).apply("agent.landing.card.manageYourSubcontractors.p"))

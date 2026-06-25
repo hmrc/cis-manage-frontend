@@ -65,7 +65,7 @@ class AgentLandingController @Inject() (
       } yield Ok(
         view(
           uniqueId = uniqueId,
-          agentName = "Agent name hardcoded",
+          agentName = "Agent name hardcoded", // TODO: Need to make it dynamic.
           schemeName = viewModel.schemeName,
           employerRef = viewModel.employerRef
         )
