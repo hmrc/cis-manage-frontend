@@ -88,7 +88,7 @@ class VerificationRequestViewSpec extends SpecBase {
       val doc = render(viewModelWithReverify)
 
       doc.text() should include(messages(app)("verify.verificationRequest.subcontractorsInRequest"))
-      doc.text() should include("7")
+      doc.text() should include("3")
     }
 
     "render the Subcontractors to verify heading" in {
