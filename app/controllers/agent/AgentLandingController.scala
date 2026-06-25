@@ -65,10 +65,9 @@ class AgentLandingController @Inject() (
       } yield Ok(
         view(
           uniqueId = uniqueId,
-          clientName = viewModel.clientName,
-          employerRef = viewModel.employerRef,
-          schemeName = "Scheme name hardcoded"
-//          utr = viewModel.utr.getOrElse(""),
+          agentName = "Agent name hardcoded",
+          schemeName = viewModel.schemeName,
+          employerRef = viewModel.employerRef
         )
       )).recover { case e =>
         logger.error(s"[AgentLandingController][onPageLoad] Failed for uniqueId=$uniqueId", e)

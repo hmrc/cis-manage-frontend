@@ -14,11 +14,6 @@
  * limitations under the License.
  *@
 
-@import java.time.format.DateTimeFormatter
-@import java.time.format.TextStyle.FULL
-@import java.util.Locale.UK
-@import play.api.i18n
-@import play.api.mvc
 @import play.twirl.api.{Html, HtmlFormat}
 @import views.html.components._
 @import config.FrontendAppConfig
@@ -30,17 +25,6 @@
     helpAndGuidelineSidebar: templates.HelpAndGuidelineSidebar,
     backNavigation: BackNavigation,
     h1: H1,
-    h2: H2,
-    h3: H3,
-    paragraph: Paragraph,
-    link: Link,
-    gridRow: GridRow,
-    gridColumnOneHalf: GridColumnOneHalf,
-    caption: Caption,
-    summaryCard: SummaryCardBlock,
-    headingLink: HeadingLink,
-    linkList: LinkList,
-    sectionBreak: SectionBreak,
     govukSummaryList: GovukSummaryList,
     twoColumnGrid: TwoColumnGrid,
     oneColumnGrid: OneColumnGrid,
@@ -48,7 +32,7 @@
 )
 
 @(uniqueId: String,
-    clientName: String,
+    agentName: String,
     schemeName: String,
     employerRef: String,
     )(implicit request: RequestHeader,
@@ -76,7 +60,7 @@
         sl.SummaryListViewModel(Seq(
             sl.SummaryListRowViewModel(
                 key   = sl.KeyViewModel(Text(messages("agent.landing.agentName.key"))),
-                value = sl.ValueViewModel(Text(clientName))
+                value = sl.ValueViewModel(Text(agentName))
             ),
             sl.SummaryListRowViewModel(
                 key   = sl.KeyViewModel(Text(messages("agent.landing.schemeName.key"))),

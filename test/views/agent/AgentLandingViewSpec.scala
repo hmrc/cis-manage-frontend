@@ -30,8 +30,8 @@ import views.html.agent.AgentLandingView
 class AgentLandingViewSpec extends SpecBase {
 
   private val uniqueId    = "1"
-  private val clientName  = "UHD Contractor Control Group"
-  private val schemeName  = "Scheme name"
+  private val agentName   = "Agent name"
+  private val schemeName  = "UHD Contractor Control Group"
   private val employerRef = "123/AB45678"
 
   "AgentLandingView" - {
@@ -55,10 +55,10 @@ class AgentLandingViewSpec extends SpecBase {
       val rows = doc.select(".govuk-summary-list .govuk-summary-list__row")
       rows.size() shouldBe 3
 
-      val clientNameKey   = rows.get(0).selectFirst(".govuk-summary-list__key").text()
-      val clientNameValue = rows.get(0).selectFirst(".govuk-summary-list__value").text()
-      clientNameKey   shouldBe messages(app).apply("agent.landing.agentName.key")
-      clientNameValue shouldBe clientName
+      val agentNameKey   = rows.get(0).selectFirst(".govuk-summary-list__key").text()
+      val agentNameValue = rows.get(0).selectFirst(".govuk-summary-list__value").text()
+      agentNameKey   shouldBe messages(app).apply("agent.landing.agentName.key")
+      agentNameValue shouldBe agentName
 
       val schemeNameKey   = rows.get(1).selectFirst(".govuk-summary-list__key").text()
       val schemeNameValue = rows.get(1).selectFirst(".govuk-summary-list__value").text()
@@ -126,7 +126,7 @@ class AgentLandingViewSpec extends SpecBase {
     val view = application.injector.instanceOf[AgentLandingView]
     val html = view(
       uniqueId = uniqueId,
-      clientName = clientName,
+      agentName = agentName,
       employerRef = employerRef,
       schemeName = schemeName
     )

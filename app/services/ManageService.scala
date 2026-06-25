@@ -116,9 +116,8 @@ class ManageService @Inject() (
                 _         <- sessionRepository.set(updatedUa)
                 _         <- cisConnector.saveAgentClient(userId, agentClient)
               } yield AgentLandingViewModel(
-                clientName = updatedClient.schemeName.getOrElse(""),
-                employerRef = s"${updatedClient.taxOfficeNumber}/${updatedClient.taxOfficeRef}",
-                utr = utrOpt // TODO: REMOVE UTR AND ADD CLIENT NAME
+                schemeName = updatedClient.schemeName.getOrElse(""),
+                employerRef = s"${updatedClient.taxOfficeNumber}/${updatedClient.taxOfficeRef}"
               )
             }
         }

@@ -17,8 +17,6 @@
 package viewmodels.agent
 
 case class AgentLandingViewModel(
-  clientName: String,
-  employerRef: String,
-  // TODO: remove utr and add schemeName
-  utr: Option[String]
+  schemeName: String,
+  employerRef: String
 )
