@@ -23,7 +23,7 @@ import models.agent.AgentClientData
 import models.history.*
 import models.requests.*
 import models.response.GetSubmittedMonthlyReturnsDataResponse
-import models.verify.{VerificationHistoryData, VerificationRequestData}
+import models.verify.{SubcontractorVerificationData, VerificationHistoryData, VerificationRequestData, VerificationRequestDetailData}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{mock, times, verify, verifyNoMoreInteractions, when}
@@ -1029,6 +1029,67 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       ex mustBe boom
 
       verify(connector).getVerificationHistory(eqTo(instanceId))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+  }
+
+  "getVerificationRequestDetail" should {
+
+    "delegate to connector and return response (happy path)" in {
+      val (service, connector, sessionRepo) = newService()
+
+      val instanceId         = "900063"
+      val verificationNumber = "V001"
+
+      val mockResponse = VerificationRequestDetailData(
+        verificationNumber = verificationNumber,
+        dateTimeSubmitted = LocalDateTime.parse("2026-04-06T10:15:30"),
+        subcontractorsToVerify = Seq(
+          SubcontractorVerificationData(
+            name = "Subcontractor A",
+            verificationNumber = "0987654321"
+          )
+        ),
+        subcontractorsToReverify = Seq(
+          SubcontractorVerificationData(
+            name = "Subcontractor B",
+            verificationNumber = "0987654322"
+          )
+        )
+      )
+
+      when(
+        connector.getVerificationRequestDetail(eqTo(instanceId), eqTo(verificationNumber))(any[HeaderCarrier])
+      ).thenReturn(Future.successful(mockResponse))
+
+      val result =
+        service.getVerificationRequestDetail(instanceId, verificationNumber).futureValue
+
+      result mustBe mockResponse
+
+      verify(connector)
+        .getVerificationRequestDetail(eqTo(instanceId), eqTo(verificationNumber))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+
+    "propagate failure from connector" in {
+      val (service, connector, sessionRepo) = newService()
+
+      val instanceId         = "900063"
+      val verificationNumber = "V001"
+      val boom               = new RuntimeException("Backend error")
+
+      when(
+        connector.getVerificationRequestDetail(eqTo(instanceId), eqTo(verificationNumber))(any[HeaderCarrier])
+      ).thenReturn(Future.failed(boom))
+
+      val ex =
+        service.getVerificationRequestDetail(instanceId, verificationNumber).failed.futureValue
+
+      ex mustBe boom
+
+      verify(connector)
+        .getVerificationRequestDetail(eqTo(instanceId), eqTo(verificationNumber))(any[HeaderCarrier])
       verifyNoInteractions(sessionRepo)
     }
   }
