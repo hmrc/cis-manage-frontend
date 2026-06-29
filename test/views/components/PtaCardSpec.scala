@@ -43,8 +43,8 @@ class PtaCardSpec extends SpecBase with Matchers {
       anchor.hasClass("govuk-link") mustBe true
       anchor.hasClass("govuk-summary-card") mustBe true
 
-      val h3 = doc.select("h3.pta-card-heading")
-      h3.text mustBe title
+      val h2 = doc.select("h2.pta-card-heading")
+      h2.text mustBe title
 
       val p = doc.select("p.pta-card-text")
       p.text mustBe "Some description text"

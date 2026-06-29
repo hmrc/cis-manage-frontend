@@ -16,13 +16,11 @@
 
 @import components.{H1, TwoColumnGrid, Nav, Aside, PtaCard, OneColumnGrid}
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow, Card, CardTitle}
 @import viewmodels.contractor.ContractorLandingViewModel
 
 @this(
     layout: templates.Layout,
-    govukButton: GovukButton,
     govukSummaryList: GovukSummaryList,
     h1: H1,
     twoColumnGrid: TwoColumnGrid,
@@ -85,7 +83,7 @@
     @oneColumnGrid(
         ptaCard(
             title = messages("contractorLanding.landing.card.noticesAndStatements.title"),
-            link = "#",
+            link = controllers.contractor.routes.ContractorLandingController.onTargetClick("noticesAndStatements").url,
             content = Html(messages("contractorLanding.landing.card.noticesAndStatements.p")),
             id = Some("notices-and-statements")
         )
