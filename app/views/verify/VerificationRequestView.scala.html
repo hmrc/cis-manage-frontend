@@ -1,0 +1,104 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import viewmodels.VerificationRequestPageViewModel
+@import views.html.components.*
+
+@this(
+    layout: templates.Layout,
+    govukSummaryList: GovukSummaryList,
+    govukTable: GovukTable,
+    h1: H1,
+    h2: H2,
+    paragraph: Paragraph,
+    printLink: PrintLink,
+    link: Link
+)
+
+@(viewModel: VerificationRequestPageViewModel)(implicit request: Request[_], messages: Messages)
+
+@layout(
+    pageTitle = titleNoForm(messages("verify.verificationRequest.title"))
+) {
+            @h1("verify.verificationRequest.heading")
+
+            @h2("verify.verificationRequest.submissionDetails.heading")
+
+            @paragraph(
+                message = "verify.verificationRequest.submittedAt",
+                args = Seq(viewModel.submittedTime, viewModel.submittedDate)
+            )
+
+            @govukSummaryList(
+                SummaryList(
+                    rows = Seq(
+                        SummaryListRow(
+                            key = Key(content = Text(messages("verify.verificationRequest.verificationNumber"))),
+                            value = Value(content = Text(viewModel.verificationNumber))
+                        ),
+                        SummaryListRow(
+                            key = Key(content = Text(messages("verify.verificationRequest.subcontractorsInRequest"))),
+                            value = Value(content = Text(viewModel.totalSubcontractors.toString))
+                        )
+                    )
+                )
+            )
+
+            @if(viewModel.hasVerifications) {
+                @h2("verify.verificationRequest.subcontractorsToVerify.heading", classes = "govuk-heading-m govuk-!-margin-top-8 govuk-!-margin-bottom-6")
+
+                @govukTable(
+                    Table(
+                        head = Some(Seq(
+                            HeadCell(content = Text(messages("verify.verificationRequest.table.name"))),
+                            HeadCell(content = Text(messages("verify.verificationRequest.table.verificationNumber")))
+                        )),
+                        rows = viewModel.subcontractorsToVerify.map { row =>
+                            Seq(
+                                TableRow(content = Text(row.name)),
+                                TableRow(content = Text(row.verificationNumber))
+                            )
+                        }
+                    )
+                )
+            }
+            @if(viewModel.hasReverifications) {
+                @h2("verify.verificationRequest.subcontractorsToReverify.heading", classes = "govuk-heading-m govuk-!-margin-top-8 govuk-!-margin-bottom-6")
+
+                @govukTable(
+                    Table(
+                        head = Some(Seq(
+                            HeadCell(content = Text(messages("verify.verificationRequest.table.name"))),
+                            HeadCell(content = Text(messages("verify.verificationRequest.table.verificationNumber")))
+                        )),
+                        rows = viewModel.subcontractorsToReverify.map { row =>
+                            Seq(
+                                TableRow(content = Text(row.name)),
+                                TableRow(content = Text(row.verificationNumber))
+                            )
+                        }
+                    )
+                )
+            }
+
+            @printLink("verify.verificationRequest.printThisRequest")
+
+            @link(
+                linkTextKey = "verify.verificationRequest.backToManage",
+                linkUrl = viewModel.manageSubcontractorsUrl,
+                hasFullStop = true
+            )
+}

@@ -92,7 +92,8 @@ class VerificationHistoryService @Inject() () {
     VerificationHistoryRowViewModel(
       verificationNumber = request.verificationNumber,
       dateSubmitted = request.dateSubmitted.format(displayDateFormatter),
-      verificationRequestLink = "#",
+      verificationRequestLink =
+        controllers.verify.routes.VerificationRequestController.onPageLoad(request.verificationNumber).url,
       submissionReceiptLink = "#"
     )
 }

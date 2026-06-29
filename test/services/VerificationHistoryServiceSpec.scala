@@ -72,12 +72,20 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
         rows(1).dateSubmitted mustBe "6 Apr 2026"
       }
 
-      "must set view links to dead links" in {
+      "must set verification request link to the verification request page" in {
         val result = service.buildAllYearsViewModel(data, instanceId)
 
         val vm  = result.get
         val row = vm.taxYears.head.rows.head
-        row.verificationRequestLink mustBe "#"
+        row.verificationRequestLink must include("/verify/verification-request")
+        row.verificationRequestLink must include("verificationNumber=V002")
+      }
+
+      "must set submission receipt link to dead link" in {
+        val result = service.buildAllYearsViewModel(data, instanceId)
+
+        val vm  = result.get
+        val row = vm.taxYears.head.rows.head
         row.submissionReceiptLink mustBe "#"
       }
 
