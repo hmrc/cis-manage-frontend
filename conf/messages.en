@@ -295,9 +295,9 @@ agent.landing.card.removeClient.title                  =  Remove client
 agent.landing.card.removeClient.p                      =  Remove a client that you no longer manage.
 agent.landing.card.noticesAndStatements.title          =  Notices and Statements
 agent.landing.card.noticesAndStatements.p              =  View HMRC notices, penalty warnings and confirmation statements.
-agent.landing.help.link1                               =  What is the Construction Industry Scheme
+agent.landing.help.link1                               =  What is the Construction Industry Scheme?
 agent.landing.help.link2                               =  CIS monthly returns guidance
-agent.landing.help.link3                               =  CIS 340: Penalties for late returns
+agent.landing.help.link3                               =  CIS 340: penalties for late returns
 agent.landing.back                                     =  Back to client list
 
 # Subcontractors
