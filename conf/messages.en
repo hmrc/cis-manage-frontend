@@ -581,7 +581,8 @@ verify.verificationRequest.subcontractorsToReverify.heading  =  Subcontractors t
 verify.verificationRequest.table.name                        =  Name
 verify.verificationRequest.table.verificationNumber          =  Verification number
 verify.verificationRequest.printThisRequest                  =  Print this request
-verify.verificationRequest.backToManage                      =  Back to Manage your subcontractors
+verify.verificationRequest.backTo                            =  Back to
+verify.verificationRequest.manageLink                        =  Manage your subcontractors
 
 verify.subcontractorSubmissionReceipt.title             =  Submission receipt
 verify.subcontractorSubmissionReceipt.heading           =  Submission receipt
