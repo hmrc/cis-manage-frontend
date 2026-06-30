@@ -560,25 +560,38 @@ manageNoticesStatements.sidebar.link3                           =  CIS 340: Pena
 manageNoticesStatements.searchResults.viewAll                   =  View all notices
 
 # Verify
-verify.verificationHistorySelectTaxYear.title           =  Which tax year do you want to view verification requests from?
-verify.verificationHistorySelectTaxYear.heading         =  Which tax year do you want to view verification requests from?
-verify.verificationHistorySelectTaxYear.or              =  or
-verify.verificationHistorySelectTaxYear.viewAll         =  View all tax years
-verify.verificationHistorySelectTaxYear.error.required  =  Select a tax year
+verify.verificationHistorySelectTaxYear.title                =  Which tax year do you want to view verification requests from?
+verify.verificationHistorySelectTaxYear.heading              =  Which tax year do you want to view verification requests from?
+verify.verificationHistorySelectTaxYear.or                   =  or
+verify.verificationHistorySelectTaxYear.viewAll              =  View all tax years
+verify.verificationHistorySelectTaxYear.error.required       =  Select a tax year
 
-verify.verificationHistory.allYears.title               =  Verification request history for all tax years
-verify.verificationHistory.allYears.heading             =  Verification request history for all tax years
-verify.verificationHistory.singleYear.title             =  Verification request history for a single tax year
-verify.verificationHistory.singleYear.heading           =  Verification request history for {0} to {1} tax year
-verify.verificationHistory.taxYear.heading              =  {0} to {1} tax year
-verify.verificationHistory.table.verificationNumber     =  Verification number
-verify.verificationHistory.table.dateSubmitted          =  Date submitted
-verify.verificationHistory.table.verificationRequest    =  Verification request
-verify.verificationHistory.table.submissionReceipt      =  Submission receipt
-verify.verificationHistory.backToManage                 =  Back to Manage your subcontractors
-verify.verificationHistory.noHistory                    =  No verification requests found.
-verify.verificationHistory.hidden.verificationRequest   =  verification request for {0}
-verify.verificationHistory.hidden.submissionReceipt     =  submission receipt for {0}
+verify.verificationHistory.allYears.title                    =  Verification request history for all tax years
+verify.verificationHistory.allYears.heading                  =  Verification request history for all tax years
+verify.verificationHistory.singleYear.title                  =  Verification request history for a single tax year
+verify.verificationHistory.singleYear.heading                =  Verification request history for {0} to {1} tax year
+verify.verificationHistory.taxYear.heading                   =  {0} to {1} tax year
+verify.verificationHistory.table.verificationNumber          =  Verification number
+verify.verificationHistory.table.dateSubmitted               =  Date submitted
+verify.verificationHistory.table.verificationRequest         =  Verification request
+verify.verificationHistory.table.submissionReceipt           =  Submission receipt
+verify.verificationHistory.backToManage                      =  Back to Manage your subcontractors
+verify.verificationHistory.noHistory                         =  No verification requests found.
+verify.verificationHistory.hidden.verificationRequest        =  verification request for {0}
+verify.verificationHistory.hidden.submissionReceipt          =  submission receipt for {0}
+
+verify.verificationRequest.title                             =  Verification request
+verify.verificationRequest.heading                           =  Verification request
+verify.verificationRequest.submissionDetails.heading         =  Submission details
+verify.verificationRequest.submittedAt                       =  Submitted at {0} on {1}
+verify.verificationRequest.verificationNumber                =  Verification number
+verify.verificationRequest.subcontractorsInRequest           =  Subcontractors in this request
+verify.verificationRequest.subcontractorsToVerify.heading    =  Subcontractors to verify
+verify.verificationRequest.subcontractorsToReverify.heading  =  Subcontractors to reverify
+verify.verificationRequest.table.name                        =  Name
+verify.verificationRequest.table.verificationNumber          =  Verification number
+verify.verificationRequest.printThisRequest                  =  Print this request
+verify.verificationRequest.backToManage                      =  Back to Manage your subcontractors
 
 # Client Details
 clientdetails.manageClientDetails.title                      =  Client details
@@ -631,8 +644,9 @@ subcontractors.subcontractorsList.filter.taxTreatment.standardRate          = St
 subcontractors.subcontractorsList.filter.taxTreatment.unknown               = Unknown
 subcontractors.subcontractorsList.hint                                      = Search by name, UTR or verification number
 subcontractors.subcontractorsList.showingResults                            = Showing {0} to {1} of {2} results
-subcontractors.subcontractorsList.search.error.length                       = Search value must be 35 characters or less
+subcontractors.subcontractorsList.search.error.length                       = Search terms must be 35 characters or less
 subcontractors.subcontractorsList.search.error.invalid                      = Search terms must only contain letters a-z, numbers, commas, and spaces
+subcontractors.subcontractorsList.search.label                              = Search subcontractors
 subcontractors.subcontractorsList.name                                      = Name
 subcontractors.subcontractorsList.utr                                       = UTR
 subcontractors.subcontractorsList.verified                                  = Verified

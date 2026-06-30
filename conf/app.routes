@@ -125,6 +125,8 @@ POST  /verify/select-tax-year-for-verification-requests     controllers.verify.V
 GET   /verify/history/verification-history-all-tax-years    controllers.verify.VerificationHistoryController.onPageLoadAllYears()
 GET   /verify/history/verification-history-single-tax-year  controllers.verify.VerificationHistoryController.onPageLoadSingleYear()
 
+GET   /verify/verification-request                          controllers.verify.VerificationRequestController.onPageLoad(verificationNumber: String)
+
 # Client Details
 GET   /client-details/manage-client-details           controllers.clientdetails.ManageClientDetailsController.onPageLoad()
 
