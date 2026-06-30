@@ -298,7 +298,6 @@ agent.landing.card.noticesAndStatements.p              =  View HMRC notices, pen
 agent.landing.help.link1                               =  What is the Construction Industry Scheme?
 agent.landing.help.link2                               =  CIS monthly returns guidance
 agent.landing.help.link3                               =  CIS 340: penalties for late returns
-agent.landing.back                                     =  Back to client list
 
 # Subcontractors
 retrievingSubcontractors.title                                =  Your subcontractors

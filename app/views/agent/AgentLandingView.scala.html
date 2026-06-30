@@ -39,11 +39,7 @@
     appConfig: FrontendAppConfig,
     messages: Messages
 )
-<!--TODO:
-    1. Update Back to the client list link
-    2. Agent name might need to be removed
-    3.
--->
+
 @schemeNameDisplay = @{
     if (schemeName.trim.isEmpty) messages("agent.landing.schemeName.key.notProvided")
     else schemeName
@@ -51,10 +47,6 @@
 
 @layout(
     pageTitle     = titleNoForm(messages("agent.landing.title")),
-    showBackLink  = false,
-    beforeContent = Some(
-    backNavigation(
-    controllers.agent.routes.ClientListSearchController.onPageLoad().url, "agent.landing.back")),
     sidebar = Some(helpAndGuidelineSidebar())
 ) {
 
