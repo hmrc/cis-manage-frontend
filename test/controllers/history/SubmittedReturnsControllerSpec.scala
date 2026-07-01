@@ -94,6 +94,20 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
     )
   )
 
+  private val submittedReturnsDataStarted =
+    submittedReturnsData.copy(
+      monthlyReturns = submittedReturnsData.monthlyReturns.map(
+        _.copy(amendmentStatus = Some("STARTED"))
+      )
+    )
+
+  private val submittedReturnsDataValidated =
+    submittedReturnsData.copy(
+      monthlyReturns = submittedReturnsData.monthlyReturns.map(
+        _.copy(amendmentStatus = Some("VALIDATED"))
+      )
+    )
+
   private val receiptViewModelWithEmail = SubmissionReceiptViewModel(
     contractorName = "Test Contractor",
     payeReference = "123/ABC456",
@@ -153,6 +167,14 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
     def mockManageServiceReturnsData(): Unit =
       when(mockManageService.getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(submittedReturnsData))
+
+    def mockManageServiceReturnsDataStarted(): Unit =
+      when(mockManageService.getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(submittedReturnsDataStarted))
+
+    def mockManageServiceReturnsDataValidated(): Unit =
+      when(mockManageService.getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(submittedReturnsDataValidated))
 
     def mockManageServiceFails(): Unit =
       when(mockManageService.getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
@@ -577,6 +599,82 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
 
       running(app) {
         val request = FakeRequest(GET, routes.SubmittedReturnsController.viewSubmissionReceipt(2024, 6, "N").url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual journeyRecoveryUrl
+      }
+    }
+
+    "onInProgressRedirect must redirect to journey recovery when amend status is STARTED" in new Setup {
+      val app = application(userAnswersWithCisId)
+
+      mockManageServiceReturnsDataStarted()
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.onInProgressRedirect(1L).url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual "#"
+
+        verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
+      }
+    }
+
+    "onInProgressRedirect must redirect to journey recovery when amend status is VALIDATED" in new Setup {
+      val app = application(userAnswersWithCisId)
+
+      mockManageServiceReturnsDataValidated()
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.onInProgressRedirect(1L).url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual "#"
+
+        verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
+      }
+    }
+
+    "onInProgressRedirect must redirect to journey recovery when amend status is not STARTED or VALIDATED" in new Setup {
+      val app = application(userAnswersWithCisId)
+
+      mockManageServiceReturnsData()
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.onInProgressRedirect(3000L).url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual journeyRecoveryUrl
+
+        verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
+      }
+    }
+
+    "onInProgressRedirect must redirect to journey recovery when service failed" in new Setup {
+      val app = application(userAnswersWithCisId)
+
+      mockManageServiceFails()
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.onInProgressRedirect(3000L).url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual journeyRecoveryUrl
+
+        verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
+      }
+    }
+
+    "onInProgressRedirect must redirect to journey recovery when CisIdPage is missing" in new Setup {
+      val app = application(emptyUserAnswers)
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.onInProgressRedirect(3000L).url)
         val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER

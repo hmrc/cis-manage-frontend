@@ -18,8 +18,10 @@ package controllers.history
 
 import config.FrontendAppConfig
 import controllers.actions.*
+import controllers.routes
 import models.history.SubmittedReturnsData
 import models.requests.CisIdDataRequest
+import pages.CisIdPage
 import pages.history.SubmittedReturnsDataPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -142,7 +144,26 @@ class SubmittedReturnsController @Inject() (
     }
 
   def onInProgressRedirect(monthlyReturnId: Long): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      Redirect("#") // TODO
+    (identify andThen getData andThen requireData).async { implicit request =>
+      request.userAnswers.get(CisIdPage) match {
+        case Some(instanceId) =>
+          manageService
+            .getSubmittedMonthlyReturns(instanceId)
+            .map { response =>
+              response.monthlyReturns.find(_.monthlyReturnId == monthlyReturnId) match {
+                case Some(data) if data.amendmentStatus.exists(Set("STARTED", "VALIDATED")) =>
+                  Redirect("#") // TODO
+                case _                                                                      =>
+                  Redirect(routes.JourneyRecoveryController.onPageLoad())
+              }
+            }
+            .recover { case ex =>
+              logger.error("[SubmittedReturnsController] Failed to get submitted monthly returns", ex)
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
+        case _                =>
+          logger.error("[SubmittedReturnsController] missing instanceId in user answers")
+          Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      }
     }
 }
