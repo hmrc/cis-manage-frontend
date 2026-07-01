@@ -17,6 +17,7 @@
 package services
 
 import base.SpecBase
+import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 
 import java.time.Instant
@@ -99,10 +100,16 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
   trait Setup {
     val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
-    val service: SubmittedReturnsService                   = new SubmittedReturnsService(mockConnector)
+    val mockAppConfig: FrontendAppConfig                   = mock[FrontendAppConfig]
+
+    when(mockAppConfig.continueAmendReturnJourneyUrl(any(), any(), any())).thenReturn("#")
+
+    implicit val appConfig: FrontendAppConfig = mockAppConfig
+
+    val service: SubmittedReturnsService = new SubmittedReturnsService(mockConnector)
 
     def singleRow(testData: SubmittedReturnsData): SubmittedReturnsRowViewModel =
-      service.buildAllYearsViewModel(testData).value.taxYears.head.rows.head
+      service.buildAllYearsViewModel(testData, instanceId).value.taxYears.head.rows.head
   }
 
   "SubmittedReturnsService" - {
@@ -142,7 +149,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         submissions = Seq(submission())
       )
 
-      val result = service.buildSingleYearViewModel(testData, "2022")
+      val result = service.buildSingleYearViewModel(testData, "2022", instanceId)
 
       result.value.selectedTaxYear                           shouldBe Some("2022")
       result.value.taxYears.map(t => (t.fromYear, t.toYear)) shouldBe Seq(2022 -> 2023)
@@ -164,7 +171,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         submissions = Seq(submission())
       )
 
-      service.buildSingleYearViewModel(testData, "abc") shouldBe None
+      service.buildSingleYearViewModel(testData, "abc", instanceId) shouldBe None
     }
 
     "uses Unknown return type for unhandled nilReturnIndicator" in new Setup {

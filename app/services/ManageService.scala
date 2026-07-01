@@ -277,7 +277,8 @@ class ManageService @Inject() (
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.continue",
             href = if (isAmendment) {
-              controllers.routes.JourneyRecoveryController.onPageLoad().url // TODO: MR03-03
+              appConfig
+                .continueAmendReturnJourneyUrl(instanceId, row.taxYear.toString, row.taxMonth.toString)
             } else {
               controllers.history.routes.IncompleteReturnsController.onContinueRedirect(row.monthlyReturnId).url
             },

@@ -16,6 +16,7 @@
 
 package services
 
+import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.history.*
 import models.history.AmendmentHandoffData.given
@@ -37,7 +38,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class SubmittedReturnsService @Inject() (
   connector: ConstructionIndustrySchemeConnector
-)(implicit ec: ExecutionContext) {
+)(implicit appConfig: FrontendAppConfig, ec: ExecutionContext) {
 
   private val ukTimezone: ZoneId                         = ZoneId.of("Europe/London")
   private val displayDateFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("d MMM yyyy")
@@ -45,8 +46,8 @@ class SubmittedReturnsService @Inject() (
   private val amendmentCutOffInstant: Instant            = ZonedDateTime.of(2016, 2, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant
   private val displayTimeFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("h:mma", Locale.UK)
 
-  def buildAllYearsViewModel(data: SubmittedReturnsData): Option[SubmittedReturnsPageViewModel] =
-    val taxYearSections = buildTaxYearSections(data, AllYears)
+  def buildAllYearsViewModel(data: SubmittedReturnsData, instanceId: String): Option[SubmittedReturnsPageViewModel] =
+    val taxYearSections = buildTaxYearSections(data, AllYears, instanceId)
 
     Some(
       SubmittedReturnsPageViewModel(
@@ -58,10 +59,11 @@ class SubmittedReturnsService @Inject() (
 
   def buildSingleYearViewModel(
     data: SubmittedReturnsData,
-    taxYear: String
+    taxYear: String,
+    instanceId: String
   ): Option[SubmittedReturnsPageViewModel] =
     taxYear.toIntOption.map { taxYearInt =>
-      val taxYearSections = buildTaxYearSections(data, SingleYear)
+      val taxYearSections = buildTaxYearSections(data, SingleYear, instanceId)
 
       SubmittedReturnsPageViewModel(
         taxYears = taxYearSections.filter(_.fromYear == taxYearInt),
@@ -172,7 +174,8 @@ class SubmittedReturnsService @Inject() (
 
   private def buildTaxYearSections(
     data: SubmittedReturnsData,
-    source: SubmittedReturnsHistorySource
+    source: SubmittedReturnsHistorySource,
+    instanceId: String
   ): Seq[TaxYearHistoryViewModel] = {
     val rowsWithTaxYear =
       data.monthlyReturns
@@ -182,7 +185,7 @@ class SubmittedReturnsService @Inject() (
             .find(_.activeObjectId.contains(monthlyReturn.monthlyReturnId))
             .map { submission =>
               val fromYear = taxYearFromYear(monthlyReturn)
-              fromYear -> toRowViewModel(monthlyReturn, Some(submission), source)
+              fromYear -> toRowViewModel(monthlyReturn, Some(submission), source, instanceId)
             }
         }
 
@@ -212,7 +215,8 @@ class SubmittedReturnsService @Inject() (
   private def toRowViewModel(
     monthlyReturn: SubmittedMonthlyReturnData,
     submissionOpt: Option[SubmittedSubmissionData],
-    source: SubmittedReturnsHistorySource
+    source: SubmittedReturnsHistorySource,
+    instanceId: String
   ): SubmittedReturnsRowViewModel = {
     val periodEndText     = buildReturnPeriodEnd(monthlyReturn)
     val returnType        = buildReturnType(monthlyReturn)
@@ -236,7 +240,7 @@ class SubmittedReturnsService @Inject() (
       ),
       submissionReceipt =
         buildSubmissionReceipt(submissionOpt, periodEndText, monthlyReturn.taxYear, monthlyReturn.taxMonth),
-      status = buildStatus(monthlyReturn, submissionOpt, amendUrl)
+      status = buildStatus(monthlyReturn, submissionOpt, amendUrl, instanceId)
     )
   }
 
@@ -294,7 +298,8 @@ class SubmittedReturnsService @Inject() (
   private def buildStatus(
     monthlyReturn: SubmittedMonthlyReturnData,
     submissionOpt: Option[SubmittedSubmissionData],
-    amendUrl: String
+    amendUrl: String,
+    instanceId: String
   ): StatusViewModel = {
     val acceptedTimeOpt = submissionOpt.flatMap(_.acceptedTime)
 
@@ -306,7 +311,7 @@ class SubmittedReturnsService @Inject() (
         monthlyReturn.status match {
           case "SUBMITTED" =>
             if (isSuperseded(monthlyReturn)) {
-              buildAmendmentStatus(monthlyReturn, amendUrl)
+              buildAmendmentStatus(monthlyReturn, amendUrl, instanceId)
             } else if (!acceptedTime.isBefore(amendmentCutOffInstant)) {
               StatusViewModel.Link(
                 link = LinkViewModel(
@@ -329,14 +334,20 @@ class SubmittedReturnsService @Inject() (
     }
   }
 
-  private def buildAmendmentStatus(monthlyReturn: SubmittedMonthlyReturnData, amendUrl: String): StatusViewModel =
+  private def buildAmendmentStatus(
+    monthlyReturn: SubmittedMonthlyReturnData,
+    amendUrl: String,
+    instanceId: String
+  ): StatusViewModel =
     monthlyReturn.amendmentStatus match {
       case Some("STARTED") | Some("VALIDATED")                               =>
         StatusViewModel.Link(
           link = LinkViewModel(
-            url = controllers.history.routes.SubmittedReturnsController
-              .onInProgressRedirect(monthlyReturn.monthlyReturnId)
-              .url,
+            url = appConfig.continueAmendReturnJourneyUrl(
+              instanceId,
+              monthlyReturn.taxYear.toString,
+              monthlyReturn.taxMonth.toString
+            ),
             hiddenText = buildReturnPeriodEnd(monthlyReturn)
           ),
           textKey = "history.returnHistory.status.inProgress",
