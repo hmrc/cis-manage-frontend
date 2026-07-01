@@ -94,6 +94,7 @@ GET  /manage-cis-return/:instanceId  controllers.ReturnsLandingController.onPage
 
 GET  /manage-your-cis-return/incomplete-returns                                 controllers.history.IncompleteReturnsController.onPageLoad()
 GET  /manage-your-cis-return/incomplete-returns/delete-return/:monthlyReturnId  controllers.history.IncompleteReturnsController.onDeleteRedirect(monthlyReturnId: Long)
+GET  /manage-your-cis-return/incomplete-returns/continue-return/:monthlyReturnId  controllers.history.IncompleteReturnsController.onContinueRedirect(monthlyReturnId: Long)
 
 # Delete
 GET   /delete/delete-monthly-return              controllers.delete.DeleteMonthlyReturnController.onPageLoad(mode: Mode = NormalMode)

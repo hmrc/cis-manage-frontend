@@ -285,8 +285,7 @@ class ManageService @Inject() (
             href = if (isAmendment) {
               controllers.routes.JourneyRecoveryController.onPageLoad().url // TODO: MR03-03
             } else {
-              appConfig
-                .continueReturnJourneyUrl(instanceId, row.taxYear.toString, row.taxMonth.toString)
+              controllers.history.routes.IncompleteReturnsController.onContinueRedirect(row.monthlyReturnId).url
             },
             hiddenTextKey = Some("incompleteReturns.action.continue.hidden")
           ),

@@ -410,8 +410,6 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       val (service, connector, sessionRepo) = newService()
       val instanceId                        = "900063"
 
-      when(appConfig.continueReturnJourneyUrl(any[String], any[String], any[String]))
-        .thenReturn("/continue")
       when(appConfig.submissionInProgressUrl(any[String]))
         .thenReturn("/submission-in-progress")
       when(appConfig.submissionUnsuccessfulCannotResubmitUrl(any[String]))
@@ -444,7 +442,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
           action = Seq(
             ActionLinkViewModel(
               textKey = "incompleteReturns.action.continue",
-              href = "/continue",
+              href = controllers.history.routes.IncompleteReturnsController.onContinueRedirect(123L).url,
               hiddenTextKey = Some("incompleteReturns.action.continue.hidden")
             ),
             ActionLinkViewModel(
