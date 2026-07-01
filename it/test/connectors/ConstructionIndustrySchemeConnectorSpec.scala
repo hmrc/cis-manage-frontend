@@ -1002,4 +1002,64 @@ class ConstructionIndustrySchemeConnectorSpec
       ex.getMessage must include("returned 500")
     }
   }
+
+  "getSubcontractorDeleteStatus" should {
+
+    val cisId = "123"
+    val subbieResourceRef = 10L
+
+    "return response when BE returns 200 with valid JSON" in {
+      stubFor(
+        get(urlPathEqualTo(s"/cis/subcontractor/$cisId/$subbieResourceRef/delete-status"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                """{
+                  |  "canBeDeleted": true
+                  |}""".stripMargin
+              )
+          )
+      )
+
+      val result =
+        connector.getSubcontractorDeleteStatus(cisId, subbieResourceRef).futureValue
+
+      result.canBeDeleted mustBe true
+    }
+
+    "fail when BE returns 200 with invalid JSON" in {
+      stubFor(
+        get(urlPathEqualTo(s"/cis/subcontractor/$cisId/$subbieResourceRef/delete-status"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody("""{ "unexpectedField": true }""")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.getSubcontractorDeleteStatus(cisId, subbieResourceRef).futureValue
+      }
+
+      ex.getMessage.toLowerCase must include("canbedeleted")
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      stubFor(
+        get(urlPathEqualTo(s"/cis/subcontractor/$cisId/$subbieResourceRef/delete-status"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody("boom")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.getSubcontractorDeleteStatus(cisId, subbieResourceRef).futureValue
+      }
+
+      ex.getMessage must include("returned 500")
+    }
+  }
 }

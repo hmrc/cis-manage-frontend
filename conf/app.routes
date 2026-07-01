@@ -22,6 +22,8 @@ GET   /subcontractors/cannot-delete-subcontractor-warning  controllers.subcontra
 
 GET   /subcontractors/no-subcontractors-to-view            controllers.subcontractors.NoSubcontractorsExistController.onPageLoad()
 
+GET  /subcontractor/:subbieResourceRef/delete-status       controllers.subcontractors.GetSubcontractorForDeleteController.onPageLoad(subbieResourceRef: Long)
+
 # Errors & Auth
 GET  /there-is-a-problem               controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
