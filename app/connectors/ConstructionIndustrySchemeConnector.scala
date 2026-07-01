@@ -21,7 +21,7 @@ import models.agent.AgentClientData
 import models.history.*
 import models.requests.*
 import models.response.*
-import models.verify.{SubcontractorVerificationData, VerificationHistoryData, VerificationRequestData, VerificationRequestDetailData}
+import models.verify.{SubcontractorVerificationData, VerificationRequestDetailData}
 import play.api.Logging
 import play.api.http.Status.{NO_CONTENT, OK}
 import play.api.libs.json.{JsObject, JsValue, Json}
@@ -30,7 +30,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpException, HttpReadsInstances, HttpResponse, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.LocalDateTime
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -207,41 +207,6 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .map(_.id)
 
   // TODO: Replace stub with real API call when available
-  def getVerificationHistory(
-    instanceId: String
-  )(implicit hc: HeaderCarrier): Future[VerificationHistoryData] =
-    Future.successful(
-      VerificationHistoryData(
-        verificationRequests = Seq(
-          VerificationRequestData("V0004528770", LocalDate.of(2027, 2, 6), 2026),
-          VerificationRequestData("V0004528769", LocalDate.of(2026, 12, 6), 2026),
-          VerificationRequestData("V0004528768", LocalDate.of(2026, 10, 6), 2026),
-          VerificationRequestData("V0004528767", LocalDate.of(2026, 8, 6), 2026),
-          VerificationRequestData("V0004528766", LocalDate.of(2026, 6, 6), 2026),
-          VerificationRequestData("V0004528765", LocalDate.of(2026, 4, 6), 2026),
-          VerificationRequestData("V0004528764", LocalDate.of(2026, 2, 6), 2025),
-          VerificationRequestData("V0004528763", LocalDate.of(2025, 12, 6), 2025),
-          VerificationRequestData("V0004528762", LocalDate.of(2025, 10, 6), 2025),
-          VerificationRequestData("V0004528761", LocalDate.of(2025, 8, 6), 2025),
-          VerificationRequestData("V0004528760", LocalDate.of(2025, 6, 6), 2025),
-          VerificationRequestData("V0004528759", LocalDate.of(2025, 4, 6), 2025),
-          VerificationRequestData("V0004528758", LocalDate.of(2025, 2, 6), 2024),
-          VerificationRequestData("V0004528757", LocalDate.of(2024, 12, 6), 2024),
-          VerificationRequestData("V0004528756", LocalDate.of(2024, 10, 6), 2024),
-          VerificationRequestData("V0004528755", LocalDate.of(2024, 8, 6), 2024),
-          VerificationRequestData("V0004528754", LocalDate.of(2024, 6, 6), 2024),
-          VerificationRequestData("V0004528753", LocalDate.of(2024, 4, 6), 2024),
-          VerificationRequestData("V0004528752", LocalDate.of(2024, 2, 6), 2023),
-          VerificationRequestData("V0004528751", LocalDate.of(2023, 12, 6), 2023),
-          VerificationRequestData("V0004528750", LocalDate.of(2023, 10, 6), 2023),
-          VerificationRequestData("V0004528749", LocalDate.of(2023, 8, 6), 2023),
-          VerificationRequestData("V0004528748", LocalDate.of(2023, 6, 6), 2023),
-          VerificationRequestData("V0004528747", LocalDate.of(2023, 4, 6), 2023)
-        )
-      )
-    )
-
-  // TODO: Replace stub with real API call when available
   def getVerificationRequestDetail(
     instanceId: String,
     verificationNumber: String
@@ -263,5 +228,13 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         )
       )
     )
+
+  def getSubmittedVerifications(
+    request: GetSubmittedVerificationsRequest
+  )(implicit hc: HeaderCarrier): Future[GetSubmittedVerificationsResponse] =
+    http
+      .post(url"$cisBaseUrl/verification/submitted-verifications")
+      .withBody(Json.toJson(request))
+      .execute[GetSubmittedVerificationsResponse]
 
 }

@@ -21,6 +21,8 @@ import viewmodels.*
 
 import java.time.format.DateTimeFormatter
 import javax.inject.{Inject, Singleton}
+import models.response.GetSubmittedVerificationsResponse
+import java.time.LocalDate
 
 @Singleton
 class VerificationHistoryService @Inject() () {
@@ -96,4 +98,48 @@ class VerificationHistoryService @Inject() () {
         controllers.verify.routes.VerificationRequestController.onPageLoad(request.verificationNumber).url,
       submissionReceiptLink = "#"
     )
+
+  def toVerificationHistoryData(
+    response: GetSubmittedVerificationsResponse
+  ): VerificationHistoryData = {
+
+    val submissionDatesByVerificationBatchId: Map[Long, LocalDate] =
+      response.submissions
+        .flatMap { submission =>
+          for {
+            verificationBatchId <- submission.activeObjectId
+            submittedDate       <- submission.submissionRequestDate
+                                     .orElse(submission.createDate)
+                                     .map(_.toLocalDate)
+          } yield verificationBatchId -> submittedDate
+        }
+        .groupBy(_._1)
+        .view
+        .mapValues(_.map(_._2).max)
+        .toMap
+
+    val verificationRequests =
+      response.verificationBatches
+        .flatMap { batch =>
+          for {
+            verificationNumber <- batch.verificationNumber
+            submittedDate      <- submissionDatesByVerificationBatchId
+                                    .get(batch.verificationBatchId)
+                                    .orElse(batch.createDate.map(_.toLocalDate))
+          } yield VerificationRequestData(
+            verificationNumber = verificationNumber,
+            dateSubmitted = submittedDate,
+            taxYear = taxYearStart(submittedDate)
+          )
+        }
+        .sortBy(_.dateSubmitted)(Ordering[LocalDate].reverse)
+
+    VerificationHistoryData(
+      verificationRequests = verificationRequests
+    )
+  }
+
+  private def taxYearStart(date: LocalDate): Int =
+    if (date.getMonthValue >= 4) date.getYear
+    else date.getYear - 1
 }
