@@ -26,12 +26,12 @@ import scala.concurrent.Future
 
 @Singleton
 class VerificationService @Inject() (
-    connector: ConstructionIndustrySchemeConnector
+  connector: ConstructionIndustrySchemeConnector
 ) {
 
   def getSubmittedVerifications(
-     instanceId: String
- )(implicit hc: HeaderCarrier): Future[GetSubmittedVerificationsResponse] =
+    instanceId: String
+  )(implicit hc: HeaderCarrier): Future[GetSubmittedVerificationsResponse] =
     connector.getSubmittedVerifications(
       GetSubmittedVerificationsRequest(instanceId)
     )

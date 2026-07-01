@@ -31,17 +31,17 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 class GetSubmittedVerificationsController @Inject() (
-                                                      override val messagesApi: MessagesApi,
-                                                      identify: IdentifierAction,
-                                                      getData: DataRetrievalAction,
-                                                      requireData: DataRequiredAction,
-                                                      requireCisId: CisIdRequiredAction,
-                                                      sessionRepository: SessionRepository,
-                                                      verificationService: VerificationService,
-                                                      verificationHistoryService: VerificationHistoryService,
-                                                      val controllerComponents: MessagesControllerComponents
- )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  requireCisId: CisIdRequiredAction,
+  sessionRepository: SessionRepository,
+  verificationService: VerificationService,
+  verificationHistoryService: VerificationHistoryService,
+  val controllerComponents: MessagesControllerComponents
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] =
