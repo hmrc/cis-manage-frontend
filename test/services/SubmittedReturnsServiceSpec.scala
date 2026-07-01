@@ -249,7 +249,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
       row.status shouldBe StatusViewModel.Link(
         link = LinkViewModel(
-          url = "#",
+          url = controllers.history.routes.SubmittedReturnsController.onInProgressRedirect(6L).url,
           hiddenText = "Mar 2023"
         ),
         textKey = "history.returnHistory.status.inProgress",

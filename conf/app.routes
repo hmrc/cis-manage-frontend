@@ -115,10 +115,11 @@ POST  /history/view-tax-year-submission-history  controllers.history.SubmittedRe
 
 GET   /history/monthly-return-submission-details  controllers.history.PrintSubmissionDetailsController.onPageLoad(taxYear: Int, taxMonth: Int, amendment: String, from: String ?= "all")
 
-GET   /history/monthly-return-history-all-tax-years      controllers.history.SubmittedReturnsController.onPageLoadAllYears()
-GET   /history/monthly-return-history-tax-year/:taxYear  controllers.history.SubmittedReturnsController.onPageLoadSingleYear(taxYear)
-GET   /history/amend/:taxYear/:taxMonth                  controllers.history.SubmittedReturnsController.startAmendment(taxYear: Int, taxMonth: Int)
-GET   /monthly-return/confirmation-history               controllers.history.SubmittedReturnsController.viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String)
+GET   /history/monthly-return-history-all-tax-years                             controllers.history.SubmittedReturnsController.onPageLoadAllYears()
+GET   /history/monthly-return-history-tax-year/:taxYear                         controllers.history.SubmittedReturnsController.onPageLoadSingleYear(taxYear)
+GET   /history/monthly-return-history/in-progress-return/:monthlyReturnId       controllers.history.SubmittedReturnsController.onInProgressRedirect(monthlyReturnId: Long)
+GET   /history/amend/:taxYear/:taxMonth                                         controllers.history.SubmittedReturnsController.startAmendment(taxYear: Int, taxMonth: Int)
+GET   /monthly-return/confirmation-history                                      controllers.history.SubmittedReturnsController.viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String)
 
 # Amend
 GET  /amend-monthly-return/no-return-submitted    controllers.amend.NoReturnsSubmittedController.onPageLoad()

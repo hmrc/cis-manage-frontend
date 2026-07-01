@@ -140,4 +140,9 @@ class SubmittedReturnsController @Inject() (
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }
+
+  def onInProgressRedirect(monthlyReturnId: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      Redirect("#") // TODO
+    }
 }
