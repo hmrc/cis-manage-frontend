@@ -616,7 +616,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual "#"
+        redirectLocation(result).value mustEqual "#" // TODO
 
         verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
       }
@@ -632,7 +632,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual "#"
+        redirectLocation(result).value mustEqual "#" // TODO
 
         verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
       }
