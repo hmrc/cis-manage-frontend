@@ -264,4 +264,11 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       )
     )
 
+  def getSubcontractorList(
+    cisId: String
+  )(implicit hc: HeaderCarrier): Future[GetSubcontractorListResponse] =
+    http
+      .get(url"$cisBaseUrl/subcontractors/$cisId")
+      .execute[GetSubcontractorListResponse]
+
 }
