@@ -252,7 +252,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
     "onPageLoadSingleYear must return OK using SubmittedReturnsDataPage when present" in new Setup {
       val userAnswers = userAnswersWithSubmittedReturnsData
 
-      when(mockSubmittedReturnsService.buildSingleYearViewModel(submittedReturnsData, "2024", any[String]))
+      when(mockSubmittedReturnsService.buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String]))
         .thenReturn(Some(viewModel))
 
       val app = application(userAnswers)
@@ -265,7 +265,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
 
-        verify(mockSubmittedReturnsService).buildSingleYearViewModel(submittedReturnsData, "2024", any[String])
+        verify(mockSubmittedReturnsService).buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String])
         verifyNoInteractions(mockManageService)
       }
     }
@@ -273,7 +273,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
     "onPageLoadAllYears must return OK using SubmittedReturnsDataPage when present" in new Setup {
       val userAnswers = userAnswersWithSubmittedReturnsData
 
-      when(mockSubmittedReturnsService.buildAllYearsViewModel(submittedReturnsData, any[String]))
+      when(mockSubmittedReturnsService.buildAllYearsViewModel(any[SubmittedReturnsData], any[String]))
         .thenReturn(Some(viewModel))
 
       val app = application(userAnswers)
@@ -286,7 +286,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
 
-        verify(mockSubmittedReturnsService).buildAllYearsViewModel(submittedReturnsData, any[String])
+        verify(mockSubmittedReturnsService).buildAllYearsViewModel(any[SubmittedReturnsData], any[String])
         verifyNoInteractions(mockManageService)
       }
     }
@@ -357,7 +357,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
     "onPageLoadSingleYear must redirect to JourneyRecovery when buildSingleYearViewModel returns None" in new Setup {
       val userAnswers = userAnswersWithSubmittedReturnsData
 
-      when(mockSubmittedReturnsService.buildSingleYearViewModel(submittedReturnsData, "2024", any[String]))
+      when(mockSubmittedReturnsService.buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String]))
         .thenReturn(None)
 
       val app = application(userAnswers)
@@ -369,7 +369,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual journeyRecoveryUrl
 
-        verify(mockSubmittedReturnsService).buildSingleYearViewModel(submittedReturnsData, "2024", any[String])
+        verify(mockSubmittedReturnsService).buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String])
       }
     }
 
@@ -394,7 +394,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
     "onPageLoadAllYears must redirect to JourneyRecovery when buildAllYearsViewModel returns None" in new Setup {
       val userAnswers = userAnswersWithSubmittedReturnsData
 
-      when(mockSubmittedReturnsService.buildAllYearsViewModel(submittedReturnsData, any[String]))
+      when(mockSubmittedReturnsService.buildAllYearsViewModel(any[SubmittedReturnsData], any[String]))
         .thenReturn(None)
 
       val app = application(userAnswers)
@@ -406,7 +406,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual journeyRecoveryUrl
 
-        verify(mockSubmittedReturnsService).buildAllYearsViewModel(submittedReturnsData, any[String])
+        verify(mockSubmittedReturnsService).buildAllYearsViewModel(any[SubmittedReturnsData], any[String])
       }
     }
 
