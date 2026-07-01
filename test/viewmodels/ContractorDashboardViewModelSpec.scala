@@ -26,78 +26,44 @@ class ContractorDashboardViewModelSpec extends SpecBase {
 
     "should create a valid instance with all required fields" in {
       val viewModel = ContractorLandingViewModel(
-        contractorName = "ABC Construction Ltd",
+        schemeName = "ABC Construction Ltd",
         employerReference = "123/AB45678",
-        utr = "1234567890",
-        returnCount = 1,
-        returnDueDate = "19 October 2025",
-        noticeCount = 2,
-        lastSubmittedDate = "19 September 2025",
-        lastSubmittedTaxMonthYear = "August 2025",
         whatIsUrl = "#",
         guidanceUrl = "#",
         penaltiesUrl = "#"
       )
 
-      viewModel.employerReference         shouldBe "123/AB45678"
-      viewModel.utr                       shouldBe "1234567890"
-      viewModel.returnCount               shouldBe 1
-      viewModel.returnDueDate             shouldBe "19 October 2025"
-      viewModel.noticeCount               shouldBe 2
-      viewModel.lastSubmittedDate         shouldBe "19 September 2025"
-      viewModel.lastSubmittedTaxMonthYear shouldBe "August 2025"
+      viewModel.employerReference shouldBe "123/AB45678"
+      viewModel.schemeName        shouldBe "ABC Construction Ltd"
     }
 
     "should support case class copy" in {
       val original = ContractorLandingViewModel(
-        contractorName = "ABC Construction Ltd",
+        schemeName = "ABC Construction Ltd",
         employerReference = "123/AB45678",
-        utr = "1234567890",
-        returnCount = 1,
-        returnDueDate = "19 October 2025",
-        noticeCount = 2,
-        lastSubmittedDate = "19 September 2025",
-        lastSubmittedTaxMonthYear = "August 2025",
         whatIsUrl = "#",
         guidanceUrl = "#",
         penaltiesUrl = "#"
       )
 
-      val modified = original.copy(returnCount = 3, noticeCount = 5)
+      val modified = original.copy(schemeName = "NEW SCHEME NAME")
 
-      modified.employerReference         shouldBe "123/AB45678"
-      modified.utr                       shouldBe "1234567890"
-      modified.returnCount               shouldBe 3
-      modified.returnDueDate             shouldBe "19 October 2025"
-      modified.noticeCount               shouldBe 5
-      modified.lastSubmittedDate         shouldBe "19 September 2025"
-      modified.lastSubmittedTaxMonthYear shouldBe "August 2025"
+      modified.employerReference shouldBe "123/AB45678"
+      modified.schemeName        shouldBe "NEW SCHEME NAME"
     }
 
     "should support equality comparison" in {
       val viewModel1 = ContractorLandingViewModel(
-        contractorName = "ABC Construction Ltd",
+        schemeName = "ABC Construction Ltd",
         employerReference = "123/AB45678",
-        utr = "1234567890",
-        returnCount = 1,
-        returnDueDate = "19 October 2025",
-        noticeCount = 2,
-        lastSubmittedDate = "19 September 2025",
-        lastSubmittedTaxMonthYear = "August 2025",
         whatIsUrl = "#",
         guidanceUrl = "#",
         penaltiesUrl = "#"
       )
 
       val viewModel2 = ContractorLandingViewModel(
-        contractorName = "ABC Construction Ltd",
+        schemeName = "ABC Construction Ltd",
         employerReference = "123/AB45678",
-        utr = "1234567890",
-        returnCount = 1,
-        returnDueDate = "19 October 2025",
-        noticeCount = 2,
-        lastSubmittedDate = "19 September 2025",
-        lastSubmittedTaxMonthYear = "August 2025",
         whatIsUrl = "#",
         guidanceUrl = "#",
         penaltiesUrl = "#"
@@ -108,28 +74,16 @@ class ContractorDashboardViewModelSpec extends SpecBase {
 
     "should handle different values correctly" in {
       val viewModel1 = ContractorLandingViewModel(
-        contractorName = "ABC Construction Ltd 1",
+        schemeName = "ABC Construction Ltd 1",
         employerReference = "123/AB45678",
-        utr = "1234567890",
-        returnCount = 1,
-        returnDueDate = "19 October 2025",
-        noticeCount = 2,
-        lastSubmittedDate = "19 September 2025",
-        lastSubmittedTaxMonthYear = "August 2025",
         whatIsUrl = "#",
         guidanceUrl = "#",
         penaltiesUrl = "#"
       )
 
       val viewModel2 = ContractorLandingViewModel(
-        contractorName = "ABC Construction Ltd 2",
+        schemeName = "ABC Construction Ltd 2",
         employerReference = "456/CD12345",
-        utr = "0987654321",
-        returnCount = 5,
-        returnDueDate = "20 November 2025",
-        noticeCount = 3,
-        lastSubmittedDate = "15 October 2025",
-        lastSubmittedTaxMonthYear = "September 2025",
         whatIsUrl = "#",
         guidanceUrl = "#",
         penaltiesUrl = "#"
