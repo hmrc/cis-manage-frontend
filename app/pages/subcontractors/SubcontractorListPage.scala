@@ -21,8 +21,7 @@ import pages.QuestionPage
 import play.api.libs.json.Format
 import play.api.libs.json.JsPath
 
-case object SubcontractorListPage
-  extends QuestionPage[GetSubcontractorListResponse] {
+case object SubcontractorListPage extends QuestionPage[GetSubcontractorListResponse] {
 
   override def path: JsPath =
     JsPath \ "subcontractorList"

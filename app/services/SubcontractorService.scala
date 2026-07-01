@@ -25,11 +25,11 @@ import scala.concurrent.Future
 
 @Singleton
 class SubcontractorService @Inject() (
-                                       connector: ConstructionIndustrySchemeConnector
-                                     ) {
+  connector: ConstructionIndustrySchemeConnector
+) {
 
   def getSubcontractorList(
-                            instanceId: String
-                          )(implicit hc: HeaderCarrier): Future[GetSubcontractorListResponse] =
+    instanceId: String
+  )(implicit hc: HeaderCarrier): Future[GetSubcontractorListResponse] =
     connector.getSubcontractorList(instanceId)
 }

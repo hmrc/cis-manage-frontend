@@ -34,9 +34,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
-class GetSubcontractorListControllerSpec
-  extends SpecBase
-    with MockitoSugar {
+class GetSubcontractorListControllerSpec extends SpecBase with MockitoSugar {
 
   private val instanceId = "test-instance-id"
 
@@ -138,8 +136,7 @@ class GetSubcontractorListControllerSpec
 
         verify(sessionRepository).set(userAnswersCaptor.capture())
 
-        userAnswersCaptor
-          .getValue
+        userAnswersCaptor.getValue
           .get(SubcontractorListPage) mustEqual Some(response)
       }
     }
@@ -183,8 +180,7 @@ class GetSubcontractorListControllerSpec
 
         verify(sessionRepository).set(userAnswersCaptor.capture())
 
-        userAnswersCaptor
-          .getValue
+        userAnswersCaptor.getValue
           .get(SubcontractorListPage) mustEqual Some(response)
       }
     }

@@ -170,13 +170,13 @@ class GetSubcontractorListResponseSpec extends SpecBase {
         )
 
       val json =
-        Json.toJson(response)(
-          using GetSubcontractorListResponse.format
+        Json.toJson(response)(using
+          GetSubcontractorListResponse.format
         )
 
       json
-        .as[GetSubcontractorListResponse](
-          using GetSubcontractorListResponse.format
+        .as[GetSubcontractorListResponse](using
+          GetSubcontractorListResponse.format
         ) mustEqual response
     }
 
@@ -187,8 +187,8 @@ class GetSubcontractorListResponseSpec extends SpecBase {
         )
 
       json
-        .as[GetSubcontractorListResponse](
-          using GetSubcontractorListResponse.format
+        .as[GetSubcontractorListResponse](using
+          GetSubcontractorListResponse.format
         ) mustEqual GetSubcontractorListResponse(
         subcontractors = Seq.empty
       )
