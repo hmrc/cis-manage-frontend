@@ -278,7 +278,12 @@ class ManageService @Inject() (
             textKey = "incompleteReturns.action.continue",
             href = if (isAmendment) {
               appConfig
-                .continueAmendReturnJourneyUrl(instanceId, row.taxYear.toString, row.taxMonth.toString)
+                .continueAmendReturnJourneyUrl(
+                  instanceId,
+                  row.taxYear.toString,
+                  row.taxMonth.toString,
+                  isOriginalNilReturn = row.returnType.equalsIgnoreCase("Nil")
+                )
             } else {
               controllers.history.routes.IncompleteReturnsController.onContinueRedirect(row.monthlyReturnId).url
             },
