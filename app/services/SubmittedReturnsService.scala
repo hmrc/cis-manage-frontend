@@ -346,7 +346,8 @@ class SubmittedReturnsService @Inject() (
             url = appConfig.continueAmendReturnJourneyUrl(
               instanceId,
               monthlyReturn.taxYear.toString,
-              monthlyReturn.taxMonth.toString
+              monthlyReturn.taxMonth.toString,
+              isOriginalNilReturn = monthlyReturn.nilReturnIndicator.equalsIgnoreCase("Nil")
             ),
             hiddenText = buildReturnPeriodEnd(monthlyReturn)
           ),

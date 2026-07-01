@@ -115,9 +115,14 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     s"$cisFrontendBaseUrl$continueReturnJourneyPath" +
       s"?instanceId=$instanceId&taxYear=$taxYear&taxMonth=$taxMonth"
 
-  def continueAmendReturnJourneyUrl(instanceId: String, taxYear: String, taxMonth: String): String =
+  def continueAmendReturnJourneyUrl(
+    instanceId: String,
+    taxYear: String,
+    taxMonth: String,
+    isOriginalNilReturn: Boolean
+  ): String =
     s"$cisFrontendBaseUrl$continueAmendReturnJourneyPath" +
-      s"?instanceId=$instanceId&taxYear=$taxYear&taxMonth=$taxMonth"
+      s"?instanceId=$instanceId&taxYear=$taxYear&taxMonth=$taxMonth&isOriginalNilReturn=$isOriginalNilReturn"
 
   def confirmAmendmentUrl(handoffId: String): String =
     s"$cisFrontendBaseUrl$confirmAmendmentPath?handoffId=$handoffId"
