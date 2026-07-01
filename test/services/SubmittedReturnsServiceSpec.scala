@@ -102,7 +102,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
     val mockConnector: ConstructionIndustrySchemeConnector = mock[ConstructionIndustrySchemeConnector]
     val mockAppConfig: FrontendAppConfig                   = mock[FrontendAppConfig]
 
-    when(mockAppConfig.continueAmendReturnJourneyUrl(any(), any(), any())).thenReturn("#")
+    when(mockAppConfig.continueAmendReturnJourneyUrl(any(), any(), any(), any())).thenReturn("#")
 
     implicit val appConfig: FrontendAppConfig = mockAppConfig
 
