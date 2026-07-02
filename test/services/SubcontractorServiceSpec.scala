@@ -43,7 +43,7 @@ class SubcontractorServiceSpec extends AnyFreeSpec with Matchers with MockitoSug
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
 
       val response = GetSubcontractorForDeleteResponse(
-        canBeDeleted = true
+        subcontractorCanBeDeleted = true
       )
 
       when(

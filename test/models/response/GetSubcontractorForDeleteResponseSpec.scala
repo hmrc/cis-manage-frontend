@@ -27,33 +27,33 @@ class GetSubcontractorForDeleteResponseSpec extends AnyFreeSpec with Matchers {
     "must serialise to JSON correctly" in {
 
       val model = GetSubcontractorForDeleteResponse(
-        canBeDeleted = true
+        subcontractorCanBeDeleted = true
       )
 
       val json = Json.toJson(model)
 
       json mustBe Json.obj(
-        "canBeDeleted" -> true
+        "subcontractorCanBeDeleted" -> true
       )
     }
 
     "must deserialise from JSON correctly" in {
 
       val json = Json.obj(
-        "canBeDeleted" -> false
+        "subcontractorCanBeDeleted" -> false
       )
 
       val result = json.as[GetSubcontractorForDeleteResponse]
 
       result mustBe GetSubcontractorForDeleteResponse(
-        canBeDeleted = false
+        subcontractorCanBeDeleted = false
       )
     }
 
     "must handle round-trip JSON conversion" in {
 
       val model = GetSubcontractorForDeleteResponse(
-        canBeDeleted = true
+        subcontractorCanBeDeleted = true
       )
 
       val json   = Json.toJson(model)
@@ -74,7 +74,7 @@ class GetSubcontractorForDeleteResponseSpec extends AnyFreeSpec with Matchers {
     "must fail to deserialise when field type is incorrect" in {
 
       val json = Json.obj(
-        "canBeDeleted" -> "not-a-boolean"
+        "subcontractorCanBeDeleted" -> "not-a-boolean"
       )
 
       val result = json.validate[GetSubcontractorForDeleteResponse]
