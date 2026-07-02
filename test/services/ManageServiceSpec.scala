@@ -432,6 +432,17 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       when(connector.getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(resp))
 
+      when(connector.getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier]))
+        .thenReturn(
+          Future.successful(
+            SubmittedReturnsData(
+              scheme = SubmittedSchemeData(name = "Test", taxOfficeNumber = "123", taxOfficeReference = "AB456"),
+              monthlyReturns = Seq.empty,
+              submissions = Seq.empty
+            )
+          )
+        )
+
       service.getUnsubmittedMonthlyReturnRows(instanceId).futureValue mustBe Seq(
         IncompleteReturnsRowViewModel(
           returnPeriodEnd = "Jan 2025",
