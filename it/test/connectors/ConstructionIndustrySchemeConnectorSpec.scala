@@ -1016,7 +1016,7 @@ class ConstructionIndustrySchemeConnectorSpec
               .withStatus(OK)
               .withBody(
                 """{
-                  |  "canBeDeleted": true
+                  |  "subcontractorCanBeDeleted": true
                   |}""".stripMargin
               )
           )
@@ -1025,7 +1025,7 @@ class ConstructionIndustrySchemeConnectorSpec
       val result =
         connector.getSubcontractorDeleteStatus(cisId, subbieResourceRef).futureValue
 
-      result.canBeDeleted mustBe true
+      result.subcontractorCanBeDeleted mustBe true
     }
 
     "fail when BE returns 200 with invalid JSON" in {
