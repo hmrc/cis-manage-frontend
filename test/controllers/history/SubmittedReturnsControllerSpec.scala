@@ -606,7 +606,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "onInProgressRedirect must redirect to journey recovery when amend status is STARTED" in new Setup {
+    "onInProgressRedirect must redirect to TODO when amend status is STARTED" in new Setup {
       val app = application(userAnswersWithCisId)
 
       mockManageServiceReturnsDataStarted()
@@ -622,7 +622,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "onInProgressRedirect must redirect to journey recovery when amend status is VALIDATED" in new Setup {
+    "onInProgressRedirect must redirect to TODO when amend status is VALIDATED" in new Setup {
       val app = application(userAnswersWithCisId)
 
       mockManageServiceReturnsDataValidated()
