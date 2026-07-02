@@ -117,37 +117,27 @@ unauthorised.agent.p2.link               =  PAYE for Agents
 unauthorised.agent.p2.suffix             =  to use this service.
 
 # Introduction & Landing
-contractorLanding.title                       =  CIS return dashboard
-contractorLanding.heading                     =  CIS return dashboard
-contractorLanding.paragraph                   =  You can manage {0}&#8217;s monthly CIS returns – including dates and statements.
+contractorLanding.title                                 =  Manage Construction Industry Service account
+contractorLanding.heading                               =  Manage Construction Industry Service account
 
-contractorLanding.label.employerReference     =  Employer reference
-contractorLanding.label.utr                   =  Unique Taxpayer Reference (UTR)
+contractorLanding.label.schemeName                      =  Scheme name
+contractorLanding.label.employerReference               =  Employer reference
 
-contractorLanding.subheading.actionRequired   =  Action required
-contractorLanding.subheading.manage           =  Manage your CIS
-contractorLanding.subheading.activity         =  Recent activity
+contractorLanding.landing.card.manageYourCisReturn.title            =  Manage your CIS return
+contractorLanding.landing.card.manageYourCisReturn.p                =  File or amend your monthly or nil returns.
+contractorLanding.landing.card.manageYourSubcontractors.title       =  Manage your subcontractors
+contractorLanding.landing.card.manageYourSubcontractors.p           =  Add or edit a subcontractor, submit or view a verification request.
+contractorLanding.landing.card.manageYourContractorDetails.title    =  Manage your contractor details
+contractorLanding.landing.card.manageYourContractorDetails.p        =  Add or change a unique taxpayer reference, scheme name or email address.
+contractorLanding.landing.card.appealPenalty.title                  =  Appeal a penalty
+contractorLanding.landing.card.appealPenalty.p                      =  Appeal a penalty within 30 days of receiving one.
+contractorLanding.landing.card.noticesAndStatements.title           =  Notices and Statements
+contractorLanding.landing.card.noticesAndStatements.p               =  View HMRC notices, penalty warnings and confirmation statements.
 
-contractorLanding.label.dueBy                 =  Due by {0}
-contractorLanding.label.newNotices            =  Notices to view
-contractorLanding.label.subcontractors        =  View, verify or manage your subcontractors.
-contractorLanding.label.history               =  View your previously submitted CIS returns.
-contractorLanding.label.notices               =  View HMRC notices, penalty warnings and confirmation statements.
-contractorLanding.label.amend                 =  Make changes to a return you’ve already submitted.
-
-contractorLanding.link.returnDue              =  Return due
-contractorLanding.link.newNotices             =  New notices
-contractorLanding.link.subcontractors         =  Subcontractors
-contractorLanding.link.history                =  Return history
-contractorLanding.link.notices                =  Notices and statements
-contractorLanding.link.amend                  =  Amend a return
-
-contractorLanding.paragraph.activity          =  Last return submitted: {0} for tax month {1}
-
-contractorLanding.sidebar.title               =  Help and guidance
-contractorLanding.sidebar.nav.whatIs.text     =  What is the Construction Industry Scheme
-contractorLanding.sidebar.nav.guidance.text   =  CIS monthly returns guidance
-contractorLanding.sidebar.nav.penalties.text  =  CIS 340: Penalties for late returns
+contractorLanding.sidebar.title                         =  Help and guidance
+contractorLanding.sidebar.nav.whatIs.text               =  What is the Construction Industry Scheme?
+contractorLanding.sidebar.nav.guidance.text             =  CIS monthly returns guidance
+contractorLanding.sidebar.nav.penalties.text            =  CIS 340: penalties for late returns
 
 introduction.title                            =  Construction Industry Scheme (CIS)
 introduction.heading                          =  Construction Industry Scheme (CIS)
@@ -593,6 +583,19 @@ verify.verificationRequest.table.verificationNumber          =  Verification num
 verify.verificationRequest.printThisRequest                  =  Print this request
 verify.verificationRequest.backToManage                      =  Back to Manage your subcontractors
 
+verify.subcontractorSubmissionReceipt.title             =  Submission receipt
+verify.subcontractorSubmissionReceipt.heading           =  Submission receipt
+verify.subcontractorSubmissionReceipt.subheading        =  Submission details
+verify.subcontractorSubmissionReceipt.p1                =  Submitted at {0} on {1}
+verify.subcontractorSubmissionReceipt.p2                =  Your verification request has been successfully submitted to HMRC.
+verify.subcontractorSubmissionReceipt.p3                =  Please keep this receipt for your records.
+verify.subcontractorSubmissionReceipt.link1             =  Print this receipt
+verify.subcontractorSubmissionReceipt.link2.prefix      =  Back to
+verify.subcontractorSubmissionReceipt.link2.link        =  Manage your subcontractors
+verify.subcontractorSubmissionReceipt.summaryList.key1  =  Contractor name
+verify.subcontractorSubmissionReceipt.summaryList.key2  =  Employer reference
+verify.subcontractorSubmissionReceipt.summaryList.key3  =  Receipt reference number
+
 # Client Details
 clientdetails.manageClientDetails.title                      =  Client details
 clientdetails.manageClientDetails.heading                    =  {0} details
@@ -668,15 +671,15 @@ subcontractors.noSubcontractorsExist.p2.suffix = before you can create a verific
 subcontractors.noSubcontractorsExist.p3.prefix = Back to
 subcontractors.noSubcontractorsExist.p3.link = Manage your subcontractors
 
-subcontractors.subcontractorDeletedConfirmation.title = Subcontractor deleted
-subcontractors.subcontractorDeletedConfirmation.heading = Subcontractor deleted
-subcontractors.subcontractorDeletedConfirmation.p1 = You have deleted {0} from your list of subcontractors.
-subcontractors.subcontractorDeletedConfirmation.p2.text = Back to
-subcontractors.subcontractorDeletedConfirmation.p2.link = Your subcontractors
-subcontractors.subcontractorDeletedConfirmation.h2 = Before you go
-subcontractors.subcontractorDeletedConfirmation.p3 = Your feedback helps us make our service better.
-subcontractors.subcontractorDeletedConfirmation.p4.text = to share your feedback on this service.
-subcontractors.subcontractorDeletedConfirmation.p4.link = Take a short survey
+subcontractors.subcontractorDeletedConfirmation.title        =  Subcontractor deleted
+subcontractors.subcontractorDeletedConfirmation.heading      =  Subcontractor deleted
+subcontractors.subcontractorDeletedConfirmation.p1           =  You have deleted {0} from your list of subcontractors.
+subcontractors.subcontractorDeletedConfirmation.p2.text      =  Back to
+subcontractors.subcontractorDeletedConfirmation.p2.link      =  Your subcontractors
+subcontractors.subcontractorDeletedConfirmation.h2           =  Before you go
+subcontractors.subcontractorDeletedConfirmation.p3           =  Your feedback helps us make our service better.
+subcontractors.subcontractorDeletedConfirmation.p4.text      =  to share your feedback on this service.
+subcontractors.subcontractorDeletedConfirmation.p4.link      =  Take a short survey
 
 subcontractors.cannotDeleteSubcontractor.title               = You cannot delete this subcontractor
 subcontractors.cannotDeleteSubcontractor.heading             = You cannot delete {0}
@@ -685,7 +688,7 @@ subcontractors.cannotDeleteSubcontractor.p2                  = You must wait unt
 subcontractors.cannotDeleteSubcontractor.p3.text             = Back to
 subcontractors.cannotDeleteSubcontractor.p3.link             = Your subcontractors
 
-subcontractors.deleteSubcontractorYesNo.title                = Are you sure you want to delete this subcontractor?
-subcontractors.deleteSubcontractorYesNo.heading              = Are you sure you want to delete {0}?
-subcontractors.deleteSubcontractorYesNo.p                    = This subcontractor will also be removed from any monthly return that you have not submitted yet.
-subcontractors.deleteSubcontractorYesNo.error.required       = Select yes if you want to delete this subcontractor
+subcontractors.deleteSubcontractorYesNo.title                =  Are you sure you want to delete this subcontractor?
+subcontractors.deleteSubcontractorYesNo.heading              =  Are you sure you want to delete {0}?
+subcontractors.deleteSubcontractorYesNo.p                    =  This subcontractor will also be removed from any monthly return that you have not submitted yet.
+subcontractors.deleteSubcontractorYesNo.error.required       =  Select yes if you want to delete this subcontractor
