@@ -265,7 +265,8 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
 
-        verify(mockSubmittedReturnsService).buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String])
+        verify(mockSubmittedReturnsService)
+          .buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String])
         verifyNoInteractions(mockManageService)
       }
     }
@@ -369,7 +370,8 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual journeyRecoveryUrl
 
-        verify(mockSubmittedReturnsService).buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String])
+        verify(mockSubmittedReturnsService)
+          .buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String])
       }
     }
 
