@@ -432,47 +432,5 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
           .url
       }
     }
-
-    "must redirect to journey recovery when CisIdPage is missing" in {
-      val mockManageService     = mock[ManageService]
-      val mockSessionRepository = mock[SessionRepository]
-
-      val mockDeletableResult = UnsubmittedMonthlyReturnsRow(
-        monthlyReturnId = monthlyReturnId,
-        taxYear = 2026,
-        taxMonth = 4,
-        returnType = "Invalid Type",
-        status = "In Progress",
-        lastUpdate = None,
-        amendment = Some("N"),
-        deletable = true
-      )
-
-      when(
-        mockManageService.checkUnsubmittedMonthlyReturnDeletion(any[UserAnswers], any[Long])(
-          any[HeaderCarrier]
-        )
-      ).thenReturn(Future.successful(Deletable(mockDeletableResult)))
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[ManageService].toInstance(mockManageService)
-          )
-          .build()
-
-      running(application) {
-        val request = FakeRequest(GET, onContinueRedirectRoute)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
-          .onPageLoad()
-          .url
-      }
-    }
   }
 }

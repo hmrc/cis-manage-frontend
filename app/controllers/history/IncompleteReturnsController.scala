@@ -20,7 +20,6 @@ import config.FrontendAppConfig
 import controllers.actions.*
 import controllers.routes
 import models.*
-import pages.CisIdPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -74,25 +73,19 @@ class IncompleteReturnsController @Inject() (
     }
 
   def onContinueRedirect(monthlyReturnId: Long): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      request.userAnswers.get(CisIdPage) match {
-        case Some(instanceId) =>
-          service.checkUnsubmittedMonthlyReturnDeletion(request.userAnswers, monthlyReturnId).flatMap {
-            case Deletable(record) =>
-              Future.successful(
-                Redirect(
-                  appConfig.continueReturnJourneyUrl(instanceId, record.taxYear.toString, record.taxMonth.toString)
-                )
-              )
-            case _                 =>
-              logger
-                .warn(
-                  s"[IncompleteReturnsController] Record is non-editable for monthlyReturnId=$monthlyReturnId"
-                )
-              Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-          }
-        case _                =>
-          logger.error(s"[IncompleteReturnsController] missing instanceId in user answers")
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+      service.checkUnsubmittedMonthlyReturnDeletion(request.userAnswers, monthlyReturnId).flatMap {
+        case Deletable(record) =>
+          Future.successful(
+            Redirect(
+              appConfig.continueReturnJourneyUrl(request.cisId, record.taxYear.toString, record.taxMonth.toString)
+            )
+          )
+        case _                 =>
+          logger
+            .warn(
+              s"[IncompleteReturnsController] Record is non-editable for monthlyReturnId=$monthlyReturnId"
+            )
           Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
     }
