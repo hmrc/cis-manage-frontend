@@ -30,10 +30,7 @@ class SubcontractorsLandingPageControllerSpec extends SpecBase with MockitoSugar
   private val instanceId            = "CIS-123"
   private val contractorName        = "ABC Construction Ltd"
   private val agentClientName       = "Client Ltd"
-  private val subcontractorsPageUrl =
-    controllers.subcontractors.routes.SubcontractorsListController
-      .onPageLoad(instanceId)
-      .url
+  private val subcontractorsPageUrl = s"/subcontractors/$instanceId/your-subcontractors"
 
   "SubcontractorsLandingPageController.onPageLoad (contractor)" - {
 
