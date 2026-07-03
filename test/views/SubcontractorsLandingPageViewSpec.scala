@@ -53,6 +53,11 @@ class SubcontractorsLandingPageViewSpec extends SpecBase {
       doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.aside.link1"))
       doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.aside.link2"))
       doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.aside.link3"))
+      doc
+        .select(
+          s"a[href='${controllers.subcontractors.routes.GetSubcontractorListController.onPageLoad().url}']"
+        )
+        .text                                   must include(messages("subcontractorsLandingPage.subcontractorList"))
     }
   }
 
