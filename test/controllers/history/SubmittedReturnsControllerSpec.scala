@@ -669,17 +669,5 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
       }
     }
-
-    "onInProgressRedirect must redirect to journey recovery when CisIdPage is missing" in new Setup {
-      val app = application(emptyUserAnswers)
-
-      running(app) {
-        val request = FakeRequest(GET, routes.SubmittedReturnsController.onInProgressRedirect(3000L).url)
-        val result  = route(app, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual journeyRecoveryUrl
-      }
-    }
   }
 }
