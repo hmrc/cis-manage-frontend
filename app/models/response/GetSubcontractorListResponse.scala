@@ -83,28 +83,36 @@ final case class GetSubcontractor(
   pendingVerifications: Option[Int]
 ) {
 
-  def displayName: String =
-    (
-      subcontractorType.map(_.toLowerCase),
-      firstName,
-      surname,
-      tradingName
-    ) match {
-      case (Some("soletrader"), Some(firstName), Some(surname), _) =>
-        s"$firstName $surname"
+  private def normalisedType: Option[String] =
+    subcontractorType.map(_.trim.toLowerCase.replace(" ", ""))
 
-      case (Some("soletrader"), None, Some(surname), _) =>
-        surname
+  def displayName: String = {
+    val personalName =
+      Seq(firstName, secondName, surname).flatten.map(_.trim).filter(_.nonEmpty).mkString(" ")
 
-      case (Some("soletrader" | "company" | "trust"), _, _, Some(tradingName)) =>
+    normalisedType match {
+      case Some("soletrader" | "individual") if personalName.nonEmpty =>
+        personalName
+
+      case Some("partnership") =>
+        partnershipTradingName
+          .orElse(tradingName)
+          .filter(_.trim.nonEmpty)
+          .getOrElse(if (personalName.nonEmpty) personalName else "No name provided")
+
+      case Some("company" | "trust" | "soletrader" | "individual") =>
         tradingName
-
-      case (Some("partnership"), _, _, Some(tradingName)) =>
-        partnershipTradingName.getOrElse(tradingName)
+          .filter(_.trim.nonEmpty)
+          .getOrElse(if (personalName.nonEmpty) personalName else "No name provided")
 
       case _ =>
-        "No name provided"
+        tradingName
+          .orElse(partnershipTradingName)
+          .filter(_.trim.nonEmpty)
+          .getOrElse(if (personalName.nonEmpty) personalName else "No name provided")
     }
+  }
+
 }
 
 object GetSubcontractor {

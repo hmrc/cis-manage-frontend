@@ -70,13 +70,22 @@ class GetSubcontractorListResponseSpec extends SpecBase {
 
   "GetSubcontractor" - {
 
-    "must return first name and surname for a sole trader" in {
-      subcontractor.displayName mustEqual "Alan Smith"
+    "must return first name, second name and surname for a sole trader" in {
+      subcontractor.displayName mustEqual "Alan James Smith"
     }
 
-    "must return surname when a sole trader has no first name" in {
+    "must return second name and surname when a sole trader has no first name" in {
       subcontractor
         .copy(firstName = None)
+        .displayName mustEqual "James Smith"
+    }
+
+    "must return surname when a sole trader has no first or second name" in {
+      subcontractor
+        .copy(
+          firstName = None,
+          secondName = None
+        )
         .displayName mustEqual "Smith"
     }
 
@@ -84,6 +93,7 @@ class GetSubcontractorListResponseSpec extends SpecBase {
       subcontractor
         .copy(
           firstName = None,
+          secondName = None,
           surname = None
         )
         .displayName mustEqual "Alan Smith Builders"
@@ -94,6 +104,7 @@ class GetSubcontractorListResponseSpec extends SpecBase {
         .copy(
           subcontractorType = Some("company"),
           firstName = None,
+          secondName = None,
           surname = None
         )
         .displayName mustEqual "Alan Smith Builders"
@@ -104,6 +115,7 @@ class GetSubcontractorListResponseSpec extends SpecBase {
         .copy(
           subcontractorType = Some("trust"),
           firstName = None,
+          secondName = None,
           surname = None
         )
         .displayName mustEqual "Alan Smith Builders"
@@ -114,6 +126,7 @@ class GetSubcontractorListResponseSpec extends SpecBase {
         .copy(
           subcontractorType = Some("partnership"),
           firstName = None,
+          secondName = None,
           surname = None
         )
         .displayName mustEqual "Alan Smith Partnership"
@@ -124,8 +137,30 @@ class GetSubcontractorListResponseSpec extends SpecBase {
         .copy(
           subcontractorType = Some("partnership"),
           firstName = None,
+          secondName = None,
           surname = None,
           partnershipTradingName = None
+        )
+        .displayName mustEqual "Alan Smith Builders"
+    }
+
+    "must return personal name for an individual" in {
+      subcontractor
+        .copy(subcontractorType = Some("Individual"))
+        .displayName mustEqual "Alan James Smith"
+    }
+
+    "must return personal name for a sole trader with a spaced type value" in {
+      subcontractor
+        .copy(subcontractorType = Some("sole trader"))
+        .displayName mustEqual "Alan James Smith"
+    }
+
+    "must fall back to trading name for an unknown subcontractor type" in {
+      subcontractor
+        .copy(
+          subcontractorType = Some("unknown"),
+          tradingName = Some("Alan Smith Builders")
         )
         .displayName mustEqual "Alan Smith Builders"
     }
@@ -135,8 +170,10 @@ class GetSubcontractorListResponseSpec extends SpecBase {
         .copy(
           subcontractorType = None,
           firstName = None,
+          secondName = None,
           surname = None,
-          tradingName = None
+          tradingName = None,
+          partnershipTradingName = None
         )
         .displayName mustEqual "No name provided"
     }
@@ -160,7 +197,7 @@ class GetSubcontractorListResponseSpec extends SpecBase {
         subcontractorsJson.value.head.as[JsObject]
 
       subcontractorJson.value("subcontractorId") mustEqual Json.toJson(123L)
-      subcontractorJson.value("displayName") mustEqual JsString("Alan Smith")
+      subcontractorJson.value("displayName") mustEqual JsString("Alan James Smith")
     }
 
     "must read a response from JSON" in {
