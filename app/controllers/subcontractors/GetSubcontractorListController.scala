@@ -20,6 +20,7 @@ import controllers.actions.*
 import pages.subcontractors.SubcontractorListPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.Logging
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -42,7 +43,8 @@ class GetSubcontractorListController @Inject() (
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
@@ -70,13 +72,15 @@ class GetSubcontractorListController @Inject() (
                 }
               }
 
-            case Failure(_) =>
+            case Failure(e) =>
+              logger.error(s"Failed to store subcontractor list in session for cisId ${request.cisId}", e)
               Future.successful(
                 Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
               )
           }
         }
-        .recover { case _ =>
+        .recover { case e =>
+          logger.error(s"Failed to retrieve subcontractor list for cisId ${request.cisId}", e)
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }

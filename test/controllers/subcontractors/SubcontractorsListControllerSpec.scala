@@ -435,5 +435,25 @@ class SubcontractorsListControllerSpec extends SpecBase {
           controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+
+    "must redirect to no subcontractors exist when the stored list is empty" in {
+      val application =
+        applicationBuilder(
+          userAnswers = Some(
+            emptyUserAnswers
+              .set(SubcontractorListPage, GetSubcontractorListResponse(Seq.empty))
+              .success
+              .value
+          )
+        ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.NoSubcontractorsExistController.onPageLoad().url
+      }
+    }
   }
 }

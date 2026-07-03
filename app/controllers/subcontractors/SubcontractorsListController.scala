@@ -95,7 +95,7 @@ class SubcontractorsListController @Inject() (
       id = subcontractor.subcontractorId.toString,
       name = subcontractor.displayName,
       utr = subcontractor.utr.getOrElse(""),
-      verified = subcontractor.verified.contains("Y"),
+      verified = subcontractor.verified.exists(_.equalsIgnoreCase("Y")),
       verificationNumber = subcontractor.verificationNumber.getOrElse(""),
       taxTreatment = toTaxTreatment(subcontractor.taxTreatment),
       dateAdded = subcontractor.createDate
@@ -379,7 +379,7 @@ class SubcontractorsListController @Inject() (
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       rowsFromUserAnswers(request.userAnswers) match {
-        case Some(allRows) =>
+        case Some(allRows) if allRows.nonEmpty =>
           renderPage(
             allRows,
             instanceId,
@@ -387,6 +387,9 @@ class SubcontractorsListController @Inject() (
             page,
             getListFilters(request)
           )
+
+        case Some(_) =>
+          Redirect(routes.NoSubcontractorsExistController.onPageLoad())
 
         case None =>
           Redirect(
