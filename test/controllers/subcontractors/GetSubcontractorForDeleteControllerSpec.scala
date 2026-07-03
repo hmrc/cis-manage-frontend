@@ -34,6 +34,7 @@ class GetSubcontractorForDeleteControllerSpec extends SpecBase with MockitoSugar
 
   val subbieResourceRef = 10L
   val cisId             = "123"
+  val displayName       = "subcontractor Name"
 
   val okResponse = GetSubcontractorForDeleteResponse(
     subcontractorCanBeDeleted = true
@@ -45,7 +46,7 @@ class GetSubcontractorForDeleteControllerSpec extends SpecBase with MockitoSugar
 
   lazy val routeUrl: String =
     controllers.subcontractors.routes.GetSubcontractorForDeleteController
-      .onPageLoad(subbieResourceRef)
+      .onPageLoad(subbieResourceRef, displayName)
       .url
 
   "GetSubcontractorForDeleteController" - {

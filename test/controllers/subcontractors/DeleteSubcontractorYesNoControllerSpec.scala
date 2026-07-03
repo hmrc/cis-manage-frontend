@@ -19,12 +19,13 @@ package controllers.subcontractors
 import base.SpecBase
 import controllers.routes
 import forms.subcontractors.DeleteSubcontractorYesNoFormProvider
+import models.subcontractors.DeleteSubcontractorJourneyData
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.subcontractors.DeleteSubcontractorYesNoPage
+import pages.subcontractors.{DeleteSubcontractorJourneyPage, DeleteSubcontractorYesNoPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -44,11 +45,23 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
   lazy val deleteSubcontractorYesNoRoute =
     controllers.subcontractors.routes.DeleteSubcontractorYesNoController.onPageLoad().url
 
+  private val journeyData =
+    DeleteSubcontractorJourneyData(
+      subcontractorName = subcontractorName,
+      subbieResourceRef = 10L,
+      subcontractorCanBeDeleted = true
+    )
+
+  private val userAnswersWithJourney =
+    emptyUserAnswers
+      .set(DeleteSubcontractorJourneyPage, journeyData)
+      .success
+      .value
   "DeleteSubcontractorYesNo Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithJourney)).build()
 
       running(application) {
         val request = FakeRequest(GET, deleteSubcontractorYesNoRoute)
@@ -67,7 +80,14 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(DeleteSubcontractorYesNoPage, true).success.value
+      val userAnswers =
+        UserAnswers(userAnswersId)
+          .set(DeleteSubcontractorJourneyPage, journeyData)
+          .success
+          .value
+          .set(DeleteSubcontractorYesNoPage, true)
+          .success
+          .value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -79,10 +99,12 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(subcontractorName, form.fill(true), NormalMode)(
-          request,
-          messages(application)
-        ).toString
+
+        contentAsString(result) mustEqual view(
+          subcontractorName,
+          form.fill(true),
+          NormalMode
+        )(request, messages(application)).toString
       }
     }
 
@@ -93,7 +115,7 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswersWithJourney))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -114,7 +136,7 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithJourney)).build()
 
       running(application) {
         val request =
@@ -146,6 +168,41 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to CannotDeleteSubcontractorController when canBeDeleted is false" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(
+            DeleteSubcontractorJourneyPage,
+            DeleteSubcontractorJourneyData(
+              subcontractorName = subcontractorName,
+              subbieResourceRef = 10L,
+              subcontractorCanBeDeleted = false
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, deleteSubcontractorYesNoRoute)
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.subcontractors.routes.CannotDeleteSubcontractorController
+            .onPageLoad()
+            .url
       }
     }
 

@@ -39,12 +39,12 @@
     pageNavigator: components.PageNavigatorSubcontractorsList
 )
 
-@(form: Form[_], mode: Mode, rows: Seq[SubcontractorsListRow], paginationViewModel: PaginationViewModel, page: Int, totalPages: Int, startIndex: Int, totalCount: Int, instanceId: String,
+@(form: Form[_], rows: Seq[SubcontractorsListRow], paginationViewModel: PaginationViewModel, page: Int, totalPages: Int, startIndex: Int, totalCount: Int, instanceId: String,
 searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("subcontractors.subcontractorsList.title"))) {
 
-    @formHelper(action = controllers.subcontractors.routes.SubcontractorsListController.onSubmit(instanceId, mode, page)) {
+    @formHelper(action = controllers.subcontractors.routes.SubcontractorsListController.onSubmit(instanceId, page)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -152,7 +152,7 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
 
                 @link(
                 linkTextKey = "subcontractors.subcontractorsList.clearFilters",
-                linkUrl = controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
+                linkUrl = controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId).url
                 )
 
             </div>
@@ -219,15 +219,24 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
                        )
                     ),
                        TableRow(Text(row.dateAdded)),
-                       TableRow(
-                           HtmlContent(
-                            "<a class=\"govuk-link\" href=\"#\">" +
-                            "Delete" +
-                            "<span class=\"govuk-visually-hidden\"> " +
-                              HtmlFormat.escape(row.name) +
-                              "</span></a>"
-                            )
-                       )
+                TableRow(Text(row.dateAdded)),
+                TableRow(
+                HtmlContent(
+                s"""
+                |<a class="govuk-link"
+                |   href="${HtmlFormat.escape(
+                            controllers.subcontractors.routes.GetSubcontractorForDeleteController
+                              .onPageLoad(row.subbieResourceRef, row.name)
+                              .url
+                          )}">
+                |  ${messages("subcontractors.subcontractorsList.delete")}
+                |  <span class="govuk-visually-hidden">
+                |    ${HtmlFormat.escape(row.name)}
+                |  </span>
+                |</a>
+                |""".stripMargin
+                )
+                )
                     )
                 },
 

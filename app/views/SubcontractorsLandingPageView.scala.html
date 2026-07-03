@@ -34,7 +34,7 @@
     caption: Caption,
 )
 
-@(contractorName: String)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
+@(contractorName: String, subcontractorsPageUrl: String)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
 
 @sidebar = {
     @aside("contractorLanding.sidebar.title", nav(Seq(
@@ -71,7 +71,7 @@
 
     @oneColumnGrid(
         HtmlFormat.fill(Seq(
-            headingLink("subcontractorsLandingPage.subcontractorList", "#"),
+            headingLink("subcontractorsLandingPage.subcontractorList", subcontractorsPageUrl),
             paragraph("subcontractorsLandingPage.subcontractorList.p1")
         )),
     )

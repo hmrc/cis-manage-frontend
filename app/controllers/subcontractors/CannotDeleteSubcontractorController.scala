@@ -17,6 +17,7 @@
 package controllers.subcontractors
 
 import controllers.actions.*
+import pages.subcontractors.DeleteSubcontractorJourneyPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -29,16 +30,37 @@ class CannotDeleteSubcontractorController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  requireCisId: CisIdRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: CannotDeleteSubcontractorView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    // TODO: subcontractorName to be retrieved from F8 - Retrieve Subcontractor for Delete business function
-    // TODO: Once the SL-01-01 - Subcontractor List page is implemented, the url should be updated to point to the subcontractor details page
-    val subcontractorsPageUrl = "#"
-    val subcontractorName     = "subcontractor Name"
-    Ok(view(subcontractorName, subcontractorsPageUrl))
-  }
+  def onPageLoad: Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId) { implicit request =>
+      request.userAnswers
+        .get(DeleteSubcontractorJourneyPage)
+        .fold {
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        } { journeyData =>
+          if (journeyData.subcontractorCanBeDeleted) {
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          } else {
+
+            val subcontractorsPageUrl =
+              controllers.subcontractors.routes.SubcontractorsListController
+                .onPageLoad(
+                  request.cisId
+                )
+                .url
+
+            Ok(
+              view(
+                subcontractorName = journeyData.subcontractorName,
+                subcontractorsPageUrl = subcontractorsPageUrl
+              )
+            )
+          }
+        }
+    }
 }

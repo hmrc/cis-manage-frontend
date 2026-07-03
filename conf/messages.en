@@ -675,6 +675,7 @@ subcontractors.subcontractorsList.backTo                                    = Ba
 subcontractors.subcontractorsList.manage                                    = Manage your subcontractors
 subcontractors.subcontractorsList.searchAndFilter                           = Search and filter
 subcontractors.subcontractorsList.clearFilters                              = Clear
+subcontractors.subcontractorsList.delete                                    = Delete
 
 subcontractors.noSubcontractorsExist.title = No subcontractors to view
 subcontractors.noSubcontractorsExist.heading = Your subcontractors

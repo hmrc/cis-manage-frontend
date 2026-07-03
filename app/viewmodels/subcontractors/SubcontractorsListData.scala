@@ -20,44 +20,54 @@ object SubcontractorsListData {
 
   val rows: Seq[SubcontractorsListRow] = Seq(
     SubcontractorsListRow(
-      "Grantalan",
-      "Grant, Alan",
-      "0991272528",
-      false,
-      "V0001256246",
-      TaxTreatment.StandardRate,
-      "11 May 2020",
-      1L
+      id = "Grantalan",
+      name = "Grant, Alan",
+      utr = "0991272528",
+      verified = false,
+      verificationNumber = "V0001256246",
+      taxTreatment = TaxTreatment.StandardRate,
+      dateAdded = "11 May 2020",
+      subbieResourceRef = 1L
     ),
     SubcontractorsListRow(
-      "Hammondhouse",
-      "Hammond House",
-      "2904743750",
-      true,
-      "V0001217702",
-      TaxTreatment.Gross,
-      "1 Oct 2025",
-      2L
+      id = "Hammondhouse",
+      name = "Hammond House",
+      utr = "2904743750",
+      verified = true,
+      verificationNumber = "V0001217702",
+      taxTreatment = TaxTreatment.Gross,
+      dateAdded = "1 Oct 2025",
+      subbieResourceRef = 2L
     ),
     SubcontractorsListRow(
-      "Ingenresearch",
-      "InGen Research",
-      "9347488729",
-      false,
-      "V0005617876",
-      TaxTreatment.StandardRate,
-      "1 Mar 2020",
-      3L
+      id = "Ingenresearch",
+      name = "InGen Research",
+      utr = "9347488729",
+      verified = false,
+      verificationNumber = "V0005617876",
+      taxTreatment = TaxTreatment.StandardRate,
+      dateAdded = "1 Mar 2020",
+      subbieResourceRef = 3L
     ),
     SubcontractorsListRow(
-      "Malcolmandsattler",
-      "Malcolm And Sattler",
-      "0074742762",
-      true,
-      "V0004635231",
-      TaxTreatment.HigherRate,
-      "1 Oct 2025",
-      4L
+      id = "Malcolmandsattler",
+      name = "Malcolm And Sattler",
+      utr = "0074742762",
+      verified = true,
+      verificationNumber = "V0004635231",
+      taxTreatment = TaxTreatment.HigherRate,
+      dateAdded = "1 Oct 2025",
+      subbieResourceRef = 4L
+    ),
+    SubcontractorsListRow(
+      id = "brightwellPartners",
+      name = "Brightwell Partners",
+      utr = "1234567890",
+      verified = false,
+      verificationNumber = "V0007771001",
+      taxTreatment = TaxTreatment.StandardRate,
+      dateAdded = "23 Apr 2026",
+      subbieResourceRef = 5L
     ),
     SubcontractorsListRow(
       "brightwellPartners",

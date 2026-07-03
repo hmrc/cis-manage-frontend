@@ -17,15 +17,20 @@
 package controllers.subcontractors
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import models.requests.DataRequest
+import models.subcontractors.DeleteSubcontractorJourneyData
 import pages.CisIdPage
+import pages.subcontractors.DeleteSubcontractorJourneyPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class GetSubcontractorForDeleteController @Inject() (
   override val messagesApi: MessagesApi,
@@ -33,6 +38,7 @@ class GetSubcontractorForDeleteController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   subcontractorService: SubcontractorService,
+  sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -40,7 +46,8 @@ class GetSubcontractorForDeleteController @Inject() (
     with Logging {
 
   def onPageLoad(
-    subbieResourceRef: Long
+    subbieResourceRef: Long,
+    displayName: String
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       request.userAnswers.get(CisIdPage) match {
@@ -48,11 +55,13 @@ class GetSubcontractorForDeleteController @Inject() (
         case Some(instanceId) =>
           subcontractorService
             .getSubcontractorDeleteStatus(instanceId, subbieResourceRef)
-            .map { response =>
-              if (response.subcontractorCanBeDeleted) {
-                Redirect(routes.DeleteSubcontractorYesNoController.onPageLoad())
-              } else {
-                Redirect(routes.CannotDeleteSubcontractorController.onPageLoad())
+            .flatMap { response =>
+              saveJourneyData(
+                displayName = displayName,
+                subbieResourceRef = subbieResourceRef,
+                canBeDeleted = response.subcontractorCanBeDeleted
+              ).map { _ =>
+                redirectToNextPage(response.subcontractorCanBeDeleted)
               }
             }
             .recover { case ex =>
@@ -61,15 +70,59 @@ class GetSubcontractorForDeleteController @Inject() (
                   s"(instanceId=$instanceId, subbieResourceRef=$subbieResourceRef)",
                 ex
               )
-              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+              journeyRecoveryRedirect
             }
 
         case None =>
-          logger.error("[SubcontractorController][onPageLoad] Missing CisId in UserAnswers")
-          Future.successful(
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          logger.error(
+            "[GetSubcontractorForDeleteController] Missing CisId in UserAnswers"
           )
+
+          Future.successful(journeyRecoveryRedirect)
       }
     }
 
+  private def saveJourneyData(
+    displayName: String,
+    subbieResourceRef: Long,
+    canBeDeleted: Boolean
+  )(implicit request: DataRequest[_]): Future[Unit] = {
+
+    val journeyData =
+      DeleteSubcontractorJourneyData(
+        subcontractorName = displayName,
+        subbieResourceRef = subbieResourceRef,
+        subcontractorCanBeDeleted = canBeDeleted
+      )
+
+    request.userAnswers
+      .set(DeleteSubcontractorJourneyPage, journeyData) match {
+
+      case Success(updatedAnswers) =>
+        sessionRepository
+          .set(updatedAnswers)
+          .map(_ => ())
+
+      case Failure(ex) =>
+        logger.error(
+          "[GetSubcontractorForDeleteController] Failed to save delete journey data",
+          ex
+        )
+
+        Future.failed(ex)
+    }
+  }
+
+  private def redirectToNextPage(
+    canDelete: Boolean
+  ) =
+    if (canDelete) {
+      Redirect(routes.DeleteSubcontractorYesNoController.onPageLoad())
+    } else {
+      Redirect(routes.CannotDeleteSubcontractorController.onPageLoad())
+    }
+
+  private def journeyRecoveryRedirect =
+    Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 }
