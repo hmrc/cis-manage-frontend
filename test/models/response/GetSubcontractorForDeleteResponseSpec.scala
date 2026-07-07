@@ -26,13 +26,16 @@ class GetSubcontractorForDeleteResponseSpec extends AnyFreeSpec with Matchers {
 
     "must serialise to JSON correctly" in {
 
-      val model = GetSubcontractorForDeleteResponse(
-        subcontractorCanBeDeleted = true
-      )
+      val model =
+        GetSubcontractorForDeleteResponse(
+          subcontractorName = "Gamma Builders",
+          subcontractorCanBeDeleted = true
+        )
 
-      val json = Json.toJson(model)
+      val result = Json.toJson(model)
 
-      json mustBe Json.obj(
+      result mustBe Json.obj(
+        "subcontractorName"         -> "Gamma Builders",
         "subcontractorCanBeDeleted" -> true
       )
     }
@@ -40,40 +43,57 @@ class GetSubcontractorForDeleteResponseSpec extends AnyFreeSpec with Matchers {
     "must deserialise from JSON correctly" in {
 
       val json = Json.obj(
+        "subcontractorName"         -> "Gamma Builders",
         "subcontractorCanBeDeleted" -> false
       )
 
       val result = json.as[GetSubcontractorForDeleteResponse]
 
       result mustBe GetSubcontractorForDeleteResponse(
+        subcontractorName = "Gamma Builders",
         subcontractorCanBeDeleted = false
       )
     }
 
-    "must handle round-trip JSON conversion" in {
+    "must handle round-trip conversion correctly" in {
 
-      val model = GetSubcontractorForDeleteResponse(
-        subcontractorCanBeDeleted = true
-      )
+      val model =
+        GetSubcontractorForDeleteResponse(
+          subcontractorName = "Gamma Builders",
+          subcontractorCanBeDeleted = true
+        )
 
-      val json   = Json.toJson(model)
-      val parsed = json.as[GetSubcontractorForDeleteResponse]
+      val json = Json.toJson(model)
 
-      parsed mustBe model
+      json.as[GetSubcontractorForDeleteResponse] mustBe model
     }
 
-    "must fail to deserialise when required field is missing" in {
+    "must fail to deserialise when subcontractorName is missing" in {
 
-      val json = Json.obj()
+      val json = Json.obj(
+        "subcontractorCanBeDeleted" -> true
+      )
 
       val result = json.validate[GetSubcontractorForDeleteResponse]
 
       result.isError mustBe true
     }
 
-    "must fail to deserialise when field type is incorrect" in {
+    "must fail to deserialise when subcontractorCanBeDeleted is missing" in {
 
       val json = Json.obj(
+        "subcontractorName" -> "Gamma Builders"
+      )
+
+      val result = json.validate[GetSubcontractorForDeleteResponse]
+
+      result.isError mustBe true
+    }
+
+    "must fail to deserialise when subcontractorCanBeDeleted has an invalid type" in {
+
+      val json = Json.obj(
+        "subcontractorName"         -> "Gamma Builders",
         "subcontractorCanBeDeleted" -> "not-a-boolean"
       )
 

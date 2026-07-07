@@ -227,7 +227,7 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       doc.select("select[name=taxTreatment] option[selected]").attr("value") mustBe "gross"
     }
 
-    "must render visually hidden subcontractor names for delete links" in new Setup {
+    "must render delete links for each subcontractor" in new Setup {
 
       val html =
         view(
@@ -246,11 +246,14 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
 
       val doc = Jsoup.parse(html.body)
 
-      val hiddenText =
-        doc.select(".govuk-visually-hidden").eachText()
-
       rows.foreach { row =>
-        hiddenText must contain(row.name)
+
+        val expectedUrl =
+          controllers.subcontractors.routes.GetSubcontractorForDeleteController
+            .onPageLoad(row.subbieResourceRef)
+            .url
+
+        doc.select(s"a[href='$expectedUrl']").size() mustBe 1
       }
     }
   }

@@ -33,8 +33,8 @@ class SubcontractorServiceSpec extends AnyFreeSpec with Matchers with MockitoSug
   implicit val ec: ExecutionContext = ExecutionContext.global
   implicit val hc: HeaderCarrier    = HeaderCarrier()
 
-  val cisId             = "123"
-  val subbieResourceRef = 10L
+  private val cisId             = "123"
+  private val subbieResourceRef = 10L
 
   "SubcontractorService#getSubcontractorDeleteStatus" - {
 
@@ -42,22 +42,33 @@ class SubcontractorServiceSpec extends AnyFreeSpec with Matchers with MockitoSug
 
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
 
-      val response = GetSubcontractorForDeleteResponse(
-        subcontractorCanBeDeleted = true
-      )
+      val response =
+        GetSubcontractorForDeleteResponse(
+          subcontractorName = "Gamma Builders",
+          subcontractorCanBeDeleted = true
+        )
 
       when(
-        mockConnector.getSubcontractorDeleteStatus(eqTo(cisId), eqTo(subbieResourceRef))(any())
+        mockConnector.getSubcontractorDeleteStatus(
+          eqTo(cisId),
+          eqTo(subbieResourceRef)
+        )(any())
       ).thenReturn(Future.successful(response))
 
       val service = new SubcontractorService(mockConnector)
 
       val result =
-        service.getSubcontractorDeleteStatus(cisId, subbieResourceRef).futureValue
+        service
+          .getSubcontractorDeleteStatus(cisId, subbieResourceRef)
+          .futureValue
 
       result mustBe response
 
-      verify(mockConnector).getSubcontractorDeleteStatus(eqTo(cisId), eqTo(subbieResourceRef))(any())
+      verify(mockConnector)
+        .getSubcontractorDeleteStatus(
+          eqTo(cisId),
+          eqTo(subbieResourceRef)
+        )(any())
     }
 
     "must propagate failure from connector" in {
@@ -65,17 +76,31 @@ class SubcontractorServiceSpec extends AnyFreeSpec with Matchers with MockitoSug
       val mockConnector = mock[ConstructionIndustrySchemeConnector]
 
       when(
-        mockConnector.getSubcontractorDeleteStatus(eqTo(cisId), eqTo(subbieResourceRef))(any())
-      ).thenReturn(Future.failed(new RuntimeException("boom")))
+        mockConnector.getSubcontractorDeleteStatus(
+          eqTo(cisId),
+          eqTo(subbieResourceRef)
+        )(any())
+      ).thenReturn(
+        Future.failed(
+          new RuntimeException("boom")
+        )
+      )
 
       val service = new SubcontractorService(mockConnector)
 
-      val result =
-        service.getSubcontractorDeleteStatus(cisId, subbieResourceRef)
+      val exception =
+        service
+          .getSubcontractorDeleteStatus(cisId, subbieResourceRef)
+          .failed
+          .futureValue
 
-      result.failed.futureValue.getMessage mustBe "boom"
+      exception.getMessage mustBe "boom"
 
-      verify(mockConnector).getSubcontractorDeleteStatus(eqTo(cisId), eqTo(subbieResourceRef))(any())
+      verify(mockConnector)
+        .getSubcontractorDeleteStatus(
+          eqTo(cisId),
+          eqTo(subbieResourceRef)
+        )(any())
     }
   }
 }

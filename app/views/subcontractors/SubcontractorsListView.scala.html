@@ -219,24 +219,19 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
                        )
                     ),
                        TableRow(Text(row.dateAdded)),
-                TableRow(Text(row.dateAdded)),
-                TableRow(
-                HtmlContent(
-                s"""
-                |<a class="govuk-link"
-                |   href="${HtmlFormat.escape(
-                            controllers.subcontractors.routes.GetSubcontractorForDeleteController
-                              .onPageLoad(row.subbieResourceRef, row.name)
-                              .url
-                          )}">
-                |  ${messages("subcontractors.subcontractorsList.delete")}
-                |  <span class="govuk-visually-hidden">
-                |    ${HtmlFormat.escape(row.name)}
-                |  </span>
-                |</a>
-                |""".stripMargin
-                )
-                )
+                       TableRow(
+                        HtmlContent(
+                            link(
+                                linkTextKey = "subcontractors.subcontractorsList.delete",
+                                linkUrl = controllers.subcontractors.routes.GetSubcontractorForDeleteController
+                                    .onPageLoad(row.subbieResourceRef)
+                                    .url,
+                                paragraphWrapped = false,
+                                visuallyHiddenText = Some(row.name)
+                            ).body
+                        )
+                       )
+
                     )
                 },
 

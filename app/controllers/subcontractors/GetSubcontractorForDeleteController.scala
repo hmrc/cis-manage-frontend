@@ -46,8 +46,7 @@ class GetSubcontractorForDeleteController @Inject() (
     with Logging {
 
   def onPageLoad(
-    subbieResourceRef: Long,
-    displayName: String
+    subbieResourceRef: Long
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       request.userAnswers.get(CisIdPage) match {
@@ -57,7 +56,7 @@ class GetSubcontractorForDeleteController @Inject() (
             .getSubcontractorDeleteStatus(instanceId, subbieResourceRef)
             .flatMap { response =>
               saveJourneyData(
-                displayName = displayName,
+                displayName = response.subcontractorName,
                 subbieResourceRef = subbieResourceRef,
                 canBeDeleted = response.subcontractorCanBeDeleted
               ).map { _ =>

@@ -22,7 +22,7 @@ import models.Scheme
 import models.agent.AgentClientData
 import models.history.{SubmittedSchemeData, SubmittedSubmissionData}
 import models.requests.{DeleteUnsubmittedMonthlyReturnRequest, GetSubmittedMonthlyReturnsDataRequest}
-import models.response.GetSubmittedMonthlyReturnsDataResponse
+import models.response.{GetSubcontractorForDeleteResponse, GetSubmittedMonthlyReturnsDataResponse}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -1009,57 +1009,106 @@ class ConstructionIndustrySchemeConnectorSpec
     val subbieResourceRef = 10L
 
     "return response when BE returns 200 with valid JSON" in {
+
       stubFor(
-        get(urlPathEqualTo(s"/cis/subcontractor/$cisId/$subbieResourceRef/delete-status"))
-          .willReturn(
-            aResponse()
-              .withStatus(OK)
-              .withBody(
-                """{
-                  |  "subcontractorCanBeDeleted": true
-                  |}""".stripMargin
-              )
+        get(
+          urlPathEqualTo(
+            s"/cis/subcontractor/$cisId/$subbieResourceRef/delete-status"
           )
+        ).willReturn(
+          aResponse()
+            .withStatus(OK)
+            .withHeader("Content-Type", "application/json")
+            .withBody(
+              """{
+                |  "subcontractorName": "Gamma Builders",
+                |  "subcontractorCanBeDeleted": true
+                |}""".stripMargin
+            )
+        )
       )
 
       val result =
-        connector.getSubcontractorDeleteStatus(cisId, subbieResourceRef).futureValue
+        connector
+          .getSubcontractorDeleteStatus(cisId, subbieResourceRef)
+          .futureValue
 
-      result.subcontractorCanBeDeleted mustBe true
+      result mustBe GetSubcontractorForDeleteResponse(
+        subcontractorName = "Gamma Builders",
+        subcontractorCanBeDeleted = true
+      )
     }
 
     "fail when BE returns 200 with invalid JSON" in {
+
       stubFor(
-        get(urlPathEqualTo(s"/cis/subcontractor/$cisId/$subbieResourceRef/delete-status"))
-          .willReturn(
-            aResponse()
-              .withStatus(OK)
-              .withBody("""{ "unexpectedField": true }""")
+        get(
+          urlPathEqualTo(
+            s"/cis/subcontractor/$cisId/$subbieResourceRef/delete-status"
           )
+        ).willReturn(
+          aResponse()
+            .withStatus(OK)
+            .withHeader("Content-Type", "application/json")
+            .withBody("""{ "unexpectedField": true }""")
+        )
       )
 
-      val ex = intercept[Exception] {
-        connector.getSubcontractorDeleteStatus(cisId, subbieResourceRef).futureValue
-      }
+      val ex =
+        connector
+          .getSubcontractorDeleteStatus(cisId, subbieResourceRef)
+          .failed
+          .futureValue
 
-      ex.getMessage.toLowerCase must include("canbedeleted")
+      ex.getMessage.toLowerCase must include("subcontractor")
+    }
+
+    "propagate an upstream error when BE returns 400" in {
+
+      stubFor(
+        get(
+          urlPathEqualTo(
+            s"/cis/subcontractor/$cisId/$subbieResourceRef/delete-status"
+          )
+        ).willReturn(
+          aResponse()
+            .withStatus(BAD_REQUEST)
+            .withBody("""{"message":"bad request"}""")
+        )
+      )
+
+      val ex =
+        connector
+          .getSubcontractorDeleteStatus(cisId, subbieResourceRef)
+          .failed
+          .futureValue
+
+      ex mustBe a[UpstreamErrorResponse]
+      ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe BAD_REQUEST
     }
 
     "propagate an upstream error when BE returns 500" in {
+
       stubFor(
-        get(urlPathEqualTo(s"/cis/subcontractor/$cisId/$subbieResourceRef/delete-status"))
-          .willReturn(
-            aResponse()
-              .withStatus(INTERNAL_SERVER_ERROR)
-              .withBody("boom")
+        get(
+          urlPathEqualTo(
+            s"/cis/subcontractor/$cisId/$subbieResourceRef/delete-status"
           )
+        ).willReturn(
+          aResponse()
+            .withStatus(INTERNAL_SERVER_ERROR)
+            .withBody("boom")
+        )
       )
 
-      val ex = intercept[Exception] {
-        connector.getSubcontractorDeleteStatus(cisId, subbieResourceRef).futureValue
-      }
+      val ex =
+        connector
+          .getSubcontractorDeleteStatus(cisId, subbieResourceRef)
+          .failed
+          .futureValue
 
-      ex.getMessage must include("returned 500")
+      ex mustBe a[UpstreamErrorResponse]
+      ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe INTERNAL_SERVER_ERROR
     }
   }
 }

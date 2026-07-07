@@ -19,7 +19,8 @@ package models.response
 import play.api.libs.json.{Json, OFormat}
 
 final case class GetSubcontractorForDeleteResponse(
-  subcontractorCanBeDeleted: Boolean
+  subcontractorCanBeDeleted: Boolean,
+  subcontractorName: String
 )
 
 object GetSubcontractorForDeleteResponse {

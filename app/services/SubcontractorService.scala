@@ -19,7 +19,6 @@ package services
 import com.google.inject.{Inject, Singleton}
 import connectors.ConstructionIndustrySchemeConnector
 import models.response.GetSubcontractorForDeleteResponse
-import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,8 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class SubcontractorService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector
-)(using ExecutionContext)
-    extends Logging {
+)(using ExecutionContext) {
 
   def getSubcontractorDeleteStatus(
     cisId: String,

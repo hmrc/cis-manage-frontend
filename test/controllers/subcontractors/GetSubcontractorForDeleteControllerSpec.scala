@@ -34,19 +34,22 @@ class GetSubcontractorForDeleteControllerSpec extends SpecBase with MockitoSugar
 
   val subbieResourceRef = 10L
   val cisId             = "123"
-  val displayName       = "subcontractor Name"
 
-  val okResponse = GetSubcontractorForDeleteResponse(
-    subcontractorCanBeDeleted = true
-  )
+  val okResponse =
+    GetSubcontractorForDeleteResponse(
+      subcontractorName = "Gamma Builders",
+      subcontractorCanBeDeleted = true
+    )
 
-  val cannotDeleteResponse = GetSubcontractorForDeleteResponse(
-    subcontractorCanBeDeleted = false
-  )
+  val cannotDeleteResponse =
+    GetSubcontractorForDeleteResponse(
+      subcontractorName = "Gamma Builders",
+      subcontractorCanBeDeleted = false
+    )
 
   lazy val routeUrl: String =
     controllers.subcontractors.routes.GetSubcontractorForDeleteController
-      .onPageLoad(subbieResourceRef, displayName)
+      .onPageLoad(subbieResourceRef)
       .url
 
   "GetSubcontractorForDeleteController" - {
@@ -54,7 +57,10 @@ class GetSubcontractorForDeleteControllerSpec extends SpecBase with MockitoSugar
     "must redirect to DeleteSubcontractorYesNoController when subcontractor can be deleted" in {
 
       val userAnswers =
-        emptyUserAnswers.set(CisIdPage, cisId).success.value
+        emptyUserAnswers
+          .set(CisIdPage, cisId)
+          .success
+          .value
 
       val mockService = mock[SubcontractorService]
 
@@ -63,7 +69,9 @@ class GetSubcontractorForDeleteControllerSpec extends SpecBase with MockitoSugar
           eqTo(cisId),
           eqTo(subbieResourceRef)
         )(any())
-      ).thenReturn(Future.successful(okResponse))
+      ).thenReturn(
+        Future.successful(okResponse)
+      )
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
@@ -74,22 +82,34 @@ class GetSubcontractorForDeleteControllerSpec extends SpecBase with MockitoSugar
 
       running(application) {
 
-        val request = FakeRequest(GET, routeUrl)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, routeUrl)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.subcontractors.routes.DeleteSubcontractorYesNoController.onPageLoad().url
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.subcontractors.routes.DeleteSubcontractorYesNoController
+            .onPageLoad()
+            .url
 
         verify(mockService)
-          .getSubcontractorDeleteStatus(eqTo(cisId), eqTo(subbieResourceRef))(any())
+          .getSubcontractorDeleteStatus(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any())
       }
     }
 
     "must redirect to CannotDeleteSubcontractorController when subcontractor cannot be deleted" in {
 
       val userAnswers =
-        emptyUserAnswers.set(CisIdPage, cisId).success.value
+        emptyUserAnswers
+          .set(CisIdPage, cisId)
+          .success
+          .value
 
       val mockService = mock[SubcontractorService]
 
@@ -98,7 +118,9 @@ class GetSubcontractorForDeleteControllerSpec extends SpecBase with MockitoSugar
           eqTo(cisId),
           eqTo(subbieResourceRef)
         )(any())
-      ).thenReturn(Future.successful(cannotDeleteResponse))
+      ).thenReturn(
+        Future.successful(cannotDeleteResponse)
+      )
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
@@ -109,30 +131,44 @@ class GetSubcontractorForDeleteControllerSpec extends SpecBase with MockitoSugar
 
       running(application) {
 
-        val request = FakeRequest(GET, routeUrl)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, routeUrl)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          controllers.subcontractors.routes.CannotDeleteSubcontractorController.onPageLoad().url
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.subcontractors.routes.CannotDeleteSubcontractorController
+            .onPageLoad()
+            .url
 
         verify(mockService)
-          .getSubcontractorDeleteStatus(eqTo(cisId), eqTo(subbieResourceRef))(any())
+          .getSubcontractorDeleteStatus(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any())
       }
     }
 
     "must redirect to JourneyRecovery when CisId is missing" in {
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .build()
 
       running(application) {
 
-        val request = FakeRequest(GET, routeUrl)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, routeUrl)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
           routes.JourneyRecoveryController.onPageLoad().url
       }
     }
@@ -140,7 +176,10 @@ class GetSubcontractorForDeleteControllerSpec extends SpecBase with MockitoSugar
     "must redirect to JourneyRecovery when service fails" in {
 
       val userAnswers =
-        emptyUserAnswers.set(CisIdPage, cisId).success.value
+        emptyUserAnswers
+          .set(CisIdPage, cisId)
+          .success
+          .value
 
       val mockService = mock[SubcontractorService]
 
@@ -149,7 +188,9 @@ class GetSubcontractorForDeleteControllerSpec extends SpecBase with MockitoSugar
           eqTo(cisId),
           eqTo(subbieResourceRef)
         )(any())
-      ).thenReturn(Future.failed(new RuntimeException("boom")))
+      ).thenReturn(
+        Future.failed(new RuntimeException("boom"))
+      )
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
@@ -160,12 +201,22 @@ class GetSubcontractorForDeleteControllerSpec extends SpecBase with MockitoSugar
 
       running(application) {
 
-        val request = FakeRequest(GET, routeUrl)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(GET, routeUrl)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
+        val result =
+          route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
           routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(mockService)
+          .getSubcontractorDeleteStatus(
+            eqTo(cisId),
+            eqTo(subbieResourceRef)
+          )(any())
       }
     }
   }
