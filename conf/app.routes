@@ -22,9 +22,6 @@ GET   /subcontractors/cannot-delete-subcontractor-warning  controllers.subcontra
 
 GET   /subcontractors/no-subcontractors-to-view  controllers.subcontractors.NoSubcontractorsExistController.onPageLoad()
 
-GET   /subcontractors/:instanceId/your-subcontractors  controllers.subcontractors.SubcontractorsListController.onPageLoad(instanceId: String, page: Int ?= 1)
-POST  /subcontractors/:instanceId/your-subcontractors  controllers.subcontractors.SubcontractorsListController.onSubmit(instanceId: String, page: Int ?= 1)
-
 GET   /subcontractors/:subbieResourceRef/delete-status/  controllers.subcontractors.GetSubcontractorForDeleteController.onPageLoad(subbieResourceRef: Long)
 
 # Errors & Auth

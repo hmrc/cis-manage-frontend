@@ -34,8 +34,9 @@ class SubcontractorService @Inject() (
     subbieResourceRef: Long
   )(implicit hc: HeaderCarrier): Future[GetSubcontractorForDeleteResponse] =
     cisConnector.getSubcontractorDeleteStatus(cisId, subbieResourceRef)
+
   def getSubcontractorList(
     instanceId: String
   )(implicit hc: HeaderCarrier): Future[GetSubcontractorListResponse] =
-    connector.getSubcontractorList(instanceId)
+    cisConnector.getSubcontractorList(instanceId)
 }

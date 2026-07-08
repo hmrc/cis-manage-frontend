@@ -33,16 +33,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SubcontractorServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar with ScalaFutures {
 
-
   implicit val ec: ExecutionContext = ExecutionContext.global
   implicit val hc: HeaderCarrier    = HeaderCarrier()
 
   private val cisId             = "123"
   private val subbieResourceRef = 10L
-  private val instanceId = "instance-id"
+  private val instanceId        = "instance-id"
 
   "SubcontractorService#getSubcontractorDeleteStatus" - {
-
 
     "must return response from connector when successful" in {
 

@@ -126,7 +126,8 @@ class SubcontractorsListControllerSpec extends SpecBase {
       verified = true,
       verificationNumber = "V000001",
       taxTreatment = TaxTreatment.Gross,
-      dateAdded = "6 Apr 2026"
+      dateAdded = "6 Apr 2026",
+      subbieResourceRef = 10L
     ),
     SubcontractorsListRow(
       id = "2",
@@ -135,7 +136,8 @@ class SubcontractorsListControllerSpec extends SpecBase {
       verified = false,
       verificationNumber = "V000002",
       taxTreatment = TaxTreatment.HigherRate,
-      dateAdded = "6 May 2026"
+      dateAdded = "6 May 2026",
+      subbieResourceRef = 20L
     )
   )
 
@@ -453,6 +455,47 @@ class SubcontractorsListControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.NoSubcontractorsExistController.onPageLoad().url
+      }
+    }
+
+    "must throw an exception when subbieResourceRef is missing" in {
+      val response =
+        GetSubcontractorListResponse(
+          subcontractors = Seq(
+            subcontractors.head.copy(
+              subbieResourceRef = None
+            )
+          )
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(SubcontractorListPage, response)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers)
+        ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            GET,
+            routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url
+          )
+
+        val result =
+          route(application, request).value
+
+        val exception =
+          intercept[IllegalStateException] {
+            await(result)
+          }
+
+        exception.getMessage mustEqual
+          "Missing subbieResourceRef for subcontractorId 1"
       }
     }
   }

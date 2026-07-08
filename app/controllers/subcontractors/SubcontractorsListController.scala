@@ -100,8 +100,18 @@ class SubcontractorsListController @Inject() (
       taxTreatment = toTaxTreatment(subcontractor.taxTreatment),
       dateAdded = subcontractor.createDate
         .map(_.format(dateAddedFormatter))
-        .getOrElse("")
+        .getOrElse(""),
+      subbieResourceRef = getSubbieResourceRef(subcontractor)
     )
+
+  private def getSubbieResourceRef(
+    subcontractor: GetSubcontractor
+  ): Long =
+    subcontractor.subbieResourceRef.getOrElse {
+      throw new IllegalStateException(
+        s"Missing subbieResourceRef for subcontractorId ${subcontractor.subcontractorId}"
+      )
+    }
 
   private def toTaxTreatment(
     taxTreatment: Option[String]

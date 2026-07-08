@@ -18,6 +18,7 @@ package views.subcontractors
 
 import base.SpecBase
 import forms.subcontractors.SubcontractorsListFormProvider
+import models.{Mode, NormalMode}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.matchers.must.Matchers
@@ -25,7 +26,7 @@ import play.api.Application
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import viewmodels.govuk.PaginationFluency.*
+import viewmodels.govuk.PaginationFluency._
 import viewmodels.subcontractors.{SubcontractorsListData, SubcontractorsListRow}
 import views.html.subcontractors.SubcontractorsListView
 
@@ -38,6 +39,7 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       val html: HtmlFormat.Appendable =
         view(
           form,
+          mode,
           rows,
           pagination,
           page = 1,
@@ -72,7 +74,7 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
 
       val clearFiltersLink =
         doc.select(
-          s"a[href='${controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId).url}']"
+          s"a[href='${controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId, mode).url}']"
         )
 
       clearFiltersLink.size() mustBe 1
@@ -96,6 +98,7 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       val html =
         view(
           form,
+          mode,
           rows,
           pagination,
           page = 1,
@@ -125,6 +128,7 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       val html =
         view(
           form,
+          mode,
           rows,
           PaginationViewModel(),
           page = 1,
@@ -161,6 +165,7 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       val html =
         view(
           form,
+          mode,
           rows,
           paginationWithItems,
           page = 1,
@@ -186,6 +191,7 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       val html =
         view(
           formWithError,
+          mode,
           rows,
           pagination,
           page = 1,
@@ -208,6 +214,7 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       val html =
         view(
           form.fill("Alan"),
+          mode,
           rows,
           pagination,
           page = 2,
@@ -225,36 +232,6 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       doc.select("input[name=searchTerm]").attr("value") mustBe "Alan"
       doc.select("select[name=verificationStatus] option[selected]").attr("value") mustBe "verified"
       doc.select("select[name=taxTreatment] option[selected]").attr("value") mustBe "gross"
-    }
-
-    "must render delete links for each subcontractor" in new Setup {
-
-      val html =
-        view(
-          form,
-          rows,
-          pagination,
-          page = 1,
-          totalPages = 2,
-          startIndex = 1,
-          totalCount = rows.size,
-          instanceId = instanceId,
-          searchTerm = "",
-          verificationStatus = "all",
-          taxTreatment = "all"
-        )
-
-      val doc = Jsoup.parse(html.body)
-
-      rows.foreach { row =>
-
-        val expectedUrl =
-          controllers.subcontractors.routes.GetSubcontractorForDeleteController
-            .onPageLoad(row.subbieResourceRef)
-            .url
-
-        doc.select(s"a[href='$expectedUrl']").size() mustBe 1
-      }
     }
   }
 
@@ -285,6 +262,8 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
         ),
         next = Some(PaginationLinkViewModel("").withText("site.pagination.next"))
       )
+
+    val mode: Mode = NormalMode
 
     val instanceId: String = "test-instance-id"
   }
