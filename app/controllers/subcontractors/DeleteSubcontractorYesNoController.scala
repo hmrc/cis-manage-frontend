@@ -20,7 +20,8 @@ import controllers.actions.*
 import forms.subcontractors.DeleteSubcontractorYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.subcontractors.DeleteSubcontractorYesNoPage
+import pages.subcontractors.{DeleteSubcontractorJourneyPage, DeleteSubcontractorYesNoPage}
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -44,26 +45,62 @@ class DeleteSubcontractorYesNoController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form              = formProvider()
-  val subcontractorName = "subcontractor Name"
-  // TODO: subcontractorName to be retrieved from F8 - Retrieve Subcontractor for Delete business function
+  val form: Form[Boolean] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      request.userAnswers
+        .get(DeleteSubcontractorJourneyPage)
+        .fold {
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        } { journeyData =>
+          if (!journeyData.subcontractorCanBeDeleted) {
 
-    val preparedForm = request.userAnswers.get(DeleteSubcontractorYesNoPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+            Redirect(
+              controllers.subcontractors.routes.CannotDeleteSubcontractorController.onPageLoad()
+            )
+
+          } else {
+
+            val preparedForm =
+              request.userAnswers
+                .get(DeleteSubcontractorYesNoPage)
+                .fold(form)(form.fill)
+
+            Ok(
+              view(
+                journeyData.subcontractorName,
+                preparedForm,
+                mode
+              )
+            )
+          }
+        }
     }
-
-    Ok(view(subcontractorName, preparedForm, mode))
-  }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(subcontractorName, formWithErrors, mode))),
+          formWithErrors =>
+            request.userAnswers
+              .get(DeleteSubcontractorJourneyPage)
+              .fold(
+                Future.successful(
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                )
+              ) { journeyData =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      journeyData.subcontractorName,
+                      formWithErrors,
+                      mode
+                    )
+                  )
+                )
+              },
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(DeleteSubcontractorYesNoPage, value))

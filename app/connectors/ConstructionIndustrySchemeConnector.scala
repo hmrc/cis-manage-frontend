@@ -264,6 +264,14 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       )
     )
 
+  def getSubcontractorDeleteStatus(
+    cisId: String,
+    subbieResourceRef: Long
+  )(implicit hc: HeaderCarrier): Future[GetSubcontractorForDeleteResponse] =
+    http
+      .get(url"$cisBaseUrl/subcontractor/$cisId/$subbieResourceRef/delete-status")
+      .execute[GetSubcontractorForDeleteResponse]
+
   def getSubcontractorList(
     cisId: String
   )(implicit hc: HeaderCarrier): Future[GetSubcontractorListResponse] =

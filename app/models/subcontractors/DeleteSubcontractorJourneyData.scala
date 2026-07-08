@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package viewmodels.agent
+package models.subcontractors
 
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
+import play.api.libs.json.{Json, OFormat}
 
-class AgentLandingViewModelSpec extends AnyFreeSpec with Matchers {
+final case class DeleteSubcontractorJourneyData(
+  subcontractorName: String,
+  subbieResourceRef: Long,
+  subcontractorCanBeDeleted: Boolean
+)
 
-  "AgentLandingViewModel" - {
-
-    "must hold the given values" in {
-      val model = AgentLandingViewModel(
-        schemeName = "ABC Construction Ltd",
-        employerRef = "123/AB45678"
-      )
-
-      model.schemeName mustBe "ABC Construction Ltd"
-      model.employerRef mustBe "123/AB45678"
-    }
-  }
+object DeleteSubcontractorJourneyData {
+  implicit val format: OFormat[DeleteSubcontractorJourneyData] =
+    Json.format[DeleteSubcontractorJourneyData]
 }

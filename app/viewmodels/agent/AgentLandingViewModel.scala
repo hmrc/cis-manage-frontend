@@ -17,7 +17,6 @@
 package viewmodels.agent
 
 case class AgentLandingViewModel(
-  clientName: String,
-  employerRef: String,
-  utr: Option[String]
+  schemeName: String,
+  employerRef: String
 )
