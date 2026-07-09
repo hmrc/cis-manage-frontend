@@ -25,7 +25,8 @@ object Target {
   private val returnsKeys = Set(
     "returnDue",
     "returnHistory",
-    "amendReturn"
+    "amendReturn",
+    "manageYourCisReturn"
   )
 
   private val noticesKeys = Set(

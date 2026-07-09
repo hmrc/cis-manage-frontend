@@ -17,33 +17,140 @@
 package controllers.subcontractors
 
 import base.SpecBase
+import controllers.routes
+import models.subcontractors.DeleteSubcontractorJourneyData
+import pages.CisIdPage
+import pages.subcontractors.DeleteSubcontractorJourneyPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.subcontractors.CannotDeleteSubcontractorView
 
 class CannotDeleteSubcontractorControllerSpec extends SpecBase {
 
+  private val subcontractorName = "Gamma Builders"
+
   "CannotDeleteSubcontractorController" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdPage, "1")
+          .success
+          .value
+          .set(
+            DeleteSubcontractorJourneyPage,
+            DeleteSubcontractorJourneyData(
+              subcontractorName = subcontractorName,
+              subbieResourceRef = 10L,
+              subcontractorCanBeDeleted = false
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
 
         val request =
-          FakeRequest(GET, controllers.subcontractors.routes.CannotDeleteSubcontractorController.onPageLoad().url)
+          FakeRequest(
+            GET,
+            controllers.subcontractors.routes.CannotDeleteSubcontractorController
+              .onPageLoad()
+              .url
+          )
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[CannotDeleteSubcontractorView]
+        val view =
+          application.injector.instanceOf[CannotDeleteSubcontractorView]
 
-        val expectedSubcontractorName = "subcontractor Name"
-        val subcontractorsPageUrl     = "#"
+        val subcontractorsPageUrl =
+          controllers.subcontractors.routes.SubcontractorsListController
+            .onPageLoad("1")
+            .url
 
         status(result) mustEqual OK
+
         contentAsString(result) mustEqual
-          view(expectedSubcontractorName, subcontractorsPageUrl)(request, messages(application)).toString
+          view(
+            subcontractorName,
+            subcontractorsPageUrl
+          )(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to Journey Recovery when journey data is missing" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdPage, "1")
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.subcontractors.routes.CannotDeleteSubcontractorController
+              .onPageLoad()
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery when subcontractor can be deleted" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdPage, "1")
+          .success
+          .value
+          .set(
+            DeleteSubcontractorJourneyPage,
+            DeleteSubcontractorJourneyData(
+              subcontractorName = subcontractorName,
+              subbieResourceRef = 10L,
+              subcontractorCanBeDeleted = true
+            )
+          )
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.subcontractors.routes.CannotDeleteSubcontractorController
+              .onPageLoad()
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

@@ -14,25 +14,20 @@
  * limitations under the License.
  *@
 
-@import components.{H1, H2, Paragraph, Link, TwoColumnGrid, SectionBreak, LandingCard, Nav, Aside}
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
+@import components.{H1, TwoColumnGrid, Nav, Aside, PtaCard, OneColumnGrid}
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukSummaryList
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow, Card, CardTitle}
 @import viewmodels.contractor.ContractorLandingViewModel
 
 @this(
-        layout: templates.Layout,
-        govukButton: GovukButton,
-        govukSummaryList: GovukSummaryList,
-        h1: H1,
-        h2: H2,
-        p: Paragraph,
-        link: Link,
-        twoColumnGrid: TwoColumnGrid,
-        landingCard: LandingCard,
-        sectionBreak: SectionBreak,
-        nav: Nav,
-        aside: Aside
+    layout: templates.Layout,
+    govukSummaryList: GovukSummaryList,
+    h1: H1,
+    twoColumnGrid: TwoColumnGrid,
+    oneColumnGrid: OneColumnGrid,
+    nav: Nav,
+    aside: Aside,
+    ptaCard: PtaCard
 )
 
 @(vm: ContractorLandingViewModel)(implicit request: Request[_], messages: Messages)
@@ -48,80 +43,49 @@
 @layout(pageTitle = titleNoForm(messages("contractorLanding.title")), sidebar = Some(sidebar)) {
 
     @h1("contractorLanding.heading")
-    @p("contractorLanding.paragraph", args = Seq(vm.contractorName))
     @govukSummaryList(
         SummaryListViewModel(rows = Seq(
-            SummaryListRowViewModel(Key("contractorLanding.label.employerReference"), Value(vm.employerReference)),
-            SummaryListRowViewModel(Key("contractorLanding.label.utr"), Value(vm.utr))
+            SummaryListRowViewModel(Key("contractorLanding.label.schemeName"), Value(vm.schemeName)),
+            SummaryListRowViewModel(Key("contractorLanding.label.employerReference"), Value(vm.employerReference))
         ))
     )
 
-    @h2("contractorLanding.subheading.actionRequired")
     @twoColumnGrid(
-        landingCard(
-            link(
-                "contractorLanding.link.returnDue",
-                controllers.contractor.routes.ContractorLandingController.onTargetClick("returnDue").url,
-                paragraphWrapped = false
-            ),
-            HtmlFormat.fill(Seq(
-                p(vm.returnCount.toString, bold = true, baseClass = "govuk-heading-l", extraClasses = "govuk-!-margin-bottom-1"),
-                p("contractorLanding.label.dueBy", extraClasses = "govuk-!-margin-bottom-1", args = Seq(vm.returnDueDate))
-            ))
+        ptaCard(
+            title = messages("contractorLanding.landing.card.manageYourCisReturn.title"),
+            link =  controllers.contractor.routes.ContractorLandingController.onTargetClick("manageYourCisReturn").url,
+            content = Html(messages("contractorLanding.landing.card.manageYourCisReturn.p")),
+            id = Some("manage-your-cis-return")
         ),
-        landingCard(
-            link(
-                "contractorLanding.link.newNotices",
-                controllers.contractor.routes.ContractorLandingController.onTargetClick("newNotices").url,
-                paragraphWrapped = false
-            ),
-            HtmlFormat.fill(Seq(
-                p(vm.noticeCount.toString, bold = true, baseClass = "govuk-heading-l", extraClasses = "govuk-!-margin-bottom-1"),
-                p("contractorLanding.label.newNotices", extraClasses = "govuk-!-margin-bottom-1")
-            ))
+        ptaCard(
+            title = messages("contractorLanding.landing.card.manageYourSubcontractors.title"),
+            link =  controllers.contractor.routes.ContractorLandingController.onTargetClick("subcontractors").url,
+            content = Html(messages("contractorLanding.landing.card.manageYourSubcontractors.p")),
+            id = Some("manage-your-subcontractors")
         )
     )
 
-    @h2("contractorLanding.subheading.manage")
-
     @twoColumnGrid(
-        HtmlFormat.fill(Seq(
-            link(
-                "contractorLanding.link.subcontractors",
-                controllers.contractor.routes.ContractorLandingController.onTargetClick("subcontractors").url,
-                bold = true
-            ),
-            p("contractorLanding.label.subcontractors")
-        )),
-        HtmlFormat.fill(Seq(
-            link(
-                "contractorLanding.link.history",
-                controllers.contractor.routes.ContractorLandingController.onTargetClick("returnHistory").url,
-                bold = true
-            ),
-            p("contractorLanding.label.history")
-        ))
+        ptaCard(
+            title = messages("contractorLanding.landing.card.manageYourContractorDetails.title"),
+            link = "#",
+            content = Html(messages("contractorLanding.landing.card.manageYourContractorDetails.p")),
+            id = Some("manage-your-contractor-details")
+        ),
+        ptaCard(
+            title = messages("contractorLanding.landing.card.appealPenalty.title"),
+            link = "#",
+            content = Html(messages("contractorLanding.landing.card.appealPenalty.p")),
+            id = Some("appeal-a-penalty")
+        )
     )
 
-    @twoColumnGrid(
-        HtmlFormat.fill(Seq(
-            link(
-                "contractorLanding.link.notices",
-                controllers.contractor.routes.ContractorLandingController.onTargetClick("noticesAndStatements").url,
-                bold = true),
-            p("contractorLanding.label.notices")
-        )),
-        HtmlFormat.fill(Seq(
-            link(
-                "contractorLanding.link.amend",
-                controllers.contractor.routes.ContractorLandingController.onTargetClick("amendReturn").url,
-                bold = true),
-            p("contractorLanding.label.amend")
-        ))
+    @oneColumnGrid(
+        ptaCard(
+            title = messages("contractorLanding.landing.card.noticesAndStatements.title"),
+            link = "#",
+            content = Html(messages("contractorLanding.landing.card.noticesAndStatements.p")),
+            id = Some("notices-and-statements")
+        )
     )
-
-    @sectionBreak()
-
-    @h2("contractorLanding.subheading.activity")
-    @p("contractorLanding.paragraph.activity", args = Seq(vm.lastSubmittedDate, vm.lastSubmittedTaxMonthYear))
 }

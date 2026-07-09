@@ -18,16 +18,15 @@ package controllers.subcontractors
 
 import controllers.actions.*
 import forms.subcontractors.SubcontractorsListFormProvider
-import models.Mode
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.PaginationSubcontractorsListService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.subcontractors.*
 import views.html.subcontractors.SubcontractorsListView
+
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-
 import javax.inject.Inject
 
 class SubcontractorsListController @Inject() (
@@ -60,7 +59,7 @@ class SubcontractorsListController @Inject() (
     }
   }
 
-  def onPageLoad(instanceId: String, mode: Mode, page: Int = 1): Action[AnyContent] =
+  def onPageLoad(instanceId: String, page: Int = 1): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
 
       val searchTerm =
@@ -139,14 +138,13 @@ class SubcontractorsListController @Inject() (
           allItems = sortedRows,
           currentPage = page,
           recordsPerPage = SubcontractorsListConstants.RecordsPerPage,
-          baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
+          baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId).url,
           queryString = queryString
         )
 
       Ok(
         view(
           filledForm,
-          mode,
           result.items,
           result.pagination,
           result.currentPage,
@@ -161,7 +159,7 @@ class SubcontractorsListController @Inject() (
       )
     }
 
-  def onSubmit(instanceId: String, mode: Mode, page: Int = 1): Action[AnyContent] =
+  def onSubmit(instanceId: String, page: Int = 1): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       form
         .bindFromRequest()
@@ -251,14 +249,13 @@ class SubcontractorsListController @Inject() (
                 allItems = sortedRows,
                 currentPage = page,
                 recordsPerPage = SubcontractorsListConstants.RecordsPerPage,
-                baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
+                baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId).url,
                 queryString = queryString
               )
 
             BadRequest(
               view(
                 formWithErrors,
-                mode,
                 result.items,
                 result.pagination,
                 result.currentPage,
@@ -298,7 +295,7 @@ class SubcontractorsListController @Inject() (
 
             val baseUrl =
               routes.SubcontractorsListController
-                .onPageLoad(instanceId, mode, targetPage)
+                .onPageLoad(instanceId, targetPage)
                 .url
 
             val redirectUrl =

@@ -155,7 +155,7 @@ class VerificationRequestViewSpec extends SpecBase {
 
       val manageLink = doc.select(s"a[href=/manage-subcontractors/900063]")
       manageLink          should not be empty
-      manageLink.text() shouldBe messages(app)("verify.verificationRequest.backToManage")
+      manageLink.text() shouldBe messages(app)("verify.verificationRequest.manageLink")
     }
 
     "render the back link" in {

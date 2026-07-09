@@ -348,9 +348,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       val result: AgentLandingViewModel =
         service.getAgentLandingData(uniqueId, ua, userId).futureValue
 
-      result.clientName mustBe "ABC Construction Ltd"
+      result.schemeName mustBe "ABC Construction Ltd"
       result.employerRef mustBe "111/test111"
-      result.utr mustBe Some("5555555555")
 
       val uaCaptor: ArgumentCaptor[UserAnswers] =
         ArgumentCaptor.forClass(classOf[UserAnswers])

@@ -18,13 +18,11 @@ package controllers.subcontractors
 
 import base.SpecBase
 import forms.subcontractors.SubcontractorsListFormProvider
-import models.{Mode, NormalMode}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import viewmodels.subcontractors.TaxTreatment
+import play.api.test.Helpers.*
 import services.PaginationSubcontractorsListService
-import viewmodels.subcontractors.{SubcontractorsListData, SubcontractorsListRow}
+import viewmodels.subcontractors.{SubcontractorsListData, SubcontractorsListRow, TaxTreatment}
 import views.html.subcontractors.SubcontractorsListView
 
 class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
@@ -33,7 +31,6 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
   private val form         = formProvider()
 
   private val instanceId = "test-instance-id"
-  private val mode: Mode = NormalMode
 
   private def filterRows(
     searchTerm: String,
@@ -96,7 +93,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
         val request =
           FakeRequest(
             GET,
-            routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url
+            routes.SubcontractorsListController.onPageLoad(instanceId, 1).url
           )
 
         val result = route(application, request).value
@@ -111,14 +108,13 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
             allItems = filteredRows,
             currentPage = 1,
             recordsPerPage = 8,
-            baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
+            baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId).url,
             queryString = ""
           )
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
           form.fill(""),
-          mode,
           paginationResult.items,
           paginationResult.pagination,
           paginationResult.currentPage,
@@ -142,7 +138,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
         val request =
           FakeRequest(
             GET,
-            routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url +
+            routes.SubcontractorsListController.onPageLoad(instanceId).url +
               "?searchTerm=Alan&verificationStatus=verified&taxTreatment=gross"
           )
 
@@ -170,14 +166,13 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
             allItems = filteredRows,
             currentPage = 1,
             recordsPerPage = 8,
-            baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
+            baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId).url,
             queryString = queryString
           )
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
           form.fill(searchTerm),
-          mode,
           paginationResult.items,
           paginationResult.pagination,
           paginationResult.currentPage,
@@ -201,7 +196,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
         val request =
           FakeRequest(
             POST,
-            routes.SubcontractorsListController.onSubmit(instanceId, mode, 1).url
+            routes.SubcontractorsListController.onSubmit(instanceId).url
           ).withFormUrlEncodedBody(
             "gotoPage"           -> "2",
             "searchTerm"         -> "Alan",
@@ -215,7 +210,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
 
         val redirectUrl = redirectLocation(result).value
 
-        redirectUrl must include(routes.SubcontractorsListController.onPageLoad(instanceId, mode, 2).url)
+        redirectUrl must include(routes.SubcontractorsListController.onPageLoad(instanceId).url)
         redirectUrl must include("searchTerm=Alan")
         redirectUrl must include("verificationStatus=verified")
         redirectUrl must include("taxTreatment=gross")
@@ -231,7 +226,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
         val request =
           FakeRequest(
             POST,
-            routes.SubcontractorsListController.onSubmit(instanceId, mode, 1).url
+            routes.SubcontractorsListController.onSubmit(instanceId).url
           ).withFormUrlEncodedBody(
             "searchTerm"         -> "Alan",
             "verificationStatus" -> "verified",
@@ -244,7 +239,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
 
         val redirectUrl = redirectLocation(result).value
 
-        redirectUrl must include(routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url)
+        redirectUrl must include(routes.SubcontractorsListController.onPageLoad(instanceId).url)
         redirectUrl must include("searchTerm=Alan")
         redirectUrl must include("verificationStatus=verified")
         redirectUrl must include("taxTreatment=gross")
@@ -260,7 +255,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
         val request =
           FakeRequest(
             GET,
-            routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url
+            routes.SubcontractorsListController.onPageLoad(instanceId).url
           )
 
         val result = route(application, request).value
@@ -279,7 +274,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
         val request =
           FakeRequest(
             POST,
-            routes.SubcontractorsListController.onSubmit(instanceId, mode, 1).url
+            routes.SubcontractorsListController.onSubmit(instanceId).url
           ).withFormUrlEncodedBody(
             "gotoPage"   -> "2",
             "searchTerm" -> "Alan"
