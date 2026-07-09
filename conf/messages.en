@@ -694,8 +694,8 @@ subcontractors.deleteSubcontractorYesNo.heading                          =  Are 
 subcontractors.deleteSubcontractorYesNo.p                                =  This subcontractor will also be removed from any monthly return that you have not submitted yet.
 subcontractors.deleteSubcontractorYesNo.error.required                   =  Select yes if you want to delete this subcontractor
 
-agentLostAccess.title = agentLostAccess
-agentLostAccess.heading = agentLostAccess
+agentLostAccess.title                                                    = agentLostAccess
+agentLostAccess.heading                                                  = agentLostAccess
 
 securityCheck.title                                                      =  Authorisation check in progress
 securityCheck.h1                                                         =  Authorisation check in progress
