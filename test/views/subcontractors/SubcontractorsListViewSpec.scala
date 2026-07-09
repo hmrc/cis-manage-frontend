@@ -253,19 +253,24 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
           instanceId = instanceId,
           searchTerm = "",
           verificationStatus = "all",
-          taxTreatment = "all"
+          taxTreatment = "all",
+          sortBy = "name",
+          sortOrder = "ascending"
         )
 
       val doc = Jsoup.parse(html.body)
 
-      rows.foreach { row =>
+      val deleteLinks =
+        doc.select("#subcontractors-table tbody tr td:last-child a.govuk-link[href='#']")
 
-        val expectedUrl =
-          controllers.subcontractors.routes.GetSubcontractorForDeleteController
-            .onPageLoad(row.subbieResourceRef)
-            .url
+      deleteLinks.size() mustBe rows.size
 
-        doc.select(s"a[href='$expectedUrl']").size() mustBe 1
+      rows.zipWithIndex.foreach { case (row, index) =>
+        val deleteLink = deleteLinks.get(index)
+
+        deleteLink.ownText().trim mustBe "Delete"
+
+        deleteLink.select(".govuk-visually-hidden").text().trim mustBe row.name
       }
     }
   }

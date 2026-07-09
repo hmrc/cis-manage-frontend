@@ -136,7 +136,8 @@ object SubcontractorsListData {
       false,
       "V0009000017",
       TaxTreatment.StandardRate,
-      "17 Jan 2026"
+      "17 Jan 2026",
+      28L
     ),
     SubcontractorsListRow(
       "noNameProvided2",
@@ -145,7 +146,8 @@ object SubcontractorsListData {
       true,
       "V0009000018",
       TaxTreatment.Gross,
-      "18 Jan 2026"
+      "18 Jan 2026",
+      29L
     ),
     SubcontractorsListRow(
       "charlieWorks",
