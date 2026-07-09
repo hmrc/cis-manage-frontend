@@ -334,6 +334,49 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
           )
         )
       }
+
+      "must calculate tax year from 6 April boundary" in {
+        val response = GetSubmittedVerificationsResponse(
+          scheme = Seq.empty,
+          subcontractors = Seq.empty,
+          verificationBatches = Seq(
+            submittedVerificationBatch(
+              verificationBatchId = 1L,
+              verificationNumber = Some("V001")
+            ),
+            submittedVerificationBatch(
+              verificationBatchId = 2L,
+              verificationNumber = Some("V002")
+            )
+          ),
+          verifications = Seq.empty,
+          submissions = Seq(
+            submittedSubmission(
+              activeObjectId = Some(1L),
+              submissionRequestDate = Some(LocalDateTime.of(2026, 4, 5, 10, 0))
+            ),
+            submittedSubmission(
+              activeObjectId = Some(2L),
+              submissionRequestDate = Some(LocalDateTime.of(2026, 4, 6, 10, 0))
+            )
+          )
+        )
+
+        service.toVerificationHistoryData(response) mustBe VerificationHistoryData(
+          verificationRequests = Seq(
+            VerificationRequestData(
+              verificationNumber = "V002",
+              dateSubmitted = LocalDate.of(2026, 4, 6),
+              taxYear = 2026
+            ),
+            VerificationRequestData(
+              verificationNumber = "V001",
+              dateSubmitted = LocalDate.of(2026, 4, 5),
+              taxYear = 2025
+            )
+          )
+        )
+      }
     }
   }
 }

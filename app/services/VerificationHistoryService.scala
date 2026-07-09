@@ -139,7 +139,14 @@ class VerificationHistoryService @Inject() () {
     )
   }
 
-  private def taxYearStart(date: LocalDate): Int =
-    if (date.getMonthValue >= 4) date.getYear
-    else date.getYear - 1
+  private def taxYearStart(date: LocalDate): Int = {
+    val taxYearStartDate =
+      LocalDate.of(date.getYear, 4, 6)
+
+    if (!date.isBefore(taxYearStartDate)) {
+      date.getYear
+    } else {
+      date.getYear - 1
+    }
+  }
 }
