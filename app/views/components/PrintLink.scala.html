@@ -16,7 +16,11 @@
 
 @this()
 
-@(textKey: String, id: String = "print-link", extraClasses: String = "")(implicit messages: play.api.i18n.Messages)
+@(
+    textKey: String,
+    id: String = "print-link",
+    extraClasses: String = ""
+)(implicit messages: play.api.i18n.Messages)
 
 <p class="govuk-body">
     <a

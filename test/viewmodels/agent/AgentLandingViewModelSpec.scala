@@ -25,14 +25,12 @@ class AgentLandingViewModelSpec extends AnyFreeSpec with Matchers {
 
     "must hold the given values" in {
       val model = AgentLandingViewModel(
-        clientName = "ABC Construction Ltd",
-        employerRef = "123/AB45678",
-        utr = Some("1234567890")
+        schemeName = "ABC Construction Ltd",
+        employerRef = "123/AB45678"
       )
 
-      model.clientName mustBe "ABC Construction Ltd"
+      model.schemeName mustBe "ABC Construction Ltd"
       model.employerRef mustBe "123/AB45678"
-      model.utr mustBe Some("1234567890")
     }
   }
 }

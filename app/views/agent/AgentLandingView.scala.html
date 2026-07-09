@@ -14,11 +14,6 @@
  * limitations under the License.
  *@
 
-@import java.time.format.DateTimeFormatter
-@import java.time.format.TextStyle.FULL
-@import java.util.Locale.UK
-@import play.api.i18n
-@import play.api.mvc
 @import play.twirl.api.{Html, HtmlFormat}
 @import views.html.components._
 @import config.FrontendAppConfig
@@ -26,159 +21,106 @@
 @import viewmodels.govuk.{summarylist => sl}
 
 @this(
-  layout: templates.LayoutWithSidebar,
-  helpAndGuidelineSidebar: templates.HelpAndGuidelineSidebar,
-  backNavigation: BackNavigation,
-  h1: H1,
-  h2: H2,
-  h3: H3,
-  paragraph: Paragraph,
-  link: Link,
-  gridRow: GridRow,
-  gridColumnOneHalf: GridColumnOneHalf,
-  caption: Caption,
-  summaryCard: SummaryCardBlock,
-  headingLink: HeadingLink,
-  linkList: LinkList,
-  sectionBreak: SectionBreak,
-  govukSummaryList: GovukSummaryList
+    layout: templates.LayoutWithSidebar,
+    helpAndGuidelineSidebar: templates.HelpAndGuidelineSidebar,
+    backNavigation: BackNavigation,
+    h1: H1,
+    govukSummaryList: GovukSummaryList,
+    twoColumnGrid: TwoColumnGrid,
+    oneColumnGrid: OneColumnGrid,
+    ptaCard: PtaCard
 )
 
 @(uniqueId: String,
-  clientName: String,
-  employerRef: String,
-  utr: String,
-  returnsDueCount: Int,
-  returnsDueBy: java.time.LocalDate,
-  newNoticesCount: Int,
-  lastSubmittedDate: java.time.LocalDate,
-  lastSubmittedTaxMonth: java.time.YearMonth
-)(implicit request: RequestHeader,
-  appConfig: FrontendAppConfig,
-  messages: Messages
+    agentName: String,
+    schemeName: String,
+    employerRef: String,
+    )(implicit request: RequestHeader,
+    appConfig: FrontendAppConfig,
+    messages: Messages
 )
 
+@schemeNameDisplay = @{
+    if (schemeName.trim.isEmpty) messages("agent.landing.schemeName.key.notProvided")
+    else schemeName
+}
+
 @layout(
-  pageTitle     = titleNoForm(messages("agent.landing.title", clientName)),
-  showBackLink  = false,
-  beforeContent = Some(
-    backNavigation(
-      controllers.agent.routes.ClientListSearchController.onPageLoad().url,
-      "agent.landing.back"
-    )
-  ),
-  sidebar = Some(helpAndGuidelineSidebar())
+    pageTitle     = titleNoForm(messages("agent.landing.title")),
+    sidebar = Some(helpAndGuidelineSidebar())
 ) {
 
-  @caption(clientName)
-  @h1(messages("agent.landing.h1"))
-  @paragraph(
-    messages("agent.landing.intro", clientName),
-    false, "govuk-body", "", Nil
-  )
+    @h1(messages("agent.landing.h1"))
 
-  @govukSummaryList(
-    sl.SummaryListViewModel(Seq(
-      sl.SummaryListRowViewModel(
-        key   = sl.KeyViewModel(Text(messages("agent.landing.employerRef.key"))),
-        value = sl.ValueViewModel(Text(employerRef))
-      ),
-      sl.SummaryListRowViewModel(
-        key   = sl.KeyViewModel(Text(messages("agent.landing.utr.key"))),
-        value = sl.ValueViewModel(Text(utr))
-      )
-    ))
-  )
+    @govukSummaryList(
+        sl.SummaryListViewModel(Seq(
+            sl.SummaryListRowViewModel(
+                key   = sl.KeyViewModel(Text(messages("agent.landing.agentName.key"))),
+                value = sl.ValueViewModel(Text(agentName))
+            ),
+            sl.SummaryListRowViewModel(
+                key   = sl.KeyViewModel(Text(messages("agent.landing.schemeName.key"))),
+                value = sl.ValueViewModel(Text(schemeNameDisplay))
+            ),
+            sl.SummaryListRowViewModel(
+                key   = sl.KeyViewModel(Text(messages("agent.landing.employerRef.key"))),
+                value = sl.ValueViewModel(Text(employerRef))
+            ),
+        ))
+    )
 
-  @h2(messages("agent.landing.h2.actionRequired"), "govuk-heading-m govuk-!-margin-top-6", None)
+    @twoColumnGrid(
+        ptaCard(
+            title = messages("agent.landing.card.manageYourCisReturns.title"),
+            link = controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "manageYourCisReturn").url,
+            content = Html(messages("agent.landing.card.manageYourCisReturns.p")),
+            id = Some("manage-your-cis-returns")
+        ),
+        ptaCard(
+            title = messages("agent.landing.card.manageYourSubcontractors.title"),
+            link = controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "subcontractors").url,
+            content = Html(messages("agent.landing.card.manageYourSubcontractors.p")),
+            id = Some("manage-your-subcontractors")
+        )
+    )
 
-  @gridRow() {
-    @gridColumnOneHalf {
-      @summaryCard(Html(
-        link(
-          "agent.landing.card.returnDue.title",
-          controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "returnDue").url,
-          false, "", "", ""
-        ).body)) {
-        @paragraph(s"$returnsDueCount", true, "govuk-body", "govuk-!-margin-bottom-1 govuk-!-font-size-36", Nil)
-        @paragraph(messages("agent.landing.card.returnDue.dueBy", returnsDueBy.format(DateTimeFormatter.ofPattern("d MMMM yyyy"))),
-          false, "govuk-body", "govuk-!-margin-bottom-0", Nil)
-    }
-  }
-  @gridColumnOneHalf {
-    @summaryCard(Html(
-      link(
-        "agent.landing.card.notices.title",
-        controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "newNotices").url,
-        false, "", "", ""
-      ).body)) {
-      @paragraph(s"$newNoticesCount", true, "govuk-body", "govuk-!-margin-bottom-1 govuk-!-font-size-36", Nil)
-      @paragraph(messages("agent.landing.card.notices.subtitle"),
-        false, "govuk-body", "govuk-!-margin-bottom-0", Nil)
-      }
-    }
-  }
+    @twoColumnGrid(
+        ptaCard(
+            title = messages("agent.landing.card.manageYourContractorDetails.title"),
+            link = "#",
+            content = Html(messages("agent.landing.card.manageYourContractorDetails.p")),
+            id = Some("manage-your-contractor-details")
+        ),
+        ptaCard(
+            title = messages("agent.landing.card.appealPenalty.title"),
+            link = "#",
+            content = Html(messages("agent.landing.card.appealPenalty.p")),
+            id = Some("appeal-a-penalty")
+        )
+    )
 
-  @h2(messages("agent.landing.h2.manageClient"), "govuk-heading-m govuk-!-margin-top-7", None)
+    @twoColumnGrid(
+        ptaCard(
+            title = messages("agent.landing.card.manageClientDetails.title"),
+            link = "#",
+            content = Html(messages("agent.landing.card.manageClientDetails.p")),
+            id = Some("manage-client-details")
+        ),
+        ptaCard(
+            title = messages("agent.landing.card.removeClient.title"),
+            link = "#",
+            content = Html(messages("agent.landing.card.removeClient.p")),
+            id = Some("remove-client")
+        )
+    )
 
-  @gridRow() {
-    @gridColumnOneHalf {
-      @headingLink(
-        messages("agent.landing.manage.subcontractors"),
-        controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "subcontractors").url
-      )
-      @paragraph(messages("agent.landing.manage.subcontractors.blurb"),
-        false, "govuk-body", "govuk-!-font-size-16", Nil)
-    }
-    @gridColumnOneHalf {
-      @headingLink(
-        messages("agent.landing.manage.returnHistory"),
-        controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "returnHistory").url
-      )
-      @paragraph(messages("agent.landing.manage.returnHistory.blurb"),
-        false, "govuk-body", "govuk-!-font-size-16", Nil)
-    }
-  }
-
-  @gridRow(classes = "govuk-!-margin-top-4") {
-    @gridColumnOneHalf {
-      @headingLink(
-        messages("agent.landing.manage.notices"),
-        controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "noticesAndStatements").url
-      )
-      @paragraph(messages("agent.landing.manage.notices.blurb"),
-        false, "govuk-body", "govuk-!-font-size-16", Nil)
-    }
-    @gridColumnOneHalf {
-      @headingLink(
-        messages("agent.landing.manage.amend"),
-        controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "amendReturn").url
-      )
-      @paragraph(messages("agent.landing.manage.amend.blurb"),
-        false, "govuk-body", "govuk-!-font-size-16", Nil)
-    }
-  }
-
-  @gridRow(classes = "govuk-!-margin-top-4") {
-    @gridColumnOneHalf {
-      @headingLink(messages("agent.landing.manage.clientDetails"), "#")
-      @paragraph(messages("agent.landing.manage.clientDetails.blurb"),
-        false, "govuk-body", "govuk-!-font-size-16", Nil)
-    }
-  }
-
-  @sectionBreak()
-
-  @h2(messages("agent.landing.h2.recentActivity"), "govuk-heading-m", None)
-
-  @paragraph(
-    messages(
-      "agent.landing.recentActivity.line",
-      lastSubmittedDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy")),
-      lastSubmittedTaxMonth.getMonth.getDisplayName(FULL, UK),
-      lastSubmittedTaxMonth.getYear.toString
-    ),
-    false, "govuk-body", "", Nil
-  )
-
+    @oneColumnGrid(
+        ptaCard(
+            title = messages("agent.landing.card.noticesAndStatements.title"),
+            link = "#",
+            content = Html(messages("agent.landing.card.noticesAndStatements.p")),
+            id = Some("notices-and-statements")
+        )
+    )
 }
+

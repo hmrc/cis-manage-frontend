@@ -21,7 +21,7 @@ import models.agent.AgentClientData
 import models.history.*
 import models.requests.*
 import models.response.*
-import models.verify.{VerificationHistoryData, VerificationRequestData}
+import models.verify.{SubcontractorVerificationData, VerificationHistoryData, VerificationRequestData, VerificationRequestDetailData}
 import play.api.Logging
 import play.api.http.Status.{NO_CONTENT, OK}
 import play.api.libs.json.{JsObject, JsValue, Json}
@@ -30,7 +30,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpException, HttpReadsInstances, HttpResponse, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -240,5 +240,36 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         )
       )
     )
+
+  // TODO: Replace stub with real API call when available
+  def getVerificationRequestDetail(
+    instanceId: String,
+    verificationNumber: String
+  )(implicit hc: HeaderCarrier): Future[VerificationRequestDetailData] =
+    Future.successful(
+      VerificationRequestDetailData(
+        verificationNumber = verificationNumber,
+        dateTimeSubmitted = LocalDateTime.of(2027, 2, 6, 14, 30),
+        subcontractorsToVerify = Seq(
+          SubcontractorVerificationData("Amity Marine Contractors", "V0004528765"),
+          SubcontractorVerificationData("Brody, Martin", "V0004528765"),
+          SubcontractorVerificationData("Brody, Michael", "V0004528765"),
+          SubcontractorVerificationData("Brody, Sean", "V0004528765"),
+          SubcontractorVerificationData("Hooper and Associates", "V0004528765")
+        ),
+        subcontractorsToReverify = Seq(
+          SubcontractorVerificationData("Orca Industrial", "V0004528765/L"),
+          SubcontractorVerificationData("Quint Transportation", "V0004528765")
+        )
+      )
+    )
+
+  def getSubcontractorDeleteStatus(
+    cisId: String,
+    subbieResourceRef: Long
+  )(implicit hc: HeaderCarrier): Future[GetSubcontractorForDeleteResponse] =
+    http
+      .get(url"$cisBaseUrl/subcontractor/$cisId/$subbieResourceRef/delete-status")
+      .execute[GetSubcontractorForDeleteResponse]
 
 }

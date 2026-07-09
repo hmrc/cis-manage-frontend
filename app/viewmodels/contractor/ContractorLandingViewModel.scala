@@ -17,14 +17,8 @@
 package viewmodels.contractor
 
 case class ContractorLandingViewModel(
-  contractorName: String,
+  schemeName: String,
   employerReference: String,
-  utr: String,
-  returnCount: Int,
-  returnDueDate: String,
-  noticeCount: Int,
-  lastSubmittedDate: String,
-  lastSubmittedTaxMonthYear: String,
   whatIsUrl: String,
   guidanceUrl: String,
   penaltiesUrl: String

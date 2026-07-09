@@ -180,15 +180,8 @@ object ContractorLandingController {
 
   def fromUserAnswers(ua: UserAnswers, appConfig: FrontendAppConfig): ContractorLandingViewModel =
     ContractorLandingViewModel(
-      contractorName = ua.get(ContractorNamePage).getOrElse(""),
+      schemeName = ua.get(ContractorNamePage).getOrElse(""),
       employerReference = ua.get(EmployerReferencePage).getOrElse(""),
-      utr = ua.get(UniqueTaxReferencePage).getOrElse(""),
-      // still hard-coded for now
-      returnCount = 1,
-      returnDueDate = "19 October 2025",
-      noticeCount = 2,
-      lastSubmittedDate = "19 September 2025",
-      lastSubmittedTaxMonthYear = "August 2025",
       whatIsUrl = appConfig.contractorLandingWhatIsUrl,
       guidanceUrl = appConfig.contractorLandingGuidanceUrl,
       penaltiesUrl = appConfig.contractorLandingPenaltiesUrl
