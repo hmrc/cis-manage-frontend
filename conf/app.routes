@@ -154,3 +154,5 @@ GET   /subcontractors/subcontractor-deleted                       controllers.su
 GET  /subcontractors/cannot-delete-subcontractor-warning                       controllers.subcontractors.CannotDeleteSubcontractorController.onPageLoad()
 
 GET  /subcontractors/no-subcontractors-to-view      controllers.subcontractors.NoSubcontractorsExistController.onPageLoad()
+
+GET        /agentLostAccess                       controllers.agent.AgentLostAccessController.onPageLoad()
