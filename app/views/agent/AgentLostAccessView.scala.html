@@ -14,14 +14,48 @@
  * limitations under the License.
  *@
 
+@import views.html.components._
+@import config.FrontendAppConfig
+
 @this(
-        layout: templates.Layout,
-        govukButton: GovukButton
+  layout: templates.Layout,
+  h1: H1,
+  h2: H2,
+  paragraph: Paragraph,
+  link: Link,
+  bulletListWithLinks: BulletListWithLinks
 )
 
 @()(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("agentLostAccess.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("agentLostAccess.heading")</h1>
+  @h1(messages("agentLostAccess.heading"), "govuk-heading-xl")
+  @paragraph(messages("agentLostAccess.p1"))
+
+  @h1(messages("agentLostAccess.h1"), "govuk-heading-m")
+  @paragraph(messages("agentLostAccess.bullet.title"))
+
+  @bulletListWithLinks(Seq(
+    link(
+      linkTextKey = messages("agentLostAccess.bullet.item.1.link"),
+      linkUrl = "#",
+      paragraphWrapped = false,
+      prefixTextKey = messages("agentLostAccess.bullet.item.1.prefix"),
+    ),
+    link(
+      linkTextKey = messages("agentLostAccess.bullet.item.2.link"),
+      linkUrl = "#",
+      paragraphWrapped = false,
+      prefixTextKey = messages("agentLostAccess.bullet.item.2.prefix"),
+      suffixTextKey = messages("agentLostAccess.bullet.item.2.suffix")
+    )
+  ))
+
+  @paragraph(messages("agentLostAccess.p2"))
+
+  @link(
+    linkTextKey = messages("agentLostAccess.return.link"),
+    linkUrl = "#"
+  )
 }
