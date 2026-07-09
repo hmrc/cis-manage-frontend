@@ -50,9 +50,9 @@ GET  /access-denied                    controllers.AccessDeniedController.onPage
 
 GET  /system-error/there-is-a-problem  controllers.SystemErrorController.onPageLoad()
 
-GET  /no-longer-authorised                       controllers.agent.AgentLostAccessController.onPageLoad()
-
 # Agent
+GET   /no-longer-authorised  controllers.agent.AgentLostAccessController.onPageLoad()
+
 GET   /agent/retrieve-client-list        controllers.agent.RetrievingClientController.onPageLoad()
 GET   /agent/retrieve-client-list/start  controllers.agent.RetrievingClientController.start()
 GET   /agent/retrieve-client-list/poll   controllers.agent.RetrievingClientController.poll(retryCount: Int ?= 0)

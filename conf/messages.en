@@ -289,6 +289,19 @@ agent.landing.help.link1                               =  What is the Constructi
 agent.landing.help.link2                               =  CIS monthly returns guidance
 agent.landing.help.link3                               =  CIS 340: penalties for late returns
 
+agentLostAccess.title                                  =  Sorry, you are unable to use this service
+agentLostAccess.heading                                =  Sorry, you are unable to use this service
+agentLostAccess.p1                                     =  You are no longer authorised.
+agentLostAccess.h1                                     =  What you need to do
+agentLostAccess.bullet.title                           =  Ask your client to authorise you. They can do this by either:
+agentLostAccess.bullet.item.1.prefix                   =  authorising you through their
+agentLostAccess.bullet.item.1.link                     =  HMRC online account
+agentLostAccess.bullet.item.2.prefix                   =  downloading and completing
+agentLostAccess.bullet.item.2.link                     =  form 64-8
+agentLostAccess.bullet.item.2.suffix                   =  to authorise you by post
+agentLostAccess.p2                                     =  It can take up to 5 working days for new authorisations to appear in your account.
+agentLostAccess.return.link                            =  Return to client list
+
 # Subcontractors
 retrievingSubcontractors.title                                =  Your subcontractors
 retrievingSubcontractors.heading                              =  Your subcontractors
