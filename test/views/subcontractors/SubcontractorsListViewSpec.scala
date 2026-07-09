@@ -39,7 +39,6 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       val html: HtmlFormat.Appendable =
         view(
           form,
-          mode,
           rows,
           pagination,
           page = 1,
@@ -49,7 +48,9 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
           instanceId = instanceId,
           searchTerm = "",
           verificationStatus = "all",
-          taxTreatment = "all"
+          taxTreatment = "all",
+          sortBy = "name",
+          sortOrder = "ascending"
         )
 
       val doc: Document = Jsoup.parse(html.body)
@@ -74,7 +75,7 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
 
       val clearFiltersLink =
         doc.select(
-          s"a[href='${controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId, mode).url}']"
+          s"a[href='${controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId).url}']"
         )
 
       clearFiltersLink.size() mustBe 1
@@ -98,17 +99,18 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       val html =
         view(
           form,
-          mode,
           rows,
           pagination,
           page = 1,
-          totalPages = 2,
+          totalPages = 1,
           startIndex = 1,
           totalCount = rows.size,
           instanceId = instanceId,
           searchTerm = "",
           verificationStatus = "all",
-          taxTreatment = "all"
+          taxTreatment = "all",
+          sortBy = "name",
+          sortOrder = "ascending"
         )
 
       val doc = Jsoup.parse(html.body)
@@ -128,7 +130,6 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       val html =
         view(
           form,
-          mode,
           rows,
           PaginationViewModel(),
           page = 1,
@@ -138,7 +139,9 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
           instanceId = instanceId,
           searchTerm = "",
           verificationStatus = "all",
-          taxTreatment = "all"
+          taxTreatment = "all",
+          sortBy = "name",
+          sortOrder = "ascending"
         )
 
       val doc = Jsoup.parse(html.body)
@@ -165,7 +168,6 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       val html =
         view(
           form,
-          mode,
           rows,
           paginationWithItems,
           page = 1,
@@ -175,7 +177,9 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
           instanceId = instanceId,
           searchTerm = "",
           verificationStatus = "all",
-          taxTreatment = "all"
+          taxTreatment = "all",
+          sortBy = "name",
+          sortOrder = "ascending"
         )
 
       val doc = Jsoup.parse(html.body)
@@ -191,7 +195,6 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       val html =
         view(
           formWithError,
-          mode,
           rows,
           pagination,
           page = 1,
@@ -201,7 +204,9 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
           instanceId = instanceId,
           searchTerm = "",
           verificationStatus = "all",
-          taxTreatment = "all"
+          taxTreatment = "all",
+          sortBy = "name",
+          sortOrder = "ascending"
         )
 
       val doc = Jsoup.parse(html.body)
@@ -214,7 +219,6 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       val html =
         view(
           form.fill("Alan"),
-          mode,
           rows,
           pagination,
           page = 2,
@@ -224,7 +228,9 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
           instanceId = instanceId,
           searchTerm = "Alan",
           verificationStatus = "verified",
-          taxTreatment = "gross"
+          taxTreatment = "gross",
+          sortBy = "name",
+          sortOrder = "ascending"
         )
 
       val doc = Jsoup.parse(html.body)

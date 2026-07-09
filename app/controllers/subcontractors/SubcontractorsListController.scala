@@ -18,7 +18,6 @@ package controllers.subcontractors
 
 import controllers.actions.*
 import forms.subcontractors.SubcontractorsListFormProvider
-import models.Mode
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.PaginationSubcontractorsListService
@@ -27,6 +26,10 @@ import viewmodels.subcontractors.*
 import views.html.subcontractors.SubcontractorsListView
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+import scala.util.Try
 
 import javax.inject.Inject
 
@@ -60,7 +63,100 @@ class SubcontractorsListController @Inject() (
     }
   }
 
-  def onPageLoad(instanceId: String, mode: Mode, page: Int = 1): Action[AnyContent] =
+  private val SortByName      = "name"
+  private val SortByDateAdded = "dateAdded"
+
+  private val SortOrderAsc  = "ascending"
+  private val SortOrderDesc = "descending"
+
+  private def normalisedSortBy(value: Option[String]): String =
+    value match {
+      case Some(SortByDateAdded) => SortByDateAdded
+      case _                     => SortByName
+    }
+
+  private def normalisedSortOrder(value: Option[String]): String =
+    value match {
+      case Some(SortOrderDesc) | Some("descending") => SortOrderDesc
+      case Some(SortOrderAsc) | Some("ascending")   => SortOrderAsc
+      case _                                        => SortOrderAsc
+    }
+
+  private val dateFormatters: Seq[DateTimeFormatter] =
+    Seq(
+      DateTimeFormatter.ISO_LOCAL_DATE,
+      DateTimeFormatter.ofPattern("d MMM yyyy", Locale.UK),
+      DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK),
+      DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.UK),
+      DateTimeFormatter.ofPattern("d/M/yyyy", Locale.UK)
+    )
+
+  private def parseDateAdded(value: String): LocalDate =
+    dateFormatters.view
+      .flatMap(formatter => Try(LocalDate.parse(value.trim, formatter)).toOption)
+      .headOption
+      .getOrElse(LocalDate.MIN)
+
+  private def sortRows(
+    rows: Seq[SubcontractorsListRow],
+    sortBy: String,
+    sortOrder: String
+  ): Seq[SubcontractorsListRow] =
+    sortBy match {
+
+      case SortByDateAdded =>
+        val sortedRows =
+          rows.sortBy(row => parseDateAdded(row.dateAdded))
+
+        if (sortOrder == SortOrderDesc) sortedRows.reverse
+        else sortedRows
+
+      case SortByName =>
+        val noNameRows =
+          rows.filter(row => row.name.trim.equalsIgnoreCase("No name provided"))
+
+        val namedRows =
+          rows.filterNot(row => row.name.trim.equalsIgnoreCase("No name provided"))
+
+        val sortedNamedRows =
+          namedRows.sortBy(row => row.name.trim.toLowerCase(Locale.UK))
+
+        val orderedNamedRows =
+          if (sortOrder == SortOrderDesc) sortedNamedRows.reverse
+          else sortedNamedRows
+
+        noNameRows ++ orderedNamedRows
+
+      case _ =>
+        rows
+    }
+
+  private def buildQueryString(
+    searchTerm: String,
+    verificationStatus: VerificationStatusFilter,
+    taxTreatment: TaxTreatmentFilter,
+    sortBy: String,
+    sortOrder: String
+  ): String =
+    Seq(
+      Option(searchTerm).filter(_.nonEmpty).map(v => "searchTerm=" + encode(v)),
+      Option(verificationStatus.value)
+        .filter(_ != VerificationStatusFilter.All.value)
+        .map(v => "verificationStatus=" + encode(v)),
+      Option(taxTreatment.value)
+        .filter(_ != TaxTreatmentFilter.All.value)
+        .map(v => "taxTreatment=" + encode(v)),
+      Some("sortBy=" + encode(sortBy)),
+      Some("sortOrder=" + encode(sortOrder))
+    ).flatten.mkString("&")
+
+  private def matchesSearchTerm(row: SubcontractorsListRow, searchTerm: String): Boolean = {
+    val normalisedSearchTerm = searchTerm.trim.toLowerCase
+
+    row.name.toLowerCase.contains(normalisedSearchTerm)
+  }
+
+  def onPageLoad(instanceId: String, page: Int = 1): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
 
       val searchTerm =
@@ -79,16 +175,17 @@ class SubcontractorsListController @Inject() (
           request.getQueryString("taxTreatment").getOrElse(TaxTreatmentFilter.All.value)
         )
 
+      val sortBy =
+        normalisedSortBy(request.getQueryString("sortBy"))
+
+      val sortOrder =
+        normalisedSortOrder(request.getQueryString("sortOrder"))
+
       val allRows = SubcontractorsListData.rows
 
       val searchFiltered =
         if (searchTerm.isEmpty) allRows
-        else
-          allRows.filter { row =>
-            row.name.toLowerCase.contains(searchTerm.toLowerCase) ||
-            row.utr.contains(searchTerm) ||
-            row.verificationNumber.contains(searchTerm)
-          }
+        else allRows.filter(row => matchesSearchTerm(row, searchTerm))
 
       val verificationFiltered =
         verificationStatus match {
@@ -121,32 +218,29 @@ class SubcontractorsListController @Inject() (
         }
 
       val sortedRows =
-        taxFiltered.sortBy(_.name.toLowerCase)
+        sortRows(taxFiltered, sortBy, sortOrder)
 
       val queryString =
-        Seq(
-          Option(searchTerm).filter(_.nonEmpty).map(v => "searchTerm=" + encode(v)),
-          Option(verificationStatus.value)
-            .filter(_ != VerificationStatusFilter.All.value)
-            .map(v => "verificationStatus=" + encode(v)),
-          Option(taxTreatment.value)
-            .filter(_ != TaxTreatmentFilter.All.value)
-            .map(v => "taxTreatment=" + encode(v))
-        ).flatten.mkString("&")
+        buildQueryString(
+          searchTerm,
+          verificationStatus,
+          taxTreatment,
+          sortBy,
+          sortOrder
+        )
 
       val result =
         paginationService.paginate(
           allItems = sortedRows,
           currentPage = page,
           recordsPerPage = SubcontractorsListConstants.RecordsPerPage,
-          baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
+          baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId).url,
           queryString = queryString
         )
 
       Ok(
         view(
           filledForm,
-          mode,
           result.items,
           result.pagination,
           result.currentPage,
@@ -156,12 +250,14 @@ class SubcontractorsListController @Inject() (
           instanceId,
           searchTerm,
           verificationStatus.value,
-          taxTreatment.value
+          taxTreatment.value,
+          sortBy,
+          sortOrder
         )
       )
     }
 
-  def onSubmit(instanceId: String, mode: Mode, page: Int = 1): Action[AnyContent] =
+  def onSubmit(instanceId: String, page: Int = 1): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       form
         .bindFromRequest()
@@ -184,6 +280,12 @@ class SubcontractorsListController @Inject() (
                 formData.get("taxTreatment").flatMap(_.headOption).getOrElse(TaxTreatmentFilter.All.value)
               )
 
+            val sortBy =
+              normalisedSortBy(formData.get("sortBy").flatMap(_.headOption))
+
+            val sortOrder =
+              normalisedSortOrder(formData.get("sortOrder").flatMap(_.headOption))
+
             val allRows = SubcontractorsListData.rows
 
             val hasSearchTermError =
@@ -195,11 +297,7 @@ class SubcontractorsListController @Inject() (
               } else if (searchTerm.isEmpty) {
                 allRows
               } else {
-                allRows.filter { row =>
-                  row.name.toLowerCase.contains(searchTerm.toLowerCase) ||
-                  row.utr.contains(searchTerm) ||
-                  row.verificationNumber.contains(searchTerm)
-                }
+                allRows.filter(row => matchesSearchTerm(row, searchTerm))
               }
 
             val verificationFiltered =
@@ -233,32 +331,29 @@ class SubcontractorsListController @Inject() (
               }
 
             val sortedRows =
-              taxFiltered.sortBy(_.name.toLowerCase)
+              sortRows(taxFiltered, sortBy, sortOrder)
 
             val queryString =
-              Seq(
-                Option(searchTerm).filter(_.nonEmpty).map(v => "searchTerm=" + encode(v)),
-                Option(verificationStatus.value)
-                  .filter(_ != VerificationStatusFilter.All.value)
-                  .map(v => "verificationStatus=" + encode(v)),
-                Option(taxTreatment.value)
-                  .filter(_ != TaxTreatmentFilter.All.value)
-                  .map(v => "taxTreatment=" + encode(v))
-              ).flatten.mkString("&")
+              buildQueryString(
+                searchTerm,
+                verificationStatus,
+                taxTreatment,
+                sortBy,
+                sortOrder
+              )
 
             val result =
               paginationService.paginate(
                 allItems = sortedRows,
                 currentPage = page,
                 recordsPerPage = SubcontractorsListConstants.RecordsPerPage,
-                baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
+                baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId).url,
                 queryString = queryString
               )
 
             BadRequest(
               view(
                 formWithErrors,
-                mode,
                 result.items,
                 result.pagination,
                 result.currentPage,
@@ -268,7 +363,9 @@ class SubcontractorsListController @Inject() (
                 instanceId,
                 searchTerm,
                 verificationStatus.value,
-                taxTreatment.value
+                taxTreatment.value,
+                sortBy,
+                sortOrder
               )
             )
           },
@@ -293,12 +390,18 @@ class SubcontractorsListController @Inject() (
                 formData.get("taxTreatment").flatMap(_.headOption).getOrElse(TaxTreatmentFilter.All.value)
               )
 
+            val sortBy =
+              normalisedSortBy(formData.get("sortBy").flatMap(_.headOption))
+
+            val sortOrder =
+              normalisedSortOrder(formData.get("sortOrder").flatMap(_.headOption))
+
             val targetPage =
               gotoPage.getOrElse(1)
 
             val baseUrl =
               routes.SubcontractorsListController
-                .onPageLoad(instanceId, mode, targetPage)
+                .onPageLoad(instanceId, targetPage)
                 .url
 
             val redirectUrl =
@@ -307,7 +410,9 @@ class SubcontractorsListController @Inject() (
                 Seq(
                   "searchTerm"         -> searchTerm.trim,
                   "verificationStatus" -> verificationStatus.value,
-                  "taxTreatment"       -> taxTreatment.value
+                  "taxTreatment"       -> taxTreatment.value,
+                  "sortBy"             -> sortBy,
+                  "sortOrder"          -> sortOrder
                 )
               )
 

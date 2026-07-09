@@ -110,6 +110,24 @@ object SubcontractorsListData {
       "02 Jan 2026"
     ),
     SubcontractorsListRow(
+      "noNameProvided1",
+      "No name provided",
+      "1111111127",
+      false,
+      "V0009000017",
+      TaxTreatment.StandardRate,
+      "17 Jan 2026"
+    ),
+    SubcontractorsListRow(
+      "noNameProvided2",
+      "No name provided",
+      "1111111128",
+      true,
+      "V0009000018",
+      TaxTreatment.Gross,
+      "18 Jan 2026"
+    ),
+    SubcontractorsListRow(
       "charlieWorks",
       "Charlie Works Ltd",
       "1111111113",
