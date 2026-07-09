@@ -26,7 +26,7 @@
   bulletListWithLinks: BulletListWithLinks
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("agentLostAccess.title"))) {
 
@@ -45,7 +45,7 @@
     ),
     link(
       linkTextKey = messages("agentLostAccess.bullet.item.2.link"),
-      linkUrl = "#",
+      linkUrl = appConfig.taxAgentsAndAdvisorsAuthorisationFormsUrl,
       paragraphWrapped = false,
       prefixTextKey = messages("agentLostAccess.bullet.item.2.prefix"),
       suffixTextKey = messages("agentLostAccess.bullet.item.2.suffix")
@@ -56,6 +56,6 @@
 
   @link(
     linkTextKey = messages("agentLostAccess.return.link"),
-    linkUrl = "#"
+    linkUrl = controllers.agent.routes.ClientListSearchController.onPageLoad().url
   )
 }

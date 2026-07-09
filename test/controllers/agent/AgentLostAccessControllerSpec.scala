@@ -37,7 +37,7 @@ class AgentLostAccessControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[AgentLostAccessView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view()(request, applicationConfig, messages(application)).toString
       }
     }
   }
