@@ -180,6 +180,8 @@ GET  /subcontractors/cannot-delete-subcontractor-warning                       c
 
 GET  /subcontractors/no-subcontractors-to-view      controllers.subcontractors.NoSubcontractorsExistController.onPageLoad()
 
-GET   /subcontractors/retrieve  controllers.subcontractors.GetSubcontractorListController.onPageLoad()
+GET  /agentLostAccess                       controllers.agent.AgentLostAccessController.onPageLoad()
+
+GET  /subcontractors/retrieve  controllers.subcontractors.GetSubcontractorListController.onPageLoad()
 
 GET  /verification-history/retrieve  controllers.verify.GetSubmittedVerificationsController.onPageLoad()
