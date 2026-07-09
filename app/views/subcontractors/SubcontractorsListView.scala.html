@@ -285,14 +285,18 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
                 attributes = Map("data-sort-value" -> row.dateAdded)
                 ),
                        TableRow(
-                           HtmlContent(
-                            "<a class=\"govuk-link\" href=\"#\">" +
-                            "Delete" +
-                            "<span class=\"govuk-visually-hidden\"> " +
-                              HtmlFormat.escape(row.name) +
-                              "</span></a>"
-                            )
+                        HtmlContent(
+                            link(
+                                linkTextKey = "subcontractors.subcontractorsList.delete",
+                                linkUrl = controllers.subcontractors.routes.GetSubcontractorForDeleteController
+                                    .onPageLoad(row.subbieResourceRef)
+                                    .url,
+                                paragraphWrapped = false,
+                                visuallyHiddenText = Some(row.name)
+                            ).body
+                        )
                        )
+
                     )
                 },
 

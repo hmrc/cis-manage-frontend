@@ -55,7 +55,17 @@ class SubcontractorsLandingPageController @Inject() (
 
       contractorNameOpt match {
         case Some(contractorName) =>
-          Ok(view(contractorName))
+          val subcontractorsPageUrl =
+            controllers.subcontractors.routes.SubcontractorsListController
+              .onPageLoad(instanceId)
+              .url
+
+          Ok(
+            view(
+              contractorName,
+              subcontractorsPageUrl
+            )
+          )
 
         case None =>
           logger.warn(

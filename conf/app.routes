@@ -1,26 +1,31 @@
 # Routes
 
 # Infrastructure
-->    /hmrc-frontend                                       hmrcfrontend.Routes
+->    /hmrc-frontend  hmrcfrontend.Routes
 
-GET   /                                                    controllers.IndexController.onPageLoad()
+GET   /  controllers.IndexController.onPageLoad()
 
-GET   /assets/*file                                        controllers.Assets.versioned(path="/public", file: Asset)
+GET   /assets/*file  controllers.Assets.versioned(path="/public", file: Asset)
 
-GET   /language/:lang                                      controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET   /language/:lang  controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET   /refresh-session                                     controllers.KeepAliveController.keepAlive()
+GET   /refresh-session  controllers.KeepAliveController.keepAlive()
 
-GET   /check-your-answers                                  controllers.CheckYourAnswersController.onPageLoad()
+GET   /check-your-answers  controllers.CheckYourAnswersController.onPageLoad()
 
-GET   /subcontractors/delete-subcontractor                 controllers.subcontractors.DeleteSubcontractorYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractors/delete-subcontractor                 controllers.subcontractors.DeleteSubcontractorYesNoController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractors/delete-subcontractor  controllers.subcontractors.DeleteSubcontractorYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST  /subcontractors/delete-subcontractor  controllers.subcontractors.DeleteSubcontractorYesNoController.onSubmit(mode: Mode = NormalMode)
 
-GET   /subcontractors/subcontractor-deleted                controllers.subcontractors.SubcontractorDeletedConfirmationController.onPageLoad()
+GET   /subcontractors/subcontractor-deleted  controllers.subcontractors.SubcontractorDeletedConfirmationController.onPageLoad()
 
 GET   /subcontractors/cannot-delete-subcontractor-warning  controllers.subcontractors.CannotDeleteSubcontractorController.onPageLoad()
 
-GET   /subcontractors/no-subcontractors-to-view            controllers.subcontractors.NoSubcontractorsExistController.onPageLoad()
+GET   /subcontractors/no-subcontractors-to-view  controllers.subcontractors.NoSubcontractorsExistController.onPageLoad()
+
+GET   /subcontractors/:instanceId/your-subcontractors  controllers.subcontractors.SubcontractorsListController.onPageLoad(instanceId: String, page: Int ?= 1)
+POST  /subcontractors/:instanceId/your-subcontractors  controllers.subcontractors.SubcontractorsListController.onSubmit(instanceId: String, page: Int ?= 1)
+
+GET   /subcontractors/:subbieResourceRef/delete-status/  controllers.subcontractors.GetSubcontractorForDeleteController.onPageLoad(subbieResourceRef: Long)
 
 # Errors & Auth
 GET  /there-is-a-problem               controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
@@ -55,8 +60,8 @@ GET   /agent/no-client-list                                    controllers.agent
 
 GET   /agent/no-authorised-clients                             controllers.agent.NoAuthorisedClientsController.onPageLoad()
 
-GET   /agent/cis-return-dashboard/:uniqueId                    controllers.agent.AgentLandingController.onPageLoad(uniqueId: String)
-GET   /agent/cis-return-dashboard/:uniqueId/target/:targetKey  controllers.agent.AgentLandingController.onTargetClick(uniqueId: String, targetKey: String)
+GET   /agent/manage-construction-industry-service-account/:uniqueId                    controllers.agent.AgentLandingController.onPageLoad(uniqueId: String)
+GET   /agent/manage-construction-industry-service-account/:uniqueId/target/:targetKey  controllers.agent.AgentLandingController.onTargetClick(uniqueId: String, targetKey: String)
 
 GET   /agent/file-monthly-cis-returns                          controllers.agent.ClientListSearchController.onPageLoad()
 POST  /agent/file-monthly-cis-returns                          controllers.agent.ClientListSearchController.onSubmit()
@@ -133,6 +138,7 @@ POST  /verify/select-tax-year-for-verification-requests     controllers.verify.V
 
 GET   /verify/history/verification-history-all-tax-years    controllers.verify.VerificationHistoryController.onPageLoadAllYears()
 GET   /verify/history/verification-history-single-tax-year  controllers.verify.VerificationHistoryController.onPageLoadSingleYear()
+
 GET   /verify/history/submission-receipt                    controllers.verify.SubcontractorSubmissionReceiptController.onPageLoad()
 
 GET   /verify/verification-request                          controllers.verify.VerificationRequestController.onPageLoad(verificationNumber: String)

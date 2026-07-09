@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package viewmodels.agent
+package pages.subcontractors
 
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
+import models.subcontractors.DeleteSubcontractorJourneyData
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-class AgentLandingViewModelSpec extends AnyFreeSpec with Matchers {
+case object DeleteSubcontractorJourneyPage extends QuestionPage[DeleteSubcontractorJourneyData] {
 
-  "AgentLandingViewModel" - {
-
-    "must hold the given values" in {
-      val model = AgentLandingViewModel(
-        schemeName = "ABC Construction Ltd",
-        employerRef = "123/AB45678"
-      )
-
-      model.schemeName mustBe "ABC Construction Ltd"
-      model.employerRef mustBe "123/AB45678"
-    }
-  }
+  override def path: JsPath =
+    JsPath \ "deleteSubcontractorJourney"
 }
