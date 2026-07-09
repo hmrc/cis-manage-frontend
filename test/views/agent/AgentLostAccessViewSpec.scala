@@ -30,12 +30,26 @@ class AgentLostAccessViewSpec extends SpecBase {
 
   "AgentLostAccessView" - {
 
-    "must render the page with the correct title, heading" in new Setup {
+    "must render the page with the correct title, heading, paragraph, list items & links" in new Setup {
       private val html: HtmlFormat.Appendable = view()
       private val doc: Document               = Jsoup.parse(html.body)
 
-      doc.title             must include(messages("agentLostAccess.title"))
-      doc.select("h1").text must include(messages("agentLostAccess.heading"))
+      doc.title                                 must include(messages("agentLostAccess.title"))
+      doc.select("h1").text                     must include(messages("agentLostAccess.heading"))
+
+      doc.select("p").text                      must include(messages("agentLostAccess.p1"))
+      doc.select("h1").text                     must include(messages("agentLostAccess.h1"))
+
+      doc.select("p").text                      must include(messages("agentLostAccess.bullet.title"))
+      doc.select("li").text                     must include(messages("agentLostAccess.bullet.item.1.prefix"))
+      doc.getElementsByClass("govuk-link").text must include(messages("agentLostAccess.bullet.item.1.link"))
+      doc.select("li").text                     must include(messages("agentLostAccess.bullet.item.2.prefix"))
+      doc.getElementsByClass("govuk-link").text must include(messages("agentLostAccess.bullet.item.2.link"))
+      doc.select("li").text                     must include(messages("agentLostAccess.bullet.item.2.suffix"))
+
+      doc.select("p").text                      must include(messages("agentLostAccess.p2"))
+
+      doc.getElementsByClass("govuk-link").text must include(messages("agentLostAccess.return.link"))
     }
   }
 
