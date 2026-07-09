@@ -30,7 +30,7 @@ class AgentLostAccessViewSpec extends SpecBase {
 
   "AgentLostAccessView" - {
 
-    "must render the page with the correct title, heading and paragraph" in new Setup {
+    "must render the page with the correct title, heading" in new Setup {
       private val html: HtmlFormat.Appendable = view()
       private val doc: Document               = Jsoup.parse(html.body)
 
@@ -40,9 +40,9 @@ class AgentLostAccessViewSpec extends SpecBase {
   }
 
   trait Setup {
-    private val app: Application       = applicationBuilder().build()
-    val view: AgentLostAccessView = app.injector.instanceOf[AgentLostAccessView]
-    implicit val request: Request[_]   = FakeRequest()
-    implicit val messages: Messages    = MessagesImpl(Lang.defaultLang, app.injector.instanceOf[MessagesApi])
+    private val app: Application     = applicationBuilder().build()
+    val view: AgentLostAccessView    = app.injector.instanceOf[AgentLostAccessView]
+    implicit val request: Request[_] = FakeRequest()
+    implicit val messages: Messages  = MessagesImpl(Lang.defaultLang, app.injector.instanceOf[MessagesApi])
   }
 }
