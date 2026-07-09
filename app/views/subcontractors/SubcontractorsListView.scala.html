@@ -59,16 +59,16 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
 
 }
 
-    @getSortState(column: String) = @{
-    if (sortBy == column) {
-    sortOrder match {
-    case "ascending"  => "ascending"
-    case "descending" => "descending"
-    case _            => "none"
-    }
-    } else {
-    "none"
-    }
+   @getSortState(column: String) = @{
+     if (sortBy == column) {
+        sortOrder match {
+            case "ascending"  => "ascending"
+            case "descending" => "descending"
+            case _            => "none"
+        }
+     } else {
+            "none"
+     }
     }
 
 
@@ -186,7 +186,6 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
                       messages("subcontractors.subcontractorsList.searchAndFilter")
                   )
                )
-
                 @link(
                 linkTextKey = "subcontractors.subcontractorsList.clearFilters",
                 linkUrl = controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId).url
@@ -214,55 +213,52 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
                 captionClasses = "govuk-table__caption govuk-table__caption--m govuk-visually-hidden",
                   head = Some(
                     Seq(
-
-                HeadCell(
-                content = Text(messages("subcontractors.subcontractorsList.name")),
-                attributes = Map(
-                "aria-sort" -> getSortState("name"),
-                "data-sort-column" -> "name"
-                )
-                ),
-                HeadCell(Text(messages("subcontractors.subcontractorsList.utr"))),
-                        HeadCell(Text(messages("subcontractors.subcontractorsList.verified"))),
-                        HeadCell(Text(messages("subcontractors.subcontractorsList.verificationNumber"))),
-                        HeadCell(Text(messages("subcontractors.subcontractorsList.taxTreatment"))),
-
-                HeadCell(
-                content = Text(messages("subcontractors.subcontractorsList.dateAdded")),
-                attributes = Map(
-                "aria-sort" -> getSortState("dateAdded"),
-                "data-sort-column" -> "dateAdded"
-                )
-                ),
-
-                HeadCell(Text(messages("subcontractors.subcontractorsList.action")))
+                  HeadCell(
+                     content = Text(messages("subcontractors.subcontractorsList.name")),
+                       attributes = Map(
+                        "aria-sort" -> getSortState("name"),
+                        "data-sort-column" -> "name"
+                     )
+                  ),
+                   HeadCell(Text(messages("subcontractors.subcontractorsList.utr"))),
+                   HeadCell(Text(messages("subcontractors.subcontractorsList.verified"))),
+                   HeadCell(Text(messages("subcontractors.subcontractorsList.verificationNumber"))),
+                   HeadCell(Text(messages("subcontractors.subcontractorsList.taxTreatment"))),
+                   HeadCell(
+                    content = Text(messages("subcontractors.subcontractorsList.dateAdded")),
+                       attributes = Map(
+                        "aria-sort" -> getSortState("dateAdded"),
+                        "data-sort-column" -> "dateAdded"
+                      )
+                    ),
+                   HeadCell(Text(messages("subcontractors.subcontractorsList.action")))
                    )
                  ),
 
                  rows = rows.map { row =>
                    Seq(
-                TableRow(
-                content = HtmlContent(
-                s"""
-                <a class="govuk-link" href="#">
-                    ${HtmlFormat.escape(row.name)}
-                    <span class="govuk-visually-hidden">
-                Show details for ${HtmlFormat.escape(row.name)}
-            </span>
-                </a>
-                """
-                ),
-                attributes = Map(
-                "data-sort-value" -> row.name
-                )
-                ),
-                     TableRow(Text(row.utr)),
+                   TableRow(
+                     content = HtmlContent(
+                      s"""
+                       <a class="govuk-link" href="#">
+                          ${HtmlFormat.escape(row.name)}
+                            <span class="govuk-visually-hidden">
+                               Show details for ${HtmlFormat.escape(row.name)}
+                            </span>
+                       </a>
+                      """
+                   ),
+                    attributes = Map(
+                     "data-sort-value" -> row.name
+                    )
+                   ),
+                   TableRow(Text(row.utr)),
                        TableRow(
                            Text(
                              messages(if (row.verified) "site.yes" else "site.no")
                            )
                        ),
-                     TableRow(Text(row.verificationNumber)),
+                   TableRow(Text(row.verificationNumber)),
                        TableRow(
                             Text(
                             row.taxTreatment match {
@@ -280,23 +276,19 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
                             }
                        )
                     ),
-                TableRow(
-                content = Text(row.dateAdded),
-                attributes = Map("data-sort-value" -> row.dateAdded)
-                ),
-                       TableRow(
-                        HtmlContent(
-                            link(
-                                linkTextKey = "subcontractors.subcontractorsList.delete",
-                                linkUrl = controllers.subcontractors.routes.GetSubcontractorForDeleteController
-                                    .onPageLoad(row.subbieResourceRef)
-                                    .url,
-                                paragraphWrapped = false,
-                                visuallyHiddenText = Some(row.name)
-                            ).body
-                        )
+                   TableRow(
+                      content = Text(row.dateAdded),
+                        attributes = Map("data-sort-value" -> row.dateAdded)
+                   ),
+                   TableRow(
+                       HtmlContent(
+                         "<a class=\"govuk-link\" href=\"#\">" +
+                            "Delete" +
+                               "<span class=\"govuk-visually-hidden\"> " +
+                                  HtmlFormat.escape(row.name) +
+                               "</span></a>"
+                            )
                        )
-
                     )
                 },
 
