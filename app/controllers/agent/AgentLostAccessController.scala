@@ -28,15 +28,13 @@ import javax.inject.{Inject, Named}
 class AgentLostAccessController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("AgentIdentifier") identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: AgentLostAccessView
 )(implicit appConfig: FrontendAppConfig)
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad: Action[AnyContent] = identify { implicit request =>
     Ok(view())
   }
 }
