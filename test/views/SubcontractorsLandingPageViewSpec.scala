@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,13 +30,9 @@ class SubcontractorsLandingPageViewSpec extends SpecBase {
   "SubcontractorsLandingPageView" - {
 
     "must render the correct title, heading, paragraphs and links" in new Setup {
-      val contractorName                = "ABC Organisation Ltd"
-      val subcontractorsPageUrl: String =
-        controllers.subcontractors.routes.SubcontractorsListController
-          .onPageLoad("CIS-123")
-          .url
-      val html: HtmlFormat.Appendable   = view(contractorName, subcontractorsPageUrl)
-      val doc: Document                 = Jsoup.parse(html.body)
+      val contractorName              = "ABC Organisation Ltd"
+      val html: HtmlFormat.Appendable = view(contractorName)
+      val doc: Document               = Jsoup.parse(html.body)
 
       doc.title                                 must include(messages("subcontractorsLandingPage.title"))
       doc.select("h1").text                     must include(messages("subcontractorsLandingPage.heading"))
@@ -57,6 +53,11 @@ class SubcontractorsLandingPageViewSpec extends SpecBase {
       doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.aside.link1"))
       doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.aside.link2"))
       doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.aside.link3"))
+      doc
+        .select(
+          s"a[href='${controllers.subcontractors.routes.GetSubcontractorListController.onPageLoad().url}']"
+        )
+        .text                                   must include(messages("subcontractorsLandingPage.subcontractorList"))
     }
   }
 

@@ -19,12 +19,15 @@ package services
 import connectors.ConstructionIndustrySchemeConnector
 import models.response.GetSubcontractorForDeleteResponse
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import models.response.GetSubcontractorListResponse
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.HeaderCarrier
 import org.scalatest.concurrent.ScalaFutures
+import scala.concurrent.Await
+import scala.concurrent.duration.*
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -35,6 +38,7 @@ class SubcontractorServiceSpec extends AnyFreeSpec with Matchers with MockitoSug
 
   private val cisId             = "123"
   private val subbieResourceRef = 10L
+  private val instanceId        = "instance-id"
 
   "SubcontractorService#getSubcontractorDeleteStatus" - {
 
@@ -101,6 +105,32 @@ class SubcontractorServiceSpec extends AnyFreeSpec with Matchers with MockitoSug
           eqTo(cisId),
           eqTo(subbieResourceRef)
         )(any())
+    }
+  }
+
+  "SubcontractorService#getSubcontractorList" - {
+
+    "must return the subcontractor list from the connector" in {
+      val connector = mock[ConstructionIndustrySchemeConnector]
+      val service   = new SubcontractorService(connector)
+
+      val expectedResponse =
+        GetSubcontractorListResponse(
+          subcontractors = Seq.empty
+        )
+
+      when(connector.getSubcontractorList(instanceId))
+        .thenReturn(Future.successful(expectedResponse))
+
+      val result =
+        Await.result(
+          service.getSubcontractorList(instanceId),
+          5.seconds
+        )
+
+      result mustEqual expectedResponse
+
+      verify(connector).getSubcontractorList(instanceId)
     }
   }
 }
