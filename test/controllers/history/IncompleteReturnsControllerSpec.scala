@@ -17,6 +17,7 @@
 package controllers.history
 
 import base.SpecBase
+import config.FrontendAppConfig
 import models.{Deletable, NotDeletable, UnsubmittedMonthlyReturnsRow, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
@@ -344,6 +345,85 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(GET, onDeleteRedirectRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController
+          .onPageLoad()
+          .url
+      }
+    }
+  }
+
+  "IncompleteReturnsController.onContinueRedirect" - {
+
+    val monthlyReturnId = 3000L
+
+    lazy val onContinueRedirectRoute: String =
+      routes.IncompleteReturnsController.onContinueRedirect(monthlyReturnId).url
+
+    "must redirect to continue return journey when an unsubmitted return is editable" in {
+      val mockManageService            = mock[ManageService]
+      val mockSessionRepository        = mock[SessionRepository]
+      val appConfig: FrontendAppConfig = mock[FrontendAppConfig]
+
+      val mockDeletableResult = UnsubmittedMonthlyReturnsRow(
+        monthlyReturnId = monthlyReturnId,
+        taxYear = 2026,
+        taxMonth = 4,
+        returnType = "Nil",
+        status = "In Progress",
+        lastUpdate = None,
+        amendment = Some("Y"),
+        deletable = true
+      )
+
+      when(appConfig.continueReturnJourneyUrl(any[String], any[String], any[String]))
+        .thenReturn("/continue")
+      when(
+        mockManageService.checkUnsubmittedMonthlyReturnDeletion(any[UserAnswers], any[Long])(
+          any[HeaderCarrier]
+        )
+      ).thenReturn(Future.successful(Deletable(mockDeletableResult)))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+          .overrides(
+            bind[ManageService].toInstance(mockManageService),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[FrontendAppConfig].toInstance(appConfig)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, onContinueRedirectRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual "/continue"
+      }
+    }
+
+    "must redirect to journey recovery when an unsubmitted return is not editable" in {
+      val mockManageService     = mock[ManageService]
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(
+        mockManageService.checkUnsubmittedMonthlyReturnDeletion(any[UserAnswers], any[Long])(
+          any[HeaderCarrier]
+        )
+      ).thenReturn(Future.successful(NotDeletable))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[ManageService].toInstance(mockManageService)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, onContinueRedirectRoute)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
