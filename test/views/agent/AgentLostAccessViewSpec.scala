@@ -38,7 +38,7 @@ class AgentLostAccessViewSpec extends SpecBase {
       doc.select("h1").text must include(messages("agentLostAccess.heading"))
 
       doc.select("p").text  must include(messages("agentLostAccess.p1"))
-      doc.select("h1").text must include(messages("agentLostAccess.h1"))
+      doc.select("h2").text must include(messages("agentLostAccess.h2"))
 
       doc.select("p").text                      must include(messages("agentLostAccess.bullet.title"))
       doc.select("li").text                     must include(messages("agentLostAccess.bullet.item.1.prefix"))
