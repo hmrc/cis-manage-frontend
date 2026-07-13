@@ -16,6 +16,7 @@
 
 package controllers.history
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import controllers.routes
 import models.*
@@ -41,7 +42,7 @@ class IncompleteReturnsController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: IncompleteReturnsView,
   service: ManageService
-)(implicit ec: ExecutionContext)
+)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
@@ -71,6 +72,24 @@ class IncompleteReturnsController @Inject() (
       }
     }
 
+  def onContinueRedirect(monthlyReturnId: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+      service.checkUnsubmittedMonthlyReturnDeletion(request.userAnswers, monthlyReturnId).flatMap {
+        case Deletable(record) =>
+          Future.successful(
+            Redirect(
+              appConfig.continueReturnJourneyUrl(request.cisId, record.taxYear.toString, record.taxMonth.toString)
+            )
+          )
+        case _                 =>
+          logger
+            .warn(
+              s"[IncompleteReturnsController] Record is non-editable for monthlyReturnId=$monthlyReturnId"
+            )
+          Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      }
+    }
+
   private def resolveDeleteRoute(record: UnsubmittedMonthlyReturnsRow): Call =
     (record.returnType, record.amendment) match {
       case ("Nil", Some("Y"))      => controllers.delete.routes.DeleteAmendedNilMonthlyReturnController.onPageLoad()
@@ -78,7 +97,9 @@ class IncompleteReturnsController @Inject() (
       case ("Standard", Some("Y")) => controllers.delete.routes.DeleteAmendedMonthlyReturnController.onPageLoad()
       case ("Standard", Some("N")) => controllers.delete.routes.DeleteMonthlyReturnController.onPageLoad()
       case _                       =>
-        logger.warn(s"[ReturnsLandingController] No delete route mapping for monthlyReturnId=${record.monthlyReturnId}")
+        logger.warn(
+          s"[IncompleteReturnsController] No delete route mapping for monthlyReturnId=${record.monthlyReturnId}"
+        )
         controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 }
