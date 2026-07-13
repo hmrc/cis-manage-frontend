@@ -34,22 +34,22 @@ class AgentLostAccessViewSpec extends SpecBase {
       private val html: HtmlFormat.Appendable = view()
       private val doc: Document               = Jsoup.parse(html.body)
 
-      doc.title             must include(messages("agentLostAccess.title"))
-      doc.select("h1").text must include(messages("agentLostAccess.heading"))
+      doc.title             must include(messages("agent.agentLostAccess.title"))
+      doc.select("h1").text must include(messages("agent.agentLostAccess.heading"))
 
-      doc.select("p").text  must include(messages("agentLostAccess.p1"))
-      doc.select("h2").text must include(messages("agentLostAccess.h2"))
+      doc.select("p").text  must include(messages("agent.agentLostAccess.p1"))
+      doc.select("h2").text must include(messages("agent.agentLostAccess.h2"))
 
-      doc.select("p").text                      must include(messages("agentLostAccess.bullet.title"))
-      doc.select("li").text                     must include(messages("agentLostAccess.bullet.item.1.prefix"))
-      doc.getElementsByClass("govuk-link").text must include(messages("agentLostAccess.bullet.item.1.link"))
-      doc.select("li").text                     must include(messages("agentLostAccess.bullet.item.2.prefix"))
-      doc.getElementsByClass("govuk-link").text must include(messages("agentLostAccess.bullet.item.2.link"))
-      doc.select("li").text                     must include(messages("agentLostAccess.bullet.item.2.suffix"))
+      doc.select("p").text                      must include(messages("agent.agentLostAccess.bullet.title"))
+      doc.select("li").text                     must include(messages("agent.agentLostAccess.bullet.item.1.prefix"))
+      doc.getElementsByClass("govuk-link").text must include(messages("agent.agentLostAccess.bullet.item.1.link"))
+      doc.select("li").text                     must include(messages("agent.agentLostAccess.bullet.item.2.prefix"))
+      doc.getElementsByClass("govuk-link").text must include(messages("agent.agentLostAccess.bullet.item.2.link"))
+      doc.select("li").text                     must include(messages("agent.agentLostAccess.bullet.item.2.suffix"))
 
-      doc.select("p").text must include(messages("agentLostAccess.p2"))
+      doc.select("p").text must include(messages("agent.agentLostAccess.p2"))
 
-      doc.getElementsByClass("govuk-link").text must include(messages("agentLostAccess.return.link"))
+      doc.getElementsByClass("govuk-link").text must include(messages("agent.agentLostAccess.return.link"))
     }
   }
 
