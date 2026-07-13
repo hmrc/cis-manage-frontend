@@ -28,37 +28,37 @@
 
 @()(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("agentLostAccess.title")),
+@layout(pageTitle = titleNoForm(messages("agent.agentLostAccess.title")),
   showSignOut = false,
   showBackLink = false
 ) {
 
-  @h1(messages("agentLostAccess.heading"), "govuk-heading-xl")
-  @paragraph(messages("agentLostAccess.p1"))
+  @h1(messages("agent.agentLostAccess.heading"), "govuk-heading-xl")
+  @paragraph(messages("agent.agentLostAccess.p1"))
 
-  @h2(messages("agentLostAccess.h2"), "govuk-heading-m")
-  @paragraph(messages("agentLostAccess.bullet.title"))
+  @h2(messages("agent.agentLostAccess.h2"), "govuk-heading-m")
+  @paragraph(messages("agent.agentLostAccess.bullet.title"))
 
   @bulletListWithLinks(Seq(
     link(
-      linkTextKey = "agentLostAccess.bullet.item.1.link",
+      linkTextKey = "agent.agentLostAccess.bullet.item.1.link",
       linkUrl = appConfig.registerAsAProfessionalTaxAgentWithHmrcUrl,
       paragraphWrapped = false,
-      prefixTextKey = "agentLostAccess.bullet.item.1.prefix",
+      prefixTextKey = "agent.agentLostAccess.bullet.item.1.prefix",
     ),
     link(
-      linkTextKey = "agentLostAccess.bullet.item.2.link",
+      linkTextKey = "agent.agentLostAccess.bullet.item.2.link",
       linkUrl = appConfig.taxAgentsAndAdvisorsAuthorisationFormsUrl,
       paragraphWrapped = false,
-      prefixTextKey = "agentLostAccess.bullet.item.2.prefix",
-      suffixTextKey = "agentLostAccess.bullet.item.2.suffix"
+      prefixTextKey = "agent.agentLostAccess.bullet.item.2.prefix",
+      suffixTextKey = "agent.agentLostAccess.bullet.item.2.suffix"
     )
   ))
 
-  @paragraph(messages("agentLostAccess.p2"))
+  @paragraph(messages("agent.agentLostAccess.p2"))
 
   @link(
-    linkTextKey = messages("agentLostAccess.return.link"),
+    linkTextKey = messages("agent.agentLostAccess.return.link"),
     linkUrl = controllers.agent.routes.ClientListSearchController.onPageLoad().url
   )
 }
