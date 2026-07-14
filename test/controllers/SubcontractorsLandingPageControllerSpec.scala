@@ -27,10 +27,9 @@ import views.html.SubcontractorsLandingPageView
 
 class SubcontractorsLandingPageControllerSpec extends SpecBase with MockitoSugar {
 
-  private val instanceId            = "CIS-123"
-  private val contractorName        = "ABC Construction Ltd"
-  private val agentClientName       = "Client Ltd"
-  private val subcontractorsPageUrl = s"/subcontractors/$instanceId/your-subcontractors"
+  private val instanceId      = "CIS-123"
+  private val contractorName  = "ABC Construction Ltd"
+  private val agentClientName = "Client Ltd"
 
   "SubcontractorsLandingPageController.onPageLoad (contractor)" - {
 
@@ -65,7 +64,7 @@ class SubcontractorsLandingPageControllerSpec extends SpecBase with MockitoSugar
 
         status(result) mustBe OK
         contentAsString(result) mustBe
-          view(contractorName, subcontractorsPageUrl)(request, appConfig, messages(application)).toString
+          view(contractorName)(request, appConfig, messages(application)).toString
       }
     }
 
@@ -138,7 +137,7 @@ class SubcontractorsLandingPageControllerSpec extends SpecBase with MockitoSugar
 
         status(result) mustBe OK
         contentAsString(result) mustBe
-          view(agentClientName, subcontractorsPageUrl)(request, appConfig, messages(application)).toString
+          view(agentClientName)(request, appConfig, messages(application)).toString
       }
     }
 

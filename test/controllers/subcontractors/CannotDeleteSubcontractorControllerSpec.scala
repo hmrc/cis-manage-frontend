@@ -18,6 +18,7 @@ package controllers.subcontractors
 
 import base.SpecBase
 import controllers.routes
+import models.NormalMode
 import models.subcontractors.DeleteSubcontractorJourneyData
 import pages.CisIdPage
 import pages.subcontractors.DeleteSubcontractorJourneyPage
@@ -69,7 +70,7 @@ class CannotDeleteSubcontractorControllerSpec extends SpecBase {
 
         val subcontractorsPageUrl =
           controllers.subcontractors.routes.SubcontractorsListController
-            .onPageLoad("1")
+            .onPageLoad("1", NormalMode)
             .url
 
         status(result) mustEqual OK

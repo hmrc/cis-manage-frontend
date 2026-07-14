@@ -18,8 +18,12 @@ package controllers.subcontractors
 
 import controllers.actions.*
 import forms.subcontractors.SubcontractorsListFormProvider
+import models.{Mode, UserAnswers}
+import models.response.GetSubcontractor
+import pages.subcontractors.SubcontractorListPage
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, RequestHeader, Result}
 import services.PaginationSubcontractorsListService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.subcontractors.*
@@ -30,9 +34,8 @@ import java.nio.charset.StandardCharsets
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import scala.util.Try
-
 import javax.inject.Inject
+import scala.util.Try
 
 class SubcontractorsListController @Inject() (
   override val messagesApi: MessagesApi,
@@ -46,23 +49,10 @@ class SubcontractorsListController @Inject() (
 ) extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  val form: Form[String] = formProvider()
 
-  private def encode(value: String): String =
-    URLEncoder.encode(value, StandardCharsets.UTF_8.toString)
-
-  private def appendQueryParams(url: String, params: Seq[(String, String)]): String = {
-    val filteredParams =
-      params.collect {
-        case (key, value) if value.nonEmpty => s"$key=${encode(value)}"
-      }
-
-    if (filteredParams.isEmpty) url
-    else {
-      val separator = if (url.contains("?")) "&" else "?"
-      s"$url$separator${filteredParams.mkString("&")}"
-    }
-  }
+  private val dateAddedFormatter: DateTimeFormatter =
+    DateTimeFormatter.ofPattern("d MMM yyyy")
 
   private val SortByName      = "name"
   private val SortByDateAdded = "dateAdded"
@@ -70,17 +60,50 @@ class SubcontractorsListController @Inject() (
   private val SortOrderAsc  = "ascending"
   private val SortOrderDesc = "descending"
 
+  private final case class ListFilters(
+    searchTerm: String,
+    verificationStatus: VerificationStatusFilter,
+    taxTreatment: TaxTreatmentFilter,
+    sortBy: String,
+    sortOrder: String
+  )
+
+  private def encode(value: String): String =
+    URLEncoder.encode(value, StandardCharsets.UTF_8.toString)
+
+  private def appendQueryParams(
+    url: String,
+    params: Seq[(String, String)]
+  ): String = {
+    val filteredParams =
+      params.collect {
+        case (key, value) if value.nonEmpty =>
+          s"$key=${encode(value)}"
+      }
+
+    if (filteredParams.isEmpty) {
+      url
+    } else {
+      val separator =
+        if (url.contains("?")) "&"
+        else "?"
+
+      s"$url$separator${filteredParams.mkString("&")}"
+    }
+  }
+
   private def normalisedSortBy(value: Option[String]): String =
     value match {
       case Some(SortByDateAdded) => SortByDateAdded
+      case Some(SortByName)      => SortByName
       case _                     => SortByName
     }
 
   private def normalisedSortOrder(value: Option[String]): String =
     value match {
-      case Some(SortOrderDesc) | Some("descending") => SortOrderDesc
-      case Some(SortOrderAsc) | Some("ascending")   => SortOrderAsc
-      case _                                        => SortOrderAsc
+      case Some(SortOrderDesc) => SortOrderDesc
+      case Some(SortOrderAsc)  => SortOrderAsc
+      case _                   => SortOrderAsc
     }
 
   private val dateFormatters: Seq[DateTimeFormatter] =
@@ -98,19 +121,147 @@ class SubcontractorsListController @Inject() (
       .headOption
       .getOrElse(LocalDate.MIN)
 
+  private def rowsFromUserAnswers(
+    userAnswers: UserAnswers
+  ): Option[Seq[SubcontractorsListRow]] =
+    userAnswers
+      .get(SubcontractorListPage)
+      .map(_.subcontractors.map(toListRow))
+
+  private def toListRow(
+    subcontractor: GetSubcontractor
+  ): SubcontractorsListRow =
+    SubcontractorsListRow(
+      id = subcontractor.subcontractorId.toString,
+      name = subcontractor.displayName,
+      utr = subcontractor.utr.getOrElse(""),
+      verified = subcontractor.verified.exists(_.equalsIgnoreCase("Y")),
+      verificationNumber = subcontractor.verificationNumber.getOrElse(""),
+      taxTreatment = toTaxTreatment(subcontractor.taxTreatment),
+      dateAdded = subcontractor.createDate
+        .map(_.format(dateAddedFormatter))
+        .getOrElse(""),
+      subbieResourceRef = getSubbieResourceRef(subcontractor)
+    )
+
+  private def getSubbieResourceRef(
+    subcontractor: GetSubcontractor
+  ): Long =
+    subcontractor.subbieResourceRef.getOrElse {
+      throw new IllegalStateException(
+        s"Missing subbieResourceRef for subcontractorId ${subcontractor.subcontractorId}"
+      )
+    }
+
+  private def toTaxTreatment(
+    taxTreatment: Option[String]
+  ): TaxTreatment =
+    taxTreatment.map(_.trim.toLowerCase) match {
+      case Some("gross") =>
+        TaxTreatment.Gross
+
+      case Some("higher rate" | "higherrate") =>
+        TaxTreatment.HigherRate
+
+      case Some("standard rate" | "standardrate") =>
+        TaxTreatment.StandardRate
+
+      case _ =>
+        TaxTreatment.Unknown
+    }
+
+  private def filterRows(
+    allRows: Seq[SubcontractorsListRow],
+    filters: ListFilters
+  ): Seq[SubcontractorsListRow] = {
+    val searchFiltered =
+      filterBySearchTerm(allRows, filters.searchTerm)
+
+    val verificationFiltered =
+      filterByVerificationStatus(searchFiltered, filters.verificationStatus)
+
+    val taxTreatmentFiltered =
+      filterByTaxTreatment(verificationFiltered, filters.taxTreatment)
+
+    sortRows(
+      taxTreatmentFiltered,
+      filters.sortBy,
+      filters.sortOrder
+    )
+  }
+
+  private def filterBySearchTerm(
+    rows: Seq[SubcontractorsListRow],
+    searchTerm: String
+  ): Seq[SubcontractorsListRow] = {
+    val trimmedSearchTerm =
+      searchTerm.trim
+
+    if (trimmedSearchTerm.isEmpty) {
+      rows
+    } else {
+      val lowerCaseSearchTerm =
+        trimmedSearchTerm.toLowerCase(Locale.UK)
+
+      rows.filter { row =>
+        row.name.toLowerCase(Locale.UK).contains(lowerCaseSearchTerm) ||
+        row.utr.contains(trimmedSearchTerm) ||
+        row.verificationNumber.contains(trimmedSearchTerm)
+      }
+    }
+  }
+
+  private def filterByVerificationStatus(
+    rows: Seq[SubcontractorsListRow],
+    verificationStatus: VerificationStatusFilter
+  ): Seq[SubcontractorsListRow] =
+    verificationStatus match {
+      case VerificationStatusFilter.Verified =>
+        rows.filter(_.verified)
+
+      case VerificationStatusFilter.NotVerified =>
+        rows.filterNot(_.verified)
+
+      case VerificationStatusFilter.All =>
+        rows
+    }
+
+  private def filterByTaxTreatment(
+    rows: Seq[SubcontractorsListRow],
+    taxTreatment: TaxTreatmentFilter
+  ): Seq[SubcontractorsListRow] =
+    taxTreatment match {
+      case TaxTreatmentFilter.Gross =>
+        rows.filter(_.taxTreatment == TaxTreatment.Gross)
+
+      case TaxTreatmentFilter.HigherRate =>
+        rows.filter(_.taxTreatment == TaxTreatment.HigherRate)
+
+      case TaxTreatmentFilter.StandardRate =>
+        rows.filter(_.taxTreatment == TaxTreatment.StandardRate)
+
+      case TaxTreatmentFilter.Unknown =>
+        rows.filter(_.taxTreatment == TaxTreatment.Unknown)
+
+      case TaxTreatmentFilter.All =>
+        rows
+    }
+
   private def sortRows(
     rows: Seq[SubcontractorsListRow],
     sortBy: String,
     sortOrder: String
   ): Seq[SubcontractorsListRow] =
     sortBy match {
-
       case SortByDateAdded =>
         val sortedRows =
           rows.sortBy(row => parseDateAdded(row.dateAdded))
 
-        if (sortOrder == SortOrderDesc) sortedRows.reverse
-        else sortedRows
+        if (sortOrder == SortOrderDesc) {
+          sortedRows.reverse
+        } else {
+          sortedRows
+        }
 
       case SortByName =>
         val noNameRows =
@@ -123,8 +274,11 @@ class SubcontractorsListController @Inject() (
           namedRows.sortBy(row => row.name.trim.toLowerCase(Locale.UK))
 
         val orderedNamedRows =
-          if (sortOrder == SortOrderDesc) sortedNamedRows.reverse
-          else sortedNamedRows
+          if (sortOrder == SortOrderDesc) {
+            sortedNamedRows.reverse
+          } else {
+            sortedNamedRows
+          }
 
         noNameRows ++ orderedNamedRows
 
@@ -132,293 +286,274 @@ class SubcontractorsListController @Inject() (
         rows
     }
 
-  private def buildQueryString(
-    searchTerm: String,
-    verificationStatus: VerificationStatusFilter,
-    taxTreatment: TaxTreatmentFilter,
-    sortBy: String,
-    sortOrder: String
+  private def getListFilters(
+    request: RequestHeader
+  ): ListFilters =
+    ListFilters(
+      searchTerm = request.getQueryString("searchTerm").getOrElse("").trim,
+      verificationStatus = VerificationStatusFilter.fromString(
+        request
+          .getQueryString("verificationStatus")
+          .getOrElse(VerificationStatusFilter.All.value)
+      ),
+      taxTreatment = TaxTreatmentFilter.fromString(
+        request
+          .getQueryString("taxTreatment")
+          .getOrElse(TaxTreatmentFilter.All.value)
+      ),
+      sortBy = normalisedSortBy(request.getQueryString("sortBy")),
+      sortOrder = normalisedSortOrder(request.getQueryString("sortOrder"))
+    )
+
+  private def getFormFilters(
+    formData: Map[String, Seq[String]]
+  ): ListFilters =
+    ListFilters(
+      searchTerm = formData
+        .get("searchTerm")
+        .flatMap(_.headOption)
+        .getOrElse("")
+        .trim,
+      verificationStatus = VerificationStatusFilter.fromString(
+        formData
+          .get("verificationStatus")
+          .flatMap(_.headOption)
+          .getOrElse(VerificationStatusFilter.All.value)
+      ),
+      taxTreatment = TaxTreatmentFilter.fromString(
+        formData
+          .get("taxTreatment")
+          .flatMap(_.headOption)
+          .getOrElse(TaxTreatmentFilter.All.value)
+      ),
+      sortBy = normalisedSortBy(
+        formData
+          .get("sortBy")
+          .flatMap(_.headOption)
+      ),
+      sortOrder = normalisedSortOrder(
+        formData
+          .get("sortOrder")
+          .flatMap(_.headOption)
+      )
+    )
+
+  private def getTargetPage(
+    formData: Map[String, Seq[String]]
+  ): Int =
+    formData
+      .get("gotoPage")
+      .flatMap(_.headOption)
+      .flatMap(_.toIntOption)
+      .getOrElse(1)
+
+  private def queryString(
+    filters: ListFilters
   ): String =
     Seq(
-      Option(searchTerm).filter(_.nonEmpty).map(v => "searchTerm=" + encode(v)),
-      Option(verificationStatus.value)
+      Option(filters.searchTerm)
+        .filter(_.nonEmpty)
+        .map(value => s"searchTerm=${encode(value)}"),
+      Option(filters.verificationStatus.value)
         .filter(_ != VerificationStatusFilter.All.value)
-        .map(v => "verificationStatus=" + encode(v)),
-      Option(taxTreatment.value)
+        .map(value => s"verificationStatus=${encode(value)}"),
+      Option(filters.taxTreatment.value)
         .filter(_ != TaxTreatmentFilter.All.value)
-        .map(v => "taxTreatment=" + encode(v)),
-      Some("sortBy=" + encode(sortBy)),
-      Some("sortOrder=" + encode(sortOrder))
+        .map(value => s"taxTreatment=${encode(value)}"),
+      Some(s"sortBy=${encode(filters.sortBy)}"),
+      Some(s"sortOrder=${encode(filters.sortOrder)}")
     ).flatten.mkString("&")
 
-  private def matchesSearchTerm(row: SubcontractorsListRow, searchTerm: String): Boolean = {
-    val normalisedSearchTerm = searchTerm.trim.toLowerCase
+  private def paginateRows(
+    allRows: Seq[SubcontractorsListRow],
+    instanceId: String,
+    mode: Mode,
+    page: Int,
+    filters: ListFilters
+  ) =
+    paginationService.paginate(
+      allItems = filterRows(allRows, filters),
+      currentPage = page,
+      recordsPerPage = SubcontractorsListConstants.RecordsPerPage,
+      baseUrl = routes.SubcontractorsListController
+        .onPageLoad(instanceId, mode)
+        .url,
+      queryString = queryString(filters)
+    )
 
-    row.name.toLowerCase.contains(normalisedSearchTerm)
+  private def renderList(
+    formToDisplay: Form[String],
+    allRows: Seq[SubcontractorsListRow],
+    instanceId: String,
+    mode: Mode,
+    page: Int,
+    filters: ListFilters
+  )(implicit request: Request[AnyContent]) = {
+    val result =
+      paginateRows(
+        allRows,
+        instanceId,
+        mode,
+        page,
+        filters
+      )
+
+    view(
+      formToDisplay,
+      mode,
+      result.items,
+      result.pagination,
+      result.currentPage,
+      result.totalPages,
+      result.startIndex,
+      result.totalCount,
+      instanceId,
+      filters.searchTerm,
+      filters.verificationStatus.value,
+      filters.taxTreatment.value,
+      filters.sortBy,
+      filters.sortOrder
+    )
   }
 
-  def onPageLoad(instanceId: String, page: Int = 1): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+  private def renderPage(
+    allRows: Seq[SubcontractorsListRow],
+    instanceId: String,
+    mode: Mode,
+    page: Int,
+    filters: ListFilters
+  )(implicit request: Request[AnyContent]): Result =
+    Ok(
+      renderList(
+        form.fill(filters.searchTerm),
+        allRows,
+        instanceId,
+        mode,
+        page,
+        filters
+      )
+    )
 
-      val searchTerm =
-        request.getQueryString("searchTerm").getOrElse("").trim
+  private def renderInvalidForm(
+    formWithErrors: Form[String],
+    allRows: Seq[SubcontractorsListRow],
+    instanceId: String,
+    mode: Mode,
+    page: Int,
+    filters: ListFilters
+  )(implicit request: Request[AnyContent]): Result = {
+    val filtersForResults =
+      if (formWithErrors.error("searchTerm").isDefined) {
+        filters.copy(searchTerm = "")
+      } else {
+        filters
+      }
 
-      val filledForm =
-        form.fill(searchTerm)
+    BadRequest(
+      renderList(
+        formWithErrors,
+        allRows,
+        instanceId,
+        mode,
+        page,
+        filtersForResults
+      )
+    )
+  }
 
-      val verificationStatus =
-        VerificationStatusFilter.fromString(
-          request.getQueryString("verificationStatus").getOrElse(VerificationStatusFilter.All.value)
-        )
+  private def redirectToFilteredList(
+    instanceId: String,
+    mode: Mode,
+    targetPage: Int,
+    searchTerm: String,
+    filters: ListFilters
+  ): Result = {
+    val baseUrl =
+      routes.SubcontractorsListController
+        .onPageLoad(instanceId, mode, targetPage)
+        .url
 
-      val taxTreatment =
-        TaxTreatmentFilter.fromString(
-          request.getQueryString("taxTreatment").getOrElse(TaxTreatmentFilter.All.value)
-        )
-
-      val sortBy =
-        normalisedSortBy(request.getQueryString("sortBy"))
-
-      val sortOrder =
-        normalisedSortOrder(request.getQueryString("sortOrder"))
-
-      val allRows = SubcontractorsListData.rows
-
-      val searchFiltered =
-        if (searchTerm.isEmpty) allRows
-        else allRows.filter(row => matchesSearchTerm(row, searchTerm))
-
-      val verificationFiltered =
-        verificationStatus match {
-          case VerificationStatusFilter.Verified =>
-            searchFiltered.filter(_.verified)
-
-          case VerificationStatusFilter.NotVerified =>
-            searchFiltered.filter(!_.verified)
-
-          case VerificationStatusFilter.All =>
-            searchFiltered
-        }
-
-      val taxFiltered =
-        taxTreatment match {
-          case TaxTreatmentFilter.Gross =>
-            verificationFiltered.filter(_.taxTreatment == TaxTreatment.Gross)
-
-          case TaxTreatmentFilter.HigherRate =>
-            verificationFiltered.filter(_.taxTreatment == TaxTreatment.HigherRate)
-
-          case TaxTreatmentFilter.StandardRate =>
-            verificationFiltered.filter(_.taxTreatment == TaxTreatment.StandardRate)
-
-          case TaxTreatmentFilter.Unknown =>
-            verificationFiltered.filter(_.taxTreatment == TaxTreatment.Unknown)
-
-          case TaxTreatmentFilter.All =>
-            verificationFiltered
-        }
-
-      val sortedRows =
-        sortRows(taxFiltered, sortBy, sortOrder)
-
-      val queryString =
-        buildQueryString(
-          searchTerm,
-          verificationStatus,
-          taxTreatment,
-          sortBy,
-          sortOrder
-        )
-
-      val result =
-        paginationService.paginate(
-          allItems = sortedRows,
-          currentPage = page,
-          recordsPerPage = SubcontractorsListConstants.RecordsPerPage,
-          baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId).url,
-          queryString = queryString
-        )
-
-      Ok(
-        view(
-          filledForm,
-          result.items,
-          result.pagination,
-          result.currentPage,
-          result.totalPages,
-          result.startIndex,
-          result.totalCount,
-          instanceId,
-          searchTerm,
-          verificationStatus.value,
-          taxTreatment.value,
-          sortBy,
-          sortOrder
+    Redirect(
+      appendQueryParams(
+        baseUrl,
+        Seq(
+          "searchTerm"         -> searchTerm.trim,
+          "verificationStatus" -> filters.verificationStatus.value,
+          "taxTreatment"       -> filters.taxTreatment.value,
+          "sortBy"             -> filters.sortBy,
+          "sortOrder"          -> filters.sortOrder
         )
       )
+    )
+  }
+
+  def onPageLoad(
+    instanceId: String,
+    mode: Mode,
+    page: Int = 1
+  ): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      rowsFromUserAnswers(request.userAnswers) match {
+        case Some(allRows) if allRows.nonEmpty =>
+          renderPage(
+            allRows,
+            instanceId,
+            mode,
+            page,
+            getListFilters(request)
+          )
+
+        case Some(_) =>
+          Redirect(routes.NoSubcontractorsExistController.onPageLoad())
+
+        case None =>
+          Redirect(
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+          )
+      }
     }
 
-  def onSubmit(instanceId: String, page: Int = 1): Action[AnyContent] =
+  def onSubmit(
+    instanceId: String,
+    mode: Mode,
+    page: Int = 1
+  ): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => {
+      rowsFromUserAnswers(request.userAnswers) match {
+        case Some(allRows) =>
+          val formData =
+            request.body.asFormUrlEncoded.getOrElse(Map.empty)
 
-            val formData =
-              request.body.asFormUrlEncoded.getOrElse(Map.empty)
+          val filters =
+            getFormFilters(formData)
 
-            val searchTerm =
-              formData.get("searchTerm").flatMap(_.headOption).getOrElse("").trim
-
-            val verificationStatus =
-              VerificationStatusFilter.fromString(
-                formData.get("verificationStatus").flatMap(_.headOption).getOrElse(VerificationStatusFilter.All.value)
-              )
-
-            val taxTreatment =
-              TaxTreatmentFilter.fromString(
-                formData.get("taxTreatment").flatMap(_.headOption).getOrElse(TaxTreatmentFilter.All.value)
-              )
-
-            val sortBy =
-              normalisedSortBy(formData.get("sortBy").flatMap(_.headOption))
-
-            val sortOrder =
-              normalisedSortOrder(formData.get("sortOrder").flatMap(_.headOption))
-
-            val allRows = SubcontractorsListData.rows
-
-            val hasSearchTermError =
-              formWithErrors.error("searchTerm").isDefined
-
-            val searchFiltered =
-              if (hasSearchTermError) {
-                allRows
-              } else if (searchTerm.isEmpty) {
-                allRows
-              } else {
-                allRows.filter(row => matchesSearchTerm(row, searchTerm))
-              }
-
-            val verificationFiltered =
-              verificationStatus match {
-                case VerificationStatusFilter.Verified =>
-                  searchFiltered.filter(_.verified)
-
-                case VerificationStatusFilter.NotVerified =>
-                  searchFiltered.filter(!_.verified)
-
-                case VerificationStatusFilter.All =>
-                  searchFiltered
-              }
-
-            val taxFiltered =
-              taxTreatment match {
-                case TaxTreatmentFilter.Gross =>
-                  verificationFiltered.filter(_.taxTreatment == TaxTreatment.Gross)
-
-                case TaxTreatmentFilter.HigherRate =>
-                  verificationFiltered.filter(_.taxTreatment == TaxTreatment.HigherRate)
-
-                case TaxTreatmentFilter.StandardRate =>
-                  verificationFiltered.filter(_.taxTreatment == TaxTreatment.StandardRate)
-
-                case TaxTreatmentFilter.Unknown =>
-                  verificationFiltered.filter(_.taxTreatment == TaxTreatment.Unknown)
-
-                case TaxTreatmentFilter.All =>
-                  verificationFiltered
-              }
-
-            val sortedRows =
-              sortRows(taxFiltered, sortBy, sortOrder)
-
-            val queryString =
-              buildQueryString(
-                searchTerm,
-                verificationStatus,
-                taxTreatment,
-                sortBy,
-                sortOrder
-              )
-
-            val result =
-              paginationService.paginate(
-                allItems = sortedRows,
-                currentPage = page,
-                recordsPerPage = SubcontractorsListConstants.RecordsPerPage,
-                baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId).url,
-                queryString = queryString
-              )
-
-            BadRequest(
-              view(
-                formWithErrors,
-                result.items,
-                result.pagination,
-                result.currentPage,
-                result.totalPages,
-                result.startIndex,
-                result.totalCount,
-                instanceId,
-                searchTerm,
-                verificationStatus.value,
-                taxTreatment.value,
-                sortBy,
-                sortOrder
-              )
-            )
-          },
-          searchTerm => {
-
-            val formData =
-              request.body.asFormUrlEncoded.getOrElse(Map.empty)
-
-            val gotoPage =
-              formData
-                .get("gotoPage")
-                .flatMap(_.headOption)
-                .flatMap(_.toIntOption)
-
-            val verificationStatus =
-              VerificationStatusFilter.fromString(
-                formData.get("verificationStatus").flatMap(_.headOption).getOrElse(VerificationStatusFilter.All.value)
-              )
-
-            val taxTreatment =
-              TaxTreatmentFilter.fromString(
-                formData.get("taxTreatment").flatMap(_.headOption).getOrElse(TaxTreatmentFilter.All.value)
-              )
-
-            val sortBy =
-              normalisedSortBy(formData.get("sortBy").flatMap(_.headOption))
-
-            val sortOrder =
-              normalisedSortOrder(formData.get("sortOrder").flatMap(_.headOption))
-
-            val targetPage =
-              gotoPage.getOrElse(1)
-
-            val baseUrl =
-              routes.SubcontractorsListController
-                .onPageLoad(instanceId, targetPage)
-                .url
-
-            val redirectUrl =
-              appendQueryParams(
-                baseUrl,
-                Seq(
-                  "searchTerm"         -> searchTerm.trim,
-                  "verificationStatus" -> verificationStatus.value,
-                  "taxTreatment"       -> taxTreatment.value,
-                  "sortBy"             -> sortBy,
-                  "sortOrder"          -> sortOrder
+          form
+            .bindFromRequest()(request)
+            .fold(
+              formWithErrors =>
+                renderInvalidForm(
+                  formWithErrors,
+                  allRows,
+                  instanceId,
+                  mode,
+                  page,
+                  filters
+                ),
+              searchTerm =>
+                redirectToFilteredList(
+                  instanceId,
+                  mode,
+                  getTargetPage(formData),
+                  searchTerm,
+                  filters
                 )
-              )
+            )
 
-            Redirect(redirectUrl)
-          }
-        )
+        case None =>
+          Redirect(
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+          )
+      }
     }
 }
+

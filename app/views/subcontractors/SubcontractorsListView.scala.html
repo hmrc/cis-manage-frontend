@@ -40,7 +40,7 @@
     pageNavigator: components.PageNavigatorSubcontractorsList
 )
 
-@(form: Form[_], rows: Seq[SubcontractorsListRow], paginationViewModel: PaginationViewModel, page: Int, totalPages: Int, startIndex: Int, totalCount: Int, instanceId: String,
+@(form: Form[_], mode: Mode, rows: Seq[SubcontractorsListRow], paginationViewModel: PaginationViewModel, page: Int, totalPages: Int, startIndex: Int, totalCount: Int, instanceId: String,
 searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: String, sortOrder: String)(implicit request: Request[_], messages: Messages)
 
 @css = {
@@ -77,7 +77,7 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
         additionalScripts = Some(scripts)
 ) {
 
-    @formHelper(action = controllers.subcontractors.routes.SubcontractorsListController.onSubmit(instanceId, page)) {
+    @formHelper(action = controllers.subcontractors.routes.SubcontractorsListController.onSubmit(instanceId, mode, page)) {
 
 
         <input type="hidden" name="sortBy" value="@sortBy">
@@ -188,7 +188,7 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
                )
                 @link(
                 linkTextKey = "subcontractors.subcontractorsList.clearFilters",
-                linkUrl = controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId).url
+                linkUrl = controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
                 )
 
             </div>
@@ -295,7 +295,7 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
                 attributes = Map(
                 "id" -> "subcontractors-table",
                 "data-module" -> "moj-sortable-table",
-                "data-sort-url" -> controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId).url
+                "data-sort-url" -> controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
                 )
                 )
              )

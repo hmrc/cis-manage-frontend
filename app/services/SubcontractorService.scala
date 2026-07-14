@@ -19,6 +19,7 @@ package services
 import com.google.inject.{Inject, Singleton}
 import connectors.ConstructionIndustrySchemeConnector
 import models.response.GetSubcontractorForDeleteResponse
+import models.response.GetSubcontractorListResponse
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,4 +34,9 @@ class SubcontractorService @Inject() (
     subbieResourceRef: Long
   )(implicit hc: HeaderCarrier): Future[GetSubcontractorForDeleteResponse] =
     cisConnector.getSubcontractorDeleteStatus(cisId, subbieResourceRef)
+
+  def getSubcontractorList(
+    instanceId: String
+  )(implicit hc: HeaderCarrier): Future[GetSubcontractorListResponse] =
+    cisConnector.getSubcontractorList(instanceId)
 }

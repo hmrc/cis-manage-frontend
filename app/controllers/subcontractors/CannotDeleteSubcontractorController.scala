@@ -17,6 +17,7 @@
 package controllers.subcontractors
 
 import controllers.actions.*
+import models.NormalMode
 import pages.subcontractors.DeleteSubcontractorJourneyPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -50,7 +51,8 @@ class CannotDeleteSubcontractorController @Inject() (
             val subcontractorsPageUrl =
               controllers.subcontractors.routes.SubcontractorsListController
                 .onPageLoad(
-                  request.cisId
+                  instanceId = request.cisId,
+                  mode = NormalMode
                 )
                 .url
 
