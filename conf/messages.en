@@ -117,79 +117,79 @@ unauthorised.agent.p2.link               =  PAYE for Agents
 unauthorised.agent.p2.suffix             =  to use this service.
 
 # Introduction & Landing
-contractorLanding.title                                 =  Manage Construction Industry Service account
-contractorLanding.heading                               =  Manage Construction Industry Service account
+contractorLanding.title                                           =  Manage Construction Industry Service account
+contractorLanding.heading                                         =  Manage Construction Industry Service account
 
-contractorLanding.label.schemeName                      =  Scheme name
-contractorLanding.label.employerReference               =  Employer reference
+contractorLanding.label.schemeName                                =  Scheme name
+contractorLanding.label.employerReference                         =  Employer reference
 
-contractorLanding.landing.card.manageYourCisReturn.title            =  Manage your CIS return
-contractorLanding.landing.card.manageYourCisReturn.p                =  File or amend your monthly or nil returns.
-contractorLanding.landing.card.manageYourSubcontractors.title       =  Manage your subcontractors
-contractorLanding.landing.card.manageYourSubcontractors.p           =  Add or edit a subcontractor, submit or view a verification request.
-contractorLanding.landing.card.manageYourContractorDetails.title    =  Manage your contractor details
-contractorLanding.landing.card.manageYourContractorDetails.p        =  Add or change a unique taxpayer reference, scheme name or email address.
-contractorLanding.landing.card.appealPenalty.title                  =  Appeal a penalty
-contractorLanding.landing.card.appealPenalty.p                      =  Appeal a penalty within 30 days of receiving one.
-contractorLanding.landing.card.noticesAndStatements.title           =  Notices and Statements
-contractorLanding.landing.card.noticesAndStatements.p               =  View HMRC notices, penalty warnings and confirmation statements.
+contractorLanding.landing.card.manageYourCisReturn.title          =  Manage your CIS return
+contractorLanding.landing.card.manageYourCisReturn.p              =  File or amend your monthly or nil returns.
+contractorLanding.landing.card.manageYourSubcontractors.title     =  Manage your subcontractors
+contractorLanding.landing.card.manageYourSubcontractors.p         =  Add or edit a subcontractor, submit or view a verification request.
+contractorLanding.landing.card.manageYourContractorDetails.title  =  Manage your contractor details
+contractorLanding.landing.card.manageYourContractorDetails.p      =  Add or change a unique taxpayer reference, scheme name or email address.
+contractorLanding.landing.card.appealPenalty.title                =  Appeal a penalty
+contractorLanding.landing.card.appealPenalty.p                    =  Appeal a penalty within 30 days of receiving one.
+contractorLanding.landing.card.noticesAndStatements.title         =  Notices and Statements
+contractorLanding.landing.card.noticesAndStatements.p             =  View HMRC notices, penalty warnings and confirmation statements.
 
-contractorLanding.sidebar.title                         =  Help and guidance
-contractorLanding.sidebar.nav.whatIs.text               =  What is the Construction Industry Scheme?
-contractorLanding.sidebar.nav.guidance.text             =  CIS monthly returns guidance
-contractorLanding.sidebar.nav.penalties.text            =  CIS 340: penalties for late returns
+contractorLanding.sidebar.title                                   =  Help and guidance
+contractorLanding.sidebar.nav.whatIs.text                         =  What is the Construction Industry Scheme?
+contractorLanding.sidebar.nav.guidance.text                       =  CIS monthly returns guidance
+contractorLanding.sidebar.nav.penalties.text                      =  CIS 340: penalties for late returns
 
-introduction.title                            =  Construction Industry Scheme (CIS)
-introduction.heading                          =  Construction Industry Scheme (CIS)
-introduction.p1                               =  Use this service to:
-introduction.listItem1                        =  file monthly CIS returns
-introduction.listItem2                        =  file nil returns (when you have made no payments)
-introduction.listItem3                        =  view and manage subcontractors
-introduction.listItem4                        =  amend returns you have already submitted
-introduction.listItem5                        =  view notices and statements
-introduction.listItem6                        =  appeal against late-filing penalties
-introduction.listItem7                        =  save incomplete returns
-introduction.inset                            =  You must file CIS returns for each tax month, by the 19th of the following month.
-introduction.h2                               =  Before you start
-introduction.p2                               =  To use this service, you need:
-introduction.listItem8                        =  to be authorised to act for your clients
-introduction.listItem9                        =  a tax office reference or Unique Taxpayer Reference (UTR)
-introduction.listItem10                       =  details of payments made to subcontractors during the tax month
+introduction.title                                                =  Construction Industry Scheme (CIS)
+introduction.heading                                              =  Construction Industry Scheme (CIS)
+introduction.p1                                                   =  Use this service to:
+introduction.listItem1                                            =  file monthly CIS returns
+introduction.listItem2                                            =  file nil returns (when you have made no payments)
+introduction.listItem3                                            =  view and manage subcontractors
+introduction.listItem4                                            =  amend returns you have already submitted
+introduction.listItem5                                            =  view notices and statements
+introduction.listItem6                                            =  appeal against late-filing penalties
+introduction.listItem7                                            =  save incomplete returns
+introduction.inset                                                =  You must file CIS returns for each tax month, by the 19th of the following month.
+introduction.h2                                                   =  Before you start
+introduction.p2                                                   =  To use this service, you need:
+introduction.listItem8                                            =  to be authorised to act for your clients
+introduction.listItem9                                            =  a tax office reference or Unique Taxpayer Reference (UTR)
+introduction.listItem10                                           =  details of payments made to subcontractors during the tax month
 
-introduction.details.summary                  =  Other ways to file CIS returns
-introduction.details.h3                       =  Filing only service
-introduction.details.p1                       =  You can send CIS monthly returns without completing an authorisation online or form FBI-2.
-introduction.details.p2                       =  This service is only available using commercial software.
-introduction.details.link                     =  Find commercial software for CIS returns
+introduction.details.summary                                      =  Other ways to file CIS returns
+introduction.details.h3                                           =  Filing only service
+introduction.details.p1                                           =  You can send CIS monthly returns without completing an authorisation online or form FBI-2.
+introduction.details.p2                                           =  This service is only available using commercial software.
+introduction.details.link                                         =  Find commercial software for CIS returns
 
-introduction.sidebar.h2                       =  Related content
-introduction.sidebar.link1                    =  What is the Construction Industry Scheme
-introduction.sidebar.link2                    =  CIS monthly returns guidance
-introduction.sidebar.link3                    =  CIS 340: Penalties for late returns
-introduction.sidebar.link4                    =  Client authorisation guidance
+introduction.sidebar.h2                                           =  Related content
+introduction.sidebar.link1                                        =  What is the Construction Industry Scheme
+introduction.sidebar.link2                                        =  CIS monthly returns guidance
+introduction.sidebar.link3                                        =  CIS 340: Penalties for late returns
+introduction.sidebar.link4                                        =  Client authorisation guidance
 
-returnsLanding.title                          =  Manage your CIS return
-returnsLanding.heading                        =  Manage your CIS return
+returnsLanding.title                                              =  Manage your CIS return
+returnsLanding.heading                                            =  Manage your CIS return
 
-returnsLanding.fileMonthlyReturn.h3.link      =  File a monthly return
-returnsLanding.fileMonthlyReturn.p1           =  File a CIS return for any subcontractors paid in a tax month.
+returnsLanding.fileMonthlyReturn.h3.link                          =  File a monthly return
+returnsLanding.fileMonthlyReturn.p1                               =  File a CIS return for any subcontractors paid in a tax month.
 
-returnsLanding.fileNilReturn.h3.link          =  File a nil return
-returnsLanding.fileNilReturn.p1               =  File a nil return when no payments were made to subcontractors in a tax month.
+returnsLanding.fileNilReturn.h3.link                              =  File a nil return
+returnsLanding.fileNilReturn.p1                                   =  File a nil return when no payments were made to subcontractors in a tax month.
 
-returnsLanding.viewSubmittedReturns.h3.link   =  View submitted returns
-returnsLanding.viewSubmittedReturns.p1        =  View a return to make amendments, change payment details you entered, or check progress.
+returnsLanding.viewSubmittedReturns.h3.link                       =  View submitted returns
+returnsLanding.viewSubmittedReturns.p1                            =  View a return to make amendments, change payment details you entered, or check progress.
 
-returnsLanding.incompleteReturns.h3.link      =  Incomplete returns
-returnsLanding.incompleteReturns.p1           =  Submit or delete a return in progress. You can also resubmit a return that was not initially accepted.
+returnsLanding.incompleteReturns.h3.link                          =  Incomplete returns
+returnsLanding.incompleteReturns.p1                               =  Submit or delete a return in progress. You can also resubmit a return that was not initially accepted.
 
-returnsLanding.aside.h2                       =  Help and guidance
-returnsLanding.aside.link1                    =  What is the Construction Industry Scheme?
-returnsLanding.aside.link2                    =  CIS monthly returns guidance
-returnsLanding.aside.link3                    =  CIS 340: penalties for late returns
-returnsLanding.aside.link4                    =  Understanding CIS penalties
+returnsLanding.aside.h2                                           =  Help and guidance
+returnsLanding.aside.link1                                        =  What is the Construction Industry Scheme?
+returnsLanding.aside.link2                                        =  CIS monthly returns guidance
+returnsLanding.aside.link3                                        =  CIS 340: penalties for late returns
+returnsLanding.aside.link4                                        =  Understanding CIS penalties
 
-returnsLanding.returnToHome.link              =  Return to home
+returnsLanding.returnToHome.link                                  =  Return to home
 
 # Agent
 agent.retrievingClient.title                           =  Retrieving your client list
@@ -693,3 +693,7 @@ subcontractors.deleteSubcontractorYesNo.title                            =  Are 
 subcontractors.deleteSubcontractorYesNo.heading                          =  Are you sure you want to delete {0}?
 subcontractors.deleteSubcontractorYesNo.p                                =  This subcontractor will also be removed from any monthly return that you have not submitted yet.
 subcontractors.deleteSubcontractorYesNo.error.required                   =  Select yes if you want to delete this subcontractor
+
+securityCheck.title                                                      =  Authorisation check in progress
+securityCheck.h1                                                         =  Authorisation check in progress
+securityCheck.paragraph                                                  =  Do not refresh this page or press the back button while the authorisation check is in progress.
