@@ -251,6 +251,7 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       val html =
         view(
           form,
+          mode,
           rows,
           pagination,
           page = 1,

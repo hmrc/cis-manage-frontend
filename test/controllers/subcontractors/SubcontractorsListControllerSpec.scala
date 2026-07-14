@@ -287,7 +287,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
           paginationService.paginate(
             allItems = filterRows("", "all", "all"),
             currentPage = 1,
-            recordsPerPage = SubcontractorsListConstants.RecordsPerPage,
+            recordsPerPage = 8,
             baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
             queryString = "sortBy=name&sortOrder=ascending"
           )
@@ -340,9 +340,10 @@ class SubcontractorsListControllerSpec extends SpecBase {
           paginationService.paginate(
             allItems = filterRows("Alan", "verified", "gross"),
             currentPage = 1,
-            recordsPerPage = SubcontractorsListConstants.RecordsPerPage,
+            recordsPerPage = 8,
             baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
-            queryString = "searchTerm=Alan&verificationStatus=verified&taxTreatment=gross&sortBy=name&sortOrder=ascending"
+            queryString =
+              "searchTerm=Alan&verificationStatus=verified&taxTreatment=gross&sortBy=name&sortOrder=ascending"
           )
 
         status(result) mustEqual OK
