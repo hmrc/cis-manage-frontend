@@ -20,14 +20,14 @@
 )
 
 @(
-  h1Text: String,
-  paratext: String
+  h1Key: String,
+  paragraphKey: String
 )(implicit messages: Messages)
 
-<div class="loading-spinner">
-    <div class="loading-spinner__spinner" aria-live="polite" role="status"></div>
+<div class="loading-spinner" aria-live="polite" role="status">
+    <div class="loading-spinner__spinner"></div>
     <div class="loading-spinner__content">
-        @h1(msg = h1Text, classes = "govuk-heading-m")
-        @paragraph(paratext)
+        @h1(msg = h1Key, classes = "govuk-heading-m")
+        @paragraph(paragraphKey)
     </div>
 </div>
