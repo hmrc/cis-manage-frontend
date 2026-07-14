@@ -147,11 +147,7 @@ class SubcontractorsListController @Inject() (
   private def getSubbieResourceRef(
     subcontractor: GetSubcontractor
   ): Long =
-    subcontractor.subbieResourceRef.getOrElse {
-      throw new IllegalStateException(
-        s"Missing subbieResourceRef for subcontractorId ${subcontractor.subcontractorId}"
-      )
-    }
+    subcontractor.subbieResourceRef.getOrElse(subcontractor.subcontractorId)
 
   private def toTaxTreatment(
     taxTreatment: Option[String]

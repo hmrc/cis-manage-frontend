@@ -521,7 +521,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
       }
     }
 
-    "must throw an exception when subbieResourceRef is missing" in {
+    "must render page when subbieResourceRef is missing and fall back to subcontractorId" in {
       val response =
         GetSubcontractorListResponse(
           subcontractors = Seq(
@@ -552,13 +552,53 @@ class SubcontractorsListControllerSpec extends SpecBase {
         val result =
           route(application, request).value
 
-        val exception =
-          intercept[IllegalStateException] {
-            await(result)
-          }
+        val view =
+          application.injector.instanceOf[SubcontractorsListView]
 
-        exception.getMessage mustEqual
-          "Missing subbieResourceRef for subcontractorId 1"
+        val paginationService =
+          application.injector.instanceOf[PaginationSubcontractorsListService]
+
+        val expectedRows =
+          Seq(
+            SubcontractorsListRow(
+              id = "1",
+              name = "Alan Smith",
+              utr = "1234567890",
+              verified = true,
+              verificationNumber = "V000001",
+              taxTreatment = TaxTreatment.Gross,
+              dateAdded = "6 Apr 2026",
+              subbieResourceRef = 1L
+            )
+          )
+
+        val paginationResult =
+          paginationService.paginate(
+            allItems = expectedRows,
+            currentPage = 1,
+            recordsPerPage = 8,
+            baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
+            queryString = "sortBy=name&sortOrder=ascending"
+          )
+
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual view(
+          form.fill(""),
+          mode,
+          paginationResult.items,
+          paginationResult.pagination,
+          paginationResult.currentPage,
+          paginationResult.totalPages,
+          paginationResult.startIndex,
+          paginationResult.totalCount,
+          instanceId,
+          "",
+          "all",
+          "all",
+          "name",
+          "ascending"
+        )(request, messages(application)).toString
       }
     }
   }
