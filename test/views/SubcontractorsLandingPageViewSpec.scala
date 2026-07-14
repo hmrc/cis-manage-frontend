@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,11 @@ class SubcontractorsLandingPageViewSpec extends SpecBase {
       doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.aside.link1"))
       doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.aside.link2"))
       doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.aside.link3"))
+      doc
+        .select(
+          s"a[href='${controllers.subcontractors.routes.GetSubcontractorListController.onPageLoad().url}']"
+        )
+        .text                                   must include(messages("subcontractorsLandingPage.subcontractorList"))
     }
   }
 

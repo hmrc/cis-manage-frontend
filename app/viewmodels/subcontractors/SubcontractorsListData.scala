@@ -26,7 +26,8 @@ object SubcontractorsListData {
       verified = false,
       verificationNumber = "V0001256246",
       taxTreatment = TaxTreatment.StandardRate,
-      dateAdded = "11 May 2020"
+      dateAdded = "11 May 2020",
+      subbieResourceRef = 1L
     ),
     SubcontractorsListRow(
       id = "Hammondhouse",
@@ -35,7 +36,8 @@ object SubcontractorsListData {
       verified = true,
       verificationNumber = "V0001217702",
       taxTreatment = TaxTreatment.Gross,
-      dateAdded = "1 Oct 2025"
+      dateAdded = "1 Oct 2025",
+      subbieResourceRef = 2L
     ),
     SubcontractorsListRow(
       id = "Ingenresearch",
@@ -44,7 +46,8 @@ object SubcontractorsListData {
       verified = false,
       verificationNumber = "V0005617876",
       taxTreatment = TaxTreatment.StandardRate,
-      dateAdded = "1 Mar 2020"
+      dateAdded = "1 Mar 2020",
+      subbieResourceRef = 3L
     ),
     SubcontractorsListRow(
       id = "Malcolmandsattler",
@@ -53,7 +56,8 @@ object SubcontractorsListData {
       verified = true,
       verificationNumber = "V0004635231",
       taxTreatment = TaxTreatment.HigherRate,
-      dateAdded = "1 Oct 2025"
+      dateAdded = "1 Oct 2025",
+      subbieResourceRef = 4L
     ),
     SubcontractorsListRow(
       id = "brightwellPartners",
@@ -62,34 +66,48 @@ object SubcontractorsListData {
       verified = false,
       verificationNumber = "V0007771001",
       taxTreatment = TaxTreatment.StandardRate,
-      dateAdded = "23 Apr 2026"
+      dateAdded = "23 Apr 2026",
+      subbieResourceRef = 5L
     ),
     SubcontractorsListRow(
-      id = "carterfieldsLtd",
-      name = "Carterfields Ltd",
-      utr = "2345678901",
-      verified = true,
-      verificationNumber = "V0007771002",
-      taxTreatment = TaxTreatment.Gross,
-      dateAdded = "23 Apr 2026"
+      "brightwellPartners",
+      "Brightwell Partners",
+      "1234567890",
+      false,
+      "V0007771001",
+      TaxTreatment.StandardRate,
+      "23 Apr 2026",
+      29L
     ),
     SubcontractorsListRow(
-      id = "northbridgeBuild",
-      name = "Northbridge Build",
-      utr = "3456789012",
-      verified = false,
-      verificationNumber = "V0007771003",
-      taxTreatment = TaxTreatment.StandardRate,
-      dateAdded = "23 Apr 2026"
+      "carterfieldsLtd",
+      "Carterfields Ltd",
+      "2345678901",
+      true,
+      "V0007771002",
+      TaxTreatment.Gross,
+      "23 Apr 2026",
+      6L
     ),
     SubcontractorsListRow(
-      id = "oakthornServices",
-      name = "Oakthorn Services",
-      utr = "4567890123",
-      verified = true,
-      verificationNumber = "V0007771004",
-      taxTreatment = TaxTreatment.HigherRate,
-      dateAdded = "23 Apr 2026"
+      "northbridgeBuild",
+      "Northbridge Build",
+      "3456789012",
+      false,
+      "V0007771003",
+      TaxTreatment.StandardRate,
+      "23 Apr 2026",
+      7L
+    ),
+    SubcontractorsListRow(
+      "oakthornServices",
+      "Oakthorn Services",
+      "4567890123",
+      true,
+      "V0007771004",
+      TaxTreatment.HigherRate,
+      "23 Apr 2026",
+      8L
     ),
     SubcontractorsListRow(
       "alphaBuild",
@@ -98,7 +116,8 @@ object SubcontractorsListData {
       false,
       "V0009000001",
       TaxTreatment.StandardRate,
-      "01 Jan 2026"
+      "01 Jan 2026",
+      9L
     ),
     SubcontractorsListRow(
       "betaConstruct",
@@ -107,7 +126,8 @@ object SubcontractorsListData {
       true,
       "V0009000002",
       TaxTreatment.Gross,
-      "02 Jan 2026"
+      "02 Jan 2026",
+      10L
     ),
     SubcontractorsListRow(
       "charlieWorks",
@@ -116,7 +136,8 @@ object SubcontractorsListData {
       false,
       "V0009000003",
       TaxTreatment.HigherRate,
-      "03 Jan 2026"
+      "03 Jan 2026",
+      11L
     ),
     SubcontractorsListRow(
       "deltaGroup",
@@ -125,7 +146,8 @@ object SubcontractorsListData {
       true,
       "V0009000004",
       TaxTreatment.StandardRate,
-      "04 Jan 2026"
+      "04 Jan 2026",
+      12L
     ),
     SubcontractorsListRow(
       "echoServices",
@@ -134,7 +156,8 @@ object SubcontractorsListData {
       false,
       "V0009000005",
       TaxTreatment.Gross,
-      "05 Jan 2026"
+      "05 Jan 2026",
+      13L
     ),
     SubcontractorsListRow(
       "foxtrotLtd",
@@ -143,7 +166,8 @@ object SubcontractorsListData {
       true,
       "V0009000006",
       TaxTreatment.StandardRate,
-      "06 Jan 2026"
+      "06 Jan 2026",
+      14L
     ),
     SubcontractorsListRow(
       "gammaBuilders",
@@ -152,7 +176,8 @@ object SubcontractorsListData {
       false,
       "V0009000007",
       TaxTreatment.HigherRate,
-      "07 Jan 2026"
+      "07 Jan 2026",
+      15L
     ),
     SubcontractorsListRow(
       "harbourWorks",
@@ -161,7 +186,8 @@ object SubcontractorsListData {
       true,
       "V0009000008",
       TaxTreatment.Gross,
-      "08 Jan 2026"
+      "08 Jan 2026",
+      16L
     ),
     SubcontractorsListRow(
       "ivoryConstruction",
@@ -170,7 +196,8 @@ object SubcontractorsListData {
       false,
       "V0009000009",
       TaxTreatment.StandardRate,
-      "09 Jan 2026"
+      "09 Jan 2026",
+      17L
     ),
     SubcontractorsListRow(
       "jupiterProjects",
@@ -179,7 +206,8 @@ object SubcontractorsListData {
       true,
       "V0009000010",
       TaxTreatment.HigherRate,
-      "10 Jan 2026"
+      "10 Jan 2026",
+      18L
     ),
     SubcontractorsListRow(
       "kingstonBuild",
@@ -188,7 +216,8 @@ object SubcontractorsListData {
       false,
       "V0009000011",
       TaxTreatment.Gross,
-      "11 Jan 2026"
+      "11 Jan 2026",
+      19L
     ),
     SubcontractorsListRow(
       "lunarDevelopments",
@@ -197,7 +226,8 @@ object SubcontractorsListData {
       true,
       "V0009000012",
       TaxTreatment.StandardRate,
-      "12 Jan 2026"
+      "12 Jan 2026",
+      20L
     ),
     SubcontractorsListRow(
       "metroConstruct",
@@ -206,7 +236,8 @@ object SubcontractorsListData {
       false,
       "V0009000013",
       TaxTreatment.HigherRate,
-      "13 Jan 2026"
+      "13 Jan 2026",
+      21L
     ),
     SubcontractorsListRow(
       "novaBuilders",
@@ -215,8 +246,11 @@ object SubcontractorsListData {
       true,
       "V0009000014",
       TaxTreatment.Gross,
-      "14 Jan 2026"
+      "14 Jan 2026",
+      22L
     ),
+
+    // duplicates retained but with different refs
     SubcontractorsListRow(
       "gammaBuilders",
       "Gamma Builders",
@@ -224,7 +258,8 @@ object SubcontractorsListData {
       false,
       "V0009000007",
       TaxTreatment.Unknown,
-      "07 Jan 2026"
+      "07 Jan 2026",
+      23L
     ),
     SubcontractorsListRow(
       "orbitWorks",
@@ -233,7 +268,8 @@ object SubcontractorsListData {
       false,
       "V0009000015",
       TaxTreatment.Unknown,
-      "15 Jan 2026"
+      "15 Jan 2026",
+      24L
     ),
     SubcontractorsListRow(
       "northbridgeBuild",
@@ -242,7 +278,8 @@ object SubcontractorsListData {
       false,
       "V0007771003",
       TaxTreatment.Unknown,
-      "23 Apr 2026"
+      "23 Apr 2026",
+      25L
     ),
     SubcontractorsListRow(
       "orbitWorks",
@@ -251,7 +288,8 @@ object SubcontractorsListData {
       false,
       "V0009000015",
       TaxTreatment.StandardRate,
-      "15 Jan 2026"
+      "15 Jan 2026",
+      26L
     ),
     SubcontractorsListRow(
       "pioneerLtd",
@@ -260,7 +298,8 @@ object SubcontractorsListData {
       true,
       "V0009000016",
       TaxTreatment.HigherRate,
-      "16 Jan 2026"
+      "16 Jan 2026",
+      27L
     )
   ).sortBy(_.name.toLowerCase)
 }

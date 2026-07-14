@@ -71,7 +71,9 @@
 
     @oneColumnGrid(
         HtmlFormat.fill(Seq(
-            headingLink("subcontractorsLandingPage.subcontractorList", "#"),
+            headingLink("subcontractorsLandingPage.subcontractorList",
+            controllers.subcontractors.routes.GetSubcontractorListController.onPageLoad().url
+          ),
             paragraph("subcontractorsLandingPage.subcontractorList.p1")
         )),
     )

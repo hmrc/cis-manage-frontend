@@ -21,7 +21,7 @@ import connectors.ConstructionIndustrySchemeConnector
 import models.*
 import models.agent.AgentClientData
 import models.history.SubmittedReturnsData
-import models.verify.VerificationHistoryData
+import models.verify.{VerificationHistoryData, VerificationRequestDetailData}
 import models.requests.*
 import models.response.*
 import pages.*
@@ -116,9 +116,8 @@ class ManageService @Inject() (
                 _         <- sessionRepository.set(updatedUa)
                 _         <- cisConnector.saveAgentClient(userId, agentClient)
               } yield AgentLandingViewModel(
-                clientName = updatedClient.schemeName.getOrElse(""),
-                employerRef = s"${updatedClient.taxOfficeNumber}/${updatedClient.taxOfficeRef}",
-                utr = utrOpt
+                schemeName = updatedClient.schemeName.getOrElse(""),
+                employerRef = s"${updatedClient.taxOfficeNumber}/${updatedClient.taxOfficeRef}"
               )
             }
         }
@@ -172,6 +171,11 @@ class ManageService @Inject() (
     hc: HeaderCarrier
   ): Future[VerificationHistoryData] =
     cisConnector.getVerificationHistory(instanceId)
+
+  def getVerificationRequestDetail(instanceId: String, verificationNumber: String)(implicit
+    hc: HeaderCarrier
+  ): Future[VerificationRequestDetailData] =
+    cisConnector.getVerificationRequestDetail(instanceId, verificationNumber)
 
   def buildReturnsLandingContext(
     instanceId: String,
@@ -280,8 +284,7 @@ class ManageService @Inject() (
             href = if (isAmendment) {
               controllers.routes.JourneyRecoveryController.onPageLoad().url // TODO: MR03-03
             } else {
-              appConfig
-                .continueReturnJourneyUrl(instanceId, row.taxYear.toString, row.taxMonth.toString)
+              controllers.history.routes.IncompleteReturnsController.onContinueRedirect(row.monthlyReturnId).url
             },
             hiddenTextKey = Some("incompleteReturns.action.continue.hidden")
           ),

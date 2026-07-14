@@ -41,9 +41,8 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
   private val uniqueId = "some-unique-id"
 
   private val landingViewModel = AgentLandingViewModel(
-    clientName = "Test Client",
-    employerRef = "123/AB456",
-    utr = Some("1234567890")
+    schemeName = "Test scheme name",
+    employerRef = "123/AB456"
   )
 
   private val client = CisTaxpayerSearchResult(
@@ -95,9 +94,8 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe OK
         val body = contentAsString(result)
 
-        body must include("Test Client")
+        body must include("Test scheme name")
         body must include("123/AB456")
-        body must include("1234567890")
 
         val savedAnswersCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockSessionRepository).set(savedAnswersCaptor.capture())
