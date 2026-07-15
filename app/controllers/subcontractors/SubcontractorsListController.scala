@@ -60,6 +60,15 @@ class SubcontractorsListController @Inject() (
   private val SortOrderAsc  = "ascending"
   private val SortOrderDesc = "descending"
 
+  private def isNoNameProvided(
+    displayName: String
+  )(implicit request: RequestHeader): Boolean = {
+    val noNameProvided =
+      messagesApi.preferred(request)("subcontractorsList.noNameProvided")
+
+    displayName.trim.equalsIgnoreCase(noNameProvided)
+  }
+
   private final case class ListFilters(
     searchTerm: String,
     verificationStatus: VerificationStatusFilter,
@@ -70,27 +79,6 @@ class SubcontractorsListController @Inject() (
 
   private def encode(value: String): String =
     URLEncoder.encode(value, StandardCharsets.UTF_8.toString)
-
-  private def appendQueryParams(
-    url: String,
-    params: Seq[(String, String)]
-  ): String = {
-    val filteredParams =
-      params.collect {
-        case (key, value) if value.nonEmpty =>
-          s"$key=${encode(value)}"
-      }
-
-    if (filteredParams.isEmpty) {
-      url
-    } else {
-      val separator =
-        if (url.contains("?")) "&"
-        else "?"
-
-      s"$url$separator${filteredParams.mkString("&")}"
-    }
-  }
 
   private def normalisedSortBy(value: Option[String]): String =
     value match {
@@ -147,7 +135,11 @@ class SubcontractorsListController @Inject() (
   private def getSubbieResourceRef(
     subcontractor: GetSubcontractor
   ): Long =
-    subcontractor.subbieResourceRef.getOrElse(subcontractor.subcontractorId)
+    subcontractor.subbieResourceRef.getOrElse {
+      throw new IllegalStateException(
+        s"Missing subbieResourceRef for subcontractorId ${subcontractor.subcontractorId}"
+      )
+    }
 
   private def toTaxTreatment(
     taxTreatment: Option[String]
@@ -169,7 +161,7 @@ class SubcontractorsListController @Inject() (
   private def filterRows(
     allRows: Seq[SubcontractorsListRow],
     filters: ListFilters
-  ): Seq[SubcontractorsListRow] = {
+  )(implicit request: RequestHeader): Seq[SubcontractorsListRow] = {
     val searchFiltered =
       filterBySearchTerm(allRows, filters.searchTerm)
 
@@ -247,7 +239,7 @@ class SubcontractorsListController @Inject() (
     rows: Seq[SubcontractorsListRow],
     sortBy: String,
     sortOrder: String
-  ): Seq[SubcontractorsListRow] =
+  )(implicit request: RequestHeader): Seq[SubcontractorsListRow] =
     sortBy match {
       case SortByDateAdded =>
         val sortedRows =
@@ -261,10 +253,10 @@ class SubcontractorsListController @Inject() (
 
       case SortByName =>
         val noNameRows =
-          rows.filter(row => row.name.trim.equalsIgnoreCase("No name provided"))
+          rows.filter(row => isNoNameProvided(row.name))
 
         val namedRows =
-          rows.filterNot(row => row.name.trim.equalsIgnoreCase("No name provided"))
+          rows.filterNot(row => isNoNameProvided(row.name))
 
         val sortedNamedRows =
           namedRows.sortBy(row => row.name.trim.toLowerCase(Locale.UK))
@@ -366,7 +358,7 @@ class SubcontractorsListController @Inject() (
     mode: Mode,
     page: Int,
     filters: ListFilters
-  ) =
+  )(implicit request: RequestHeader) =
     paginationService.paginate(
       allItems = filterRows(allRows, filters),
       currentPage = page,
@@ -469,17 +461,14 @@ class SubcontractorsListController @Inject() (
         .onPageLoad(instanceId, mode, targetPage)
         .url
 
+    val filtersForRedirect =
+      filters.copy(searchTerm = searchTerm.trim)
+
+    val qs =
+      queryString(filtersForRedirect)
+
     Redirect(
-      appendQueryParams(
-        baseUrl,
-        Seq(
-          "searchTerm"         -> searchTerm.trim,
-          "verificationStatus" -> filters.verificationStatus.value,
-          "taxTreatment"       -> filters.taxTreatment.value,
-          "sortBy"             -> filters.sortBy,
-          "sortOrder"          -> filters.sortOrder
-        )
-      )
+      if (qs.isEmpty) baseUrl else s"$baseUrl?$qs"
     )
   }
 

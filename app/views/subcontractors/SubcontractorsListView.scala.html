@@ -105,6 +105,7 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
                )
             )
             .withCssClass("search-term-input")
+            .copy(autocomplete = Some("off"))
           )
 
            <div class="govuk-grid-row govuk-!-margin-bottom-4">
@@ -132,7 +133,8 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
                             text = messages("subcontractors.subcontractorsList.filter.verificationStatus.notVerified"),
                             selected = verificationStatus == VerificationStatusFilter.NotVerified.value
                               )
-                            )
+                            ),
+                            attributes = Map("autocomplete" -> "off")
                          )
                     )
 
@@ -171,7 +173,8 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
                                 text = messages("subcontractors.subcontractorsList.filter.taxTreatment.unknown"),
                                 selected = taxTreatment == TaxTreatmentFilter.Unknown.value
                                       )
-                                )
+                                ),
+                                attributes = Map("autocomplete" -> "off")
                             )
                     )
 
@@ -240,14 +243,13 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
                    TableRow(
                      content = HtmlContent(
                       s"""
-                       <a class="govuk-link" href="#">
-                          ${HtmlFormat.escape(row.name)}
-                            <span class="govuk-visually-hidden">
-                               Show details for ${HtmlFormat.escape(row.name)}
-                            </span>
-                       </a>
-                      """
-                   ),
+                      <a class=" ${HtmlFormat.escape(row.name)}
+                         <span class="govuk-visually-hidden">
+                            ${messages("subcontractors.subcontractorsList.showDetailsFor", row.name)}
+                         </span>
+                      </a>
+                   """
+                ),
                     attributes = Map(
                      "data-sort-value" -> row.name
                     )
