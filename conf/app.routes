@@ -153,6 +153,8 @@ GET   /verify/history/submission-receipt                    controllers.verify.S
 
 GET   /verify/verification-request                          controllers.verify.VerificationRequestController.onPageLoad(verificationNumber: String)
 
+GET   /verification-history/retrieve                        controllers.verify.GetSubmittedVerificationsController.onPageLoad()
+
 # Client Details
 GET   /client-details/manage-client-details           controllers.clientdetails.ManageClientDetailsController.onPageLoad()
 
@@ -172,5 +174,3 @@ POST  /client-details/change-change-client-reference  controllers.clientdetails.
 
 # Add Contractor Details
 GET  /add-contractor-details  controllers.AddContractorDetailsController.onPageLoad()
-
-GET  /verification-history/retrieve  controllers.verify.GetSubmittedVerificationsController.onPageLoad()

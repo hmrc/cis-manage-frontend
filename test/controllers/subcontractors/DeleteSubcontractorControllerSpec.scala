@@ -37,17 +37,13 @@ class DeleteSubcontractorControllerSpec extends SpecBase with MockitoSugar {
   private val subcontractorName = "ABC Contractors"
   private val subbieResourceRef = 10L
 
+  lazy val deleteSubcontractorRoute: String = "/subcontractors/delete-subcontractor/submit"
   private val journeyData =
     DeleteSubcontractorJourneyData(
       subcontractorName = subcontractorName,
       subbieResourceRef = subbieResourceRef,
       subcontractorCanBeDeleted = true
     )
-
-  private val deleteSubcontractorRoute =
-    controllers.subcontractors.routes.DeleteSubcontractorController
-      .onSubmit()
-      .url
 
   "DeleteSubcontractorController" - {
 
