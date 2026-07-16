@@ -127,6 +127,51 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       )
     }
 
+    "must render subcontractor name links with visually hidden text" in new Setup {
+
+      val html =
+        view(
+          form,
+          mode,
+          rows,
+          pagination,
+          page = 1,
+          totalPages = 2,
+          startIndex = 1,
+          totalCount = rows.size,
+          instanceId = instanceId,
+          searchTerm = "",
+          verificationStatus = "all",
+          taxTreatment = "all",
+          sortBy = "name",
+          sortOrder = "ascending"
+        )
+
+      val doc = Jsoup.parse(html.body)
+
+      val nameLinks =
+        doc.select("#subcontractors-table tbody tr td:first-child a.govuk-link")
+
+      nameLinks.size() mustBe rows.size
+
+      rows.zipWithIndex.foreach { case (row, index) =>
+        val link = nameLinks.get(index)
+
+        link.attr("href") mustBe "#"
+
+        link.ownText().trim mustBe row.name
+
+        link
+          .select(".govuk-visually-hidden")
+          .text()
+          .trim mustBe
+          messages(
+            "subcontractors.subcontractorsList.showDetailsFor",
+            row.name
+          )
+      }
+    }
+
     "must NOT render showing results text when pagination is empty" in new Setup {
 
       val html =
@@ -269,16 +314,25 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       val doc = Jsoup.parse(html.body)
 
       val deleteLinks =
-        doc.select("#subcontractors-table tbody tr td:last-child a.govuk-link[href='#']")
+        doc.select("#subcontractors-table tbody tr td:last-child a.govuk-link")
 
       deleteLinks.size() mustBe rows.size
 
       rows.zipWithIndex.foreach { case (row, index) =>
         val deleteLink = deleteLinks.get(index)
 
-        deleteLink.ownText().trim mustBe "Delete"
+        deleteLink.attr("href") mustBe
+          controllers.subcontractors.routes.GetSubcontractorForDeleteController
+            .onPageLoad(row.subbieResourceRef)
+            .url
 
-        deleteLink.select(".govuk-visually-hidden").text().trim mustBe row.name
+        deleteLink.ownText().trim mustBe
+          messages("subcontractors.subcontractorsList.delete")
+
+        deleteLink
+          .select(".govuk-visually-hidden")
+          .text()
+          .trim mustBe row.name
       }
     }
   }

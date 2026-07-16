@@ -22,6 +22,7 @@
 @import viewmodels.subcontractors.TaxTreatment
 @import views.html.helper.CSPNonce
 @import views.html.templates.Layout
+@import play.twirl.api.HtmlFormat
 @import viewmodels.govuk.PaginationFluency._
 @import views.html.components._
 
@@ -240,21 +241,29 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
 
                  rows = rows.map { row =>
                    Seq(
-                   TableRow(
-                     content = HtmlContent(
-                      s"""
-                      <a class=" ${HtmlFormat.escape(row.name)}
-                         <span class="govuk-visually-hidden">
-                            ${messages("subcontractors.subcontractorsList.showDetailsFor", row.name)}
-                         </span>
-                      </a>
-                   """
+                TableRow(
+                content = HtmlContent(
+                Html(
+                s"""
+                |<a href="#" class="govuk-link">
+                |  ${HtmlFormat.escape(row.name)}
+                |  <span class="govuk-visually-hidden">
+         |    ${HtmlFormat.escape(
+                  messages(
+                    "subcontractors.subcontractorsList.showDetailsFor",
+                    row.name
+                  )
+                )}
+         |  </span>
+                |</a>
+                |""".stripMargin
+                )
                 ),
-                    attributes = Map(
-                     "data-sort-value" -> row.name
-                    )
-                   ),
-                   TableRow(Text(row.utr)),
+                attributes = Map(
+                "data-sort-value" -> row.name
+                )
+                ),
+                    TableRow(Text(row.utr)),
                        TableRow(
                            Text(
                              messages(if (row.verified) "site.yes" else "site.no")
@@ -282,16 +291,17 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
                       content = Text(row.dateAdded),
                         attributes = Map("data-sort-value" -> row.dateAdded)
                    ),
-                   TableRow(
-                       HtmlContent(
-                         "<a class=\"govuk-link\" href=\"#\">" +
-                            "Delete" +
-                               "<span class=\"govuk-visually-hidden\"> " +
-                                  HtmlFormat.escape(row.name) +
-                               "</span></a>"
-                            )
-                       )
+                  TableRow(
+                    HtmlContent(
+                      link(
+                        linkTextKey = "subcontractors.subcontractorsList.delete",
+                        linkUrl = controllers.subcontractors.routes.GetSubcontractorForDeleteController.onPageLoad(row.subbieResourceRef).url,
+                        paragraphWrapped = false,
+                        visuallyHiddenText = Some(row.name)
+                      ).body
                     )
+                   )
+                  )
                 },
 
                 attributes = Map(
