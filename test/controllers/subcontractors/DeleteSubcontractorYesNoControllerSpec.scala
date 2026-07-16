@@ -25,6 +25,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import pages.CisIdPage
 import pages.subcontractors.{DeleteSubcontractorJourneyPage, DeleteSubcontractorYesNoPage}
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -42,6 +43,7 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
   val formProvider                       = new DeleteSubcontractorYesNoFormProvider()
   val form                               = formProvider()
   val subcontractorName                  = "subcontractor Name"
+  val cisId                              = "1"
   lazy val deleteSubcontractorYesNoRoute =
     controllers.subcontractors.routes.DeleteSubcontractorYesNoController.onPageLoad().url
 
@@ -54,6 +56,9 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
 
   private val userAnswersWithJourney =
     emptyUserAnswers
+      .set(CisIdPage, cisId)
+      .success
+      .value
       .set(DeleteSubcontractorJourneyPage, journeyData)
       .success
       .value
@@ -108,7 +113,7 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to DeleteSubcontractorController when Yes is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -117,12 +122,12 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
       val application =
         applicationBuilder(userAnswers = Some(userAnswersWithJourney))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
 
       running(application) {
+
         val request =
           FakeRequest(POST, deleteSubcontractorYesNoRoute)
             .withFormUrlEncodedBody(("value", "true"))
@@ -130,7 +135,41 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+
+        redirectLocation(result).value mustEqual
+          controllers.subcontractors.routes.DeleteSubcontractorController
+            .onSubmit()
+            .url
+      }
+    }
+
+    "must redirect to SubcontractorsListController when No is submitted" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithJourney))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, deleteSubcontractorYesNoRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.subcontractors.routes.SubcontractorsListController
+            .onPageLoad(cisId, NormalMode)
+            .url
       }
     }
 
