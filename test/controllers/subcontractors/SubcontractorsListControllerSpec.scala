@@ -18,103 +18,243 @@ package controllers.subcontractors
 
 import base.SpecBase
 import forms.subcontractors.SubcontractorsListFormProvider
-import org.scalatestplus.mockito.MockitoSugar
+import models.{Mode, NormalMode, UserAnswers}
+import models.response.{GetSubcontractor, GetSubcontractorListResponse}
+import pages.subcontractors.SubcontractorListPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.PaginationSubcontractorsListService
-import viewmodels.subcontractors.{SubcontractorsListData, SubcontractorsListRow, TaxTreatment}
+import viewmodels.subcontractors.{SubcontractorsListRow, TaxTreatment}
 import views.html.subcontractors.SubcontractorsListView
 
-class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
+import java.time.LocalDateTime
+
+class SubcontractorsListControllerSpec extends SpecBase {
 
   private val formProvider = new SubcontractorsListFormProvider()
   private val form         = formProvider()
 
   private val instanceId = "test-instance-id"
+  private val mode: Mode = NormalMode
+
+  private val subcontractors = Seq(
+    GetSubcontractor(
+      subcontractorId = 1L,
+      utr = Some("1234567890"),
+      pageVisited = None,
+      partnerUtr = None,
+      crn = None,
+      firstName = Some("Alan"),
+      nino = None,
+      secondName = None,
+      surname = Some("Smith"),
+      partnershipTradingName = None,
+      tradingName = None,
+      subcontractorType = Some("soleTrader"),
+      addressLine1 = None,
+      addressLine2 = None,
+      addressLine3 = None,
+      addressLine4 = None,
+      country = None,
+      postcode = None,
+      emailAddress = None,
+      phoneNumber = None,
+      mobilePhoneNumber = None,
+      worksReferenceNumber = None,
+      createDate = Some(LocalDateTime.of(2026, 4, 6, 10, 0)),
+      lastUpdate = None,
+      subbieResourceRef = Some(10L),
+      matched = None,
+      autoVerified = None,
+      verified = Some("Y"),
+      verificationNumber = Some("V000001"),
+      taxTreatment = Some("Gross"),
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
+    ),
+    GetSubcontractor(
+      subcontractorId = 2L,
+      utr = Some("9876543210"),
+      pageVisited = None,
+      partnerUtr = None,
+      crn = None,
+      firstName = Some("Brian"),
+      nino = None,
+      secondName = None,
+      surname = Some("Jones"),
+      partnershipTradingName = None,
+      tradingName = None,
+      subcontractorType = Some("soleTrader"),
+      addressLine1 = None,
+      addressLine2 = None,
+      addressLine3 = None,
+      addressLine4 = None,
+      country = None,
+      postcode = None,
+      emailAddress = None,
+      phoneNumber = None,
+      mobilePhoneNumber = None,
+      worksReferenceNumber = None,
+      createDate = Some(LocalDateTime.of(2026, 5, 6, 10, 0)),
+      lastUpdate = None,
+      subbieResourceRef = Some(20L),
+      matched = None,
+      autoVerified = None,
+      verified = Some("N"),
+      verificationNumber = Some("V000002"),
+      taxTreatment = Some("Higher Rate"),
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
+    )
+  )
+
+  private val listResponse = GetSubcontractorListResponse(
+    subcontractors = subcontractors
+  )
+
+  private val rows = Seq(
+    SubcontractorsListRow(
+      id = "1",
+      name = "Alan Smith",
+      utr = "1234567890",
+      verified = true,
+      verificationNumber = "V000001",
+      taxTreatment = TaxTreatment.Gross,
+      dateAdded = "6 Apr 2026",
+      subbieResourceRef = 10L
+    ),
+    SubcontractorsListRow(
+      id = "2",
+      name = "Brian Jones",
+      utr = "9876543210",
+      verified = false,
+      verificationNumber = "V000002",
+      taxTreatment = TaxTreatment.HigherRate,
+      dateAdded = "6 May 2026",
+      subbieResourceRef = 20L
+    )
+  )
+
+  private def userAnswersWithSubcontractors: UserAnswers =
+    emptyUserAnswers
+      .set(SubcontractorListPage, listResponse)
+      .success
+      .value
 
   private def filterRows(
     searchTerm: String,
     verificationStatus: String,
     taxTreatment: String
+  ): Seq[SubcontractorsListRow] =
+    filterByTaxTreatment(
+      filterByVerificationStatus(
+        filterBySearchTerm(rows, searchTerm),
+        verificationStatus
+      ),
+      taxTreatment
+    ).sortBy(_.name.toLowerCase)
+
+  private def filterBySearchTerm(
+    sourceRows: Seq[SubcontractorsListRow],
+    searchTerm: String
   ): Seq[SubcontractorsListRow] = {
+    val trimmedSearchTerm =
+      searchTerm.trim
 
-    val allRows = SubcontractorsListData.rows
+    if (trimmedSearchTerm.isEmpty) {
+      sourceRows
+    } else {
+      val lowerSearch =
+        trimmedSearchTerm.toLowerCase
 
-    val searchFiltered =
-      if (searchTerm.isEmpty) allRows
-      else {
-        val lowerSearch = searchTerm.toLowerCase
-        allRows.filter { row =>
-          row.name.toLowerCase.contains(lowerSearch) ||
-          row.utr.contains(searchTerm) ||
-          row.verificationNumber.contains(searchTerm)
-        }
+      sourceRows.filter { row =>
+        row.name.toLowerCase.contains(lowerSearch) ||
+        row.utr.contains(trimmedSearchTerm) ||
+        row.verificationNumber.contains(trimmedSearchTerm)
       }
-
-    val verificationFiltered =
-      verificationStatus match {
-        case "verified"    =>
-          searchFiltered.filter(_.verified)
-        case "notVerified" =>
-          searchFiltered.filter(!_.verified)
-        case _             =>
-          searchFiltered
-      }
-
-    val taxFiltered =
-      taxTreatment match {
-        case "gross" =>
-          verificationFiltered.filter(_.taxTreatment == TaxTreatment.Gross)
-
-        case "higherRate" =>
-          verificationFiltered.filter(_.taxTreatment == TaxTreatment.HigherRate)
-
-        case "standardRate" =>
-          verificationFiltered.filter(_.taxTreatment == TaxTreatment.StandardRate)
-
-        case "unknown" =>
-          verificationFiltered.filter(_.taxTreatment == TaxTreatment.Unknown)
-
-        case _ =>
-          verificationFiltered
-      }
-
-    taxFiltered.sortBy(_.name.toLowerCase)
+    }
   }
+
+  private def filterByVerificationStatus(
+    sourceRows: Seq[SubcontractorsListRow],
+    verificationStatus: String
+  ): Seq[SubcontractorsListRow] =
+    verificationStatus match {
+      case "verified" =>
+        sourceRows.filter(_.verified)
+
+      case "notVerified" =>
+        sourceRows.filterNot(_.verified)
+
+      case _ =>
+        sourceRows
+    }
+
+  private def filterByTaxTreatment(
+    sourceRows: Seq[SubcontractorsListRow],
+    taxTreatment: String
+  ): Seq[SubcontractorsListRow] =
+    taxTreatment match {
+      case "gross" =>
+        sourceRows.filter(_.taxTreatment == TaxTreatment.Gross)
+
+      case "higherRate" =>
+        sourceRows.filter(_.taxTreatment == TaxTreatment.HigherRate)
+
+      case "standardRate" =>
+        sourceRows.filter(_.taxTreatment == TaxTreatment.StandardRate)
+
+      case "unknown" =>
+        sourceRows.filter(_.taxTreatment == TaxTreatment.Unknown)
+
+      case _ =>
+        sourceRows
+    }
 
   "SubcontractorsListController" - {
 
     "must return OK and the correct view for a GET with default filters" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithSubcontractors)
+        ).build()
 
       running(application) {
-
         val request =
           FakeRequest(
             GET,
-            routes.SubcontractorsListController.onPageLoad(instanceId, 1).url
+            routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url
           )
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
 
-        val view              = application.injector.instanceOf[SubcontractorsListView]
-        val paginationService = application.injector.instanceOf[PaginationSubcontractorsListService]
+        val view =
+          application.injector.instanceOf[SubcontractorsListView]
 
-        val filteredRows = filterRows("", "all", "all")
+        val paginationService =
+          application.injector.instanceOf[PaginationSubcontractorsListService]
 
         val paginationResult =
           paginationService.paginate(
-            allItems = filteredRows,
+            allItems = filterRows("", "all", "all"),
             currentPage = 1,
             recordsPerPage = 8,
-            baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId).url,
+            baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
             queryString = ""
           )
 
         status(result) mustEqual OK
+
         contentAsString(result) mustEqual view(
           form.fill(""),
+          mode,
           paginationResult.items,
           paginationResult.pagination,
           paginationResult.currentPage,
@@ -130,49 +270,42 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return OK and the correct view for a GET with search and filters applied" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithSubcontractors)
+        ).build()
 
       running(application) {
-
         val request =
           FakeRequest(
             GET,
-            routes.SubcontractorsListController.onPageLoad(instanceId).url +
+            routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url +
               "?searchTerm=Alan&verificationStatus=verified&taxTreatment=gross"
           )
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
 
-        val view              = application.injector.instanceOf[SubcontractorsListView]
-        val paginationService = application.injector.instanceOf[PaginationSubcontractorsListService]
+        val view =
+          application.injector.instanceOf[SubcontractorsListView]
 
-        val searchTerm         = "Alan"
-        val verificationStatus = "verified"
-        val taxTreatment       = "gross"
-
-        val filteredRows =
-          filterRows(searchTerm, verificationStatus, taxTreatment)
-
-        val queryString =
-          Seq(
-            Some("searchTerm=Alan"),
-            Some("verificationStatus=verified"),
-            Some("taxTreatment=gross")
-          ).flatten.mkString("&")
+        val paginationService =
+          application.injector.instanceOf[PaginationSubcontractorsListService]
 
         val paginationResult =
           paginationService.paginate(
-            allItems = filteredRows,
+            allItems = filterRows("Alan", "verified", "gross"),
             currentPage = 1,
             recordsPerPage = 8,
-            baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId).url,
-            queryString = queryString
+            baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
+            queryString = "searchTerm=Alan&verificationStatus=verified&taxTreatment=gross"
           )
 
         status(result) mustEqual OK
+
         contentAsString(result) mustEqual view(
-          form.fill(searchTerm),
+          form.fill("Alan"),
+          mode,
           paginationResult.items,
           paginationResult.pagination,
           paginationResult.currentPage,
@@ -180,23 +313,24 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
           paginationResult.startIndex,
           paginationResult.totalCount,
           instanceId,
-          searchTerm,
-          verificationStatus,
-          taxTreatment
+          "Alan",
+          "verified",
+          "gross"
         )(request, messages(application)).toString
       }
     }
 
     "must redirect to the selected page with filters preserved when pagination is submitted" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithSubcontractors)
+        ).build()
 
       running(application) {
-
         val request =
           FakeRequest(
             POST,
-            routes.SubcontractorsListController.onSubmit(instanceId).url
+            routes.SubcontractorsListController.onSubmit(instanceId, mode, 1).url
           ).withFormUrlEncodedBody(
             "gotoPage"           -> "2",
             "searchTerm"         -> "Alan",
@@ -204,13 +338,17 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
             "taxTreatment"       -> "gross"
           )
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
 
         status(result) mustEqual SEE_OTHER
 
-        val redirectUrl = redirectLocation(result).value
+        val redirectUrl =
+          redirectLocation(result).value
 
-        redirectUrl must include(routes.SubcontractorsListController.onPageLoad(instanceId).url)
+        redirectUrl must include(
+          routes.SubcontractorsListController.onPageLoad(instanceId, mode, 2).url
+        )
         redirectUrl must include("searchTerm=Alan")
         redirectUrl must include("verificationStatus=verified")
         redirectUrl must include("taxTreatment=gross")
@@ -218,72 +356,146 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to page 1 when gotoPage is not submitted" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithSubcontractors)
+        ).build()
 
       running(application) {
-
         val request =
           FakeRequest(
             POST,
-            routes.SubcontractorsListController.onSubmit(instanceId).url
+            routes.SubcontractorsListController.onSubmit(instanceId, mode, 1).url
           ).withFormUrlEncodedBody(
             "searchTerm"         -> "Alan",
             "verificationStatus" -> "verified",
             "taxTreatment"       -> "gross"
           )
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
 
         status(result) mustEqual SEE_OTHER
 
-        val redirectUrl = redirectLocation(result).value
+        val redirectUrl =
+          redirectLocation(result).value
 
-        redirectUrl must include(routes.SubcontractorsListController.onPageLoad(instanceId).url)
+        redirectUrl must include(
+          routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url
+        )
         redirectUrl must include("searchTerm=Alan")
         redirectUrl must include("verificationStatus=verified")
         redirectUrl must include("taxTreatment=gross")
       }
     }
 
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
+    "must redirect to Journey Recovery for a GET when subcontractor list data is missing" in {
+      val application =
+        applicationBuilder(
+          userAnswers = Some(emptyUserAnswers)
+        ).build()
 
       running(application) {
-
         val request =
           FakeRequest(
             GET,
-            routes.SubcontractorsListController.onPageLoad(instanceId).url
+            routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url
           )
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
+    "must redirect to Journey Recovery for a POST when subcontractor list data is missing" in {
+      val application =
+        applicationBuilder(
+          userAnswers = Some(emptyUserAnswers)
+        ).build()
 
       running(application) {
-
         val request =
           FakeRequest(
             POST,
-            routes.SubcontractorsListController.onSubmit(instanceId).url
+            routes.SubcontractorsListController.onSubmit(instanceId, mode, 1).url
           ).withFormUrlEncodedBody(
             "gotoPage"   -> "2",
             "searchTerm" -> "Alan"
           )
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to no subcontractors exist when the stored list is empty" in {
+      val application =
+        applicationBuilder(
+          userAnswers = Some(
+            emptyUserAnswers
+              .set(SubcontractorListPage, GetSubcontractorListResponse(Seq.empty))
+              .success
+              .value
+          )
+        ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.NoSubcontractorsExistController.onPageLoad().url
+      }
+    }
+
+    "must throw an exception when subbieResourceRef is missing" in {
+      val response =
+        GetSubcontractorListResponse(
+          subcontractors = Seq(
+            subcontractors.head.copy(
+              subbieResourceRef = None
+            )
+          )
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(SubcontractorListPage, response)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers)
+        ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(
+            GET,
+            routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url
+          )
+
+        val result =
+          route(application, request).value
+
+        val exception =
+          intercept[IllegalStateException] {
+            await(result)
+          }
+
+        exception.getMessage mustEqual
+          "Missing subbieResourceRef for subcontractorId 1"
       }
     }
   }

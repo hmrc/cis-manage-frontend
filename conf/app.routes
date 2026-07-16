@@ -22,10 +22,9 @@ GET   /subcontractors/cannot-delete-subcontractor-warning  controllers.subcontra
 
 GET   /subcontractors/no-subcontractors-to-view  controllers.subcontractors.NoSubcontractorsExistController.onPageLoad()
 
-GET   /subcontractors/:instanceId/your-subcontractors  controllers.subcontractors.SubcontractorsListController.onPageLoad(instanceId: String, page: Int ?= 1)
-POST  /subcontractors/:instanceId/your-subcontractors  controllers.subcontractors.SubcontractorsListController.onSubmit(instanceId: String, page: Int ?= 1)
-
 GET   /subcontractors/:subbieResourceRef/delete-status/  controllers.subcontractors.GetSubcontractorForDeleteController.onPageLoad(subbieResourceRef: Long)
+
+GET   /authorisation-check-in-progress  controllers.SecurityCheckController.onPageLoad()
 
 # Errors & Auth
 GET  /there-is-a-problem               controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
@@ -52,25 +51,25 @@ GET  /access-denied                    controllers.AccessDeniedController.onPage
 GET  /system-error/there-is-a-problem  controllers.SystemErrorController.onPageLoad()
 
 # Agent
-GET   /agent/retrieve-client-list                              controllers.agent.RetrievingClientController.onPageLoad()
-GET   /agent/retrieve-client-list/start                        controllers.agent.RetrievingClientController.start()
-GET   /agent/retrieve-client-list/poll                         controllers.agent.RetrievingClientController.poll(retryCount: Int ?= 0)
+GET   /agent/retrieve-client-list        controllers.agent.RetrievingClientController.onPageLoad()
+GET   /agent/retrieve-client-list/start  controllers.agent.RetrievingClientController.start()
+GET   /agent/retrieve-client-list/poll   controllers.agent.RetrievingClientController.poll(retryCount: Int ?= 0)
 
-GET   /agent/no-client-list                                    controllers.agent.FailedToRetrieveClientController.onPageLoad()
+GET   /agent/no-client-list  controllers.agent.FailedToRetrieveClientController.onPageLoad()
 
-GET   /agent/no-authorised-clients                             controllers.agent.NoAuthorisedClientsController.onPageLoad()
+GET   /agent/no-authorised-clients  controllers.agent.NoAuthorisedClientsController.onPageLoad()
 
 GET   /agent/manage-construction-industry-service-account/:uniqueId                    controllers.agent.AgentLandingController.onPageLoad(uniqueId: String)
 GET   /agent/manage-construction-industry-service-account/:uniqueId/target/:targetKey  controllers.agent.AgentLandingController.onTargetClick(uniqueId: String, targetKey: String)
 
-GET   /agent/file-monthly-cis-returns                          controllers.agent.ClientListSearchController.onPageLoad()
-POST  /agent/file-monthly-cis-returns                          controllers.agent.ClientListSearchController.onSubmit()
-GET   /agent/file-monthly-cis-returns/clear                    controllers.agent.ClientListSearchController.clearFilter()
-GET   /agent/file-monthly-cis-returns/download                 controllers.agent.ClientListSearchController.downloadClientList()
+GET   /agent/file-monthly-cis-returns           controllers.agent.ClientListSearchController.onPageLoad()
+POST  /agent/file-monthly-cis-returns           controllers.agent.ClientListSearchController.onSubmit()
+GET   /agent/file-monthly-cis-returns/clear     controllers.agent.ClientListSearchController.clearFilter()
+GET   /agent/file-monthly-cis-returns/download  controllers.agent.ClientListSearchController.downloadClientList()
 
 # Contractor Landing
-GET  /org/manage-construction-industry-service-account                      controllers.contractor.ContractorLandingController.onPageLoad()
-GET  /org/manage-construction-industry-service-account/target/:targetKey    controllers.contractor.ContractorLandingController.onTargetClick(targetKey: String)
+GET  /org/manage-construction-industry-service-account                    controllers.contractor.ContractorLandingController.onPageLoad()
+GET  /org/manage-construction-industry-service-account/target/:targetKey  controllers.contractor.ContractorLandingController.onTargetClick(targetKey: String)
 
 # Introduction
 GET  /sign-into-cis          controllers.IntroductionController.onPageLoad()
@@ -99,6 +98,7 @@ GET  /manage-cis-return/:instanceId  controllers.ReturnsLandingController.onPage
 
 GET  /manage-your-cis-return/incomplete-returns                                 controllers.history.IncompleteReturnsController.onPageLoad()
 GET  /manage-your-cis-return/incomplete-returns/delete-return/:monthlyReturnId  controllers.history.IncompleteReturnsController.onDeleteRedirect(monthlyReturnId: Long)
+GET  /manage-your-cis-return/incomplete-returns/continue-return/:monthlyReturnId  controllers.history.IncompleteReturnsController.onContinueRedirect(monthlyReturnId: Long)
 
 # Delete
 GET   /delete/delete-monthly-return              controllers.delete.DeleteMonthlyReturnController.onPageLoad(mode: Mode = NormalMode)
@@ -119,10 +119,11 @@ POST  /history/view-tax-year-submission-history  controllers.history.SubmittedRe
 
 GET   /history/monthly-return-submission-details  controllers.history.PrintSubmissionDetailsController.onPageLoad(taxYear: Int, taxMonth: Int, amendment: String, from: String ?= "all")
 
-GET   /history/monthly-return-history-all-tax-years      controllers.history.SubmittedReturnsController.onPageLoadAllYears()
-GET   /history/monthly-return-history-tax-year/:taxYear  controllers.history.SubmittedReturnsController.onPageLoadSingleYear(taxYear)
-GET   /history/amend/:taxYear/:taxMonth                  controllers.history.SubmittedReturnsController.startAmendment(taxYear: Int, taxMonth: Int)
-GET   /monthly-return/confirmation-history               controllers.history.SubmittedReturnsController.viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String)
+GET   /history/monthly-return-history-all-tax-years                             controllers.history.SubmittedReturnsController.onPageLoadAllYears()
+GET   /history/monthly-return-history-tax-year/:taxYear                         controllers.history.SubmittedReturnsController.onPageLoadSingleYear(taxYear)
+GET   /history/monthly-return-history/in-progress-return/:monthlyReturnId       controllers.history.SubmittedReturnsController.onInProgressRedirect(monthlyReturnId: Long)
+GET   /history/amend/:taxYear/:taxMonth                                         controllers.history.SubmittedReturnsController.startAmendment(taxYear: Int, taxMonth: Int)
+GET   /monthly-return/confirmation-history                                      controllers.history.SubmittedReturnsController.viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String)
 
 # Amend
 GET  /amend-monthly-return/no-return-submitted    controllers.amend.NoReturnsSubmittedController.onPageLoad()
@@ -162,5 +163,23 @@ POST  /client-details/change-change-client-reference  controllers.clientdetails.
 
 # Add Contractor Details
 GET  /add-contractor-details  controllers.AddContractorDetailsController.onPageLoad()
+
+# Subcontractors
+GET   /subcontractors/:instanceId/your-subcontractors             controllers.subcontractors.SubcontractorsListController.onPageLoad(instanceId: String, mode: Mode = NormalMode, page: Int ?= 1)
+POST  /subcontractors/:instanceId/your-subcontractors             controllers.subcontractors.SubcontractorsListController.onSubmit(instanceId: String, mode: Mode = NormalMode, page: Int ?= 1)
+GET   /subcontractors/:instanceId/change-your-subcontractors      controllers.subcontractors.SubcontractorsListController.onPageLoad(instanceId: String, mode: Mode = CheckMode, page: Int ?= 1)
+POST  /subcontractors/:instanceId/change-your-subcontractors      controllers.subcontractors.SubcontractorsListController.onSubmit(instanceId: String, mode: Mode = CheckMode, page: Int ?= 1)
+
+# Delete Subcontractor
+GET     /subcontractors/delete-subcontractor                        controllers.subcontractors.DeleteSubcontractorYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST    /subcontractors/delete-subcontractor                        controllers.subcontractors.DeleteSubcontractorYesNoController.onSubmit(mode: Mode = NormalMode)
+
+GET   /subcontractors/subcontractor-deleted                       controllers.subcontractors.SubcontractorDeletedConfirmationController.onPageLoad()
+
+GET  /subcontractors/cannot-delete-subcontractor-warning                       controllers.subcontractors.CannotDeleteSubcontractorController.onPageLoad()
+
+GET  /subcontractors/no-subcontractors-to-view      controllers.subcontractors.NoSubcontractorsExistController.onPageLoad()
+
+GET   /subcontractors/retrieve  controllers.subcontractors.GetSubcontractorListController.onPageLoad()
 
 GET  /verification-history/retrieve  controllers.verify.GetSubmittedVerificationsController.onPageLoad()

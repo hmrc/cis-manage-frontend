@@ -18,6 +18,7 @@ package controllers.history
 
 import config.FrontendAppConfig
 import controllers.actions.*
+import controllers.routes
 import models.history.SubmittedReturnsData
 import models.requests.CisIdDataRequest
 import pages.history.SubmittedReturnsDataPage
@@ -137,6 +138,24 @@ class SubmittedReturnsController @Inject() (
         }
         .recover { case ex =>
           logger.error("[startAmendment] failed", ex)
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
+
+  def onInProgressRedirect(monthlyReturnId: Long): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+      manageService
+        .getSubmittedMonthlyReturns(request.cisId)
+        .map { response =>
+          response.monthlyReturns.find(_.monthlyReturnId == monthlyReturnId) match {
+            case Some(data) if data.amendmentStatus.exists(Set("STARTED", "VALIDATED")) =>
+              Redirect("#") // TODO
+            case _                                                                      =>
+              Redirect(routes.JourneyRecoveryController.onPageLoad())
+          }
+        }
+        .recover { case ex =>
+          logger.error("[SubmittedReturnsController] Failed to get submitted monthly returns", ex)
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }

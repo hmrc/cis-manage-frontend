@@ -334,7 +334,9 @@ class SubmittedReturnsService @Inject() (
       case Some("STARTED") | Some("VALIDATED")                               =>
         StatusViewModel.Link(
           link = LinkViewModel(
-            url = "#", // TODO
+            url = controllers.history.routes.SubmittedReturnsController
+              .onInProgressRedirect(monthlyReturn.monthlyReturnId)
+              .url,
             hiddenText = buildReturnPeriodEnd(monthlyReturn)
           ),
           textKey = "history.returnHistory.status.inProgress",
