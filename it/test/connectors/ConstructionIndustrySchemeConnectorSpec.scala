@@ -21,7 +21,7 @@ import itutil.ApplicationWithWiremock
 import models.Scheme
 import models.agent.AgentClientData
 import models.history.{SubmittedSchemeData, SubmittedSubmissionData}
-import models.requests.{DeleteUnsubmittedMonthlyReturnRequest, GetSubmittedMonthlyReturnsDataRequest}
+import models.requests.{DeleteSubcontractorRequest, DeleteUnsubmittedMonthlyReturnRequest, GetSubmittedMonthlyReturnsDataRequest}
 import models.response.{GetSubcontractorForDeleteResponse, GetSubmittedMonthlyReturnsDataResponse}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
@@ -1109,6 +1109,115 @@ class ConstructionIndustrySchemeConnectorSpec
 
       ex mustBe a[UpstreamErrorResponse]
       ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe INTERNAL_SERVER_ERROR
+    }
+  }
+
+  "deleteSubcontractor" should {
+
+    "return successfully when BE returns 204" in {
+
+      val request =
+        DeleteSubcontractorRequest(
+          instanceId = "cis-123",
+          subbieResourceRef = 10L
+        )
+
+      stubFor(
+        post(urlPathEqualTo("/cis/subcontractor/delete"))
+          .willReturn(
+            aResponse()
+              .withStatus(NO_CONTENT)
+          )
+      )
+
+      connector
+        .deleteSubcontractor(request)
+        .futureValue mustBe()
+    }
+
+    "fail with UpstreamErrorResponse when BE returns 400" in {
+
+      val request =
+        DeleteSubcontractorRequest(
+          instanceId = "cis-123",
+          subbieResourceRef = 10L
+        )
+
+      stubFor(
+        post(urlPathEqualTo("/cis/subcontractor/delete"))
+          .willReturn(
+            aResponse()
+              .withStatus(BAD_REQUEST)
+              .withBody("""{"message":"invalid request"}""")
+          )
+      )
+
+      val ex =
+        connector
+          .deleteSubcontractor(request)
+          .failed
+          .futureValue
+
+      ex mustBe a[UpstreamErrorResponse]
+
+      ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe BAD_REQUEST
+    }
+
+    "fail with UpstreamErrorResponse when BE returns 404" in {
+
+      val request =
+        DeleteSubcontractorRequest(
+          instanceId = "cis-123",
+          subbieResourceRef = 10L
+        )
+
+      stubFor(
+        post(urlPathEqualTo("/cis/subcontractor/delete"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+              .withBody("""{"message":"not found"}""")
+          )
+      )
+
+      val ex =
+        connector
+          .deleteSubcontractor(request)
+          .failed
+          .futureValue
+
+      ex mustBe a[UpstreamErrorResponse]
+
+      ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe NOT_FOUND
+    }
+
+    "fail with UpstreamErrorResponse when BE returns 500" in {
+
+      val request =
+        DeleteSubcontractorRequest(
+          instanceId = "cis-123",
+          subbieResourceRef = 10L
+        )
+
+      stubFor(
+        post(urlPathEqualTo("/cis/subcontractor/delete"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody("boom")
+          )
+      )
+
+      val ex =
+        connector
+          .deleteSubcontractor(request)
+          .failed
+          .futureValue
+
+      ex mustBe a[UpstreamErrorResponse]
+
+      ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe INTERNAL_SERVER_ERROR
+      ex.getMessage must include("boom")
     }
   }
 }
