@@ -24,7 +24,7 @@ import pages.verify.{VerificationHistoryDataPage, VerificationHistorySelectTaxYe
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{ManageService, VerificationHistoryService}
+import services.{VerificationHistoryService, VerificationService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
@@ -42,7 +42,7 @@ class VerificationHistoryController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: VerificationHistoryView,
   verificationHistoryService: VerificationHistoryService,
-  manageService: ManageService
+  verificationService: VerificationService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -95,7 +95,10 @@ class VerificationHistoryController @Inject() (
     request.userAnswers.get(VerificationHistoryDataPage) match {
       case Some(data) =>
         Future.successful(data)
-      case None       =>
-        manageService.getVerificationHistory(request.cisId)
+
+      case None =>
+        verificationService
+          .getSubmittedVerifications(request.cisId)
+          .map(verificationHistoryService.toVerificationHistoryData)
     }
 }

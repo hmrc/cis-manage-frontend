@@ -21,6 +21,8 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
 import java.time.LocalDate
+import models.response.*
+import java.time.LocalDateTime
 
 class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
 
@@ -35,6 +37,51 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
       VerificationRequestData("V004", LocalDate.of(2025, 6, 6), 2025)
     )
   )
+
+  private def submittedVerificationBatch(
+    verificationBatchId: Long,
+    verificationNumber: Option[String],
+    createDate: Option[LocalDateTime] = None
+  ): GetSubmittedVerificationBatch =
+    GetSubmittedVerificationBatch(
+      verificationBatchId = verificationBatchId,
+      schemeId = 1L,
+      verificationsCounter = None,
+      verifBatchResourceRef = None,
+      proceedSession = None,
+      confirmArrangement = None,
+      confirmCorrect = None,
+      status = None,
+      verificationNumber = verificationNumber,
+      createDate = createDate,
+      lastUpdate = None,
+      version = None
+    )
+
+  private def submittedSubmission(
+    activeObjectId: Option[Long],
+    submissionRequestDate: Option[LocalDateTime] = None,
+    createDate: Option[LocalDateTime] = None
+  ): GetSubmittedSubmission =
+    GetSubmittedSubmission(
+      submissionId = 1L,
+      submissionType = "Verification",
+      activeObjectId = activeObjectId,
+      status = None,
+      hmrcMarkGenerated = None,
+      hmrcMarkGgis = None,
+      emailRecipient = None,
+      acceptedTime = None,
+      createDate = createDate,
+      lastUpdate = None,
+      schemeId = 1L,
+      agentId = None,
+      l_Migrated = None,
+      submissionRequestDate = submissionRequestDate,
+      govTalkErrorCode = None,
+      govTalkErrorType = None,
+      govTalkErrorMessage = None
+    )
 
   "VerificationHistoryService" - {
 
@@ -122,6 +169,213 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
         val result = service.buildSingleYearViewModel(data, "2020", instanceId)
 
         result mustBe None
+      }
+    }
+
+    "toVerificationHistoryData" - {
+
+      "must map submitted verification batches to history data using submission request date and calculate tax years" in {
+        val response = GetSubmittedVerificationsResponse(
+          scheme = Seq.empty,
+          subcontractors = Seq.empty,
+          verificationBatches = Seq(
+            submittedVerificationBatch(
+              verificationBatchId = 1L,
+              verificationNumber = Some("V001"),
+              createDate = Some(LocalDateTime.of(2026, 4, 1, 9, 0))
+            ),
+            submittedVerificationBatch(
+              verificationBatchId = 2L,
+              verificationNumber = Some("V002"),
+              createDate = Some(LocalDateTime.of(2026, 1, 1, 9, 0))
+            )
+          ),
+          verifications = Seq.empty,
+          submissions = Seq(
+            submittedSubmission(
+              activeObjectId = Some(1L),
+              submissionRequestDate = Some(LocalDateTime.of(2026, 4, 6, 10, 0))
+            ),
+            submittedSubmission(
+              activeObjectId = Some(2L),
+              submissionRequestDate = Some(LocalDateTime.of(2026, 2, 6, 10, 0))
+            )
+          )
+        )
+
+        service.toVerificationHistoryData(response) mustBe VerificationHistoryData(
+          verificationRequests = Seq(
+            VerificationRequestData(
+              verificationNumber = "V001",
+              dateSubmitted = LocalDate.of(2026, 4, 6),
+              taxYear = 2026
+            ),
+            VerificationRequestData(
+              verificationNumber = "V002",
+              dateSubmitted = LocalDate.of(2026, 2, 6),
+              taxYear = 2025
+            )
+          )
+        )
+      }
+
+      "must use submission create date when submission request date is absent" in {
+        val response = GetSubmittedVerificationsResponse(
+          scheme = Seq.empty,
+          subcontractors = Seq.empty,
+          verificationBatches = Seq(
+            submittedVerificationBatch(
+              verificationBatchId = 1L,
+              verificationNumber = Some("V001"),
+              createDate = Some(LocalDateTime.of(2026, 1, 1, 9, 0))
+            )
+          ),
+          verifications = Seq.empty,
+          submissions = Seq(
+            submittedSubmission(
+              activeObjectId = Some(1L),
+              createDate = Some(LocalDateTime.of(2026, 6, 6, 10, 0))
+            )
+          )
+        )
+
+        service.toVerificationHistoryData(response) mustBe VerificationHistoryData(
+          verificationRequests = Seq(
+            VerificationRequestData(
+              verificationNumber = "V001",
+              dateSubmitted = LocalDate.of(2026, 6, 6),
+              taxYear = 2026
+            )
+          )
+        )
+      }
+
+      "must use verification batch create date when there is no matching submission" in {
+        val response = GetSubmittedVerificationsResponse(
+          scheme = Seq.empty,
+          subcontractors = Seq.empty,
+          verificationBatches = Seq(
+            submittedVerificationBatch(
+              verificationBatchId = 1L,
+              verificationNumber = Some("V001"),
+              createDate = Some(LocalDateTime.of(2026, 3, 31, 9, 0))
+            )
+          ),
+          verifications = Seq.empty,
+          submissions = Seq.empty
+        )
+
+        service.toVerificationHistoryData(response) mustBe VerificationHistoryData(
+          verificationRequests = Seq(
+            VerificationRequestData(
+              verificationNumber = "V001",
+              dateSubmitted = LocalDate.of(2026, 3, 31),
+              taxYear = 2025
+            )
+          )
+        )
+      }
+
+      "must exclude batches without a verification number or a usable date" in {
+        val response = GetSubmittedVerificationsResponse(
+          scheme = Seq.empty,
+          subcontractors = Seq.empty,
+          verificationBatches = Seq(
+            submittedVerificationBatch(
+              verificationBatchId = 1L,
+              verificationNumber = None,
+              createDate = Some(LocalDateTime.of(2026, 4, 6, 9, 0))
+            ),
+            submittedVerificationBatch(
+              verificationBatchId = 2L,
+              verificationNumber = Some("V002"),
+              createDate = None
+            )
+          ),
+          verifications = Seq.empty,
+          submissions = Seq.empty
+        )
+
+        service.toVerificationHistoryData(response) mustBe VerificationHistoryData(
+          verificationRequests = Seq.empty
+        )
+      }
+
+      "must use the newest submission date when more than one submission exists for a batch" in {
+        val response = GetSubmittedVerificationsResponse(
+          scheme = Seq.empty,
+          subcontractors = Seq.empty,
+          verificationBatches = Seq(
+            submittedVerificationBatch(
+              verificationBatchId = 1L,
+              verificationNumber = Some("V001")
+            )
+          ),
+          verifications = Seq.empty,
+          submissions = Seq(
+            submittedSubmission(
+              activeObjectId = Some(1L),
+              submissionRequestDate = Some(LocalDateTime.of(2026, 4, 6, 10, 0))
+            ),
+            submittedSubmission(
+              activeObjectId = Some(1L),
+              submissionRequestDate = Some(LocalDateTime.of(2026, 6, 6, 10, 0))
+            )
+          )
+        )
+
+        service.toVerificationHistoryData(response) mustBe VerificationHistoryData(
+          verificationRequests = Seq(
+            VerificationRequestData(
+              verificationNumber = "V001",
+              dateSubmitted = LocalDate.of(2026, 6, 6),
+              taxYear = 2026
+            )
+          )
+        )
+      }
+
+      "must calculate tax year from 6 April boundary" in {
+        val response = GetSubmittedVerificationsResponse(
+          scheme = Seq.empty,
+          subcontractors = Seq.empty,
+          verificationBatches = Seq(
+            submittedVerificationBatch(
+              verificationBatchId = 1L,
+              verificationNumber = Some("V001")
+            ),
+            submittedVerificationBatch(
+              verificationBatchId = 2L,
+              verificationNumber = Some("V002")
+            )
+          ),
+          verifications = Seq.empty,
+          submissions = Seq(
+            submittedSubmission(
+              activeObjectId = Some(1L),
+              submissionRequestDate = Some(LocalDateTime.of(2026, 4, 5, 10, 0))
+            ),
+            submittedSubmission(
+              activeObjectId = Some(2L),
+              submissionRequestDate = Some(LocalDateTime.of(2026, 4, 6, 10, 0))
+            )
+          )
+        )
+
+        service.toVerificationHistoryData(response) mustBe VerificationHistoryData(
+          verificationRequests = Seq(
+            VerificationRequestData(
+              verificationNumber = "V002",
+              dateSubmitted = LocalDate.of(2026, 4, 6),
+              taxYear = 2026
+            ),
+            VerificationRequestData(
+              verificationNumber = "V001",
+              dateSubmitted = LocalDate.of(2026, 4, 5),
+              taxYear = 2025
+            )
+          )
+        )
       }
     }
   }
