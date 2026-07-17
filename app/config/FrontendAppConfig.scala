@@ -41,6 +41,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val signOutUrl: String                                 = configuration.get[String]("urls.signOut")
   lazy val govUkCISGuidanceUrl: String                        = configuration.get[String]("urls.govUkCISGuidance")
   lazy val commercialSoftwareSuppliersUrl: String             = configuration.get[String]("urls.commercialSoftwareSuppliers")
+  lazy val cisContractorsGuidanceUrl: String                  = configuration.get[String]("urls.cisContractorsGuidance")
+  lazy val cisUpdatesUrl: String                              = configuration.get[String]("urls.cisUpdates")
+  lazy val cisMoreInformationUrl: String                      = configuration.get[String]("urls.cisMoreInformation")
   lazy val technicalSupportWithHmrcOnlineServicesUrl: String  =
     configuration.get[String]("urls.technicalSupportWithHmrcOnlineServices")
   lazy val registerAsAProfessionalTaxAgentWithHmrcUrl: String =
