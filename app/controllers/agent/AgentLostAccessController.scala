@@ -18,6 +18,7 @@ package controllers.agent
 
 import config.FrontendAppConfig
 import controllers.actions.*
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -28,13 +29,25 @@ import javax.inject.{Inject, Named}
 class AgentLostAccessController @Inject() (
   override val messagesApi: MessagesApi,
   @Named("AgentIdentifier") identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: AgentLostAccessView
 )(implicit appConfig: FrontendAppConfig)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
-  def onPageLoad: Action[AnyContent] = identify { implicit request =>
-    Ok(view())
-  }
+  def onPageLoad: Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      request.agentCode match {
+        case Some(agentCode) =>
+          val authoriseClientRequestUrl = appConfig.authoriseClientRequestUrl(agentCode)
+
+          Ok(view(authoriseClientRequestUrl))
+        case None            =>
+          logger.warn("[AgentLostAccessController] Auth returned no agentCode")
+          Redirect(controllers.routes.UnauthorisedAgentAffinityController.onPageLoad())
+      }
+    }
 }

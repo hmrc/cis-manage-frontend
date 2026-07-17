@@ -31,7 +31,7 @@ class AgentLostAccessViewSpec extends SpecBase {
   "AgentLostAccessView" - {
 
     "must render the page with the correct title, heading, paragraph, list items & links" in new Setup {
-      private val html: HtmlFormat.Appendable = view()
+      private val html: HtmlFormat.Appendable = view(authoriseClientRequestUrl)
       private val doc: Document               = Jsoup.parse(html.body)
 
       doc.title             must include(messages("agent.agentLostAccess.title"))
@@ -43,6 +43,7 @@ class AgentLostAccessViewSpec extends SpecBase {
       doc.select("p").text                      must include(messages("agent.agentLostAccess.bullet.title"))
       doc.select("li").text                     must include(messages("agent.agentLostAccess.bullet.item.1.prefix"))
       doc.getElementsByClass("govuk-link").text must include(messages("agent.agentLostAccess.bullet.item.1.link"))
+      doc.select("li a").first().attr("href") mustBe authoriseClientRequestUrl
       doc.select("li").text                     must include(messages("agent.agentLostAccess.bullet.item.2.prefix"))
       doc.getElementsByClass("govuk-link").text must include(messages("agent.agentLostAccess.bullet.item.2.link"))
       doc.select("li").text                     must include(messages("agent.agentLostAccess.bullet.item.2.suffix"))
@@ -54,9 +55,10 @@ class AgentLostAccessViewSpec extends SpecBase {
   }
 
   trait Setup {
-    private val app: Application     = applicationBuilder().build()
-    val view: AgentLostAccessView    = app.injector.instanceOf[AgentLostAccessView]
-    implicit val request: Request[_] = FakeRequest()
-    implicit val messages: Messages  = MessagesImpl(Lang.defaultLang, app.injector.instanceOf[MessagesApi])
+    private val app: Application          = applicationBuilder().build()
+    val view: AgentLostAccessView         = app.injector.instanceOf[AgentLostAccessView]
+    val authoriseClientRequestUrl: String = "http://localhost:8095/account/authorise-client/agent/123456798/request"
+    implicit val request: Request[_]      = FakeRequest()
+    implicit val messages: Messages       = MessagesImpl(Lang.defaultLang, app.injector.instanceOf[MessagesApi])
   }
 }
