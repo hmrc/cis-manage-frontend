@@ -22,7 +22,7 @@ GET   /subcontractors/cannot-delete-subcontractor-warning  controllers.subcontra
 
 GET   /subcontractors/no-subcontractors-to-view  controllers.subcontractors.NoSubcontractorsExistController.onPageLoad()
 
-GET   /subcontractors/:subbieResourceRef/delete-status/  controllers.subcontractors.GetSubcontractorForDeleteController.onPageLoad(subbieResourceRef: Long)
+GET   /subcontractors/:subbieResourceRef/delete-status  controllers.subcontractors.GetSubcontractorForDeleteController.onPageLoad(subbieResourceRef: Long)
 
 GET   /authorisation-check-in-progress  controllers.SecurityCheckController.onPageLoad()
 
@@ -31,7 +31,7 @@ POST  /subcontractors/:instanceId/your-subcontractors         controllers.subcon
 GET   /subcontractors/:instanceId/change-your-subcontractors  controllers.subcontractors.SubcontractorsListController.onPageLoad(instanceId: String, mode: Mode = CheckMode, page: Int ?= 1)
 POST  /subcontractors/:instanceId/change-your-subcontractors  controllers.subcontractors.SubcontractorsListController.onSubmit(instanceId: String, mode: Mode = CheckMode, page: Int ?= 1)
 
-POST  /subcontractors/delete-subcontractor/submit  controllers.subcontractors.DeleteSubcontractorController.onSubmit()
+GET  /subcontractors/delete-subcontractor/submit  controllers.subcontractors.DeleteSubcontractorController.onSubmit()
 
 GET   /subcontractors/retrieve  controllers.subcontractors.GetSubcontractorListController.onPageLoad()
 
