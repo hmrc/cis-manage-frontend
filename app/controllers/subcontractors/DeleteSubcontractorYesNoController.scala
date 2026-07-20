@@ -19,7 +19,6 @@ package controllers.subcontractors
 import controllers.actions.*
 import forms.subcontractors.DeleteSubcontractorYesNoFormProvider
 import models.Mode
-import navigation.Navigator
 import pages.subcontractors.{DeleteSubcontractorJourneyPage, DeleteSubcontractorYesNoPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -34,10 +33,10 @@ import scala.concurrent.{ExecutionContext, Future}
 class DeleteSubcontractorYesNoController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
-  navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  requireCisId: CisIdRequiredAction,
   formProvider: DeleteSubcontractorYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: DeleteSubcontractorYesNoView
@@ -45,7 +44,7 @@ class DeleteSubcontractorYesNoController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form: Form[Boolean] = formProvider()
+  private val form: Form[Boolean] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
@@ -55,13 +54,10 @@ class DeleteSubcontractorYesNoController @Inject() (
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         } { journeyData =>
           if (!journeyData.subcontractorCanBeDeleted) {
-
             Redirect(
               controllers.subcontractors.routes.CannotDeleteSubcontractorController.onPageLoad()
             )
-
           } else {
-
             val preparedForm =
               request.userAnswers
                 .get(DeleteSubcontractorYesNoPage)
@@ -78,8 +74,8 @@ class DeleteSubcontractorYesNoController @Inject() (
         }
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
@@ -103,9 +99,23 @@ class DeleteSubcontractorYesNoController @Inject() (
               },
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(DeleteSubcontractorYesNoPage, value))
+              updatedAnswers <- Future.fromTry(
+                                  request.userAnswers.set(
+                                    DeleteSubcontractorYesNoPage,
+                                    value
+                                  )
+                                )
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(DeleteSubcontractorYesNoPage, mode, updatedAnswers))
+            } yield
+              if (value) {
+                Redirect(
+                  controllers.subcontractors.routes.DeleteSubcontractorController.onSubmit()
+                )
+              } else {
+                Redirect(
+                  controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(request.cisId, mode)
+                )
+              }
         )
-  }
+    }
 }

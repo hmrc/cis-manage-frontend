@@ -237,6 +237,27 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .get(url"$cisBaseUrl/subcontractor/$cisId/$subbieResourceRef/delete-status")
       .execute[GetSubcontractorForDeleteResponse]
 
+  def deleteSubcontractor(
+    request: DeleteSubcontractorRequest
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/subcontractor/delete")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { response =>
+        response.status match {
+          case NO_CONTENT => Future.unit
+          case status     =>
+            Future.failed(
+              UpstreamErrorResponse(
+                response.body,
+                status,
+                status
+              )
+            )
+        }
+      }
+
   def getSubmittedVerifications(
     request: GetSubmittedVerificationsRequest
   )(implicit hc: HeaderCarrier): Future[GetSubmittedVerificationsResponse] =

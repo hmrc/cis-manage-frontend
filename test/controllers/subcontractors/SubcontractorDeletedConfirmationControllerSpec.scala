@@ -17,41 +17,108 @@
 package controllers.subcontractors
 
 import base.SpecBase
+import models.NormalMode
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.subcontractors.SubcontractorDeletedConfirmationView
+import models.subcontractors.DeleteSubcontractorJourneyData
+import pages.CisIdPage
+import pages.subcontractors.{DeleteSubcontractorJourneyPage, DeletedSubcontractorPage}
 
 class SubcontractorDeletedConfirmationControllerSpec extends SpecBase {
+
+  private val cisId = "cis-123"
+
+  val userAnswers =
+    emptyUserAnswers
+      .set(CisIdPage, cisId)
+      .success
+      .value
+      .set(DeletedSubcontractorPage, "ABC Contractors")
+      .success
+      .value
 
   "SubcontractorDeletedConfirmationController" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdPage, cisId)
+          .success
+          .value
+          .set(DeletedSubcontractorPage, "ABC Contractors")
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .build()
 
       running(application) {
 
         val request =
           FakeRequest(
             GET,
-            controllers.subcontractors.routes.SubcontractorDeletedConfirmationController.onPageLoad().url
+            controllers.subcontractors.routes.SubcontractorDeletedConfirmationController
+              .onPageLoad()
+              .url
           )
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
 
-        val view = application.injector.instanceOf[SubcontractorDeletedConfirmationView]
-
-        val expectedSubcontractorName = "subcontractor Name"
-        val expectedUrl               = "#"
-        val expectedSurveyUrl         = "#"
+        val view =
+          application.injector
+            .instanceOf[SubcontractorDeletedConfirmationView]
 
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual
-          view(expectedSubcontractorName, expectedUrl, expectedSurveyUrl)(
+          view(
+            "ABC Contractors",
+            controllers.subcontractors.routes.GetSubcontractorListController
+              .onPageLoad()
+              .url,
+            "#"
+          )(
             request,
             messages(application)
           ).toString
+      }
+    }
+
+    "must redirect to journey recovery when journey data is missing" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdPage, cisId)
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.subcontractors.routes.SubcontractorDeletedConfirmationController
+              .onPageLoad()
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
       }
     }
   }
