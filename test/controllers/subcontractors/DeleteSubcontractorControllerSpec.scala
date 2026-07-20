@@ -87,7 +87,7 @@ class DeleteSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
 
         val request =
-          FakeRequest(POST, deleteSubcontractorRoute)
+          FakeRequest(GET, deleteSubcontractorRoute)
 
         val result =
           route(application, request).value
@@ -136,7 +136,7 @@ class DeleteSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
 
         val request =
-          FakeRequest(POST, deleteSubcontractorRoute)
+          FakeRequest(GET, deleteSubcontractorRoute)
 
         val result =
           route(application, request).value
@@ -144,8 +144,8 @@ class DeleteSubcontractorControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.subcontractors.routes.SubcontractorsListController
-            .onPageLoad(cisId, NormalMode)
+          controllers.subcontractors.routes.GetSubcontractorListController
+            .onPageLoad()
             .url
       }
     }
@@ -165,7 +165,7 @@ class DeleteSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
 
         val request =
-          FakeRequest(POST, deleteSubcontractorRoute)
+          FakeRequest(GET, deleteSubcontractorRoute)
 
         val result =
           route(application, request).value
@@ -197,7 +197,7 @@ class DeleteSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
 
         val request =
-          FakeRequest(POST, deleteSubcontractorRoute)
+          FakeRequest(GET, deleteSubcontractorRoute)
 
         val result =
           route(application, request).value
@@ -247,7 +247,7 @@ class DeleteSubcontractorControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
 
         val request =
-          FakeRequest(POST, deleteSubcontractorRoute)
+          FakeRequest(GET, deleteSubcontractorRoute)
 
         val result =
           route(application, request).value

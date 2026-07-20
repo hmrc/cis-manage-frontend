@@ -23,31 +23,33 @@ import play.api.test.Helpers.*
 import views.html.subcontractors.SubcontractorDeletedConfirmationView
 import models.subcontractors.DeleteSubcontractorJourneyData
 import pages.CisIdPage
-import pages.subcontractors.DeleteSubcontractorJourneyPage
+import pages.subcontractors.{DeleteSubcontractorJourneyPage, DeletedSubcontractorPage}
 
 class SubcontractorDeletedConfirmationControllerSpec extends SpecBase {
 
   private val cisId = "cis-123"
 
-  private val userAnswers =
+  val userAnswers =
     emptyUserAnswers
       .set(CisIdPage, cisId)
       .success
       .value
-      .set(
-        DeleteSubcontractorJourneyPage,
-        DeleteSubcontractorJourneyData(
-          subcontractorName = "ABC Contractors",
-          subbieResourceRef = 10L,
-          subcontractorCanBeDeleted = true
-        )
-      )
+      .set(DeletedSubcontractorPage, "ABC Contractors")
       .success
       .value
 
   "SubcontractorDeletedConfirmationController" - {
 
     "must return OK and the correct view for a GET" in {
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdPage, cisId)
+          .success
+          .value
+          .set(DeletedSubcontractorPage, "ABC Contractors")
+          .success
+          .value
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
@@ -70,22 +72,15 @@ class SubcontractorDeletedConfirmationControllerSpec extends SpecBase {
           application.injector
             .instanceOf[SubcontractorDeletedConfirmationView]
 
-        val expectedSubcontractorName = "ABC Contractors"
-
-        val expectedUrl =
-          controllers.subcontractors.routes.SubcontractorsListController
-            .onPageLoad(cisId, NormalMode)
-            .url
-
-        val expectedSurveyUrl = "#"
-
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual
           view(
-            expectedSubcontractorName,
-            expectedUrl,
-            expectedSurveyUrl
+            "ABC Contractors",
+            controllers.subcontractors.routes.GetSubcontractorListController
+              .onPageLoad()
+              .url,
+            "#"
           )(
             request,
             messages(application)

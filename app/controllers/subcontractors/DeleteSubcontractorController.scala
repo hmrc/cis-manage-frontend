@@ -17,8 +17,7 @@
 package controllers.subcontractors
 
 import controllers.actions.*
-import models.NormalMode
-import pages.subcontractors.{DeleteSubcontractorJourneyPage, DeleteSubcontractorYesNoPage, SubcontractorListPage}
+import pages.subcontractors.{DeleteSubcontractorJourneyPage, DeleteSubcontractorYesNoPage, DeletedSubcontractorPage, SubcontractorListPage}
 import play.api.Logging
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -58,9 +57,17 @@ class DeleteSubcontractorController @Inject() (
             )
             .flatMap { _ =>
               Future
-                .fromTry(
-                  request.userAnswers.remove(SubcontractorListPage)
-                )
+                .fromTry {
+                  for {
+                    ua1 <- request.userAnswers.set(
+                             DeletedSubcontractorPage,
+                             journeyData.subcontractorName
+                           )
+                    ua2 <- ua1.remove(DeleteSubcontractorJourneyPage)
+                    ua3 <- ua2.remove(DeleteSubcontractorYesNoPage)
+                    ua4 <- ua3.remove(SubcontractorListPage)
+                  } yield ua4
+                }
                 .flatMap(sessionRepository.set)
                 .map { _ =>
                   Redirect(
@@ -82,10 +89,7 @@ class DeleteSubcontractorController @Inject() (
         case (Some(_), Some(false)) =>
           Future.successful(
             Redirect(
-              controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(
-                request.cisId,
-                NormalMode
-              )
+              controllers.subcontractors.routes.GetSubcontractorListController.onPageLoad()
             )
           )
 
