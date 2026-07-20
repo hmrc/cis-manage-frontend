@@ -17,8 +17,7 @@
 package controllers.subcontractors
 
 import controllers.actions.*
-import models.NormalMode
-import pages.subcontractors.DeleteSubcontractorJourneyPage
+import pages.subcontractors.DeletedSubcontractorPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -40,23 +39,23 @@ class SubcontractorDeletedConfirmationController @Inject() (
   def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId) { implicit request =>
       request.userAnswers
-        .get(DeleteSubcontractorJourneyPage)
+        .get(DeletedSubcontractorPage)
         .fold {
           Redirect(
             controllers.routes.JourneyRecoveryController.onPageLoad()
           )
-        } { journeyData =>
+        } { subcontractorName =>
 
           val url =
-            controllers.subcontractors.routes.SubcontractorsListController
-              .onPageLoad(request.cisId, NormalMode)
+            controllers.subcontractors.routes.GetSubcontractorListController
+              .onPageLoad()
               .url
 
           val surveyURL = "#"
 
           Ok(
             view(
-              journeyData.subcontractorName,
+              subcontractorName,
               url,
               surveyURL
             )
