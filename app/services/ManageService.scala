@@ -21,7 +21,7 @@ import connectors.ConstructionIndustrySchemeConnector
 import models.*
 import models.agent.AgentClientData
 import models.history.SubmittedReturnsData
-import models.verify.{VerificationHistoryData, VerificationRequestDetailData}
+import models.verify.VerificationRequestDetailData
 import models.requests.*
 import models.response.*
 import pages.*
@@ -166,11 +166,6 @@ class ManageService @Inject() (
     hc: HeaderCarrier
   ): Future[SubmittedReturnsData] =
     cisConnector.getSubmittedMonthlyReturns(instanceId)
-
-  def getVerificationHistory(instanceId: String)(implicit
-    hc: HeaderCarrier
-  ): Future[VerificationHistoryData] =
-    cisConnector.getVerificationHistory(instanceId)
 
   def getVerificationRequestDetail(instanceId: String, verificationNumber: String)(implicit
     hc: HeaderCarrier

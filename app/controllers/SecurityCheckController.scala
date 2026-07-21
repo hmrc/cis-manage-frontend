@@ -14,40 +14,26 @@
  * limitations under the License.
  */
 
-package controllers.agent
+package controllers
 
-import config.FrontendAppConfig
-import controllers.actions.*
-import play.api.Logging
+import controllers.actions._
+import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.agent.AgentLostAccessView
+import views.html.SecurityCheckView
 
-import javax.inject.{Inject, Named}
-
-class AgentLostAccessController @Inject() (
+class SecurityCheckController @Inject() (
   override val messagesApi: MessagesApi,
-  @Named("AgentIdentifier") identify: IdentifierAction,
+  identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: AgentLostAccessView
-)(implicit appConfig: FrontendAppConfig)
-    extends FrontendBaseController
-    with I18nSupport
-    with Logging {
+  view: SecurityCheckView
+) extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      request.agentCode match {
-        case Some(agentCode) =>
-          val authoriseClientRequestUrl = appConfig.authoriseClientRequestUrl(agentCode)
-
-          Ok(view(authoriseClientRequestUrl))
-        case None            =>
-          logger.warn("[AgentLostAccessController] Auth returned no agentCode")
-          Redirect(controllers.routes.UnauthorisedAgentAffinityController.onPageLoad())
-      }
-    }
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    Ok(view())
+  }
 }

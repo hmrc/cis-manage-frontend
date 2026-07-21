@@ -29,7 +29,8 @@ import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import services.{ManageService, VerificationHistoryService}
+import models.response.GetSubmittedVerificationsResponse
+import services.{VerificationHistoryService, VerificationService}
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.*
 import views.html.verify.VerificationHistoryView
@@ -60,6 +61,14 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
     instanceId = cisId
   )
 
+  private val submittedVerificationsResponse = GetSubmittedVerificationsResponse(
+    scheme = Seq.empty,
+    subcontractors = Seq.empty,
+    verificationBatches = Seq.empty,
+    verifications = Seq.empty,
+    submissions = Seq.empty
+  )
+
   private val verificationHistoryData = VerificationHistoryData(
     verificationRequests = Seq(
       VerificationRequestData("V0004528765", LocalDate.of(2026, 4, 6), 2026)
@@ -69,13 +78,13 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
   trait Setup {
 
     val mockVerificationHistoryService: VerificationHistoryService = mock[VerificationHistoryService]
-    val mockManageService: ManageService                           = mock[ManageService]
+    val mockVerificationService: VerificationService               = mock[VerificationService]
 
     def application(userAnswers: UserAnswers): Application =
       applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(
           bind[VerificationHistoryService].toInstance(mockVerificationHistoryService),
-          bind[ManageService].toInstance(mockManageService)
+          bind[VerificationService].toInstance(mockVerificationService)
         )
         .build()
 
@@ -97,13 +106,26 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
         .success
         .value
 
-    def mockManageServiceReturnsData(): Unit =
-      when(mockManageService.getVerificationHistory(any[String])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(verificationHistoryData))
+    def mockVerificationServiceReturnsData(): Unit = {
+      when(
+        mockVerificationService.getSubmittedVerifications(
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.successful(submittedVerificationsResponse))
 
-    def mockManageServiceFails(): Unit =
-      when(mockManageService.getVerificationHistory(any[String])(any[HeaderCarrier]))
-        .thenReturn(Future.failed(new RuntimeException("boom")))
+      when(
+        mockVerificationHistoryService.toVerificationHistoryData(
+          submittedVerificationsResponse
+        )
+      ).thenReturn(verificationHistoryData)
+    }
+
+    def mockVerificationServiceFails(): Unit =
+      when(
+        mockVerificationService.getSubmittedVerifications(
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.failed(new RuntimeException("boom")))
 
     def mockSingleYearViewModelReturns(model: Option[VerificationHistoryPageViewModel]): Unit =
       when(
@@ -148,7 +170,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
 
         mockVerify(mockVerificationHistoryService).buildSingleYearViewModel(verificationHistoryData, "2026", cisId)
-        verifyNoInteractions(mockManageService)
+        verifyNoInteractions(mockVerificationService)
       }
     }
 
@@ -169,14 +191,14 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
 
         mockVerify(mockVerificationHistoryService).buildAllYearsViewModel(verificationHistoryData, cisId)
-        verifyNoInteractions(mockManageService)
+        verifyNoInteractions(mockVerificationService)
       }
     }
 
-    "onPageLoadSingleYear must fetch data from manageService when VerificationHistoryDataPage is missing and CisIdPage exists" in new Setup {
+    "onPageLoadSingleYear must retrieve and convert submitted verifications when VerificationHistoryDataPage is missing" in new Setup {
       val userAnswers = userAnswersWithCisIdAndTaxYearSelection
 
-      mockManageServiceReturnsData()
+      mockVerificationServiceReturnsData()
       mockSingleYearViewModelReturns(Some(viewModel))
 
       val app = application(userAnswers)
@@ -187,16 +209,20 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
 
-        mockVerify(mockManageService).getVerificationHistory(any[String])(any[HeaderCarrier])
+        mockVerify(mockVerificationService)
+          .getSubmittedVerifications(any[String])(any[HeaderCarrier])
+
+        mockVerify(mockVerificationHistoryService)
+          .toVerificationHistoryData(submittedVerificationsResponse)
         mockVerify(mockVerificationHistoryService)
           .buildSingleYearViewModel(any[VerificationHistoryData], any[String], any[String])
       }
     }
 
-    "onPageLoadAllYears must fetch data from manageService when VerificationHistoryDataPage is missing and CisIdPage exists" in new Setup {
+    "onPageLoadAllYears must retrieve and convert submitted verifications when VerificationHistoryDataPage is missing" in new Setup {
       val userAnswers = userAnswersWithCisId
 
-      mockManageServiceReturnsData()
+      mockVerificationServiceReturnsData()
       mockAllYearsViewModelReturns(Some(viewModel))
 
       val app = application(userAnswers)
@@ -207,7 +233,11 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
 
-        mockVerify(mockManageService).getVerificationHistory(any[String])(any[HeaderCarrier])
+        mockVerify(mockVerificationService)
+          .getSubmittedVerifications(any[String])(any[HeaderCarrier])
+
+        mockVerify(mockVerificationHistoryService)
+          .toVerificationHistoryData(submittedVerificationsResponse)
         mockVerify(mockVerificationHistoryService).buildAllYearsViewModel(any[VerificationHistoryData], any[String])
       }
     }
@@ -286,7 +316,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual journeyRecoveryUrl
 
-        verifyNoInteractions(mockManageService)
+        verifyNoInteractions(mockVerificationService)
         verifyNoInteractions(mockVerificationHistoryService)
       }
     }
@@ -294,7 +324,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
     "onPageLoadSingleYear must redirect to JourneyRecovery when resolveVerificationHistoryData fails" in new Setup {
       val userAnswers = userAnswersWithCisIdAndTaxYearSelection
 
-      mockManageServiceFails()
+      mockVerificationServiceFails()
 
       val app = application(userAnswers)
 
@@ -305,14 +335,15 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual journeyRecoveryUrl
 
-        mockVerify(mockManageService).getVerificationHistory(any[String])(any[HeaderCarrier])
+        mockVerify(mockVerificationService)
+          .getSubmittedVerifications(any[String])(any[HeaderCarrier])
       }
     }
 
     "onPageLoadAllYears must redirect to JourneyRecovery when resolveVerificationHistoryData fails" in new Setup {
       val userAnswers = userAnswersWithCisId
 
-      mockManageServiceFails()
+      mockVerificationServiceFails()
 
       val app = application(userAnswers)
 
@@ -323,7 +354,8 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual journeyRecoveryUrl
 
-        mockVerify(mockManageService).getVerificationHistory(any[String])(any[HeaderCarrier])
+        mockVerify(mockVerificationService)
+          .getSubmittedVerifications(any[String])(any[HeaderCarrier])
       }
     }
   }

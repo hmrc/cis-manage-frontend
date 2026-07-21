@@ -86,6 +86,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val contractorLandingPenaltiesUrl: String = configuration.get[String]("urls.contractorLandingPenaltiesUrl")
 
   private lazy val cisFrontendBaseUrl: String                       = configuration.get[String]("cis-frontend.host")
+  private lazy val portalAccountBaseUrl: String                     = configuration.get[String]("portal-account.host")
   private lazy val fileStandardReturnPath: String                   = configuration.get[String]("urls.fileStandardReturn")
   private lazy val fileNilReturnPath: String                        = configuration.get[String]("urls.fileNilReturn")
   private lazy val continueReturnJourneyPath: String                = configuration.get[String]("urls.continueReturnJourney")
@@ -93,6 +94,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   private lazy val submissionInProgressPath: String                 = configuration.get[String]("urls.submissionInProgress")
   private lazy val submissionUnsuccessfulCannotResubmitPath: String =
     configuration.get[String]("urls.submissionUnsuccessfulCannotResubmit")
+  private lazy val authoriseClientRequestPath: String               = configuration.get[String]("urls.authoriseClientRequest")
 
   def fileStandardReturnUrl: String = s"$cisFrontendBaseUrl$fileStandardReturnPath"
 
@@ -121,6 +123,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   def submissionUnsuccessfulCannotResubmitUrl(cisId: String): String =
     s"$cisFrontendBaseUrl$submissionUnsuccessfulCannotResubmitPath?cisId=$cisId"
+
+  def authoriseClientRequestUrl(agentCode: String): String =
+    s"$portalAccountBaseUrl${authoriseClientRequestPath.replace("{agentCode}", agentCode)}"
 
   lazy val cisTypeOfSubcontractorUrl: String = configuration.get[String]("urls.cis-contractor-frontend")
 }
