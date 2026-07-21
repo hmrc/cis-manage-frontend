@@ -335,6 +335,96 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
           .trim mustBe row.name
       }
     }
+
+    "must display translated no name provided when name is empty" in new Setup {
+
+      val rowWithNoName =
+        rows.head.copy(name = "")
+
+      val html =
+        view(
+          form,
+          mode,
+          Seq(rowWithNoName),
+          pagination,
+          page = 1,
+          totalPages = 1,
+          startIndex = 1,
+          totalCount = 1,
+          instanceId = instanceId,
+          searchTerm = "",
+          verificationStatus = "all",
+          taxTreatment = "all",
+          sortBy = "name",
+          sortOrder = "ascending"
+        )
+
+      val doc = Jsoup.parse(html.body)
+
+      doc.text must include(
+        messages("subcontractorsList.noNameProvided")
+      )
+    }
+
+    "must display unknown when verification number is empty" in new Setup {
+
+      val row =
+        rows.head.copy(verificationNumber = "")
+
+      val html =
+        view(
+          form,
+          mode,
+          Seq(row),
+          pagination,
+          page = 1,
+          totalPages = 1,
+          startIndex = 1,
+          totalCount = 1,
+          instanceId = instanceId,
+          searchTerm = "",
+          verificationStatus = "all",
+          taxTreatment = "all",
+          sortBy = "name",
+          sortOrder = "ascending"
+        )
+
+      val doc = Jsoup.parse(html.body)
+
+      doc.text must include(
+        messages("site.unknown")
+      )
+    }
+
+    "must display unknown when date added is empty" in new Setup {
+
+      val row =
+        rows.head.copy(dateAdded = "")
+
+      val html =
+        view(
+          form,
+          mode,
+          Seq(row),
+          pagination,
+          page = 1,
+          totalPages = 1,
+          startIndex = 1,
+          totalCount = 1,
+          instanceId = instanceId,
+          searchTerm = "",
+          verificationStatus = "all",
+          taxTreatment = "all",
+          sortBy = "name",
+          sortOrder = "ascending"
+        )
+
+      val doc = Jsoup.parse(html.body)
+
+      doc.text must include(
+        messages("site.unknown")
+      )
+    }
   }
 
   trait Setup {

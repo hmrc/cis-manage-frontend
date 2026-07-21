@@ -240,27 +240,35 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
                  ),
 
                  rows = rows.map { row =>
-                   Seq(
+
+                val displayName =
+                if (row.name.nonEmpty) {
+                row.name
+                } else {
+                messages("subcontractorsList.noNameProvided")
+                }
+
+                Seq(
                 TableRow(
                 content = HtmlContent(
                 Html(
                 s"""
                 |<a href="#" class="govuk-link">
-                |  ${HtmlFormat.escape(row.name)}
+                |  ${HtmlFormat.escape(displayName)}
                 |  <span class="govuk-visually-hidden">
-         |    ${HtmlFormat.escape(
-                  messages(
-                    "subcontractors.subcontractorsList.showDetailsFor",
-                    row.name
-                  )
-                )}
-         |  </span>
+                |    ${HtmlFormat.escape(
+                          messages(
+                            "subcontractors.subcontractorsList.showDetailsFor",
+                            displayName
+                          )
+                        )}
+                |  </span>
                 |</a>
                 |""".stripMargin
                 )
                 ),
                 attributes = Map(
-                "data-sort-value" -> row.name
+                "data-sort-value" -> displayName
                 )
                 ),
                     TableRow(Text(row.utr)),
@@ -269,28 +277,44 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
                              messages(if (row.verified) "site.yes" else "site.no")
                            )
                        ),
-                   TableRow(Text(row.verificationNumber)),
-                       TableRow(
-                            Text(
-                            row.taxTreatment match {
-                                case TaxTreatment.Gross =>
-                                    messages("subcontractors.subcontractorsList.filter.taxTreatment.gross")
-
-                                case TaxTreatment.StandardRate =>
-                                     messages("subcontractors.subcontractorsList.filter.taxTreatment.standardRate")
-
-                                case TaxTreatment.HigherRate =>
-                                     messages("subcontractors.subcontractorsList.filter.taxTreatment.higherRate")
-
-                                case TaxTreatment.Unknown =>
-                                     messages("subcontractors.subcontractorsList.filter.taxTreatment.unknown")
+                    TableRow(
+                        Text(
+                            if (row.verificationNumber.nonEmpty) {
+                                row.verificationNumber
+                            } else {
+                                messages("site.unknown")
                             }
-                       )
+                        )
                     ),
                    TableRow(
-                      content = Text(row.dateAdded),
-                        attributes = Map("data-sort-value" -> row.dateAdded)
-                   ),
+                        Text(
+                        row.taxTreatment match {
+                            case TaxTreatment.Gross =>
+                                messages("subcontractors.subcontractorsList.filter.taxTreatment.gross")
+
+                            case TaxTreatment.StandardRate =>
+                                 messages("subcontractors.subcontractorsList.filter.taxTreatment.standardRate")
+
+                            case TaxTreatment.HigherRate =>
+                                 messages("subcontractors.subcontractorsList.filter.taxTreatment.higherRate")
+
+                            case TaxTreatment.Unknown =>
+                                 messages("subcontractors.subcontractorsList.filter.taxTreatment.unknown")
+                        }
+                        )
+                    ),
+                    TableRow(
+                        content = Text(
+                            if (row.dateAdded.nonEmpty) {
+                            row.dateAdded
+                        } else {
+                            messages("site.unknown")
+                        }
+                        ),
+                            attributes = Map(
+                            "data-sort-value" -> row.dateAdded
+                        )
+                    ),
                   TableRow(
                     HtmlContent(
                       link(

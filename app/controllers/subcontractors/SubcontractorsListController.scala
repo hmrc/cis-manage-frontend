@@ -18,21 +18,22 @@ package controllers.subcontractors
 
 import controllers.actions.*
 import forms.subcontractors.SubcontractorsListFormProvider
-import models.{Mode, UserAnswers}
 import models.response.GetSubcontractor
+import models.{Mode, UserAnswers}
 import pages.subcontractors.SubcontractorListPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, RequestHeader, Result}
+import play.api.mvc.*
 import services.PaginationSubcontractorsListService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.ReverificationRules
 import viewmodels.subcontractors.*
 import views.html.subcontractors.SubcontractorsListView
 
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.{Clock, LocalDate}
 import java.util.Locale
 import javax.inject.Inject
 import scala.util.Try
@@ -44,6 +45,7 @@ class SubcontractorsListController @Inject() (
   requireData: DataRequiredAction,
   formProvider: SubcontractorsListFormProvider,
   paginationService: PaginationSubcontractorsListService,
+  clock: Clock,
   val controllerComponents: MessagesControllerComponents,
   view: SubcontractorsListView
 ) extends FrontendBaseController
@@ -118,19 +120,46 @@ class SubcontractorsListController @Inject() (
 
   private def toListRow(
     subcontractor: GetSubcontractor
-  ): SubcontractorsListRow =
+  ): SubcontractorsListRow = {
+
+    val isVerified =
+      subcontractor.verified.exists(_.equalsIgnoreCase("Y"))
+
+    val reverifyRequired =
+      isVerified && ReverificationRules.reverifyRequired(
+        subcontractor,
+        LocalDate.now(clock)
+      )
+
+    val verificationNumber =
+      if (reverifyRequired) {
+        ""
+      } else {
+        subcontractor.verificationNumber
+          .filter(_.nonEmpty)
+          .getOrElse("")
+      }
+
+    val taxTreatment =
+      if (reverifyRequired) {
+        TaxTreatment.Unknown
+      } else {
+        toTaxTreatment(subcontractor.taxTreatment)
+      }
+
     SubcontractorsListRow(
       id = subcontractor.subcontractorId.toString,
-      name = subcontractor.displayName,
+      name = subcontractor.displayName.getOrElse(""),
       utr = subcontractor.utr.getOrElse(""),
-      verified = subcontractor.verified.exists(_.equalsIgnoreCase("Y")),
-      verificationNumber = subcontractor.verificationNumber.getOrElse(""),
-      taxTreatment = toTaxTreatment(subcontractor.taxTreatment),
+      verified = !reverifyRequired,
+      verificationNumber = verificationNumber,
+      taxTreatment = taxTreatment,
       dateAdded = subcontractor.createDate
         .map(_.format(dateAddedFormatter))
         .getOrElse(""),
       subbieResourceRef = getSubbieResourceRef(subcontractor)
     )
+  }
 
   private def getSubbieResourceRef(
     subcontractor: GetSubcontractor
@@ -148,11 +177,11 @@ class SubcontractorsListController @Inject() (
       case Some("gross") =>
         TaxTreatment.Gross
 
-      case Some("higher rate" | "higherrate") =>
-        TaxTreatment.HigherRate
-
-      case Some("standard rate" | "standardrate") =>
+      case Some("net") =>
         TaxTreatment.StandardRate
+
+      case Some("unmatched") =>
+        TaxTreatment.HigherRate
 
       case _ =>
         TaxTreatment.Unknown
