@@ -59,7 +59,7 @@ class SubmittedReturnsController @Inject() (
 
       resolveSubmittedReturnsData
         .map { data =>
-          submittedReturnsService.buildSingleYearViewModel(data, taxYear) match {
+          submittedReturnsService.buildSingleYearViewModel(data, taxYear, request.cisId) match {
             case Some(vm) => Ok(view(vm))
             case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
@@ -76,7 +76,7 @@ class SubmittedReturnsController @Inject() (
 
       resolveSubmittedReturnsData
         .map { data =>
-          submittedReturnsService.buildAllYearsViewModel(data) match {
+          submittedReturnsService.buildAllYearsViewModel(data, request.cisId) match {
             case Some(vm) => Ok(view(vm))
             case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
