@@ -262,6 +262,47 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         textKey = "history.returnHistory.status.inProgress",
         hiddenTextKey = "history.returnHistory.hidden.status.inProgress"
       )
+
+      verify(mockAppConfig).continueAmendReturnJourneyUrl(
+        instanceId,
+        "2023",
+        "3",
+        isOriginalNilReturn = false
+      )
+    }
+
+    "returns inProgress for superseded nil return with amendment status STARTED" in new Setup {
+      val row = singleRow(
+        data(
+          monthlyReturns = Seq(
+            monthlyReturn(
+              id = 6L,
+              nilReturnIndicator = "Nil",
+              supersededBy = Some(99L),
+              amendmentStatus = Some("STARTED")
+            )
+          ),
+          submissions = Seq(
+            submission(submissionId = 16L, activeObjectId = Some(6L))
+          )
+        )
+      )
+
+      row.status shouldBe StatusViewModel.Link(
+        link = LinkViewModel(
+          url = "#",
+          hiddenText = "Mar 2023"
+        ),
+        textKey = "history.returnHistory.status.inProgress",
+        hiddenTextKey = "history.returnHistory.hidden.status.inProgress"
+      )
+
+      verify(mockAppConfig).continueAmendReturnJourneyUrl(
+        instanceId,
+        "2023",
+        "3",
+        isOriginalNilReturn = true
+      )
     }
 
     "returns awaitingConfirmation for superseded return with amendment status PENDING" in new Setup {
