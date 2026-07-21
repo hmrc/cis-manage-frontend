@@ -70,30 +70,33 @@ final case class GetSubcontractor(
   private def normalisedType: Option[String] =
     subcontractorType.map(_.trim.toLowerCase.replace(" ", ""))
 
-  def displayName: String = {
+  def displayName: Option[String] = {
     val personalName =
-      Seq(firstName, secondName, surname).flatten.map(_.trim).filter(_.nonEmpty).mkString(" ")
+      Seq(firstName, secondName, surname).flatten
+        .map(_.trim)
+        .filter(_.nonEmpty)
+        .mkString(" ")
 
     normalisedType match {
       case Some("soletrader" | "individual") if personalName.nonEmpty =>
-        personalName
+        Some(personalName)
 
       case Some("partnership") =>
         partnershipTradingName
           .orElse(tradingName)
           .filter(_.trim.nonEmpty)
-          .getOrElse(if (personalName.nonEmpty) personalName else "No name provided")
+          .orElse(Option.when(personalName.nonEmpty)(personalName))
 
       case Some("company" | "trust" | "soletrader" | "individual") =>
         tradingName
           .filter(_.trim.nonEmpty)
-          .getOrElse(if (personalName.nonEmpty) personalName else "No name provided")
+          .orElse(Option.when(personalName.nonEmpty)(personalName))
 
       case _ =>
         tradingName
           .orElse(partnershipTradingName)
           .filter(_.trim.nonEmpty)
-          .getOrElse(if (personalName.nonEmpty) personalName else "No name provided")
+          .orElse(Option.when(personalName.nonEmpty)(personalName))
     }
   }
 
@@ -106,5 +109,7 @@ object GetSubcontractor {
   given writes: Writes[GetSubcontractor] = subcontractor =>
     Json
       .writes[GetSubcontractor]
-      .writes(subcontractor) + ("displayName" -> JsString(subcontractor.displayName))
+      .writes(subcontractor) + ("displayName" -> JsString(
+      subcontractor.displayName.getOrElse("")
+    ))
 }

@@ -118,14 +118,14 @@ class SubcontractorsListControllerSpec extends SpecBase {
     subcontractors = subcontractors
   )
 
-  private val rows = Seq(
+  private val rows                                       = Seq(
     SubcontractorsListRow(
       id = "1",
       name = "Alan Smith",
       utr = "1234567890",
-      verified = true,
-      verificationNumber = "V000001",
-      taxTreatment = TaxTreatment.Gross,
+      verified = false,
+      verificationNumber = "",
+      taxTreatment = TaxTreatment.Unknown,
       dateAdded = "6 Apr 2026",
       subbieResourceRef = 10L
     ),
@@ -133,14 +133,13 @@ class SubcontractorsListControllerSpec extends SpecBase {
       id = "2",
       name = "Brian Jones",
       utr = "9876543210",
-      verified = false,
+      verified = true,
       verificationNumber = "V000002",
-      taxTreatment = TaxTreatment.HigherRate,
+      taxTreatment = TaxTreatment.Unknown,
       dateAdded = "6 May 2026",
       subbieResourceRef = 20L
     )
   )
-
   private def userAnswersWithSubcontractors: UserAnswers =
     emptyUserAnswers
       .set(SubcontractorListPage, listResponse)
@@ -518,6 +517,39 @@ class SubcontractorsListControllerSpec extends SpecBase {
 
         redirectLocation(result).value mustEqual
           routes.NoSubcontractorsExistController.onPageLoad().url
+      }
+    }
+
+    "must apply reverification rules when rendering subcontractors" in {
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithSubcontractors)
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            routes.SubcontractorsListController
+              .onPageLoad(instanceId, mode)
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual OK
+
+        val page =
+          contentAsString(result)
+
+        page must include("Alan Smith")
+
+        page must include(messages(application)("site.no"))
+
+        page must include(messages(application)("site.unknown"))
       }
     }
 
