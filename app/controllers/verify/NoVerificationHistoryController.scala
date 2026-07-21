@@ -24,7 +24,7 @@ import views.html.verify.NoVerificationHistoryView
 
 import javax.inject.Inject
 
-class NoVerificationHistoryController @Inject()(
+class NoVerificationHistoryController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
@@ -32,7 +32,8 @@ class NoVerificationHistoryController @Inject()(
   requireCisId: CisIdRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: NoVerificationHistoryView
-) extends FrontendBaseController with I18nSupport {
+) extends FrontendBaseController
+    with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData andThen requireCisId) {
     implicit request =>
