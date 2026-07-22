@@ -42,6 +42,13 @@ class FrontendAppConfigSpec extends SpecBase {
       appConfig.taxAgentsAndAdvisorsAuthorisationFormsUrl mustBe
         "https://www.gov.uk/government/collections/tax-agents-and-advisors-authorisation-forms"
 
+      appConfig.cisContractorsGuidanceUrl mustBe
+        "https://www.gov.uk/government/publications/construction-industry-scheme-cis-340/construction-industry-scheme-a-guide-for-contractors-and-subcontractors-cis-340"
+      appConfig.cisUpdatesUrl mustBe
+        "https://www.gov.uk/guidance/help-and-support-for-the-construction-industry-scheme"
+      appConfig.cisMoreInformationUrl mustBe
+        "https://www.gov.uk/browse/business/construction-property-management"
+
       appConfig.cisHelpWhatIsUrl mustBe "https://www.gov.uk/what-is-the-construction-industry-scheme"
       appConfig.cisHelpMonthlyUrl mustBe "https://www.gov.uk/what-you-must-do-as-a-cis-contractor/file-your-monthly-returns#guide-contents"
       appConfig.cisHelp340Url mustBe

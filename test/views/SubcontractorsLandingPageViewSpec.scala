@@ -30,34 +30,31 @@ class SubcontractorsLandingPageViewSpec extends SpecBase {
   "SubcontractorsLandingPageView" - {
 
     "must render the correct title, heading, paragraphs and links" in new Setup {
-      val contractorName              = "ABC Organisation Ltd"
-      val html: HtmlFormat.Appendable = view(contractorName)
+      val html: HtmlFormat.Appendable = view()
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.title                                 must include(messages("subcontractorsLandingPage.title"))
       doc.select("h1").text                     must include(messages("subcontractorsLandingPage.heading"))
       doc.select("p").text                      must include(messages("subcontractorsLandingPage.p1"))
-      doc.select("p").text                      must include(messages("subcontractorsLandingPage.hint"))
+      doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.hint.link"))
       doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.addSubcontractors"))
       doc.select("p").text                      must include(messages("subcontractorsLandingPage.addSubcontractors.p1"))
       doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.verifySubcontractors"))
       doc.select("p").text                      must include(messages("subcontractorsLandingPage.verifySubcontractors.p1"))
-      doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.subcontractorList"))
-      doc.select("p").text                      must include(messages("subcontractorsLandingPage.subcontractorList.p1"))
-      doc.select("h2").text                     must include(messages("subcontractorsLandingPage.h2"))
-      doc.select("p").text                      must include(messages("subcontractorsLandingPage.p2"))
-      doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.p2.link"))
-      doc.select("p").text                      must include(messages("subcontractorsLandingPage.p3"))
-
+      doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.viewSubcontractors"))
+      doc.select("p").text                      must include(messages("subcontractorsLandingPage.viewSubcontractors.p1"))
+      doc.getElementsByClass("govuk-link").text must include(
+        messages("subcontractorsLandingPage.viewVerificationHistory")
+      )
+      doc.select("p").text                      must include(messages("subcontractorsLandingPage.viewVerificationHistory.p1"))
+      doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.checkResults"))
+      doc.select("p").text                      must include(messages("subcontractorsLandingPage.checkResults.p1"))
       doc.select("h2").text                     must include(messages("subcontractorsLandingPage.aside.h2"))
+
       doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.aside.link1"))
       doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.aside.link2"))
       doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.aside.link3"))
-      doc
-        .select(
-          s"a[href='${controllers.subcontractors.routes.GetSubcontractorListController.onPageLoad().url}']"
-        )
-        .text                                   must include(messages("subcontractorsLandingPage.subcontractorList"))
+
     }
   }
 

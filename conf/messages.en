@@ -323,33 +323,38 @@ successfulNoRecordsFound.p2                                   =  You can
 
 successfulNoRecordsFound.p2.link                              =  add a subcontractor
 
-subcontractorsLandingPage.title                               =  Manage your CIS return subcontractor
-subcontractorsLandingPage.heading                             =  Manage your CIS return subcontractor
-subcontractorsLandingPage.p1                                  =  You can use this service to manage your subcontractors list.
-subcontractorsLandingPage.hint                                =  You will need HMRC free software to access the links below.
-subcontractorsLandingPage.addSubcontractors                   =  Add subcontractor
+subcontractorsLandingPage.title                               =  Manage your subcontractors
+subcontractorsLandingPage.heading                             =  Manage your subcontractors
+subcontractorsLandingPage.p1                                  =  Subcontractors must be verified before you can include them on a monthly return. This will ensure that deductions are made at the correct rate.
 
-subcontractorsLandingPage.addSubcontractors.p1                =  Add subcontractors to your list
+subcontractorsLandingPage.hint.prefix                         =  You will need to use
+subcontractorsLandingPage.hint.link                           =  commercial software
+subcontractorsLandingPage.hint.suffix                         =  to submit any verification requests that include more than 50 subcontractors.
 
-subcontractorsLandingPage.verifySubcontractors                =  Verify subcontractor
+subcontractorsLandingPage.addSubcontractors                   =  Add new subcontractors
 
-subcontractorsLandingPage.verifySubcontractors.p1             =  View, verify or manage subcontractors
+subcontractorsLandingPage.addSubcontractors.p1                =  Create records for any new subcontractors who you want to pay.
 
-subcontractorsLandingPage.subcontractorList                   =  Subcontractor list
+subcontractorsLandingPage.verifySubcontractors                =  Verify your subcontractors
 
-subcontractorsLandingPage.subcontractorList.p1                =  View subcontractor list
+subcontractorsLandingPage.verifySubcontractors.p1             =  Make sure your subcontractors are given the correct tax treatment.
 
-subcontractorsLandingPage.h2                                  =  What you need to know
-subcontractorsLandingPage.p2                                  =  You should include subcontractors ‐ with or without gross payment status ‐ on your subcontractor list. For more information
+subcontractorsLandingPage.viewSubcontractors                  =  View your subcontractors
 
-subcontractorsLandingPage.p2.link                             =  on gross payment status
+subcontractorsLandingPage.viewSubcontractors.p1               =  Edit the details of any subcontractor in your list.
 
-subcontractorsLandingPage.p3                                  =  Subcontractors from your list must be included in your monthly return if you pay them during the month. To submit a return, your selected subcontractors must be verified.
+subcontractorsLandingPage.viewVerificationHistory             =  Review your verification history
+
+subcontractorsLandingPage.viewVerificationHistory.p1          =  Download or print copies of all verification requests you’ve submitted.
+
+subcontractorsLandingPage.checkResults                        =  Check your results
+
+subcontractorsLandingPage.checkResults.p1                     =  View the outcome of your latest verification request.
 
 subcontractorsLandingPage.aside.h2                            =  Help and guidance
-subcontractorsLandingPage.aside.link1                         =  What is the Construction Industry Scheme
-subcontractorsLandingPage.aside.link2                         =  CIS monthly returns guidance
-subcontractorsLandingPage.aside.link3                         =  CIS 340: Penalties for late returns
+subcontractorsLandingPage.aside.link1                         =  Construction Industry Scheme: A guide for contractors and subcontractors
+subcontractorsLandingPage.aside.link2                         =  Email updates, videos and webinars about the Construction Industry Scheme
+subcontractorsLandingPage.aside.link3                         =  More information about construction and property management
 
 # Returns & Submissions
 addContractorDetails.title                   =  Add contractor details
