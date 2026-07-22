@@ -18,8 +18,6 @@ package controllers
 
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import pages.{AgentClientsPage, ContractorNamePage}
-import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -36,32 +34,10 @@ class SubcontractorsLandingPageController @Inject() (
   requireData: DataRequiredAction
 )(implicit appConfig: FrontendAppConfig)
     extends FrontendBaseController
-    with I18nSupport
-    with Logging {
+    with I18nSupport {
 
   def onPageLoad(instanceId: String): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-
-      val contractorNameOpt: Option[String] =
-        if (request.isAgent) {
-          for {
-            clients <- request.userAnswers.get(AgentClientsPage)
-            client  <- clients.find(_.uniqueId == instanceId)
-            name    <- client.schemeName
-          } yield name
-        } else {
-          request.userAnswers.get(ContractorNamePage)
-        }
-
-      contractorNameOpt match {
-        case Some(contractorName) =>
-          Ok(view(contractorName))
-
-        case None =>
-          logger.warn(
-            s"[SubcontractorsLandingPageController] contractorName missing (isAgent=${request.isAgent}, instanceId=$instanceId)"
-          )
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      }
+      Ok(view())
     }
 }

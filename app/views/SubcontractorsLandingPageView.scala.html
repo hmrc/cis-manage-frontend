@@ -19,22 +19,18 @@
 
 @this(
     layout: templates.Layout,
-    govukButton: GovukButton,
     govukInsetText: GovukInsetText,
     h1: H1,
-    h2: H2,
     link: Link,
     paragraph: Paragraph,
     aside: Aside,
     nav: Nav,
     twoColumnGrid: TwoColumnGrid,
     oneColumnGrid: OneColumnGrid,
-    headingLink: HeadingLink,
-    sectionBreak: SectionBreak,
     ptaCard: PtaCard
 )
 
-@(contractorName: String)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
+@()(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
 
 @sidebar = {
     @aside("contractorLanding.sidebar.title", nav(Seq(
