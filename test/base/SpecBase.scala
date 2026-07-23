@@ -57,7 +57,8 @@ trait SpecBase
   protected def applicationBuilder(
     userAnswers: Option[UserAnswers] = None,
     additionalBindings: Seq[Binding[_]] = Nil,
-    isAgent: Boolean = false
+    isAgent: Boolean = false,
+    agentCode: Option[String] = Some("agentCode")
   ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .configure("play.http.router" -> "app.Routes")
@@ -65,7 +66,9 @@ trait SpecBase
         Seq(
           bind[DataRequiredAction].to[DataRequiredActionImpl],
           bind[IdentifierAction].to(new FakeIdentifierAction(isAgent)(parsers)),
-          bind[IdentifierAction].qualifiedWith("AgentIdentifier").to(new FakeIdentifierAction(true)(parsers)),
+          bind[IdentifierAction]
+            .qualifiedWith("AgentIdentifier")
+            .to(new FakeIdentifierAction(true, agentCode)(parsers)),
           bind[IdentifierAction].qualifiedWith("ContractorIdentifier").to(new FakeIdentifierAction(false)(parsers)),
           bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
         ) ++ additionalBindings

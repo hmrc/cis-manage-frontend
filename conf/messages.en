@@ -289,6 +289,19 @@ agent.landing.help.link1                               =  What is the Constructi
 agent.landing.help.link2                               =  CIS monthly returns guidance
 agent.landing.help.link3                               =  CIS 340: penalties for late returns
 
+agent.agentLostAccess.title                            =  Sorry, you are unable to use this service
+agent.agentLostAccess.heading                          =  Sorry, you are unable to use this service
+agent.agentLostAccess.p1                               =  You are no longer authorised.
+agent.agentLostAccess.h2                               =  What you need to do
+agent.agentLostAccess.bullet.title                     =  Ask your client to authorise you. They can do this by either:
+agent.agentLostAccess.bullet.item.1.prefix             =  authorising you through their
+agent.agentLostAccess.bullet.item.1.link               =  HMRC online account
+agent.agentLostAccess.bullet.item.2.prefix             =  downloading and completing
+agent.agentLostAccess.bullet.item.2.link               =  form 64-8
+agent.agentLostAccess.bullet.item.2.suffix             =  to authorise you by post
+agent.agentLostAccess.p2                               =  It can take up to 5 working days for new authorisations to appear in your account.
+agent.agentLostAccess.return.link                      =  Return to client list
+
 # Subcontractors
 retrievingSubcontractors.title                                =  Your subcontractors
 retrievingSubcontractors.heading                              =  Your subcontractors
@@ -693,6 +706,9 @@ subcontractors.deleteSubcontractorYesNo.title                            =  Are 
 subcontractors.deleteSubcontractorYesNo.heading                          =  Are you sure you want to delete {0}?
 subcontractors.deleteSubcontractorYesNo.p                                =  This subcontractor will also be removed from any monthly return that you have not submitted yet.
 subcontractors.deleteSubcontractorYesNo.error.required                   =  Select yes if you want to delete this subcontractor
+
+agentLostAccess.title                                                    = agentLostAccess
+agentLostAccess.heading                                                  = agentLostAccess
 
 securityCheck.title                                                      =  Authorisation check in progress
 securityCheck.h1                                                         =  Authorisation check in progress
