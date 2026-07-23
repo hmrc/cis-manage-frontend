@@ -150,15 +150,21 @@ class SubcontractorsListControllerSpec extends SpecBase {
   private def filterRows(
     searchTerm: String,
     verificationStatus: String,
-    taxTreatment: String
-  ): Seq[SubcontractorsListRow] =
-    filterByTaxTreatment(
-      filterByVerificationStatus(
-        filterBySearchTerm(rows, searchTerm),
-        verificationStatus
-      ),
-      taxTreatment
-    ).sortBy(_.name.toLowerCase)
+    taxTreatment: String,
+    sortBy: String = "name",
+    sortOrder: String = "ascending"
+  ): Seq[SubcontractorsListRow] = {
+    val searchFiltered =
+      filterBySearchTerm(rows, searchTerm)
+
+    val verificationFiltered =
+      filterByVerificationStatus(searchFiltered, verificationStatus)
+
+    val taxTreatmentFiltered =
+      filterByTaxTreatment(verificationFiltered, taxTreatment)
+
+    sortRows(taxTreatmentFiltered, sortBy, sortOrder)
+  }
 
   private def filterBySearchTerm(
     sourceRows: Seq[SubcontractorsListRow],
@@ -217,6 +223,42 @@ class SubcontractorsListControllerSpec extends SpecBase {
         sourceRows
     }
 
+  private def sortRows(
+    sourceRows: Seq[SubcontractorsListRow],
+    sortBy: String,
+    sortOrder: String
+  ): Seq[SubcontractorsListRow] =
+    sortBy match {
+      case "dateAdded" =>
+        val sortedRows =
+          sourceRows.sortBy(_.dateAdded)
+
+        if (sortOrder == "descending") {
+          sortedRows.reverse
+        } else {
+          sortedRows
+        }
+
+      case _ =>
+        val noNameRows =
+          sourceRows.filter(_.name.trim.equalsIgnoreCase("No name provided"))
+
+        val namedRows =
+          sourceRows.filterNot(_.name.trim.equalsIgnoreCase("No name provided"))
+
+        val sortedNamedRows =
+          namedRows.sortBy(_.name.trim.toLowerCase)
+
+        val orderedNamedRows =
+          if (sortOrder == "descending") {
+            sortedNamedRows.reverse
+          } else {
+            sortedNamedRows
+          }
+
+        noNameRows ++ orderedNamedRows
+    }
+
   "SubcontractorsListController" - {
 
     "must return OK and the correct view for a GET with default filters" in {
@@ -247,7 +289,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
             currentPage = 1,
             recordsPerPage = 8,
             baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
-            queryString = ""
+            queryString = "sortBy=name&sortOrder=ascending"
           )
 
         status(result) mustEqual OK
@@ -264,7 +306,9 @@ class SubcontractorsListControllerSpec extends SpecBase {
           instanceId,
           "",
           "all",
-          "all"
+          "all",
+          "name",
+          "ascending"
         )(request, messages(application)).toString
       }
     }
@@ -298,7 +342,8 @@ class SubcontractorsListControllerSpec extends SpecBase {
             currentPage = 1,
             recordsPerPage = 8,
             baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
-            queryString = "searchTerm=Alan&verificationStatus=verified&taxTreatment=gross"
+            queryString =
+              "searchTerm=Alan&verificationStatus=verified&taxTreatment=gross&sortBy=name&sortOrder=ascending"
           )
 
         status(result) mustEqual OK
@@ -315,7 +360,9 @@ class SubcontractorsListControllerSpec extends SpecBase {
           instanceId,
           "Alan",
           "verified",
-          "gross"
+          "gross",
+          "name",
+          "ascending"
         )(request, messages(application)).toString
       }
     }
@@ -335,7 +382,9 @@ class SubcontractorsListControllerSpec extends SpecBase {
             "gotoPage"           -> "2",
             "searchTerm"         -> "Alan",
             "verificationStatus" -> "verified",
-            "taxTreatment"       -> "gross"
+            "taxTreatment"       -> "gross",
+            "sortBy"             -> "name",
+            "sortOrder"          -> "ascending"
           )
 
         val result =
@@ -352,6 +401,8 @@ class SubcontractorsListControllerSpec extends SpecBase {
         redirectUrl must include("searchTerm=Alan")
         redirectUrl must include("verificationStatus=verified")
         redirectUrl must include("taxTreatment=gross")
+        redirectUrl must include("sortBy=name")
+        redirectUrl must include("sortOrder=ascending")
       }
     }
 
@@ -369,7 +420,9 @@ class SubcontractorsListControllerSpec extends SpecBase {
           ).withFormUrlEncodedBody(
             "searchTerm"         -> "Alan",
             "verificationStatus" -> "verified",
-            "taxTreatment"       -> "gross"
+            "taxTreatment"       -> "gross",
+            "sortBy"             -> "name",
+            "sortOrder"          -> "ascending"
           )
 
         val result =
@@ -386,6 +439,8 @@ class SubcontractorsListControllerSpec extends SpecBase {
         redirectUrl must include("searchTerm=Alan")
         redirectUrl must include("verificationStatus=verified")
         redirectUrl must include("taxTreatment=gross")
+        redirectUrl must include("sortBy=name")
+        redirectUrl must include("sortOrder=ascending")
       }
     }
 
@@ -450,15 +505,23 @@ class SubcontractorsListControllerSpec extends SpecBase {
         ).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(
+            GET,
+            routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url
+          )
+
+        val result =
+          route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.NoSubcontractorsExistController.onPageLoad().url
+
+        redirectLocation(result).value mustEqual
+          routes.NoSubcontractorsExistController.onPageLoad().url
       }
     }
 
-    "must throw an exception when subbieResourceRef is missing" in {
+    "must throw an IllegalStateException when subbieResourceRef is missing" in {
       val response =
         GetSubcontractorListResponse(
           subcontractors = Seq(
@@ -491,7 +554,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
 
         val exception =
           intercept[IllegalStateException] {
-            await(result)
+            status(result)
           }
 
         exception.getMessage mustEqual
