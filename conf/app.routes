@@ -31,7 +31,7 @@ POST  /subcontractors/:instanceId/your-subcontractors         controllers.subcon
 GET   /subcontractors/:instanceId/change-your-subcontractors  controllers.subcontractors.SubcontractorsListController.onPageLoad(instanceId: String, mode: Mode = CheckMode, page: Int ?= 1)
 POST  /subcontractors/:instanceId/change-your-subcontractors  controllers.subcontractors.SubcontractorsListController.onSubmit(instanceId: String, mode: Mode = CheckMode, page: Int ?= 1)
 
-GET  /subcontractors/delete-subcontractor/submit  controllers.subcontractors.DeleteSubcontractorController.onSubmit()
+GET  /subcontractors/delete-subcontractor/submit  controllers.subcontractors.DeleteSubcontractorController.onPageLoad()
 
 GET   /subcontractors/retrieve  controllers.subcontractors.GetSubcontractorListController.onPageLoad()
 

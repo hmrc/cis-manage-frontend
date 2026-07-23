@@ -17,9 +17,11 @@
 package controllers.subcontractors
 
 import controllers.actions.*
+import models.requests.CisIdDataRequest
+import models.subcontractors.DeleteSubcontractorJourneyData
 import pages.subcontractors.{DeleteSubcontractorJourneyPage, DeleteSubcontractorYesNoPage, DeletedSubcontractorPage, SubcontractorListPage}
 import play.api.Logging
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -39,10 +41,10 @@ class DeleteSubcontractorController @Inject() (
     extends FrontendBaseController
     with Logging {
 
-  private val journeyRecoveryRedirect =
+  private def journeyRecoveryRedirect: Result =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
-  def onSubmit(): Action[AnyContent] =
+  def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
       (
         request.userAnswers.get(DeleteSubcontractorJourneyPage),
@@ -50,46 +52,13 @@ class DeleteSubcontractorController @Inject() (
       ) match {
 
         case (Some(journeyData), Some(true)) =>
-          subcontractorService
-            .deleteSubcontractor(
-              request.cisId,
-              journeyData.subbieResourceRef
-            )
-            .flatMap { _ =>
-              Future
-                .fromTry {
-                  for {
-                    ua1 <- request.userAnswers.set(
-                             DeletedSubcontractorPage,
-                             journeyData.subcontractorName
-                           )
-                    ua2 <- ua1.remove(DeleteSubcontractorJourneyPage)
-                    ua3 <- ua2.remove(DeleteSubcontractorYesNoPage)
-                    ua4 <- ua3.remove(SubcontractorListPage)
-                  } yield ua4
-                }
-                .flatMap(sessionRepository.set)
-                .map { _ =>
-                  Redirect(
-                    controllers.subcontractors.routes.SubcontractorDeletedConfirmationController
-                      .onPageLoad()
-                  )
-                }
-            }
-            .recover { case ex =>
-              logger.error(
-                s"[DeleteSubcontractorController] Failed to delete subcontractor " +
-                  s"(cisId=${request.cisId}, subbieResourceRef=${journeyData.subbieResourceRef})",
-                ex
-              )
-
-              journeyRecoveryRedirect
-            }
+          deleteSubcontractor(journeyData)
 
         case (Some(_), Some(false)) =>
           Future.successful(
             Redirect(
-              controllers.subcontractors.routes.GetSubcontractorListController.onPageLoad()
+              controllers.subcontractors.routes.GetSubcontractorListController
+                .onPageLoad()
             )
           )
 
@@ -102,4 +71,48 @@ class DeleteSubcontractorController @Inject() (
           Future.successful(journeyRecoveryRedirect)
       }
     }
+
+  private def deleteSubcontractor(
+    journeyData: DeleteSubcontractorJourneyData
+  )(implicit request: CisIdDataRequest[AnyContent]): Future[Result] =
+    subcontractorService
+      .deleteSubcontractor(
+        request.cisId,
+        journeyData.subbieResourceRef
+      )
+      .flatMap { _ =>
+        cleanupUserAnswers(journeyData.subcontractorName)
+          .map { _ =>
+            Redirect(
+              controllers.subcontractors.routes.SubcontractorDeletedConfirmationController
+                .onPageLoad()
+            )
+          }
+      }
+      .recover { case ex =>
+        logger.error(
+          s"[DeleteSubcontractorController] Failed to delete subcontractor " +
+            s"(cisId=${request.cisId}, subbieResourceRef=${journeyData.subbieResourceRef})",
+          ex
+        )
+
+        journeyRecoveryRedirect
+      }
+
+  private def cleanupUserAnswers(
+    subcontractorName: String
+  )(implicit request: CisIdDataRequest[AnyContent]): Future[Boolean] =
+    Future
+      .fromTry {
+        for {
+          ua1 <- request.userAnswers.set(
+                   DeletedSubcontractorPage,
+                   subcontractorName
+                 )
+          ua2 <- ua1.remove(DeleteSubcontractorJourneyPage)
+          ua3 <- ua2.remove(DeleteSubcontractorYesNoPage)
+          ua4 <- ua3.remove(SubcontractorListPage)
+        } yield ua4
+      }
+      .flatMap(sessionRepository.set)
 }
