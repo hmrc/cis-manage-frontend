@@ -610,6 +610,13 @@ verify.subcontractorSubmissionReceipt.summaryList.key1       =  Contractor name
 verify.subcontractorSubmissionReceipt.summaryList.key2       =  Employer reference
 verify.subcontractorSubmissionReceipt.summaryList.key3       =  Receipt reference number
 
+verify.noVerificationHistory.title                           = No verification history
+verify.noVerificationHistory.heading                         = Verification history
+verify.noVerificationHistory.p1                              = You do not have any verification requests to show at the moment.
+verify.noVerificationHistory.p2                              = Once you create and submit one, you can print or download a copy from here.
+verify.noVerificationHistory.backTo                          = Back to
+verify.noVerificationHistory.manageYourSubcontractors.link   = Manage your subcontractors
+
 # Client Details
 clientdetails.manageClientDetails.title                                  =  Client details
 clientdetails.manageClientDetails.heading                                =  {0} details

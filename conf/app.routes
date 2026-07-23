@@ -146,6 +146,8 @@ GET   /verify/history/submission-receipt                    controllers.verify.S
 
 GET   /verify/verification-request                          controllers.verify.VerificationRequestController.onPageLoad(verificationNumber: String)
 
+GET   /verify/no-verification-history                       controllers.verify.NoVerificationHistoryController.onPageLoad()
+
 # Client Details
 GET   /client-details/manage-client-details           controllers.clientdetails.ManageClientDetailsController.onPageLoad()
 
@@ -185,3 +187,4 @@ GET  /subcontractors/no-subcontractors-to-view      controllers.subcontractors.N
 GET  /subcontractors/retrieve  controllers.subcontractors.GetSubcontractorListController.onPageLoad()
 
 GET  /verification-history/retrieve  controllers.verify.GetSubmittedVerificationsController.onPageLoad()
+
