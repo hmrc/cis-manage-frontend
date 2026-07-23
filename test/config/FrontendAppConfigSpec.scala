@@ -139,6 +139,14 @@ class FrontendAppConfigSpec extends SpecBase {
     }
   }
 
+  "authoriseClientRequestUrl" - {
+
+    "must build the URL using the agent code" in new Setup {
+      appConfig.authoriseClientRequestUrl("123456789") mustBe
+        "http://localhost:8095/account/authorise-client/agent/123456789/request"
+    }
+  }
+
   trait Setup {
     val app: Application             = applicationBuilder().build()
     val appConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]

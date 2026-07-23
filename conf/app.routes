@@ -51,6 +51,8 @@ GET  /access-denied                    controllers.AccessDeniedController.onPage
 GET  /system-error/there-is-a-problem  controllers.SystemErrorController.onPageLoad()
 
 # Agent
+GET   /agent/no-longer-authorised  controllers.agent.AgentLostAccessController.onPageLoad()
+
 GET   /agent/retrieve-client-list        controllers.agent.RetrievingClientController.onPageLoad()
 GET   /agent/retrieve-client-list/start  controllers.agent.RetrievingClientController.start()
 GET   /agent/retrieve-client-list/poll   controllers.agent.RetrievingClientController.poll(retryCount: Int ?= 0)
@@ -180,6 +182,6 @@ GET  /subcontractors/cannot-delete-subcontractor-warning                       c
 
 GET  /subcontractors/no-subcontractors-to-view      controllers.subcontractors.NoSubcontractorsExistController.onPageLoad()
 
-GET   /subcontractors/retrieve  controllers.subcontractors.GetSubcontractorListController.onPageLoad()
+GET  /subcontractors/retrieve  controllers.subcontractors.GetSubcontractorListController.onPageLoad()
 
 GET  /verification-history/retrieve  controllers.verify.GetSubmittedVerificationsController.onPageLoad()
