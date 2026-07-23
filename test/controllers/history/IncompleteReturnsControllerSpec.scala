@@ -99,7 +99,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.amend.routes.NoIncompleteReturnsController.onPageLoad().url
+          controllers.history.routes.NoIncompleteReturnsController.onPageLoad().url
 
         verify(mockService).getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier])
       }
