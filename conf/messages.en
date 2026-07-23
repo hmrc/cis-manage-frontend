@@ -117,8 +117,8 @@ unauthorised.agent.p2.link               =  PAYE for Agents
 unauthorised.agent.p2.suffix             =  to use this service.
 
 # Introduction & Landing
-contractorLanding.title                                           =  Manage Construction Industry Service account
-contractorLanding.heading                                         =  Manage Construction Industry Service account
+contractorLanding.title                                           =  Manage Construction Industry Scheme account
+contractorLanding.heading                                         =  Manage Construction Industry Scheme account
 
 contractorLanding.label.schemeName                                =  Scheme name
 contractorLanding.label.employerReference                         =  Employer reference
@@ -131,13 +131,13 @@ contractorLanding.landing.card.manageYourContractorDetails.title  =  Manage your
 contractorLanding.landing.card.manageYourContractorDetails.p      =  Add or change a unique taxpayer reference, scheme name or email address.
 contractorLanding.landing.card.appealPenalty.title                =  Appeal a penalty
 contractorLanding.landing.card.appealPenalty.p                    =  Appeal a penalty within 30 days of receiving one.
-contractorLanding.landing.card.noticesAndStatements.title         =  Notices and Statements
+contractorLanding.landing.card.noticesAndStatements.title         =  Notices and statements
 contractorLanding.landing.card.noticesAndStatements.p             =  View HMRC notices, penalty warnings and confirmation statements.
 
 contractorLanding.sidebar.title                                   =  Help and guidance
-contractorLanding.sidebar.nav.whatIs.text                         =  What is the Construction Industry Scheme?
-contractorLanding.sidebar.nav.guidance.text                       =  CIS monthly returns guidance
-contractorLanding.sidebar.nav.penalties.text                      =  CIS 340: penalties for late returns
+contractorLanding.sidebar.nav.whatIs.text                         =  Construction Industry Scheme: A guide (CIS 340)
+contractorLanding.sidebar.nav.guidance.text                       =  Pay employers’ PAYE
+contractorLanding.sidebar.nav.penalties.text                      =  Penalties for late returns (CIS) CC/FS18b
 
 introduction.title                                                =  Construction Industry Scheme (CIS)
 introduction.heading                                              =  Construction Industry Scheme (CIS)
@@ -184,10 +184,8 @@ returnsLanding.incompleteReturns.h3.link                          =  Incomplete 
 returnsLanding.incompleteReturns.p1                               =  Submit or delete a return in progress. You can also resubmit a return that was not initially accepted.
 
 returnsLanding.aside.h2                                           =  Help and guidance
-returnsLanding.aside.link1                                        =  What is the Construction Industry Scheme?
-returnsLanding.aside.link2                                        =  CIS monthly returns guidance
-returnsLanding.aside.link3                                        =  CIS 340: penalties for late returns
-returnsLanding.aside.link4                                        =  Understanding CIS penalties
+returnsLanding.aside.link1                                        =  Construction Industry Scheme: A guide (CIS 340)
+returnsLanding.aside.link2                                        =  Find software suppliers for the Construction Industry Scheme (CIS) - GOV.UK
 
 returnsLanding.returnToHome.link                                  =  Return to home
 
@@ -264,8 +262,8 @@ agent.clientListSearch.details.2.p1                    =  You can send CIS month
 agent.clientListSearch.details.2.p2                    =  This service is only available using commercial software.
 agent.clientListSearch.details.2.link                  =  Find commercial software for CIS returns (opens in new tab)
 
-agent.landing.title                                    =  Manage Construction Industry Service account
-agent.landing.h1                                       =  Manage Construction Industry Service account
+agent.landing.title                                    =  Manage Construction Industry Scheme account
+agent.landing.h1                                       =  Manage Construction Industry Scheme account
 agent.landing.agentName.key                            =  Agent name
 agent.landing.schemeName.key                           =  Scheme name
 agent.landing.schemeName.key.notProvided               =  Not provided
@@ -283,11 +281,11 @@ agent.landing.card.manageClientDetails.title           =  Manage client details
 agent.landing.card.manageClientDetails.p               =  View client details or change their employer reference.
 agent.landing.card.removeClient.title                  =  Remove client
 agent.landing.card.removeClient.p                      =  Remove a client that you no longer manage.
-agent.landing.card.noticesAndStatements.title          =  Notices and Statements
+agent.landing.card.noticesAndStatements.title          =  Notices and statements
 agent.landing.card.noticesAndStatements.p              =  View HMRC notices, penalty warnings and confirmation statements.
-agent.landing.help.link1                               =  What is the Construction Industry Scheme?
-agent.landing.help.link2                               =  CIS monthly returns guidance
-agent.landing.help.link3                               =  CIS 340: penalties for late returns
+agent.landing.help.link1                               =  Construction Industry Scheme: A guide (CIS 340)
+agent.landing.help.link2                               =  Pay employers’ PAYE
+agent.landing.help.link3                               =  Penalties for late returns (CIS) CC/FS18b
 
 # Subcontractors
 retrievingSubcontractors.title                                =  Your subcontractors
