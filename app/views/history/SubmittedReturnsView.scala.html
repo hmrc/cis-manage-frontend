@@ -21,7 +21,6 @@
     layout: templates.Layout,
     govukTable: GovukTable,
     govukSummaryList: GovukSummaryList,
-    caption: Caption,
     h1: H1,
     paragraph: Paragraph,
     link: Link
@@ -85,7 +84,6 @@
 ) {
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            @caption(messages("history.returnHistory.caption"))
             @h1(pageHeading)
 
             @if(viewModel.taxYears.isEmpty) {

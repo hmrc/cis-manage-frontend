@@ -128,4 +128,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     s"$portalAccountBaseUrl${authoriseClientRequestPath.replace("{agentCode}", agentCode)}"
 
   lazy val cisTypeOfSubcontractorUrl: String = configuration.get[String]("urls.cis-contractor-frontend")
+  lazy val cisVerifySubcontractorUrl: String =
+    configuration.get[String]("urls.cis-contractor-frontend") + "/verify/newest"
+
 }
