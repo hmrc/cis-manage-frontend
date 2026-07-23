@@ -109,7 +109,7 @@ class DeleteSubcontractorYesNoController @Inject() (
             } yield
               if (value) {
                 Redirect(
-                  controllers.subcontractors.routes.DeleteSubcontractorController.onSubmit()
+                  controllers.subcontractors.routes.DeleteSubcontractorController.onPageLoad()
                 )
               } else {
                 Redirect(
