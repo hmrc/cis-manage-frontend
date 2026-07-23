@@ -131,7 +131,7 @@ contractorLanding.landing.card.manageYourContractorDetails.title  =  Manage your
 contractorLanding.landing.card.manageYourContractorDetails.p      =  Add or change a unique taxpayer reference, scheme name or email address.
 contractorLanding.landing.card.appealPenalty.title                =  Appeal a penalty
 contractorLanding.landing.card.appealPenalty.p                    =  Appeal a penalty within 30 days of receiving one.
-contractorLanding.landing.card.noticesAndStatements.title         =  Notices and Statements
+contractorLanding.landing.card.noticesAndStatements.title         =  Notices and statements
 contractorLanding.landing.card.noticesAndStatements.p             =  View HMRC notices, penalty warnings and confirmation statements.
 
 contractorLanding.sidebar.title                                   =  Help and guidance
@@ -281,7 +281,7 @@ agent.landing.card.manageClientDetails.title           =  Manage client details
 agent.landing.card.manageClientDetails.p               =  View client details or change their employer reference.
 agent.landing.card.removeClient.title                  =  Remove client
 agent.landing.card.removeClient.p                      =  Remove a client that you no longer manage.
-agent.landing.card.noticesAndStatements.title          =  Notices and Statements
+agent.landing.card.noticesAndStatements.title          =  Notices and statements
 agent.landing.card.noticesAndStatements.p              =  View HMRC notices, penalty warnings and confirmation statements.
 agent.landing.help.link1                               =  Construction Industry Scheme: A guide (CIS 340)
 agent.landing.help.link2                               =  Pay employers’ PAYE
