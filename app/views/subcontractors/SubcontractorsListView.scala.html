@@ -20,7 +20,9 @@
 @import viewmodels.subcontractors.VerificationStatusFilter
 @import viewmodels.subcontractors.TaxTreatmentFilter
 @import viewmodels.subcontractors.TaxTreatment
+@import views.html.helper.CSPNonce
 @import views.html.templates.Layout
+@import play.twirl.api.HtmlFormat
 @import viewmodels.govuk.PaginationFluency._
 @import views.html.components._
 
@@ -40,11 +42,47 @@
 )
 
 @(form: Form[_], mode: Mode, rows: Seq[SubcontractorsListRow], paginationViewModel: PaginationViewModel, page: Int, totalPages: Int, startIndex: Int, totalCount: Int, instanceId: String,
-searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit request: Request[_], messages: Messages)
+searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: String, sortOrder: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("subcontractors.subcontractorsList.title"))) {
+@css = {
+        <link href='@controllers.routes.Assets.versioned("stylesheets/moj-frontend.min.css")'
+          rel="stylesheet"
+          type="text/css"/>
+       }
+
+@scripts = {
+
+<script src='@controllers.routes.Assets.versioned("javascripts/jquery-3.6.3.min.js")' @{CSPNonce.attr}></script>
+
+<script src='@controllers.routes.Assets.versioned("javascripts/moj-frontend.min.js")' @{CSPNonce.attr}></script>
+
+<script src='@controllers.routes.Assets.versioned("javascripts/subcontractors-list.js")' @{CSPNonce.attr}></script>
+
+}
+
+   @getSortState(column: String) = @{
+     if (sortBy == column) {
+        sortOrder match {
+            case "ascending"  => "ascending"
+            case "descending" => "descending"
+            case _            => "none"
+        }
+     } else {
+            "none"
+     }
+    }
+
+
+@layout(pageTitle = title(form, messages("subcontractors.subcontractorsList.title")),
+        additionalCss = Some(css),
+        additionalScripts = Some(scripts)
+) {
 
     @formHelper(action = controllers.subcontractors.routes.SubcontractorsListController.onSubmit(instanceId, mode, page)) {
+
+
+        <input type="hidden" name="sortBy" value="@sortBy">
+        <input type="hidden" name="sortOrder" value="@sortOrder">
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -68,6 +106,7 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
                )
             )
             .withCssClass("search-term-input")
+            .copy(autocomplete = Some("off"))
           )
 
            <div class="govuk-grid-row govuk-!-margin-bottom-4">
@@ -95,7 +134,8 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
                             text = messages("subcontractors.subcontractorsList.filter.verificationStatus.notVerified"),
                             selected = verificationStatus == VerificationStatusFilter.NotVerified.value
                               )
-                            )
+                            ),
+                            attributes = Map("autocomplete" -> "off")
                          )
                     )
 
@@ -134,7 +174,8 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
                                 text = messages("subcontractors.subcontractorsList.filter.taxTreatment.unknown"),
                                 selected = taxTreatment == TaxTreatmentFilter.Unknown.value
                                       )
-                                )
+                                ),
+                                attributes = Map("autocomplete" -> "off")
                             )
                     )
 
@@ -149,7 +190,6 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
                       messages("subcontractors.subcontractorsList.searchAndFilter")
                   )
                )
-
                 @link(
                 linkTextKey = "subcontractors.subcontractorsList.clearFilters",
                 linkUrl = controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
@@ -172,68 +212,126 @@ searchTerm: String, verificationStatus: String, taxTreatment: String)(implicit r
             <div class="govuk-table__container">
 
              @govukTable(
-               Table(
-                 head = Some(
-                   Seq(
-                        HeadCell(Text(messages("subcontractors.subcontractorsList.name"))),
-                        HeadCell(Text(messages("subcontractors.subcontractorsList.utr"))),
-                        HeadCell(Text(messages("subcontractors.subcontractorsList.verified"))),
-                        HeadCell(Text(messages("subcontractors.subcontractorsList.verificationNumber"))),
-                        HeadCell(Text(messages("subcontractors.subcontractorsList.taxTreatment"))),
-                        HeadCell(Text(messages("subcontractors.subcontractorsList.dateAdded"))),
-                        HeadCell(Text(messages("subcontractors.subcontractorsList.action")))
+                Table(
+                caption = Some(messages("subcontractors.subcontractorsList.heading")),
+                captionClasses = "govuk-table__caption govuk-table__caption--m govuk-visually-hidden",
+                  head = Some(
+                    Seq(
+                  HeadCell(
+                     content = Text(messages("subcontractors.subcontractorsList.name")),
+                       attributes = Map(
+                        "aria-sort" -> getSortState("name"),
+                        "data-sort-column" -> "name"
+                     )
+                  ),
+                   HeadCell(Text(messages("subcontractors.subcontractorsList.utr"))),
+                   HeadCell(Text(messages("subcontractors.subcontractorsList.verified"))),
+                   HeadCell(Text(messages("subcontractors.subcontractorsList.verificationNumber"))),
+                   HeadCell(Text(messages("subcontractors.subcontractorsList.taxTreatment"))),
+                   HeadCell(
+                    content = Text(messages("subcontractors.subcontractorsList.dateAdded")),
+                       attributes = Map(
+                        "aria-sort" -> getSortState("dateAdded"),
+                        "data-sort-column" -> "dateAdded"
+                      )
+                    ),
+                   HeadCell(Text(messages("subcontractors.subcontractorsList.action")))
                    )
                  ),
 
                  rows = rows.map { row =>
-                   Seq(
-                    TableRow(
-                      HtmlContent(
-                        "<a class=\"govuk-link\" href=\"#\">" +
-                        HtmlFormat.escape(row.name) +
-                        "</a>"
-                      )
-                     ),
-                     TableRow(Text(row.utr)),
+
+                val displayName =
+                if (row.name.nonEmpty) {
+                row.name
+                } else {
+                messages("subcontractorsList.noNameProvided")
+                }
+
+                Seq(
+                TableRow(
+                content = HtmlContent(
+                Html(
+                s"""
+                |<a href="#" class="govuk-link">
+                |  ${HtmlFormat.escape(displayName)}
+                |  <span class="govuk-visually-hidden">
+                |    ${HtmlFormat.escape(
+                          messages(
+                            "subcontractors.subcontractorsList.showDetailsFor",
+                            displayName
+                          )
+                        )}
+                |  </span>
+                |</a>
+                |""".stripMargin
+                )
+                ),
+                attributes = Map(
+                "data-sort-value" -> displayName
+                )
+                ),
+                    TableRow(Text(row.utr)),
                        TableRow(
                            Text(
                              messages(if (row.verified) "site.yes" else "site.no")
                            )
                        ),
-                     TableRow(Text(row.verificationNumber)),
-                       TableRow(
-                            Text(
-                            row.taxTreatment match {
-                                case TaxTreatment.Gross =>
-                                    messages("subcontractors.subcontractorsList.filter.taxTreatment.gross")
-
-                                case TaxTreatment.StandardRate =>
-                                     messages("subcontractors.subcontractorsList.filter.taxTreatment.standardRate")
-
-                                case TaxTreatment.HigherRate =>
-                                     messages("subcontractors.subcontractorsList.filter.taxTreatment.higherRate")
-
-                                case TaxTreatment.Unknown =>
-                                     messages("subcontractors.subcontractorsList.filter.taxTreatment.unknown")
+                    TableRow(
+                        Text(
+                            if (row.verificationNumber.nonEmpty) {
+                                row.verificationNumber
+                            } else {
+                                messages("site.unknown")
                             }
-                       )
+                        )
                     ),
-                       TableRow(Text(row.dateAdded)),
-                       TableRow(
-                           HtmlContent(
-                            "<a class=\"govuk-link\" href=\"#\">" +
-                            "Delete" +
-                            "<span class=\"govuk-visually-hidden\"> " +
-                              HtmlFormat.escape(row.name) +
-                              "</span></a>"
-                            )
-                       )
+                   TableRow(
+                        Text(
+                        row.taxTreatment match {
+                            case TaxTreatment.Gross =>
+                                messages("subcontractors.subcontractorsList.filter.taxTreatment.gross")
+
+                            case TaxTreatment.StandardRate =>
+                                 messages("subcontractors.subcontractorsList.filter.taxTreatment.standardRate")
+
+                            case TaxTreatment.HigherRate =>
+                                 messages("subcontractors.subcontractorsList.filter.taxTreatment.higherRate")
+
+                            case TaxTreatment.Unknown =>
+                                 messages("subcontractors.subcontractorsList.filter.taxTreatment.unknown")
+                        }
+                        )
+                    ),
+                    TableRow(
+                        content = Text(
+                            if (row.dateAdded.nonEmpty) {
+                            row.dateAdded
+                        } else {
+                            messages("site.unknown")
+                        }
+                        ),
+                            attributes = Map(
+                            "data-sort-value" -> row.dateAdded
+                        )
+                    ),
+                  TableRow(
+                    HtmlContent(
+                      link(
+                        linkTextKey = "subcontractors.subcontractorsList.delete",
+                        linkUrl = controllers.subcontractors.routes.GetSubcontractorForDeleteController.onPageLoad(row.subbieResourceRef).url,
+                        paragraphWrapped = false,
+                        visuallyHiddenText = Some(row.name)
+                      ).body
                     )
+                   )
+                  )
                 },
 
                 attributes = Map(
                 "id" -> "subcontractors-table",
-                "class" -> "govuk-table govuk-table--small-text-until-tablet"
+                "data-module" -> "moj-sortable-table",
+                "data-sort-url" -> controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
                 )
                 )
              )
