@@ -17,13 +17,11 @@
 package controllers.subcontractors
 
 import base.SpecBase
-import models.NormalMode
+import pages.CisIdPage
+import pages.subcontractors.DeletedSubcontractorPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.subcontractors.SubcontractorDeletedConfirmationView
-import models.subcontractors.DeleteSubcontractorJourneyData
-import pages.CisIdPage
-import pages.subcontractors.{DeleteSubcontractorJourneyPage, DeletedSubcontractorPage}
 
 class SubcontractorDeletedConfirmationControllerSpec extends SpecBase {
 

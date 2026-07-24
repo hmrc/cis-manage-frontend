@@ -17,7 +17,6 @@
 package controllers.subcontractors
 
 import base.SpecBase
-import models.NormalMode
 import models.subcontractors.DeleteSubcontractorJourneyData
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
