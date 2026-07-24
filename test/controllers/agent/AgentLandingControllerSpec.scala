@@ -94,6 +94,53 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe OK
         val body = contentAsString(result)
 
+        body must include("No name")
+        body must include("Test scheme name")
+        body must include("123/AB456")
+
+        val savedAnswersCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockSessionRepository).set(savedAnswersCaptor.capture())
+        savedAnswersCaptor.getValue.get(CisIdPage) mustBe Some(uniqueId)
+
+        verify(mockManageService)
+          .getAgentLandingData(eqTo(uniqueId), any[UserAnswers], eqTo(userId))(using any[HeaderCarrier])
+      } finally application.stop()
+    }
+
+    "must return OK and render the page when the service succeeds with ITMP name" in {
+      val mockManageService     = mock[ManageService]
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(
+        mockManageService.getAgentLandingData(
+          eqTo(uniqueId),
+          any[UserAnswers],
+          eqTo(userId)
+        )(using any[HeaderCarrier])
+      ).thenReturn(Future.successful(landingViewModel))
+
+      when(mockSessionRepository.set(any[UserAnswers]))
+        .thenReturn(Future.successful(true))
+
+      val application: Application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithCisId),
+          additionalBindings = Seq(
+            bind[ManageService].toInstance(mockManageService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          ),
+          isAgent = true,
+          itmpName = Some("Test name")
+        ).build()
+
+      try {
+        val request = FakeRequest(GET, controllers.agent.routes.AgentLandingController.onPageLoad(uniqueId).url)
+        val result  = route(application, request).value
+
+        status(result) mustBe OK
+        val body = contentAsString(result)
+
+        body must include("Test name")
         body must include("Test scheme name")
         body must include("123/AB456")
 

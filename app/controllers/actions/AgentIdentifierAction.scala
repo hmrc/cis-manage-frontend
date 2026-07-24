@@ -55,32 +55,40 @@ class AgentIdentifierAction @Inject() (
           Retrievals.allEnrolments and
           Retrievals.affinityGroup and
           Retrievals.credentialRole and
-          Retrievals.agentCode
+          Retrievals.agentCode and
+          Retrievals.itmpName
       ) {
-        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ Some(User) ~ _ =>
+        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ Some(User) ~ _ ~ _      =>
           logger.info("AgentIdentifierAction - Organisation login attempt")
           Future.successful(
             Redirect(controllers.routes.UnauthorisedController.onPageLoad())
           )
-        case Some(_) ~ _ ~ Some(Organisation) ~ Some(Assistant) ~ _                          =>
+        case Some(_) ~ _ ~ Some(Organisation) ~ Some(Assistant) ~ _ ~ _                               =>
           logger.info("AgentIdentifierAction - Organisation: Assistant login attempt")
           Future.successful(Redirect(controllers.routes.UnauthorisedWrongRoleController.onPageLoad()))
-        case Some(_) ~ _ ~ Some(Individual) ~ _ ~ _                                          =>
+        case Some(_) ~ _ ~ Some(Individual) ~ _ ~ _ ~ _                                               =>
           logger.info("AgentIdentifierAction - Individual login attempt")
           Future.successful(
             Redirect(controllers.routes.UnauthorisedIndividualAffinityController.onPageLoad())
           )
-        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Agent) ~ _ ~ agentCode         =>
+        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Agent) ~ _ ~ agentCodeOpt ~ itmpNameOpt =>
           hasCisAgentEnrolment(enrolments)
             .map { agentReference =>
-              block(IdentifierRequest(request, internalId, None, Some(agentReference), true, agentCode))
+              val itmpFullNameOpt =
+                itmpNameOpt
+                  .map(name => Seq(name.givenName, name.middleName, name.familyName).flatten.mkString(" "))
+                  .filter(_.nonEmpty)
+
+              block(
+                IdentifierRequest(request, internalId, None, Some(agentReference), true, agentCodeOpt, itmpFullNameOpt)
+              )
             }
             .getOrElse(
               Future.successful(
                 Redirect(controllers.routes.UnauthorisedAgentAffinityController.onPageLoad())
               )
             )
-        case _                                                                               =>
+        case _                                                                                        =>
           logger.warn("AgentIdentifierAction - Unable to retrieve internal id or affinity group")
           Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
       } recover {
