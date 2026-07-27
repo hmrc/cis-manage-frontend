@@ -663,7 +663,7 @@ subcontractors.subcontractorsList.searchAndFilter                        =  Sear
 subcontractors.subcontractorsList.clearFilters                           =  Clear
 subcontractors.subcontractorsList.delete                                 =  Delete
 subcontractors.subcontractorsList.noNameProvided                         =  No name provided
-subcontractors.subcontractors.subcontractorsList.showDetailsFor          =  Show details for {0}
+subcontractors.subcontractorsList.showDetailsFor                         =  Show details for {0}
 
 subcontractors.noSubcontractorsExist.title                               =  No subcontractors to view
 subcontractors.noSubcontractorsExist.heading                             =  Your subcontractors
