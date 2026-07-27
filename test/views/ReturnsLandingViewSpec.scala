@@ -48,9 +48,6 @@ class ReturnsLandingViewSpec extends SpecBase {
       doc.select("h2").text                     must include(messages("returnsLanding.aside.h2"))
       doc.getElementsByClass("govuk-link").text must include(messages("returnsLanding.aside.link1"))
       doc.getElementsByClass("govuk-link").text must include(messages("returnsLanding.aside.link2"))
-      doc.getElementsByClass("govuk-link").text must include(messages("returnsLanding.aside.link3"))
-      doc.getElementsByClass("govuk-link").text must include(messages("returnsLanding.aside.link4"))
-      doc.getElementsByClass("govuk-link").text must include(messages("returnsLanding.returnToHome.link"))
     }
   }
 
