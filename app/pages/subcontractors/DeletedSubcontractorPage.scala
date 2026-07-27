@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package models.requests
+package pages.subcontractors
 
-import models.EmployerReference
-import play.api.mvc.{Request, WrappedRequest}
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-case class IdentifierRequest[A](
-  request: Request[A],
-  userId: String,
-  employerReference: Option[EmployerReference],
-  agentReference: Option[String],
-  isAgent: Boolean = false,
-  agentCode: Option[String] = None
-) extends WrappedRequest[A](request)
+case object DeletedSubcontractorPage extends QuestionPage[String] {
+
+  override def path: JsPath =
+    JsPath \ "deletedSubcontractorName"
+
+  override def toString: String =
+    "deletedSubcontractorName"
+}

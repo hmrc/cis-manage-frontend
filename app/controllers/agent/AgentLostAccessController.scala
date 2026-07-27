@@ -14,52 +14,40 @@
  * limitations under the License.
  */
 
-package controllers.subcontractors
+package controllers.agent
 
+import config.FrontendAppConfig
 import controllers.actions.*
-import pages.subcontractors.DeletedSubcontractorPage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.subcontractors.SubcontractorDeletedConfirmationView
+import views.html.agent.AgentLostAccessView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 
-class SubcontractorDeletedConfirmationController @Inject() (
+class AgentLostAccessController @Inject() (
   override val messagesApi: MessagesApi,
-  identify: IdentifierAction,
+  @Named("AgentIdentifier") identify: IdentifierAction,
   getData: DataRetrievalAction,
-  requireCisId: CisIdRequiredAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: SubcontractorDeletedConfirmationView
-) extends FrontendBaseController
-    with I18nSupport {
+  view: AgentLostAccessView
+)(implicit appConfig: FrontendAppConfig)
+    extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
   def onPageLoad: Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen requireCisId) { implicit request =>
-      request.userAnswers
-        .get(DeletedSubcontractorPage)
-        .fold {
-          Redirect(
-            controllers.routes.JourneyRecoveryController.onPageLoad()
-          )
-        } { subcontractorName =>
+    (identify andThen getData andThen requireData) { implicit request =>
+      request.agentCode match {
+        case Some(agentCode) =>
+          val authoriseClientRequestUrl = appConfig.authoriseClientRequestUrl(agentCode)
 
-          val url =
-            controllers.subcontractors.routes.GetSubcontractorListController
-              .onPageLoad()
-              .url
-
-          val surveyURL = "#"
-
-          Ok(
-            view(
-              subcontractorName,
-              url,
-              surveyURL
-            )
-          )
-        }
+          Ok(view(authoriseClientRequestUrl))
+        case None            =>
+          logger.warn("[AgentLostAccessController] Auth returned no agentCode")
+          Redirect(controllers.routes.UnauthorisedAgentAffinityController.onPageLoad())
+      }
     }
 }

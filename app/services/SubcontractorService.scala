@@ -18,6 +18,7 @@ package services
 
 import com.google.inject.{Inject, Singleton}
 import connectors.ConstructionIndustrySchemeConnector
+import models.requests.DeleteSubcontractorRequest
 import models.response.GetSubcontractorForDeleteResponse
 import models.response.GetSubcontractorListResponse
 import uk.gov.hmrc.http.HeaderCarrier
@@ -39,4 +40,15 @@ class SubcontractorService @Inject() (
     instanceId: String
   )(implicit hc: HeaderCarrier): Future[GetSubcontractorListResponse] =
     cisConnector.getSubcontractorList(instanceId)
+
+  def deleteSubcontractor(
+    instanceId: String,
+    subbieResourceRef: Long
+  )(implicit hc: HeaderCarrier): Future[Unit] =
+    cisConnector.deleteSubcontractor(
+      DeleteSubcontractorRequest(
+        instanceId = instanceId,
+        subbieResourceRef = subbieResourceRef
+      )
+    )
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,13 @@
 
 package models.requests
 
-import models.EmployerReference
-import play.api.mvc.{Request, WrappedRequest}
+import play.api.libs.json.{Json, OFormat}
 
-case class IdentifierRequest[A](
-  request: Request[A],
-  userId: String,
-  employerReference: Option[EmployerReference],
-  agentReference: Option[String],
-  isAgent: Boolean = false,
-  agentCode: Option[String] = None
-) extends WrappedRequest[A](request)
+case class DeleteSubcontractorRequest(
+  instanceId: String,
+  subbieResourceRef: Long
+)
+
+object DeleteSubcontractorRequest {
+  given format: OFormat[DeleteSubcontractorRequest] = Json.format[DeleteSubcontractorRequest]
+}
