@@ -131,21 +131,26 @@ class ManageService @Inject() (
   def getUnsubmittedMonthlyReturnRows(instanceId: String)(implicit
     hc: HeaderCarrier
   ): Future[Seq[IncompleteReturnsRowViewModel]] =
-    getUnsubmittedMonthlyReturns(instanceId).map { response =>
-      response.unsubmittedCisReturns
-        .sortBy(r => (r.taxYear, r.taxMonth))
-        .reverse
-        .map { r =>
-          IncompleteReturnsRowViewModel(
-            returnPeriodEnd = buildReturnPeriodEnd(r.taxMonth, r.taxYear),
-            returnType = r.returnType,
-            lastUpdate = formatLastUpdate(r.lastUpdate),
-            status = r.status,
-            action = buildActions(instanceId, r),
-            amendment = r.amendment
-          )
-        }
-    }
+    for {
+      unsubmitted <- getUnsubmittedMonthlyReturns(instanceId)
+      submitted   <- getSubmittedMonthlyReturns(instanceId)
+    } yield unsubmitted.unsubmittedCisReturns
+      .sortBy(r => (r.taxYear, r.taxMonth))
+      .reverse
+      .map { r =>
+        val originalReturn      =
+          submitted.monthlyReturns.find(_.supersededBy.contains(r.monthlyReturnId))
+        val isOriginalNilReturn =
+          originalReturn.exists(_.nilReturnIndicator.equalsIgnoreCase("Nil"))
+        IncompleteReturnsRowViewModel(
+          returnPeriodEnd = buildReturnPeriodEnd(r.taxMonth, r.taxYear),
+          returnType = r.returnType,
+          lastUpdate = formatLastUpdate(r.lastUpdate),
+          status = r.status,
+          action = buildActions(instanceId, r, isOriginalNilReturn),
+          amendment = r.amendment
+        )
+      }
 
   def getSubmittedTaxYears(instanceId: String)(implicit
     hc: HeaderCarrier
@@ -267,7 +272,11 @@ class ManageService @Inject() (
       case None           => ""
     }
 
-  private def buildActions(instanceId: String, row: UnsubmittedMonthlyReturnsRow): Seq[ActionLinkViewModel] = {
+  private def buildActions(
+    instanceId: String,
+    row: UnsubmittedMonthlyReturnsRow,
+    isOriginalNilReturn: Boolean
+  ): Seq[ActionLinkViewModel] = {
     val isDeletable = row.deletable
     val isAmendment = row.amendment.exists(_.equals("Y"))
 
@@ -277,7 +286,13 @@ class ManageService @Inject() (
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.continue",
             href = if (isAmendment) {
-              controllers.routes.JourneyRecoveryController.onPageLoad().url // TODO: MR03-03
+              appConfig
+                .continueAmendReturnJourneyUrl(
+                  instanceId,
+                  row.taxYear.toString,
+                  row.taxMonth.toString,
+                  isOriginalNilReturn = isOriginalNilReturn
+                )
             } else {
               controllers.history.routes.IncompleteReturnsController.onContinueRedirect(row.monthlyReturnId).url
             },
