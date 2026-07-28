@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.amend
+package controllers.history
 
 import controllers.actions.*
 import pages.CisIdPage
@@ -22,24 +22,24 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.amend.NoReturnsSubmittedView
+import views.html.history.NoIncompleteReturnsView
 
 import javax.inject.Inject
 
-class NoReturnsSubmittedController @Inject() (
+class NoIncompleteReturnsController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: NoReturnsSubmittedView
+  view: NoIncompleteReturnsView
 ) extends FrontendBaseController
     with I18nSupport
     with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     val cisId = request.userAnswers.get(CisIdPage).getOrElse {
-      logger.error("[NoReturnsSubmittedController] cisId missing from userAnswers")
+      logger.error("[NoIncompleteReturnsController] cisId missing from userAnswers")
       throw new IllegalStateException("cisId missing from userAnswers")
     }
     Ok(view(cisId))

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.amend
+package views.history
 
 import base.SpecBase
 import org.jsoup.Jsoup
@@ -23,7 +23,7 @@ import play.api.Application
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import views.html.amend.NoReturnsSubmittedView
+import views.html.history.NoReturnsSubmittedView
 
 class NoReturnsSubmittedViewSpec extends SpecBase {
 

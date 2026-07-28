@@ -55,7 +55,7 @@ class SubmittedReturnsChooseTaxYearController @Inject() (
         .getSubmittedTaxYears(request.cisId)
         .map {
           case Nil =>
-            Redirect(controllers.amend.routes.NoReturnsSubmittedController.onPageLoad())
+            Redirect(controllers.history.routes.NoReturnsSubmittedController.onPageLoad())
 
           case Seq((start, _)) =>
             Redirect(controllers.history.routes.SubmittedReturnsController.onPageLoadSingleYear(start.toString))

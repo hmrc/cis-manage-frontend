@@ -17,23 +17,37 @@
 package controllers.agent
 
 import config.FrontendAppConfig
-import controllers.actions.IdentifierAction
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.agent.NoAuthorisedClientsView
+
 import javax.inject.{Inject, Named}
 
 class NoAuthorisedClientsController @Inject() (
   override val messagesApi: MessagesApi,
   val controllerComponents: MessagesControllerComponents,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
   @Named("AgentIdentifier") identify: IdentifierAction,
   view: NoAuthorisedClientsView
 )(implicit appConfig: FrontendAppConfig)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
-  def onPageLoad: Action[AnyContent] = identify { implicit request =>
-    Ok(view())
-  }
+  def onPageLoad: Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      request.agentCode match {
+        case Some(agentCode) =>
+          val authoriseClientRequestUrl = appConfig.authoriseClientRequestUrl(agentCode)
+
+          Ok(view(authoriseClientRequestUrl))
+        case None            =>
+          logger.warn("[NoAuthorisedClientsController] Auth returned no agentCode")
+          Redirect(controllers.routes.UnauthorisedAgentAffinityController.onPageLoad())
+      }
+    }
 }
