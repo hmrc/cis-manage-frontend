@@ -136,10 +136,9 @@ GET   /history/monthly-return-history/in-progress-return/:monthlyReturnId  contr
 GET   /history/amend/:taxYear/:taxMonth                                    controllers.history.SubmittedReturnsController.startAmendment(taxYear: Int, taxMonth: Int)
 GET   /monthly-return/confirmation-history                                 controllers.history.SubmittedReturnsController.viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String)
 
-GET   /no-return-submitted                                                      controllers.history.NoReturnsSubmittedController.onPageLoad()
-GET   /no-incomplete-returns                                                    controllers.history.NoIncompleteReturnsController.onPageLoad()
+GET   /no-return-submitted  controllers.history.NoReturnsSubmittedController.onPageLoad()
 
-# Amend
+GET   /no-incomplete-returns  controllers.history.NoIncompleteReturnsController.onPageLoad()
 
 # Notices & Statements
 GET  /manage-notices-statements/:instanceId  controllers.notices.ManageNoticesStatementsController.onPageLoad(instanceId: String)
@@ -156,6 +155,11 @@ GET   /verify/history/submission-receipt                    controllers.verify.S
 GET   /verify/verification-request                          controllers.verify.VerificationRequestController.onPageLoad(verificationNumber: String)
 
 GET   /verification-history/retrieve                        controllers.verify.GetSubmittedVerificationsController.onPageLoad()
+
+GET   /removeSubcontractorVerifyRequest                     controllers.verify.RemoveSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
+POST  /removeSubcontractorVerifyRequest                     controllers.verify.RemoveSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
+GET   /changeRemoveSubcontractorVerifyRequest               controllers.verify.RemoveSubcontractorVerifyRequestController.onPageLoad(mode: Mode = CheckMode)
+POST  /changeRemoveSubcontractorVerifyRequest               controllers.verify.RemoveSubcontractorVerifyRequestController.onSubmit(mode: Mode = CheckMode)
 
 # Client Details
 GET   /client-details/manage-client-details           controllers.clientdetails.ManageClientDetailsController.onPageLoad()
