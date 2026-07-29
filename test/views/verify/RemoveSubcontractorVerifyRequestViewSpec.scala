@@ -33,8 +33,8 @@ class RemoveSubcontractorVerifyRequestViewSpec extends SpecBase with Matchers {
       val html = view(form, NormalMode)
       val doc  = Jsoup.parse(html.body)
 
-      doc.title                                 must include(messages("verify.removeSubcontractorVerifyRequest.title"))
-      doc.select("h1").text                     must include(messages("verify.removeSubcontractorVerifyRequest.heading"))
+      doc.title             must include(messages("verify.removeSubcontractorVerifyRequest.title"))
+      doc.select("h1").text must include(messages("verify.removeSubcontractorVerifyRequest.heading"))
       doc.select(".govuk-radios__item").size() mustBe 2
     }
   }

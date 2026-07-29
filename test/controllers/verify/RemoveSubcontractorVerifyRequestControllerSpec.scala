@@ -40,9 +40,10 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new RemoveSubcontractorVerifyRequestFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
-  lazy val removeSubcontractorVerifyRequestRoute = verifyRoutes.RemoveSubcontractorVerifyRequestController.onPageLoad(NormalMode).url
+  lazy val removeSubcontractorVerifyRequestRoute =
+    verifyRoutes.RemoveSubcontractorVerifyRequestController.onPageLoad(NormalMode).url
 
   "RemoveSubcontractorVerifyRequest Controller" - {
 
