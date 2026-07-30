@@ -67,11 +67,25 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
       .success
       .value
 
+  private val userAnswersWithoutAgentClient: UserAnswers =
+    emptyUserAnswers
+      .set(AgentClientsPage, List.empty[CisTaxpayerSearchResult])
+      .success
+      .value
+
+  private val commonBindings = Seq(
+    bind[ManageService].toInstance(mockManageService),
+    bind[SessionRepository].toInstance(mockSessionRepository),
+    bind[PrepopService].toInstance(mockPrepopService)
+  )
+
   private val builtApplications = ListBuffer.empty[Application]
 
-  private def withApplication[T](application: Application)(block: => T): T =
+  private def withApplication[T](application: Application)(block: => T): T = {
+    builtApplications += application
     try block
     finally application.stop().futureValue
+  }
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -85,6 +99,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
 
   override def afterAll(): Unit = {
     builtApplications.foreach(application => Try(application.stop().futureValue))
+    builtApplications.clear()
     super.afterAll()
   }
 
@@ -100,16 +115,10 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
         )(using any[HeaderCarrier])
       ).thenReturn(Future.successful(landingViewModel))
 
-      when(mockSessionRepository.set(any[UserAnswers]))
-        .thenReturn(Future.successful(true))
-
       val application: Application =
         applicationBuilder(
           userAnswers = Some(userAnswersWithCisId),
-          additionalBindings = Seq(
-            bind[ManageService].toInstance(mockManageService),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          ),
+          additionalBindings = commonBindings,
           isAgent = true
         ).build()
 
@@ -143,16 +152,10 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
         )(using any[HeaderCarrier])
       ).thenReturn(Future.successful(landingViewModel))
 
-      when(mockSessionRepository.set(any[UserAnswers]))
-        .thenReturn(Future.successful(true))
-
       val application: Application =
         applicationBuilder(
           userAnswers = Some(userAnswersWithCisId),
-          additionalBindings = Seq(
-            bind[ManageService].toInstance(mockManageService),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          ),
+          additionalBindings = commonBindings,
           isAgent = true,
           itmpName = Some("Test name")
         ).build()
@@ -190,9 +193,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
       val application: Application =
         applicationBuilder(
           userAnswers = Some(userAnswersWithCisId),
-          additionalBindings = Seq(
-            bind[ManageService].toInstance(mockManageService)
-          ),
+          additionalBindings = commonBindings,
           isAgent = true
         ).build()
 
@@ -205,7 +206,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
           controllers.routes.JourneyRecoveryController.onPageLoad().url
-
       }
     }
   }
@@ -250,9 +250,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
       val application: Application =
         applicationBuilder(
           userAnswers = Some(userAnswersWithAgentClient),
-          additionalBindings = Seq(
-            bind[PrepopService].toInstance(mockPrepopService)
-          ),
+          additionalBindings = commonBindings,
           isAgent = true
         ).build()
 
@@ -302,9 +300,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
       val application: Application =
         applicationBuilder(
           userAnswers = Some(userAnswersWithAgentClient),
-          additionalBindings = Seq(
-            bind[PrepopService].toInstance(mockPrepopService)
-          ),
+          additionalBindings = commonBindings,
           isAgent = true
         ).build()
 
@@ -320,7 +316,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
           controllers.routes.SystemErrorController.onPageLoad().url
-
       }
     }
 
@@ -339,9 +334,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
       val application: Application =
         applicationBuilder(
           userAnswers = Some(userAnswersWithAgentClient),
-          additionalBindings = Seq(
-            bind[PrepopService].toInstance(mockPrepopService)
-          ),
+          additionalBindings = commonBindings,
           isAgent = true
         ).build()
 
@@ -357,24 +350,15 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
           controllers.routes.SystemErrorController.onPageLoad().url
-
       }
     }
 
     "must redirect to SystemErrorController when client is missing from AgentClientsPage" in {
 
-      val uaWithoutClient =
-        emptyUserAnswers
-          .set(AgentClientsPage, List.empty[CisTaxpayerSearchResult])
-          .success
-          .value
-
       val application: Application =
         applicationBuilder(
-          userAnswers = Some(uaWithoutClient),
-          additionalBindings = Seq(
-            bind[PrepopService].toInstance(mockPrepopService)
-          ),
+          userAnswers = Some(userAnswersWithoutAgentClient),
+          additionalBindings = commonBindings,
           isAgent = true
         ).build()
 
@@ -392,7 +376,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
           controllers.routes.SystemErrorController.onPageLoad().url
 
         verifyNoInteractions(mockPrepopService)
-
       }
     }
 
@@ -401,9 +384,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
       val application: Application =
         applicationBuilder(
           userAnswers = Some(userAnswersWithAgentClient),
-          additionalBindings = Seq(
-            bind[PrepopService].toInstance(mockPrepopService)
-          ),
+          additionalBindings = commonBindings,
           isAgent = true
         ).build()
 
@@ -418,7 +399,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
 
         status(result) mustBe NOT_FOUND
         verifyNoInteractions(mockPrepopService)
-
       }
     }
 
@@ -435,7 +415,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
       val application: Application =
         applicationBuilder(
           userAnswers = Some(userAnswersWithAgentClient),
-          additionalBindings = Seq(bind[PrepopService].toInstance(mockPrepopService)),
+          additionalBindings = commonBindings,
           isAgent = true
         ).build()
 
