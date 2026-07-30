@@ -157,6 +157,8 @@ GET   /verify/verification-request                          controllers.verify.V
 
 GET   /verification-history/retrieve                        controllers.verify.GetSubmittedVerificationsController.onPageLoad()
 
+GET   /verify/no-verification-history                       controllers.verify.NoVerificationHistoryController.onPageLoad()
+
 # Client Details
 GET   /client-details/manage-client-details           controllers.clientdetails.ManageClientDetailsController.onPageLoad()
 
