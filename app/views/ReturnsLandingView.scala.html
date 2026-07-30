@@ -25,7 +25,6 @@
     layout: templates.Layout,
     h1: H1,
     twoColumnGrid: TwoColumnGrid,
-    link: Link,
     aside: Aside,
     nav: Nav,
     caption: Caption,
@@ -36,10 +35,8 @@
 
 @sidebar = {
     @aside("returnsLanding.aside.h2", nav(Seq(
-        "returnsLanding.aside.link1" -> config.govUkCISGuidanceUrl,
-        "returnsLanding.aside.link2" -> config.cisMonthlyReturnsGuidanceUrl,
-        "returnsLanding.aside.link3" -> config.cis340PenaltiesForLateReturnsUrl,
-        "returnsLanding.aside.link4" -> config.cisLateFilingPenaltyUrl
+        "returnsLanding.aside.link1" -> config.contractorLandingWhatIsUrl,
+        "returnsLanding.aside.link2" -> config.commercialSoftwareSuppliersUrl
     )))
 }
 
@@ -48,8 +45,6 @@
     showSignOut = false,
     sidebar = Some(sidebar)
 ) {
-
-    @caption(contractorName)
     @h1(messages("returnsLanding.heading"))
 
     @twoColumnGrid(
@@ -81,6 +76,4 @@
             id = Some("incomplete-returns")
         )
     )
-
-    @link(linkTextKey = "returnsLanding.returnToHome.link", linkUrl = returnToHomeLink)
 }

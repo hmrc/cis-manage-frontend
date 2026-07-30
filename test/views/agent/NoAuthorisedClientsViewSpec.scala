@@ -30,7 +30,7 @@ class NoAuthorisedClientsViewSpec extends SpecBase {
   "NoAuthorisedClientsView" - {
 
     "must render the page with the correct heading, paragraphs, list items and links" in new Setup {
-      val html: HtmlFormat.Appendable = view()
+      val html: HtmlFormat.Appendable = view(authoriseClientRequestUrl)
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.title                                 must include(messages("agent.noAuthorisedClients.title"))
@@ -52,6 +52,7 @@ class NoAuthorisedClientsViewSpec extends SpecBase {
   trait Setup {
     val app: Application                          = applicationBuilder().build()
     val view: NoAuthorisedClientsView             = app.injector.instanceOf[NoAuthorisedClientsView]
+    val authoriseClientRequestUrl: String         = "http://localhost:8095/account/authorise-client/agent/123456798/request"
     implicit val request: play.api.mvc.Request[_] = FakeRequest()
     implicit val messages: Messages               = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,

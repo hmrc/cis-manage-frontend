@@ -50,9 +50,9 @@ class FrontendAppConfigSpec extends SpecBase {
         "https://www.gov.uk/what-you-must-do-as-a-cis-contractor"
       appConfig.returnToHomeUrl mustBe "http://localhost:6996/construction-industry-scheme/management"
 
-      appConfig.contractorLandingWhatIsUrl mustBe "https://www.gov.uk/what-is-the-construction-industry-scheme"
-      appConfig.contractorLandingGuidanceUrl mustBe "https://www.gov.uk/what-you-must-do-as-a-cis-contractor/file-your-monthly-returns#guide-contents"
-      appConfig.contractorLandingPenaltiesUrl mustBe "https://www.gov.uk/what-you-must-do-as-a-cis-contractor/file-your-monthly-returns#penalties-for-late-returns"
+      appConfig.contractorLandingWhatIsUrl mustBe "https://www.gov.uk/government/publications/construction-industry-scheme-cis-340/construction-industry-scheme-a-guide-for-contractors-and-subcontractors-cis-340"
+      appConfig.contractorLandingGuidanceUrl mustBe "https://www.gov.uk/pay-paye-tax"
+      appConfig.contractorLandingPenaltiesUrl mustBe "https://www.gov.uk/government/publications/compliance-checks-penalties-if-you-dont-file-construction-industry-scheme-returns-on-time-ccfs18b/penalties-for-failure-to-file-returns-on-time-the-construction-industry-scheme-cis-ccfs18b"
 
       appConfig.hmrcOnlineServiceDeskUrl mustBe
         "https://www.gov.uk/find-hmrc-contacts/technical-support-with-hmrc-online-services"
