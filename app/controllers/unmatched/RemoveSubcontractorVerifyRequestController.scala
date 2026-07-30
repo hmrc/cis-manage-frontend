@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package controllers.verify
+package controllers.unmatched
 
 import controllers.actions.*
-import forms.verify.RemoveSubcontractorVerifyRequestFormProvider
+import forms.unmatched.RemoveSubcontractorVerifyRequestFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.verify.RemoveSubcontractorVerifyRequestPage
+import pages.unmatched.RemoveSubcontractorVerifyRequestPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.verify.RemoveSubcontractorVerifyRequestView
+import views.html.unmatched.RemoveSubcontractorVerifyRequestView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -48,12 +48,14 @@ class RemoveSubcontractorVerifyRequestController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
+    val subcontractorName = "Test Subcontractor"
+
     val preparedForm = request.userAnswers.get(RemoveSubcontractorVerifyRequestPage) match {
       case None        => form
       case Some(value) => form.fill(value)
     }
 
-    Ok(view(preparedForm, mode))
+    Ok(view(preparedForm, mode, subcontractorName))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -61,7 +63,8 @@ class RemoveSubcontractorVerifyRequestController @Inject() (
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName = "Test Subcontractor"))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveSubcontractorVerifyRequestPage, value))

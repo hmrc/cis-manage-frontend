@@ -17,12 +17,12 @@
 package forms
 
 import forms.behaviours.BooleanFieldBehaviours
-import forms.verify.RemoveSubcontractorVerifyRequestFormProvider
+import forms.unmatched.RemoveSubcontractorVerifyRequestFormProvider
 import play.api.data.FormError
 
 class RemoveSubcontractorVerifyRequestFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "verify.removeSubcontractorVerifyRequest.error.required"
+  val requiredKey = "unmatched.removeSubcontractorVerifyRequest.error.required"
   val invalidKey  = "error.boolean"
 
   val form = new RemoveSubcontractorVerifyRequestFormProvider()()

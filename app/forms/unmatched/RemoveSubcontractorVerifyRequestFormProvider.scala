@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package pages.verify
+package forms.unmatched
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import forms.mappings.Mappings
+import play.api.data.Form
 
-case object RemoveSubcontractorVerifyRequestPage extends QuestionPage[Boolean] {
+import javax.inject.Inject
 
-  override def path: JsPath = JsPath \ toString
+class RemoveSubcontractorVerifyRequestFormProvider @Inject() extends Mappings {
 
-  override def toString: String = "removeSubcontractorVerifyRequest"
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("unmatched.removeSubcontractorVerifyRequest.error.required")
+    )
 }

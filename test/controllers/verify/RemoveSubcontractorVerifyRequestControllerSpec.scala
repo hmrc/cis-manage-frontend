@@ -18,20 +18,20 @@ package controllers.verify
 
 import base.SpecBase
 import controllers.routes
-import controllers.verify.routes as verifyRoutes
-import forms.verify.RemoveSubcontractorVerifyRequestFormProvider
+import controllers.unmatched.routes as unmatchedRoutes
+import forms.unmatched.RemoveSubcontractorVerifyRequestFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify.RemoveSubcontractorVerifyRequestPage
+import pages.unmatched.RemoveSubcontractorVerifyRequestPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.verify.RemoveSubcontractorVerifyRequestView
+import views.html.unmatched.RemoveSubcontractorVerifyRequestView
 
 import scala.concurrent.Future
 
@@ -42,8 +42,10 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
   val formProvider = new RemoveSubcontractorVerifyRequestFormProvider()
   val form         = formProvider()
 
+  val subcontractorName = "Test Subcontractor"
+
   lazy val removeSubcontractorVerifyRequestRoute =
-    verifyRoutes.RemoveSubcontractorVerifyRequestController.onPageLoad(NormalMode).url
+    unmatchedRoutes.RemoveSubcontractorVerifyRequestController.onPageLoad(NormalMode).url
 
   "RemoveSubcontractorVerifyRequest Controller" - {
 
@@ -59,7 +61,10 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
         val view = application.injector.instanceOf[RemoveSubcontractorVerifyRequestView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, subcontractorName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -77,7 +82,10 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, subcontractorName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -123,7 +131,10 @@ class RemoveSubcontractorVerifyRequestControllerSpec extends SpecBase with Mocki
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, subcontractorName)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 

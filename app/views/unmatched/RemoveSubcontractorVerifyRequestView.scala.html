@@ -14,28 +14,35 @@
  * limitations under the License.
  *@
 
+@import views.html.components._
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    h1: H1,
+    paragraph: Paragraph
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, subcontractorName: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("verify.removeSubcontractorVerifyRequest.title"))) {
+@layout(pageTitle = title(form, messages("unmatched.removeSubcontractorVerifyRequest.title"))) {
 
-    @formHelper(action = controllers.verify.routes.RemoveSubcontractorVerifyRequestController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.unmatched.routes.RemoveSubcontractorVerifyRequestController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
+            @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
         }
+
+        @h1(messages("unmatched.removeSubcontractorVerifyRequest.heading", subcontractorName))
+        @paragraph(messages("unmatched.removeSubcontractorVerifyRequest.p1"))
 
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("verify.removeSubcontractorVerifyRequest.heading")).asPageHeading()
+                legend = LegendViewModel(messages("unmatched.removeSubcontractorVerifyRequest.heading", subcontractorName)).withCssClass("govuk-visually-hidden")
             )
         )
 

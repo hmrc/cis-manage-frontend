@@ -17,24 +17,27 @@
 package views.verify
 
 import base.SpecBase
-import forms.verify.RemoveSubcontractorVerifyRequestFormProvider
+import forms.unmatched.RemoveSubcontractorVerifyRequestFormProvider
 import models.NormalMode
 import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
-import views.html.verify.RemoveSubcontractorVerifyRequestView
+import views.html.unmatched.RemoveSubcontractorVerifyRequestView
 
 class RemoveSubcontractorVerifyRequestViewSpec extends SpecBase with Matchers {
 
   "RemoveSubcontractorVerifyRequestView" - {
 
     "must render the page with the correct title, heading, paragraphs and link" in new Setup {
-      val html = view(form, NormalMode)
+      val html = view(form, NormalMode, subcontractorName)
       val doc  = Jsoup.parse(html.body)
 
-      doc.title             must include(messages("verify.removeSubcontractorVerifyRequest.title"))
-      doc.select("h1").text must include(messages("verify.removeSubcontractorVerifyRequest.heading"))
+      doc.title             must include(messages("unmatched.removeSubcontractorVerifyRequest.title"))
+      doc.select("h1").text must include(
+        messages("unmatched.removeSubcontractorVerifyRequest.heading", subcontractorName)
+      )
+      doc.select("p").text  must include(messages("unmatched.removeSubcontractorVerifyRequest.p1"))
       doc.select(".govuk-radios__item").size() mustBe 2
     }
   }
@@ -44,6 +47,7 @@ class RemoveSubcontractorVerifyRequestViewSpec extends SpecBase with Matchers {
     val view                                      = app.injector.instanceOf[RemoveSubcontractorVerifyRequestView]
     val formProvider                              = app.injector.instanceOf[RemoveSubcontractorVerifyRequestFormProvider]
     val form                                      = formProvider()
+    val subcontractorName                         = "Test Subcontractor"
     implicit val request: play.api.mvc.Request[_] = FakeRequest()
     implicit val messages: Messages               = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,

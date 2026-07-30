@@ -17,6 +17,7 @@
 package pages.verify
 
 import base.SpecBase
+import pages.unmatched.RemoveSubcontractorVerifyRequestPage
 import play.api.libs.json.JsPath
 
 class RemoveSubcontractorVerifyRequestPageSpec extends SpecBase {

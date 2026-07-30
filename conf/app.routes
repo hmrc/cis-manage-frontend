@@ -35,6 +35,11 @@ GET   /subcontractors/delete-subcontractor/submit  controllers.subcontractors.De
 
 GET   /subcontractors/retrieve  controllers.subcontractors.GetSubcontractorListController.onPageLoad()
 
+GET   /remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
+POST  /remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
+GET   /changeRemoveSubcontractorVerifyRequest       controllers.unmatched.RemoveSubcontractorVerifyRequestController.onPageLoad(mode: Mode = CheckMode)
+POST  /changeRemoveSubcontractorVerifyRequest       controllers.unmatched.RemoveSubcontractorVerifyRequestController.onSubmit(mode: Mode = CheckMode)
+
 # Errors & Auth
 GET  /there-is-a-problem               controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
@@ -155,11 +160,6 @@ GET   /verify/history/submission-receipt                    controllers.verify.S
 GET   /verify/verification-request                          controllers.verify.VerificationRequestController.onPageLoad(verificationNumber: String)
 
 GET   /verification-history/retrieve                        controllers.verify.GetSubmittedVerificationsController.onPageLoad()
-
-GET   /removeSubcontractorVerifyRequest                     controllers.verify.RemoveSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
-POST  /removeSubcontractorVerifyRequest                     controllers.verify.RemoveSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
-GET   /changeRemoveSubcontractorVerifyRequest               controllers.verify.RemoveSubcontractorVerifyRequestController.onPageLoad(mode: Mode = CheckMode)
-POST  /changeRemoveSubcontractorVerifyRequest               controllers.verify.RemoveSubcontractorVerifyRequestController.onSubmit(mode: Mode = CheckMode)
 
 # Client Details
 GET   /client-details/manage-client-details           controllers.clientdetails.ManageClientDetailsController.onPageLoad()
