@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.verify
+package views.unmatched
 
 import base.SpecBase
 import forms.unmatched.RemoveSubcontractorVerifyRequestFormProvider

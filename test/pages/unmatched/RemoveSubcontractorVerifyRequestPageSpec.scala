@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package pages.verify
+package pages.unmatched
 
 import base.SpecBase
-import pages.unmatched.RemoveSubcontractorVerifyRequestPage
 import play.api.libs.json.JsPath
 
 class RemoveSubcontractorVerifyRequestPageSpec extends SpecBase {

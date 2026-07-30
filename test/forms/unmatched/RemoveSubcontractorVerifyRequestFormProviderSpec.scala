@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package forms
+package forms.unmatched
 
 import forms.behaviours.BooleanFieldBehaviours
-import forms.unmatched.RemoveSubcontractorVerifyRequestFormProvider
 import play.api.data.FormError
 
 class RemoveSubcontractorVerifyRequestFormProviderSpec extends BooleanFieldBehaviours {

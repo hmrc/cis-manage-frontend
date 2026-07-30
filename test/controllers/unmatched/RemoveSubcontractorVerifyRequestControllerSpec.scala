@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.verify
+package controllers.unmatched
 
 import base.SpecBase
 import controllers.routes
