@@ -133,7 +133,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
       id = "2",
       name = "Jones, Brian",
       utr = "9876543210",
-      verified = true,
+      verified = false,
       verificationNumber = "V000002",
       taxTreatment = TaxTreatment.Unknown,
       dateAdded = "6 May 2026",
