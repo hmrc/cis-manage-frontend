@@ -70,35 +70,38 @@ final case class GetSubcontractor(
   private def normalisedType: Option[String] =
     subcontractorType.map(_.trim.toLowerCase.replace(" ", ""))
 
-  def displayName: Option[String] = {
-    val personalName =
-      Seq(firstName, secondName, surname).flatten
-        .map(_.trim)
-        .filter(_.nonEmpty)
-        .mkString(" ")
-
+  def displayName: Option[String] =
     normalisedType match {
-      case Some("soletrader" | "individual") if personalName.nonEmpty =>
-        Some(personalName)
+
+      case Some("individual") | Some("soletrader") =>
+        surnameValue
+          .map { surname =>
+            firstNameValue.fold(surname)(firstName => s"$surname, $firstName")
+          }
+          .orElse(tradingNameValue)
+
+      case Some("company") | Some("trust") =>
+        tradingNameValue
 
       case Some("partnership") =>
-        partnershipTradingName
-          .orElse(tradingName)
-          .filter(_.trim.nonEmpty)
-          .orElse(Option.when(personalName.nonEmpty)(personalName))
-
-      case Some("company" | "trust" | "soletrader" | "individual") =>
-        tradingName
-          .filter(_.trim.nonEmpty)
-          .orElse(Option.when(personalName.nonEmpty)(personalName))
+        partnershipTradingNameValue
+          .orElse(tradingNameValue)
 
       case _ =>
-        tradingName
-          .orElse(partnershipTradingName)
-          .filter(_.trim.nonEmpty)
-          .orElse(Option.when(personalName.nonEmpty)(personalName))
+        None
     }
-  }
+
+  private def tradingNameValue: Option[String] =
+    tradingName.map(_.trim).filter(_.nonEmpty)
+
+  private def partnershipTradingNameValue: Option[String] =
+    partnershipTradingName.map(_.trim).filter(_.nonEmpty)
+
+  private def firstNameValue: Option[String] =
+    firstName.map(_.trim).filter(_.nonEmpty)
+
+  private def surnameValue: Option[String] =
+    surname.map(_.trim).filter(_.nonEmpty)
 
 }
 

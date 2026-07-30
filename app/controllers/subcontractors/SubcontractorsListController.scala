@@ -122,11 +122,8 @@ class SubcontractorsListController @Inject() (
     subcontractor: GetSubcontractor
   ): SubcontractorsListRow = {
 
-    val isVerified =
-      subcontractor.verified.exists(_.equalsIgnoreCase("Y"))
-
     val reverifyRequired =
-      isVerified && ReverificationRules.reverifyRequired(
+      ReverificationRules.reverifyRequired(
         subcontractor,
         LocalDate.now(clock)
       )

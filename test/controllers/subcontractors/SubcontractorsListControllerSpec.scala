@@ -121,7 +121,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
   private val rows                                       = Seq(
     SubcontractorsListRow(
       id = "1",
-      name = "Alan Smith",
+      name = "Smith, Alan",
       utr = "1234567890",
       verified = false,
       verificationNumber = "",
@@ -131,7 +131,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
     ),
     SubcontractorsListRow(
       id = "2",
-      name = "Brian Jones",
+      name = "Jones, Brian",
       utr = "9876543210",
       verified = true,
       verificationNumber = "V000002",
@@ -545,7 +545,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
         val page =
           contentAsString(result)
 
-        page must include("Alan Smith")
+        page must include("Smith, Alan")
 
         page must include(messages(application)("site.no"))
 
