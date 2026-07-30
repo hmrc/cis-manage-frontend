@@ -91,8 +91,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
   "AgentLandingController.onPageLoad" - {
 
     "must return OK and render the page when the service succeeds" in {
-      val mockManageService     = mock[ManageService]
-      val mockSessionRepository = mock[SessionRepository]
 
       when(
         mockManageService.getAgentLandingData(
@@ -136,8 +134,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
     }
 
     "must return OK and render the page when the service succeeds with ITMP name" in {
-      val mockManageService     = mock[ManageService]
-      val mockSessionRepository = mock[SessionRepository]
 
       when(
         mockManageService.getAgentLandingData(
@@ -182,7 +178,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
     }
 
     "must redirect to JourneyRecoveryController when the service fails" in {
-      val mockManageService = mock[ManageService]
 
       when(
         mockManageService.getAgentLandingData(
@@ -220,7 +215,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
     val returnsTargetKey = "returnDue"
 
     "must call prepopulate + getScheme and redirect using determineLandingDestination when scheme is found" in {
-      val mockPrepopService = mock[PrepopService]
 
       val scheme = Scheme(
         schemeId = 123,
@@ -294,7 +288,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
     }
 
     "must redirect to SystemErrorController when prepopulateContractorKnownFacts fails with UpstreamErrorResponse" in {
-      val mockPrepopService = mock[PrepopService]
 
       when(
         mockPrepopService.prepopulateContractorKnownFacts(
@@ -332,7 +325,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
     }
 
     "must redirect to SystemErrorController when prepopulateContractorKnownFacts fails with an unexpected error" in {
-      val mockPrepopService = mock[PrepopService]
 
       when(
         mockPrepopService.prepopulateContractorKnownFacts(
@@ -370,7 +362,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
     }
 
     "must redirect to SystemErrorController when client is missing from AgentClientsPage" in {
-      val mockPrepopService = mock[PrepopService]
 
       val uaWithoutClient =
         emptyUserAnswers
@@ -406,7 +397,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
     }
 
     "must return NotFound when targetKey is unknown" in {
-      val mockPrepopService = mock[PrepopService]
 
       val application: Application =
         applicationBuilder(
@@ -433,7 +423,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
     }
 
     "must redirect to SystemErrorController when getScheme returns None" in {
-      val mockPrepopService = mock[PrepopService]
 
       when(
         mockPrepopService.prepopulateContractorKnownFacts(any[String], any[String], any[String])(any[HeaderCarrier])
