@@ -18,308 +18,340 @@ package viewmodels.subcontractors
 
 object SubcontractorsListData {
 
-  val rows: Seq[SubcontractorsListRow] = Seq(
-    SubcontractorsListRow(
-      id = "Grantalan",
-      name = "Grant, Alan",
-      utr = "0991272528",
-      verified = false,
-      verificationNumber = "V0001256246",
-      taxTreatment = TaxTreatment.StandardRate,
-      dateAdded = "11 May 2020",
-      subbieResourceRef = 1L
-    ),
-    SubcontractorsListRow(
-      id = "Hammondhouse",
-      name = "Hammond House",
-      utr = "2904743750",
-      verified = true,
-      verificationNumber = "V0001217702",
-      taxTreatment = TaxTreatment.Gross,
-      dateAdded = "1 Oct 2025",
-      subbieResourceRef = 2L
-    ),
-    SubcontractorsListRow(
-      id = "Ingenresearch",
-      name = "InGen Research",
-      utr = "9347488729",
-      verified = false,
-      verificationNumber = "V0005617876",
-      taxTreatment = TaxTreatment.StandardRate,
-      dateAdded = "1 Mar 2020",
-      subbieResourceRef = 3L
-    ),
-    SubcontractorsListRow(
-      id = "Malcolmandsattler",
-      name = "Malcolm And Sattler",
-      utr = "0074742762",
-      verified = true,
-      verificationNumber = "V0004635231",
-      taxTreatment = TaxTreatment.HigherRate,
-      dateAdded = "1 Oct 2025",
-      subbieResourceRef = 4L
-    ),
-    SubcontractorsListRow(
-      id = "brightwellPartners",
-      name = "Brightwell Partners",
-      utr = "1234567890",
-      verified = false,
-      verificationNumber = "V0007771001",
-      taxTreatment = TaxTreatment.StandardRate,
-      dateAdded = "23 Apr 2026",
-      subbieResourceRef = 5L
-    ),
-    SubcontractorsListRow(
-      "brightwellPartners",
-      "Brightwell Partners",
-      "1234567890",
-      false,
-      "V0007771001",
-      TaxTreatment.StandardRate,
-      "23 Apr 2026",
-      29L
-    ),
-    SubcontractorsListRow(
-      "carterfieldsLtd",
-      "Carterfields Ltd",
-      "2345678901",
-      true,
-      "V0007771002",
-      TaxTreatment.Gross,
-      "23 Apr 2026",
-      6L
-    ),
-    SubcontractorsListRow(
-      "northbridgeBuild",
-      "Northbridge Build",
-      "3456789012",
-      false,
-      "V0007771003",
-      TaxTreatment.StandardRate,
-      "23 Apr 2026",
-      7L
-    ),
-    SubcontractorsListRow(
-      "oakthornServices",
-      "Oakthorn Services",
-      "4567890123",
-      true,
-      "V0007771004",
-      TaxTreatment.HigherRate,
-      "23 Apr 2026",
-      8L
-    ),
-    SubcontractorsListRow(
-      "alphaBuild",
-      "Alpha Build Ltd",
-      "1111111111",
-      false,
-      "V0009000001",
-      TaxTreatment.StandardRate,
-      "01 Jan 2026",
-      9L
-    ),
-    SubcontractorsListRow(
-      "betaConstruct",
-      "Beta Construction",
-      "1111111112",
-      true,
-      "V0009000002",
-      TaxTreatment.Gross,
-      "02 Jan 2026",
-      10L
-    ),
-    SubcontractorsListRow(
-      "noNameProvided1",
-      "No name provided",
-      "1111111127",
-      false,
-      "V0009000017",
-      TaxTreatment.StandardRate,
-      "17 Jan 2026",
-      28L
-    ),
-    SubcontractorsListRow(
-      "noNameProvided2",
-      "No name provided",
-      "1111111128",
-      true,
-      "V0009000018",
-      TaxTreatment.Gross,
-      "18 Jan 2026",
-      29L
-    ),
-    SubcontractorsListRow(
-      "charlieWorks",
-      "Charlie Works Ltd",
-      "1111111113",
-      false,
-      "V0009000003",
-      TaxTreatment.HigherRate,
-      "03 Jan 2026",
-      11L
-    ),
-    SubcontractorsListRow(
-      "deltaGroup",
-      "Delta Group",
-      "1111111114",
-      true,
-      "V0009000004",
-      TaxTreatment.StandardRate,
-      "04 Jan 2026",
-      12L
-    ),
-    SubcontractorsListRow(
-      "echoServices",
-      "Echo Services",
-      "1111111115",
-      false,
-      "V0009000005",
-      TaxTreatment.Gross,
-      "05 Jan 2026",
-      13L
-    ),
-    SubcontractorsListRow(
-      "foxtrotLtd",
-      "Foxtrot Ltd",
-      "1111111116",
-      true,
-      "V0009000006",
-      TaxTreatment.StandardRate,
-      "06 Jan 2026",
-      14L
-    ),
-    SubcontractorsListRow(
-      "gammaBuilders",
-      "Gamma Builders",
-      "1111111117",
-      false,
-      "V0009000007",
-      TaxTreatment.HigherRate,
-      "07 Jan 2026",
-      15L
-    ),
-    SubcontractorsListRow(
-      "harbourWorks",
-      "Harbour Works",
-      "1111111118",
-      true,
-      "V0009000008",
-      TaxTreatment.Gross,
-      "08 Jan 2026",
-      16L
-    ),
-    SubcontractorsListRow(
-      "ivoryConstruction",
-      "Ivory Construction",
-      "1111111119",
-      false,
-      "V0009000009",
-      TaxTreatment.StandardRate,
-      "09 Jan 2026",
-      17L
-    ),
-    SubcontractorsListRow(
-      "jupiterProjects",
-      "Jupiter Projects",
-      "1111111120",
-      true,
-      "V0009000010",
-      TaxTreatment.HigherRate,
-      "10 Jan 2026",
-      18L
-    ),
-    SubcontractorsListRow(
-      "kingstonBuild",
-      "Kingston Build",
-      "1111111121",
-      false,
-      "V0009000011",
-      TaxTreatment.Gross,
-      "11 Jan 2026",
-      19L
-    ),
-    SubcontractorsListRow(
-      "lunarDevelopments",
-      "Lunar Developments",
-      "1111111122",
-      true,
-      "V0009000012",
-      TaxTreatment.StandardRate,
-      "12 Jan 2026",
-      20L
-    ),
-    SubcontractorsListRow(
-      "metroConstruct",
-      "Metro Construct Ltd",
-      "1111111123",
-      false,
-      "V0009000013",
-      TaxTreatment.HigherRate,
-      "13 Jan 2026",
-      21L
-    ),
-    SubcontractorsListRow(
-      "novaBuilders",
-      "Nova Builders",
-      "1111111124",
-      true,
-      "V0009000014",
-      TaxTreatment.Gross,
-      "14 Jan 2026",
-      22L
-    ),
+  private val contractorFrontendBaseUrl =
+    "http://localhost:6998/construction-industry-scheme/subcontractor"
 
-    // duplicates retained but with different refs
+  private val instanceId =
+    "test-instance-id"
+
+  private def detailsUrl(
+    subbieResourceRef: Long
+  ): String =
+    s"$contractorFrontendBaseUrl/amend/company/$instanceId/$subbieResourceRef"
+
+  private def row(
+    id: String,
+    name: String,
+    utr: String,
+    verified: Boolean,
+    verificationNumber: String,
+    taxTreatment: TaxTreatment,
+    dateAdded: String,
+    subbieResourceRef: Long
+  ): SubcontractorsListRow =
     SubcontractorsListRow(
-      "gammaBuilders",
-      "Gamma Builders",
-      "1111111117",
-      false,
-      "V0009000007",
-      TaxTreatment.Unknown,
-      "07 Jan 2026",
-      23L
-    ),
-    SubcontractorsListRow(
-      "orbitWorks",
-      "Orbit Works",
-      "1111111125",
-      false,
-      "V0009000015",
-      TaxTreatment.Unknown,
-      "15 Jan 2026",
-      24L
-    ),
-    SubcontractorsListRow(
-      "northbridgeBuild",
-      "Northbridge Build",
-      "3456789012",
-      false,
-      "V0007771003",
-      TaxTreatment.Unknown,
-      "23 Apr 2026",
-      25L
-    ),
-    SubcontractorsListRow(
-      "orbitWorks",
-      "Orbit Works",
-      "1111111125",
-      false,
-      "V0009000015",
-      TaxTreatment.StandardRate,
-      "15 Jan 2026",
-      26L
-    ),
-    SubcontractorsListRow(
-      "pioneerLtd",
-      "Pioneer Ltd",
-      "1111111126",
-      true,
-      "V0009000016",
-      TaxTreatment.HigherRate,
-      "16 Jan 2026",
-      27L
+      id = id,
+      name = name,
+      utr = utr,
+      verified = verified,
+      verificationNumber = verificationNumber,
+      taxTreatment = taxTreatment,
+      dateAdded = dateAdded,
+      subbieResourceRef = subbieResourceRef,
+      detailsUrl = detailsUrl(subbieResourceRef)
     )
-  ).sortBy(_.name.toLowerCase)
+
+  val rows: Seq[SubcontractorsListRow] =
+    Seq(
+      row(
+        id = "Grantalan",
+        name = "Grant, Alan",
+        utr = "0991272528",
+        verified = false,
+        verificationNumber = "V0001256246",
+        taxTreatment = TaxTreatment.StandardRate,
+        dateAdded = "11 May 2020",
+        subbieResourceRef = 1L
+      ),
+      row(
+        id = "Hammondhouse",
+        name = "Hammond House",
+        utr = "2904743750",
+        verified = true,
+        verificationNumber = "V0001217702",
+        taxTreatment = TaxTreatment.Gross,
+        dateAdded = "1 Oct 2025",
+        subbieResourceRef = 2L
+      ),
+      row(
+        id = "Ingenresearch",
+        name = "InGen Research",
+        utr = "9347488729",
+        verified = false,
+        verificationNumber = "V0005617876",
+        taxTreatment = TaxTreatment.StandardRate,
+        dateAdded = "1 Mar 2020",
+        subbieResourceRef = 3L
+      ),
+      row(
+        id = "Malcolmandsattler",
+        name = "Malcolm And Sattler",
+        utr = "0074742762",
+        verified = true,
+        verificationNumber = "V0004635231",
+        taxTreatment = TaxTreatment.HigherRate,
+        dateAdded = "1 Oct 2025",
+        subbieResourceRef = 4L
+      ),
+      row(
+        id = "brightwellPartners",
+        name = "Brightwell Partners",
+        utr = "1234567890",
+        verified = false,
+        verificationNumber = "V0007771001",
+        taxTreatment = TaxTreatment.StandardRate,
+        dateAdded = "23 Apr 2026",
+        subbieResourceRef = 5L
+      ),
+      row(
+        id = "brightwellPartners",
+        name = "Brightwell Partners",
+        utr = "1234567890",
+        verified = false,
+        verificationNumber = "V0007771001",
+        taxTreatment = TaxTreatment.StandardRate,
+        dateAdded = "23 Apr 2026",
+        subbieResourceRef = 29L
+      ),
+      row(
+        id = "carterfieldsLtd",
+        name = "Carterfields Ltd",
+        utr = "2345678901",
+        verified = true,
+        verificationNumber = "V0007771002",
+        taxTreatment = TaxTreatment.Gross,
+        dateAdded = "23 Apr 2026",
+        subbieResourceRef = 6L
+      ),
+      row(
+        id = "northbridgeBuild",
+        name = "Northbridge Build",
+        utr = "3456789012",
+        verified = false,
+        verificationNumber = "V0007771003",
+        taxTreatment = TaxTreatment.StandardRate,
+        dateAdded = "23 Apr 2026",
+        subbieResourceRef = 7L
+      ),
+      row(
+        id = "oakthornServices",
+        name = "Oakthorn Services",
+        utr = "4567890123",
+        verified = true,
+        verificationNumber = "V0007771004",
+        taxTreatment = TaxTreatment.HigherRate,
+        dateAdded = "23 Apr 2026",
+        subbieResourceRef = 8L
+      ),
+      row(
+        id = "alphaBuild",
+        name = "Alpha Build Ltd",
+        utr = "1111111111",
+        verified = false,
+        verificationNumber = "V0009000001",
+        taxTreatment = TaxTreatment.StandardRate,
+        dateAdded = "01 Jan 2026",
+        subbieResourceRef = 9L
+      ),
+      row(
+        id = "betaConstruct",
+        name = "Beta Construction",
+        utr = "1111111112",
+        verified = true,
+        verificationNumber = "V0009000002",
+        taxTreatment = TaxTreatment.Gross,
+        dateAdded = "02 Jan 2026",
+        subbieResourceRef = 10L
+      ),
+      row(
+        id = "noNameProvided1",
+        name = "No name provided",
+        utr = "1111111127",
+        verified = false,
+        verificationNumber = "V0009000017",
+        taxTreatment = TaxTreatment.StandardRate,
+        dateAdded = "17 Jan 2026",
+        subbieResourceRef = 28L
+      ),
+      row(
+        id = "noNameProvided2",
+        name = "No name provided",
+        utr = "1111111128",
+        verified = true,
+        verificationNumber = "V0009000018",
+        taxTreatment = TaxTreatment.Gross,
+        dateAdded = "18 Jan 2026",
+        subbieResourceRef = 29L
+      ),
+      row(
+        id = "charlieWorks",
+        name = "Charlie Works Ltd",
+        utr = "1111111113",
+        verified = false,
+        verificationNumber = "V0009000003",
+        taxTreatment = TaxTreatment.HigherRate,
+        dateAdded = "03 Jan 2026",
+        subbieResourceRef = 11L
+      ),
+      row(
+        id = "deltaGroup",
+        name = "Delta Group",
+        utr = "1111111114",
+        verified = true,
+        verificationNumber = "V0009000004",
+        taxTreatment = TaxTreatment.StandardRate,
+        dateAdded = "04 Jan 2026",
+        subbieResourceRef = 12L
+      ),
+      row(
+        id = "echoServices",
+        name = "Echo Services",
+        utr = "1111111115",
+        verified = false,
+        verificationNumber = "V0009000005",
+        taxTreatment = TaxTreatment.Gross,
+        dateAdded = "05 Jan 2026",
+        subbieResourceRef = 13L
+      ),
+      row(
+        id = "foxtrotLtd",
+        name = "Foxtrot Ltd",
+        utr = "1111111116",
+        verified = true,
+        verificationNumber = "V0009000006",
+        taxTreatment = TaxTreatment.StandardRate,
+        dateAdded = "06 Jan 2026",
+        subbieResourceRef = 14L
+      ),
+      row(
+        id = "gammaBuilders",
+        name = "Gamma Builders",
+        utr = "1111111117",
+        verified = false,
+        verificationNumber = "V0009000007",
+        taxTreatment = TaxTreatment.HigherRate,
+        dateAdded = "07 Jan 2026",
+        subbieResourceRef = 15L
+      ),
+      row(
+        id = "harbourWorks",
+        name = "Harbour Works",
+        utr = "1111111118",
+        verified = true,
+        verificationNumber = "V0009000008",
+        taxTreatment = TaxTreatment.Gross,
+        dateAdded = "08 Jan 2026",
+        subbieResourceRef = 16L
+      ),
+      row(
+        id = "ivoryConstruction",
+        name = "Ivory Construction",
+        utr = "1111111119",
+        verified = false,
+        verificationNumber = "V0009000009",
+        taxTreatment = TaxTreatment.StandardRate,
+        dateAdded = "09 Jan 2026",
+        subbieResourceRef = 17L
+      ),
+      row(
+        id = "jupiterProjects",
+        name = "Jupiter Projects",
+        utr = "1111111120",
+        verified = true,
+        verificationNumber = "V0009000010",
+        taxTreatment = TaxTreatment.HigherRate,
+        dateAdded = "10 Jan 2026",
+        subbieResourceRef = 18L
+      ),
+      row(
+        id = "kingstonBuild",
+        name = "Kingston Build",
+        utr = "1111111121",
+        verified = false,
+        verificationNumber = "V0009000011",
+        taxTreatment = TaxTreatment.Gross,
+        dateAdded = "11 Jan 2026",
+        subbieResourceRef = 19L
+      ),
+      row(
+        id = "lunarDevelopments",
+        name = "Lunar Developments",
+        utr = "1111111122",
+        verified = true,
+        verificationNumber = "V0009000012",
+        taxTreatment = TaxTreatment.StandardRate,
+        dateAdded = "12 Jan 2026",
+        subbieResourceRef = 20L
+      ),
+      row(
+        id = "metroConstruct",
+        name = "Metro Construct Ltd",
+        utr = "1111111123",
+        verified = false,
+        verificationNumber = "V0009000013",
+        taxTreatment = TaxTreatment.HigherRate,
+        dateAdded = "13 Jan 2026",
+        subbieResourceRef = 21L
+      ),
+      row(
+        id = "novaBuilders",
+        name = "Nova Builders",
+        utr = "1111111124",
+        verified = true,
+        verificationNumber = "V0009000014",
+        taxTreatment = TaxTreatment.Gross,
+        dateAdded = "14 Jan 2026",
+        subbieResourceRef = 22L
+      ),
+      row(
+        id = "gammaBuilders",
+        name = "Gamma Builders",
+        utr = "1111111117",
+        verified = false,
+        verificationNumber = "V0009000007",
+        taxTreatment = TaxTreatment.Unknown,
+        dateAdded = "07 Jan 2026",
+        subbieResourceRef = 23L
+      ),
+      row(
+        id = "orbitWorks",
+        name = "Orbit Works",
+        utr = "1111111125",
+        verified = false,
+        verificationNumber = "V0009000015",
+        taxTreatment = TaxTreatment.Unknown,
+        dateAdded = "15 Jan 2026",
+        subbieResourceRef = 24L
+      ),
+      row(
+        id = "northbridgeBuild",
+        name = "Northbridge Build",
+        utr = "3456789012",
+        verified = false,
+        verificationNumber = "V0007771003",
+        taxTreatment = TaxTreatment.Unknown,
+        dateAdded = "23 Apr 2026",
+        subbieResourceRef = 25L
+      ),
+      row(
+        id = "orbitWorks",
+        name = "Orbit Works",
+        utr = "1111111125",
+        verified = false,
+        verificationNumber = "V0009000015",
+        taxTreatment = TaxTreatment.StandardRate,
+        dateAdded = "15 Jan 2026",
+        subbieResourceRef = 26L
+      ),
+      row(
+        id = "pioneerLtd",
+        name = "Pioneer Ltd",
+        utr = "1111111126",
+        verified = true,
+        verificationNumber = "V0009000016",
+        taxTreatment = TaxTreatment.HigherRate,
+        dateAdded = "16 Jan 2026",
+        subbieResourceRef = 27L
+      )
+    ).sortBy(_.name.toLowerCase)
 }

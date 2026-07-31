@@ -245,7 +245,7 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
                 content = HtmlContent(
                 Html(
                 s"""
-                |<a href="#" class="govuk-link">
+                |<a href="${HtmlFormat.escape(row.detailsUrl)}" class="govuk-link">
                 |  ${HtmlFormat.escape(row.name)}
                 |  <span class="govuk-visually-hidden">
          |    ${HtmlFormat.escape(

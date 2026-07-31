@@ -37,6 +37,9 @@ class SubcontractorsListControllerSpec extends SpecBase {
   private val instanceId = "test-instance-id"
   private val mode: Mode = NormalMode
 
+  private val contractorFrontendBaseUrl =
+    "http://localhost:6998/construction-industry-scheme/subcontractor"
+
   private val subcontractors = Seq(
     GetSubcontractor(
       subcontractorId = 1L,
@@ -127,7 +130,8 @@ class SubcontractorsListControllerSpec extends SpecBase {
       verificationNumber = "V000001",
       taxTreatment = TaxTreatment.Gross,
       dateAdded = "6 Apr 2026",
-      subbieResourceRef = 10L
+      subbieResourceRef = 10L,
+      detailsUrl = s"$contractorFrontendBaseUrl/amend/individual/$instanceId/10"
     ),
     SubcontractorsListRow(
       id = "2",
@@ -137,9 +141,22 @@ class SubcontractorsListControllerSpec extends SpecBase {
       verificationNumber = "V000002",
       taxTreatment = TaxTreatment.HigherRate,
       dateAdded = "6 May 2026",
-      subbieResourceRef = 20L
+      subbieResourceRef = 20L,
+      detailsUrl = s"$contractorFrontendBaseUrl/amend/individual/$instanceId/20"
     )
   )
+
+  private def buildApplication(
+    userAnswers: Option[UserAnswers]
+  ) =
+    applicationBuilder(
+      userAnswers = userAnswers
+    )
+      .configure(
+        "urls.cis-contractor-frontend" ->
+          contractorFrontendBaseUrl
+      )
+      .build()
 
   private def userAnswersWithSubcontractors: UserAnswers =
     emptyUserAnswers
@@ -263,9 +280,9 @@ class SubcontractorsListControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET with default filters" in {
       val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubcontractors)
-        ).build()
+        buildApplication(
+          Some(userAnswersWithSubcontractors)
+        )
 
       running(application) {
         val request =
@@ -315,9 +332,9 @@ class SubcontractorsListControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET with search and filters applied" in {
       val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubcontractors)
-        ).build()
+        buildApplication(
+          Some(userAnswersWithSubcontractors)
+        )
 
       running(application) {
         val request =
@@ -369,9 +386,9 @@ class SubcontractorsListControllerSpec extends SpecBase {
 
     "must redirect to the selected page with filters preserved when pagination is submitted" in {
       val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubcontractors)
-        ).build()
+        buildApplication(
+          Some(userAnswersWithSubcontractors)
+        )
 
       running(application) {
         val request =
@@ -408,9 +425,9 @@ class SubcontractorsListControllerSpec extends SpecBase {
 
     "must redirect to page 1 when gotoPage is not submitted" in {
       val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubcontractors)
-        ).build()
+        buildApplication(
+          Some(userAnswersWithSubcontractors)
+        )
 
       running(application) {
         val request =
@@ -446,15 +463,17 @@ class SubcontractorsListControllerSpec extends SpecBase {
 
     "must redirect to Journey Recovery for a GET when subcontractor list data is missing" in {
       val application =
-        applicationBuilder(
-          userAnswers = Some(emptyUserAnswers)
-        ).build()
+        buildApplication(
+          Some(emptyUserAnswers)
+        )
 
       running(application) {
         val request =
           FakeRequest(
             GET,
-            routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url
+            routes.SubcontractorsListController
+              .onPageLoad(instanceId, mode, 1)
+              .url
           )
 
         val result =
@@ -463,21 +482,25 @@ class SubcontractorsListControllerSpec extends SpecBase {
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
       }
     }
 
     "must redirect to Journey Recovery for a POST when subcontractor list data is missing" in {
       val application =
-        applicationBuilder(
-          userAnswers = Some(emptyUserAnswers)
-        ).build()
+        buildApplication(
+          Some(emptyUserAnswers)
+        )
 
       running(application) {
         val request =
           FakeRequest(
             POST,
-            routes.SubcontractorsListController.onSubmit(instanceId, mode, 1).url
+            routes.SubcontractorsListController
+              .onSubmit(instanceId, mode, 1)
+              .url
           ).withFormUrlEncodedBody(
             "gotoPage"   -> "2",
             "searchTerm" -> "Alan"
@@ -489,7 +512,9 @@ class SubcontractorsListControllerSpec extends SpecBase {
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
+          controllers.routes.JourneyRecoveryController
+            .onPageLoad()
+            .url
       }
     }
 
@@ -559,6 +584,261 @@ class SubcontractorsListControllerSpec extends SpecBase {
 
         exception.getMessage mustEqual
           "Missing subbieResourceRef for subcontractorId 1"
+      }
+    }
+
+    "must create the individual amend URL for a sole trader" in {
+      val soleTrader =
+        subcontractors.head.copy(
+          subcontractorType = Some("soleTrader"),
+          subbieResourceRef = Some(10L)
+        )
+
+      val answers =
+        emptyUserAnswers
+          .set(
+            SubcontractorListPage,
+            GetSubcontractorListResponse(
+              Seq(soleTrader)
+            )
+          )
+          .success
+          .value
+
+      val application =
+        buildApplication(Some(answers))
+
+      running(application) {
+        val request =
+          FakeRequest(
+            GET,
+            routes.SubcontractorsListController
+              .onPageLoad(instanceId, mode, 1)
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual OK
+
+        contentAsString(result) must include(
+          s"$contractorFrontendBaseUrl/amend/individual/$instanceId/10"
+        )
+      }
+    }
+
+    "must create the company amend URL for a company" in {
+      val company =
+        subcontractors.head.copy(
+          subcontractorType = Some("company"),
+          tradingName = Some("Test Company Ltd"),
+          subbieResourceRef = Some(11L)
+        )
+
+      val answers =
+        emptyUserAnswers
+          .set(
+            SubcontractorListPage,
+            GetSubcontractorListResponse(
+              Seq(company)
+            )
+          )
+          .success
+          .value
+
+      val application =
+        buildApplication(Some(answers))
+
+      running(application) {
+        val request =
+          FakeRequest(
+            GET,
+            routes.SubcontractorsListController
+              .onPageLoad(instanceId, mode, 1)
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual OK
+
+        contentAsString(result) must include(
+          s"$contractorFrontendBaseUrl/amend/company/$instanceId/11"
+        )
+      }
+    }
+
+    "must create the partnership amend URL for a partnership" in {
+      val partnership =
+        subcontractors.head.copy(
+          subcontractorType = Some("partnership"),
+          partnershipTradingName = Some("Test Partnership"),
+          subbieResourceRef = Some(12L)
+        )
+
+      val answers =
+        emptyUserAnswers
+          .set(
+            SubcontractorListPage,
+            GetSubcontractorListResponse(
+              Seq(partnership)
+            )
+          )
+          .success
+          .value
+
+      val application =
+        buildApplication(Some(answers))
+
+      running(application) {
+        val request =
+          FakeRequest(
+            GET,
+            routes.SubcontractorsListController
+              .onPageLoad(instanceId, mode, 1)
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual OK
+
+        contentAsString(result) must include(
+          s"$contractorFrontendBaseUrl/amend/partnership/$instanceId/12"
+        )
+      }
+    }
+
+    "must create the trust amend URL for a trust" in {
+      val trust =
+        subcontractors.head.copy(
+          subcontractorType = Some("trust"),
+          tradingName = Some("Test Trust"),
+          subbieResourceRef = Some(13L)
+        )
+
+      val answers =
+        emptyUserAnswers
+          .set(
+            SubcontractorListPage,
+            GetSubcontractorListResponse(
+              Seq(trust)
+            )
+          )
+          .success
+          .value
+
+      val application =
+        buildApplication(Some(answers))
+
+      running(application) {
+        val request =
+          FakeRequest(
+            GET,
+            routes.SubcontractorsListController
+              .onPageLoad(instanceId, mode, 1)
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual OK
+
+        contentAsString(result) must include(
+          s"$contractorFrontendBaseUrl/amend/trust/$instanceId/13"
+        )
+      }
+    }
+
+    "must throw an IllegalStateException when subcontractorType is missing" in {
+      val response =
+        GetSubcontractorListResponse(
+          subcontractors = Seq(
+            subcontractors.head.copy(
+              subcontractorType = None
+            )
+          )
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(
+            SubcontractorListPage,
+            response
+          )
+          .success
+          .value
+
+      val application =
+        buildApplication(Some(userAnswers))
+
+      running(application) {
+        val request =
+          FakeRequest(
+            GET,
+            routes.SubcontractorsListController
+              .onPageLoad(instanceId, mode, 1)
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        val exception =
+          intercept[IllegalStateException] {
+            status(result)
+          }
+
+        exception.getMessage mustEqual
+          "Unsupported subcontractor type missing for subcontractorId=1"
+      }
+    }
+
+    "must throw an IllegalStateException when subcontractorType is unsupported" in {
+      val response =
+        GetSubcontractorListResponse(
+          subcontractors = Seq(
+            subcontractors.head.copy(
+              subcontractorType = Some("unknownType")
+            )
+          )
+        )
+
+      val userAnswers =
+        emptyUserAnswers
+          .set(
+            SubcontractorListPage,
+            response
+          )
+          .success
+          .value
+
+      val application =
+        buildApplication(Some(userAnswers))
+
+      running(application) {
+        val request =
+          FakeRequest(
+            GET,
+            routes.SubcontractorsListController
+              .onPageLoad(instanceId, mode, 1)
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        val exception =
+          intercept[IllegalStateException] {
+            status(result)
+          }
+
+        exception.getMessage mustEqual
+          "Unsupported subcontractor type unknowntype for subcontractorId=1"
       }
     }
   }

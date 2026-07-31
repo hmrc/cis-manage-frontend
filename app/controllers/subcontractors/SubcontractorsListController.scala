@@ -36,6 +36,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
 import scala.util.Try
+import config.FrontendAppConfig
 
 class SubcontractorsListController @Inject() (
   override val messagesApi: MessagesApi,
@@ -44,6 +45,7 @@ class SubcontractorsListController @Inject() (
   requireData: DataRequiredAction,
   formProvider: SubcontractorsListFormProvider,
   paginationService: PaginationSubcontractorsListService,
+  appConfig: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   view: SubcontractorsListView
 ) extends FrontendBaseController
@@ -110,27 +112,88 @@ class SubcontractorsListController @Inject() (
       .getOrElse(LocalDate.MIN)
 
   private def rowsFromUserAnswers(
-    userAnswers: UserAnswers
+    userAnswers: UserAnswers,
+    cisId: String
   ): Option[Seq[SubcontractorsListRow]] =
     userAnswers
       .get(SubcontractorListPage)
-      .map(_.subcontractors.map(toListRow))
+      .map(
+        _.subcontractors.map { subcontractor =>
+          toListRow(
+            subcontractor = subcontractor,
+            cisId = cisId
+          )
+        }
+      )
 
   private def toListRow(
-    subcontractor: GetSubcontractor
-  ): SubcontractorsListRow =
+    subcontractor: GetSubcontractor,
+    cisId: String
+  ): SubcontractorsListRow = {
+    val subbieResourceRef =
+      getSubbieResourceRef(subcontractor)
+
     SubcontractorsListRow(
       id = subcontractor.subcontractorId.toString,
       name = subcontractor.displayName,
       utr = subcontractor.utr.getOrElse(""),
-      verified = subcontractor.verified.exists(_.equalsIgnoreCase("Y")),
+      verified = subcontractor.verified.exists(
+        _.trim.equalsIgnoreCase("Y")
+      ),
       verificationNumber = subcontractor.verificationNumber.getOrElse(""),
       taxTreatment = toTaxTreatment(subcontractor.taxTreatment),
       dateAdded = subcontractor.createDate
         .map(_.format(dateAddedFormatter))
         .getOrElse(""),
-      subbieResourceRef = getSubbieResourceRef(subcontractor)
+      subbieResourceRef = subbieResourceRef,
+      detailsUrl = subcontractorDetailsUrl(
+        subcontractor = subcontractor,
+        cisId = cisId,
+        subbieResourceRef = subbieResourceRef
+      )
     )
+  }
+
+  private def subcontractorDetailsUrl(
+    subcontractor: GetSubcontractor,
+    cisId: String,
+    subbieResourceRef: Long
+  ): String = {
+    val amendPath =
+      normalisedSubcontractorType(subcontractor) match {
+        case Some("soletrader" | "individual") =>
+          "individual"
+
+        case Some("company") =>
+          "company"
+
+        case Some("partnership") =>
+          "partnership"
+
+        case Some("trust") =>
+          "trust"
+
+        case unsupportedType =>
+          throw new IllegalStateException(
+            s"Unsupported subcontractor type " +
+              s"${unsupportedType.getOrElse("missing")} " +
+              s"for subcontractorId=${subcontractor.subcontractorId}"
+          )
+      }
+
+    s"${appConfig.cisTypeOfSubcontractorUrl.stripSuffix("/")}/amend/$amendPath/$cisId/$subbieResourceRef"
+  }
+
+  private def normalisedSubcontractorType(
+    subcontractor: GetSubcontractor
+  ): Option[String] =
+    subcontractor.subcontractorType
+      .map(
+        _.trim
+          .toLowerCase(Locale.UK)
+          .replace(" ", "")
+      )
+      .filter(_.nonEmpty)
 
   private def getSubbieResourceRef(
     subcontractor: GetSubcontractor
@@ -478,7 +541,10 @@ class SubcontractorsListController @Inject() (
     page: Int = 1
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      rowsFromUserAnswers(request.userAnswers) match {
+      rowsFromUserAnswers(
+        request.userAnswers,
+        instanceId
+      ) match {
         case Some(allRows) if allRows.nonEmpty =>
           renderPage(
             allRows,
@@ -504,7 +570,10 @@ class SubcontractorsListController @Inject() (
     page: Int = 1
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      rowsFromUserAnswers(request.userAnswers) match {
+      rowsFromUserAnswers(
+        request.userAnswers,
+        instanceId
+      ) match {
         case Some(allRows) =>
           val formData =
             request.body.asFormUrlEncoded.getOrElse(Map.empty)

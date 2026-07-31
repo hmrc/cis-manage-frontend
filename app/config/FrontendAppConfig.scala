@@ -141,4 +141,33 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val cisVerifySubcontractorUrl: String =
     configuration.get[String]("urls.cis-contractor-frontend") + "/verify/newest"
 
+  def amendSubcontractorUrl(
+    subcontractorType: String,
+    cisId: String,
+    subbieResourceRef: Long
+  ): String = {
+    val amendType =
+      subcontractorType.trim.toLowerCase
+        .replace(" ", "") match {
+        case "soletrader" | "individual" =>
+          "individual"
+
+        case "company" =>
+          "company"
+
+        case "partnership" =>
+          "partnership"
+
+        case "trust" =>
+          "trust"
+
+        case unsupportedType =>
+          throw new IllegalArgumentException(
+            s"Unsupported subcontractor type: $unsupportedType"
+          )
+      }
+
+    s"${cisTypeOfSubcontractorUrl.stripSuffix("/")}/amend/$amendType/$cisId/$subbieResourceRef"
+  }
+
 }

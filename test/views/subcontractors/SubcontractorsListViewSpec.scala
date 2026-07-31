@@ -127,7 +127,7 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       )
     }
 
-    "must render subcontractor name links with visually hidden text" in new Setup {
+    "must render subcontractor name links with the correct details URLs and visually hidden text" in new Setup {
 
       val html =
         view(
@@ -147,17 +147,21 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
           sortOrder = "ascending"
         )
 
-      val doc = Jsoup.parse(html.body)
+      val doc =
+        Jsoup.parse(html.body)
 
       val nameLinks =
-        doc.select("#subcontractors-table tbody tr td:first-child a.govuk-link")
+        doc.select(
+          "#subcontractors-table tbody tr td:first-child a.govuk-link"
+        )
 
       nameLinks.size() mustBe rows.size
 
       rows.zipWithIndex.foreach { case (row, index) =>
-        val link = nameLinks.get(index)
+        val link =
+          nameLinks.get(index)
 
-        link.attr("href") mustBe "#"
+        link.attr("href") mustBe row.detailsUrl
 
         link.ownText().trim mustBe row.name
 
