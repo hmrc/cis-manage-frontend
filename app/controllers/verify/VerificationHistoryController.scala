@@ -32,6 +32,7 @@ import views.html.verify.VerificationHistoryView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.matching.Regex
 
 class VerificationHistoryController @Inject() (
   override val messagesApi: MessagesApi,
@@ -48,14 +49,15 @@ class VerificationHistoryController @Inject() (
     with I18nSupport
     with Logging {
 
+  private val taxYearSelectionRegex: Regex = """^(\d{4}) to \d{4}.*$""".r
+
   def onPageLoadSingleYear(): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
 
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       request.userAnswers.get(VerificationHistorySelectTaxYearPage) match {
-        case Some(TaxYear(v)) =>
-          val taxYear = v.takeWhile(_ != ' ')
+        case Some(TaxYear(taxYearSelectionRegex(taxYear))) =>
           resolveVerificationHistoryData
             .map { data =>
               verificationHistoryService.buildSingleYearViewModel(data, taxYear, request.cisId) match {
@@ -66,7 +68,7 @@ class VerificationHistoryController @Inject() (
             .recover { case _ =>
               Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
             }
-        case _                =>
+        case _                                             =>
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
     }

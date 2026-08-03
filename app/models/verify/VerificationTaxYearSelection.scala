@@ -31,13 +31,6 @@ object VerificationTaxYearSelection {
     override def toString: String = "all"
   }
 
-  val taxYears: Seq[TaxYear] = Seq(
-    TaxYear("2026 to 2027 (current tax year)"),
-    TaxYear("2025 to 2026"),
-    TaxYear("2024 to 2025"),
-    TaxYear("2023 to 2024")
-  )
-
   def fromString(value: String): VerificationTaxYearSelection =
     if (value == "all") AllTaxYears
     else TaxYear(value)

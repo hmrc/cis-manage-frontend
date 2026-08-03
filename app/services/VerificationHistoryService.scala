@@ -21,13 +21,21 @@ import viewmodels.*
 
 import java.time.format.DateTimeFormatter
 import javax.inject.{Inject, Singleton}
-import models.response.GetSubmittedVerificationsResponse
-import java.time.LocalDate
+import models.response.{GetSubmittedSubmission, GetSubmittedVerificationsResponse}
+
+import java.time.{Instant, LocalDate, LocalDateTime, OffsetDateTime, ZoneOffset}
+import scala.util.Try
 
 @Singleton
 class VerificationHistoryService @Inject() () {
 
   private val displayDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM yyyy")
+
+  def getSubmittedVerificationTaxYears(data: VerificationHistoryData): Seq[(Int, Int)] =
+    data.verificationRequests
+      .map(request => request.taxYear -> (request.taxYear + 1))
+      .distinct
+      .sortBy(_._1)(Ordering.Int.reverse)
 
   def buildAllYearsViewModel(
     data: VerificationHistoryData,
@@ -103,33 +111,16 @@ class VerificationHistoryService @Inject() () {
     response: GetSubmittedVerificationsResponse
   ): VerificationHistoryData = {
 
-    val submissionDatesByVerificationBatchId: Map[Long, LocalDate] =
-      response.submissions
-        .flatMap { submission =>
-          for {
-            verificationBatchId <- submission.activeObjectId
-            submittedDate       <- submission.submissionRequestDate
-                                     .orElse(submission.createDate)
-                                     .map(_.toLocalDate)
-          } yield verificationBatchId -> submittedDate
-        }
-        .groupBy(_._1)
-        .view
-        .mapValues(_.map(_._2).max)
-        .toMap
-
     val verificationRequests =
       response.verificationBatches
         .flatMap { batch =>
           for {
             verificationNumber <- batch.verificationNumber
-            submittedDate      <- submissionDatesByVerificationBatchId
-                                    .get(batch.verificationBatchId)
-                                    .orElse(batch.createDate.map(_.toLocalDate))
+            acceptedDate        = acceptedDateFor(batch.verificationBatchId, response.submissions)
           } yield VerificationRequestData(
             verificationNumber = verificationNumber,
-            dateSubmitted = submittedDate,
-            taxYear = taxYearStart(submittedDate)
+            dateSubmitted = acceptedDate,
+            taxYear = taxYearStart(acceptedDate)
           )
         }
         .sortBy(_.dateSubmitted)(Ordering[LocalDate].reverse)
@@ -149,4 +140,35 @@ class VerificationHistoryService @Inject() () {
       date.getYear - 1
     }
   }
+
+  private def acceptedDateFor(
+    verificationBatchId: Long,
+    submissions: Seq[GetSubmittedSubmission]
+  ): LocalDate =
+    submissions
+      .filter(_.activeObjectId.contains(verificationBatchId))
+      .map { submission =>
+        submission.acceptedTime
+          .map(parseAcceptedDate)
+          .getOrElse {
+            throw new IllegalStateException(
+              s"Submitted verification $verificationBatchId is missing accepted date"
+            )
+          }
+      }
+      .maxOption
+      .getOrElse {
+        throw new IllegalStateException(
+          s"Submitted verification $verificationBatchId has no matching accepted submission"
+        )
+      }
+
+  private def parseAcceptedDate(value: String): LocalDate =
+    Try(LocalDateTime.parse(value).toLocalDate)
+      .orElse(Try(OffsetDateTime.parse(value).toLocalDate))
+      .orElse(Try(Instant.parse(value).atZone(ZoneOffset.UTC).toLocalDate))
+      .orElse(Try(LocalDate.parse(value)))
+      .getOrElse {
+        throw new IllegalStateException("Unable to parse submitted verification accepted date")
+      }
 }

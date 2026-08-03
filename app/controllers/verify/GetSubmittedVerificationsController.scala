@@ -17,7 +17,8 @@
 package controllers.verify
 
 import controllers.actions.*
-import pages.verify.VerificationHistoryDataPage
+import models.verify.VerificationTaxYearSelection.TaxYear
+import pages.verify.{VerificationHistoryDataPage, VerificationHistorySelectTaxYearPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -54,15 +55,42 @@ class GetSubmittedVerificationsController @Inject() (
         .getSubmittedVerifications(request.cisId)
         .map(verificationHistoryService.toVerificationHistoryData)
         .flatMap { historyData =>
+          val taxYears = verificationHistoryService.getSubmittedVerificationTaxYears(historyData)
+
           request.userAnswers.set(VerificationHistoryDataPage, historyData) match {
             case Success(updatedAnswers) =>
-              sessionRepository
-                .set(updatedAnswers)
-                .map { _ =>
-                  Redirect(
-                    controllers.verify.routes.VerificationHistorySelectTaxYearController.onPageLoad()
-                  )
-                }
+              taxYears match {
+                case Nil =>
+                  sessionRepository
+                    .set(updatedAnswers)
+                    .map { _ =>
+                      Redirect(controllers.verify.routes.NoVerificationHistoryController.onPageLoad())
+                    }
+
+                case Seq((start, end)) =>
+                  updatedAnswers.set(VerificationHistorySelectTaxYearPage, TaxYear(s"$start to $end")) match {
+                    case Success(answersWithTaxYear) =>
+                      sessionRepository
+                        .set(answersWithTaxYear)
+                        .map { _ =>
+                          Redirect(controllers.verify.routes.VerificationHistoryController.onPageLoadSingleYear())
+                        }
+
+                    case Failure(_) =>
+                      Future.successful(
+                        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                      )
+                  }
+
+                case _ =>
+                  sessionRepository
+                    .set(updatedAnswers)
+                    .map { _ =>
+                      Redirect(
+                        controllers.verify.routes.VerificationHistorySelectTaxYearController.onPageLoad()
+                      )
+                    }
+              }
 
             case Failure(_) =>
               Future.successful(

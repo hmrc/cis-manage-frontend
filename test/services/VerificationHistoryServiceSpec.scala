@@ -60,6 +60,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
 
   private def submittedSubmission(
     activeObjectId: Option[Long],
+    acceptedTime: Option[String] = Some("2026-04-06T10:00:00"),
     submissionRequestDate: Option[LocalDateTime] = None,
     createDate: Option[LocalDateTime] = None
   ): GetSubmittedSubmission =
@@ -71,7 +72,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
       hmrcMarkGenerated = None,
       hmrcMarkGgis = None,
       emailRecipient = None,
-      acceptedTime = None,
+      acceptedTime = acceptedTime,
       createDate = createDate,
       lastUpdate = None,
       schemeId = 1L,
@@ -174,7 +175,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
 
     "toVerificationHistoryData" - {
 
-      "must map submitted verification batches to history data using submission request date and calculate tax years" in {
+      "must map submitted verification batches to history data using accepted date and calculate tax years" in {
         val response = GetSubmittedVerificationsResponse(
           scheme = Seq.empty,
           subcontractors = Seq.empty,
@@ -194,11 +195,11 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
           submissions = Seq(
             submittedSubmission(
               activeObjectId = Some(1L),
-              submissionRequestDate = Some(LocalDateTime.of(2026, 4, 6, 10, 0))
+              acceptedTime = Some("2026-04-06T10:00:00")
             ),
             submittedSubmission(
               activeObjectId = Some(2L),
-              submissionRequestDate = Some(LocalDateTime.of(2026, 2, 6, 10, 0))
+              acceptedTime = Some("2026-02-06T10:00:00")
             )
           )
         )
@@ -219,7 +220,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
         )
       }
 
-      "must use submission create date when submission request date is absent" in {
+      "must throw when accepted date is missing" in {
         val response = GetSubmittedVerificationsResponse(
           scheme = Seq.empty,
           subcontractors = Seq.empty,
@@ -234,23 +235,20 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
           submissions = Seq(
             submittedSubmission(
               activeObjectId = Some(1L),
+              acceptedTime = None,
               createDate = Some(LocalDateTime.of(2026, 6, 6, 10, 0))
             )
           )
         )
 
-        service.toVerificationHistoryData(response) mustBe VerificationHistoryData(
-          verificationRequests = Seq(
-            VerificationRequestData(
-              verificationNumber = "V001",
-              dateSubmitted = LocalDate.of(2026, 6, 6),
-              taxYear = 2026
-            )
-          )
-        )
+        val exception = intercept[IllegalStateException] {
+          service.toVerificationHistoryData(response)
+        }
+
+        exception.getMessage must include("missing accepted date")
       }
 
-      "must use verification batch create date when there is no matching submission" in {
+      "must throw when there is no matching accepted submission" in {
         val response = GetSubmittedVerificationsResponse(
           scheme = Seq.empty,
           subcontractors = Seq.empty,
@@ -265,18 +263,14 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
           submissions = Seq.empty
         )
 
-        service.toVerificationHistoryData(response) mustBe VerificationHistoryData(
-          verificationRequests = Seq(
-            VerificationRequestData(
-              verificationNumber = "V001",
-              dateSubmitted = LocalDate.of(2026, 3, 31),
-              taxYear = 2025
-            )
-          )
-        )
+        val exception = intercept[IllegalStateException] {
+          service.toVerificationHistoryData(response)
+        }
+
+        exception.getMessage must include("no matching accepted submission")
       }
 
-      "must exclude batches without a verification number or a usable date" in {
+      "must exclude batches without a verification number" in {
         val response = GetSubmittedVerificationsResponse(
           scheme = Seq.empty,
           subcontractors = Seq.empty,
@@ -293,15 +287,24 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
             )
           ),
           verifications = Seq.empty,
-          submissions = Seq.empty
+          submissions = Seq(
+            submittedSubmission(activeObjectId = Some(1L)),
+            submittedSubmission(activeObjectId = Some(2L))
+          )
         )
 
         service.toVerificationHistoryData(response) mustBe VerificationHistoryData(
-          verificationRequests = Seq.empty
+          verificationRequests = Seq(
+            VerificationRequestData(
+              verificationNumber = "V002",
+              dateSubmitted = LocalDate.of(2026, 4, 6),
+              taxYear = 2026
+            )
+          )
         )
       }
 
-      "must use the newest submission date when more than one submission exists for a batch" in {
+      "must use the newest accepted date when more than one submission exists for a batch" in {
         val response = GetSubmittedVerificationsResponse(
           scheme = Seq.empty,
           subcontractors = Seq.empty,
@@ -315,11 +318,11 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
           submissions = Seq(
             submittedSubmission(
               activeObjectId = Some(1L),
-              submissionRequestDate = Some(LocalDateTime.of(2026, 4, 6, 10, 0))
+              acceptedTime = Some("2026-04-06T10:00:00")
             ),
             submittedSubmission(
               activeObjectId = Some(1L),
-              submissionRequestDate = Some(LocalDateTime.of(2026, 6, 6, 10, 0))
+              acceptedTime = Some("2026-06-06T10:00:00")
             )
           )
         )
@@ -353,11 +356,11 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
           submissions = Seq(
             submittedSubmission(
               activeObjectId = Some(1L),
-              submissionRequestDate = Some(LocalDateTime.of(2026, 4, 5, 10, 0))
+              acceptedTime = Some("2026-04-05T10:00:00")
             ),
             submittedSubmission(
               activeObjectId = Some(2L),
-              submissionRequestDate = Some(LocalDateTime.of(2026, 4, 6, 10, 0))
+              acceptedTime = Some("2026-04-06T10:00:00")
             )
           )
         )
@@ -375,6 +378,16 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
               taxYear = 2025
             )
           )
+        )
+      }
+    }
+
+    "getSubmittedVerificationTaxYears" - {
+
+      "must return distinct tax years sorted descending" in {
+        service.getSubmittedVerificationTaxYears(data) mustBe Seq(
+          2026 -> 2027,
+          2025 -> 2026
         )
       }
     }
