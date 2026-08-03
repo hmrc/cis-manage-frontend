@@ -23,7 +23,7 @@ import models.requests.DataRequest
 import models.{CisTaxpayerSearchResult, Target}
 import pages.{AgentClientsPage, CisIdPage}
 import play.api.Logging
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.*
 import repositories.SessionRepository
 import services.{ManageService, PrepopService}
@@ -56,7 +56,7 @@ class AgentLandingController @Inject() (
     (identify andThen getData andThen requireData).async { implicit request =>
       implicit val config: FrontendAppConfig = appConfig
       implicit val hc: HeaderCarrier         = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
+      implicit val messages: Messages        = messagesApi.preferred(request)
       (for {
         updatedUserAnswers <- Future.fromTry(request.userAnswers.set(CisIdPage, uniqueId))
         _                  <- sessionRepository.set(updatedUserAnswers)
@@ -64,7 +64,7 @@ class AgentLandingController @Inject() (
       } yield Ok(
         view(
           uniqueId = uniqueId,
-          agentName = request.itmpName.getOrElse("No name"),
+          agentName = request.itmpName.getOrElse(messages("agent.landing.agentName.noName")),
           schemeName = viewModel.schemeName,
           employerRef = viewModel.employerRef
         )

@@ -17,26 +17,24 @@
 package controllers.agent
 
 import base.SpecBase
+import models.{CisTaxpayerSearchResult, Scheme, UserAnswers}
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.*
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
+import org.scalatestplus.mockito.MockitoSugar
+import pages.{AgentClientsPage, CisIdPage}
 import play.api.Application
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.ArgumentCaptor
-import org.mockito.Mockito.*
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
-import org.scalatestplus.mockito.MockitoSugar
-import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
-import scala.concurrent.Future
-import models.{CisTaxpayerSearchResult, Scheme, UserAnswers}
-import pages.{AgentClientsPage, CisIdPage}
 import repositories.SessionRepository
 import services.{ManageService, PrepopService}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import viewmodels.agent.AgentLandingViewModel
 
-import scala.collection.mutable.ListBuffer
-import scala.util.Try
+import scala.concurrent.Future
 
 class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterAll with BeforeAndAfterEach {
 
@@ -79,13 +77,9 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
     bind[PrepopService].toInstance(mockPrepopService)
   )
 
-  private val builtApplications = ListBuffer.empty[Application]
-
-  private def withApplication[T](application: Application)(block: => T): T = {
-    builtApplications += application
+  private def withApplication[T](application: Application)(block: => T): T =
     try block
     finally application.stop().futureValue
-  }
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -95,12 +89,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
   override def afterEach(): Unit = {
     reset(mockManageService, mockSessionRepository, mockPrepopService)
     super.afterEach()
-  }
-
-  override def afterAll(): Unit = {
-    builtApplications.foreach(application => Try(application.stop().futureValue))
-    builtApplications.clear()
-    super.afterAll()
   }
 
   "AgentLandingController.onPageLoad" - {
