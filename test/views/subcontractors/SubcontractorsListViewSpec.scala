@@ -362,7 +362,7 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       val doc = Jsoup.parse(html.body)
 
       doc.text must include(
-        messages("subcontractorsList.noNameProvided")
+        messages("subcontractors.subcontractorsList.noNameProvided")
       )
     }
 
