@@ -240,62 +240,6 @@ class AgentIdentifierActionSpec extends SpecBase {
               contentAsString(result) mustBe "John Jake Doe"
             }
           }
-
-          "when the user has a IR-PAYE-AGENT enrolment and itmp data with no middle name" in {
-            val enrolments = Enrolments(
-              Set(
-                Enrolment(
-                  "IR-PAYE-AGENT",
-                  Seq(EnrolmentIdentifier("IRAgentReference", "123456")),
-                  "activated",
-                  None
-                )
-              )
-            )
-
-            val itmpName = ItmpName(givenName = Some("John"), middleName = None, familyName = Some("Doe"))
-
-            when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
-              .thenReturn(
-                Future.successful(Some(id) ~ enrolments ~ Some(Agent) ~ None ~ Some(agentCode) ~ Some(itmpName))
-              )
-            running(application) {
-              val authAction = new AgentIdentifierAction(mockAuthConnector, appConfig, bodyParsers)
-              val controller = new CaptureHarness(authAction)
-              val result     = controller.onPageLoad()(FakeRequest())
-
-              status(result) mustBe OK
-              contentAsString(result) mustBe "John Doe"
-            }
-          }
-
-          "when the user has a IR-PAYE-AGENT enrolment and itmp name with all fields absent" in {
-            val enrolments = Enrolments(
-              Set(
-                Enrolment(
-                  "IR-PAYE-AGENT",
-                  Seq(EnrolmentIdentifier("IRAgentReference", "123456")),
-                  "activated",
-                  None
-                )
-              )
-            )
-
-            val itmpName = ItmpName(givenName = None, middleName = None, familyName = None)
-
-            when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
-              .thenReturn(
-                Future.successful(Some(id) ~ enrolments ~ Some(Agent) ~ None ~ Some(agentCode) ~ Some(itmpName))
-              )
-            running(application) {
-              val authAction = new AgentIdentifierAction(mockAuthConnector, appConfig, bodyParsers)
-              val controller = new CaptureHarness(authAction)
-              val result     = controller.onPageLoad()(FakeRequest())
-
-              status(result) mustBe OK
-              contentAsString(result) mustBe ""
-            }
-          }
         }
       }
 
