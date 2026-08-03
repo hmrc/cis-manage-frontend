@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package views.unmatched
 
 import base.SpecBase
 import forms.unmatched.RemoveSubcontractorVerifyRequestFormProvider
-import models.NormalMode
 import org.jsoup.Jsoup
 import org.scalatest.matchers.must.Matchers
 import play.api.i18n.Messages
@@ -30,7 +29,7 @@ class RemoveSubcontractorVerifyRequestViewSpec extends SpecBase with Matchers {
   "RemoveSubcontractorVerifyRequestView" - {
 
     "must render the page with the correct title, heading, paragraphs and link" in new Setup {
-      val html = view(form, NormalMode, subcontractorName)
+      val html = view(form, subcontractorName)
       val doc  = Jsoup.parse(html.body)
 
       doc.title             must include(messages("unmatched.removeSubcontractorVerifyRequest.title"))

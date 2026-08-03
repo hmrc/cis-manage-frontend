@@ -612,11 +612,6 @@ verify.subcontractorSubmissionReceipt.summaryList.key2       =  Employer referen
 verify.subcontractorSubmissionReceipt.summaryList.key3       =  Receipt reference number
 
 # Client Details
-unmatched.removeSubcontractorVerifyRequest.title                         =  Are you sure you want to remove this subcontractor from this verification request?
-unmatched.removeSubcontractorVerifyRequest.heading                       =  Are you sure you want to remove {0} from this verification request?
-unmatched.removeSubcontractorVerifyRequest.p1                            =  This means they will remain unverified, so you must not make any payments to them.
-unmatched.removeSubcontractorVerifyRequest.error.required                =  Select yes if you want to remove this subcontractor from this verification request
-
 clientdetails.manageClientDetails.title                                  =  Client details
 clientdetails.manageClientDetails.heading                                =  {0} details
 clientdetails.manageClientDetails.employerRef.key                        =  Employers reference
@@ -719,7 +714,12 @@ securityCheck.title                                                      =  Auth
 securityCheck.h1                                                         =  Authorisation check in progress
 securityCheck.paragraph                                                  =  Do not refresh this page or press the back button while the authorisation check is in progress.
 
-unmatched.proceedSubcontractorVerifyRequest.title                        =  Are you sure you want to proceed with verifying this subcontractor
+unmatched.removeSubcontractorVerifyRequest.title                         =  Are you sure you want to remove this subcontractor from this verification request?
+unmatched.removeSubcontractorVerifyRequest.heading                       =  Are you sure you want to remove {0} from this verification request?
+unmatched.removeSubcontractorVerifyRequest.p1                            =  This means they will remain unverified, so you must not make any payments to them.
+unmatched.removeSubcontractorVerifyRequest.error.required                =  Select yes if you want to remove this subcontractor from this verification request
+
+unmatched.proceedSubcontractorVerifyRequest.title                        =  Are you sure you want to proceed with verifying this subcontractor?
 unmatched.proceedSubcontractorVerifyRequest.heading                      =  Are you sure you want to proceed with verifying {0}?
 unmatched.proceedSubcontractorVerifyRequest.p1                           =  This will assign the higher rate tax treatment to this subcontractor.
 unmatched.proceedSubcontractorVerifyRequest.error.required               =  Select yes if you want to proceed with verifying this subcontractor

@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import controllers.unmatched.routes as unmatchedRoutes
 import forms.unmatched.ProceedSubcontractorVerifyRequestFormProvider
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -44,7 +44,7 @@ class ProceedSubcontractorVerifyRequestControllerSpec extends SpecBase with Mock
   val subcontractorName = "Test Subcontractor"
 
   lazy val proceedSubcontractorVerifyRequestRoute =
-    unmatchedRoutes.ProceedSubcontractorVerifyRequestController.onPageLoad(NormalMode).url
+    unmatchedRoutes.ProceedSubcontractorVerifyRequestController.onPageLoad().url
 
   "ProceedSubcontractorVerifyRequest Controller" - {
 
@@ -60,7 +60,7 @@ class ProceedSubcontractorVerifyRequestControllerSpec extends SpecBase with Mock
         val view = application.injector.instanceOf[ProceedSubcontractorVerifyRequestView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, subcontractorName)(
+        contentAsString(result) mustEqual view(form, subcontractorName)(
           request,
           messages(application)
         ).toString
@@ -81,7 +81,7 @@ class ProceedSubcontractorVerifyRequestControllerSpec extends SpecBase with Mock
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, subcontractorName)(
+        contentAsString(result) mustEqual view(form.fill(true), subcontractorName)(
           request,
           messages(application)
         ).toString
@@ -130,7 +130,7 @@ class ProceedSubcontractorVerifyRequestControllerSpec extends SpecBase with Mock
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, subcontractorName)(
+        contentAsString(result) mustEqual view(boundForm, subcontractorName)(
           request,
           messages(application)
         ).toString

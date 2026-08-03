@@ -44,18 +44,17 @@ class ProceedSubcontractorVerifyRequestController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  val form              = formProvider()
+  val subcontractorName = "Test Subcontractor" // TODO: Make Dynamic
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-
-    val subcontractorName = "Test Subcontractor"
 
     val preparedForm = request.userAnswers.get(ProceedSubcontractorVerifyRequestPage) match {
       case None        => form
       case Some(value) => form.fill(value)
     }
 
-    Ok(view(preparedForm, mode, subcontractorName))
+    Ok(view(preparedForm, subcontractorName))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -63,8 +62,7 @@ class ProceedSubcontractorVerifyRequestController @Inject() (
       form
         .bindFromRequest()
         .fold(
-          formWithErrors =>
-            Future.successful(BadRequest(view(formWithErrors, mode, subcontractorName = "Test Subcontractor"))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, subcontractorName = subcontractorName))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(ProceedSubcontractorVerifyRequestPage, value))
