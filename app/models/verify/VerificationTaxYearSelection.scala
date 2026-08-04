@@ -39,15 +39,11 @@ object VerificationTaxYearSelection {
     override def toString: String = "all"
   }
 
-  def fromString(value: String): VerificationTaxYearSelection = {
-    val taxYearRegex = """^(\d{4}) to \d{4}.*$""".r
-
+  def fromString(value: String): VerificationTaxYearSelection =
     value match {
-      case "all"                   => AllTaxYears
-      case taxYearRegex(startYear) => TaxYear(startYear.toInt)
-      case _                       => throw new IllegalArgumentException("Invalid tax year selection")
+      case "all" => AllTaxYears
+      case _     => TaxYear(value.toInt)
     }
-  }
 
   given OFormat[TaxYearPeriod] = Json.format[TaxYearPeriod]
 

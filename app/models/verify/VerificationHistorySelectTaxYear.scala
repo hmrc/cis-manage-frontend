@@ -16,18 +16,19 @@
 
 package models.verify
 
+import models.verify.VerificationTaxYearSelection.TaxYearPeriod
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
 object VerificationHistorySelectTaxYear {
 
-  def options(taxYears: Seq[String])(implicit messages: Messages): Seq[RadioItem] = {
+  def options(taxYears: Seq[TaxYearPeriod])(implicit messages: Messages): Seq[RadioItem] = {
 
-    val yearItems = taxYears.zipWithIndex.map { case (year, index) =>
+    val yearItems = taxYears.zipWithIndex.map { case (taxYear, index) =>
       RadioItem(
-        content = Text(year),
-        value = Some(year),
+        content = Text(taxYear.toString),
+        value = Some(taxYear.startYear.toString),
         id = Some(s"value_$index")
       )
     }

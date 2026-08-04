@@ -51,7 +51,7 @@ class VerificationHistorySelectTaxYearSpec extends AnyFreeSpec with Matchers {
     "fromString must return TaxYear for tax year value" in {
 
       VerificationTaxYearSelection
-        .fromString("2026 to 2027") mustEqual TaxYear(2026)
+        .fromString("2026") mustEqual TaxYear(2026)
     }
   }
 }

@@ -15,6 +15,7 @@
  *@
 
 @import models.verify.VerificationHistorySelectTaxYear
+@import models.verify.VerificationTaxYearSelection.TaxYearPeriod
 @import viewmodels.LegendSize.Large
 
 @this(
@@ -25,7 +26,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, taxYears: Seq[String])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, taxYears: Seq[TaxYearPeriod])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("verify.verificationHistorySelectTaxYear.title"))) {
 

@@ -32,10 +32,10 @@ class VerificationTaxYearSelectionSpec extends AnyFreeSpec with Matchers {
         VerificationTaxYearSelection.fromString("all") mustEqual AllTaxYears
       }
 
-      "must return TaxYear when value is a tax year" in {
+      "must return TaxYear when value is a start year" in {
 
         VerificationTaxYearSelection
-          .fromString("2026 to 2027 (current tax year)") mustEqual
+          .fromString("2026") mustEqual
           TaxYear(2026)
       }
     }

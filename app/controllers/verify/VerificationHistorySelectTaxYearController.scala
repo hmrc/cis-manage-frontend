@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.verify.VerificationHistorySelectTaxYearFormProvider
 import models.Mode
 import models.verify.{VerificationHistoryData, VerificationTaxYearSelection}
-import models.verify.VerificationTaxYearSelection.{AllTaxYears, TaxYear}
+import models.verify.VerificationTaxYearSelection.{AllTaxYears, TaxYear, TaxYearPeriod}
 import pages.verify.{VerificationHistoryDataPage, VerificationHistorySelectTaxYearPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -50,22 +50,24 @@ class VerificationHistorySelectTaxYearController @Inject() (
   private def selectionFrom(value: String): VerificationTaxYearSelection =
     VerificationTaxYearSelection.fromString(value)
 
-  private def taxYearStrings(data: VerificationHistoryData): Seq[String] =
+  private def taxYears(data: VerificationHistoryData): Seq[TaxYearPeriod] =
     verificationHistoryService
       .getSubmittedVerificationTaxYears(data)
-      .map(_.toString)
+
+  private def validValues(taxYears: Seq[TaxYearPeriod]): Seq[String] =
+    taxYears.map(_.startYear.toString)
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(VerificationHistoryDataPage) match {
         case Some(data) =>
-          val years = taxYearStrings(data)
-          val form  = formProvider(years)
+          val years = taxYears(data)
+          val form  = formProvider(validValues(years))
 
           val preparedForm =
             request.userAnswers.get(VerificationHistorySelectTaxYearPage) match {
               case Some(AllTaxYears) => form.fill("all")
-              case Some(TaxYear(v))  => form.fill(TaxYear(v).toString)
+              case Some(TaxYear(v))  => form.fill(v.toString)
               case None              => form
             }
 
@@ -80,8 +82,8 @@ class VerificationHistorySelectTaxYearController @Inject() (
     (identify andThen getData andThen requireData).async { implicit request =>
       request.userAnswers.get(VerificationHistoryDataPage) match {
         case Some(data) =>
-          val years = taxYearStrings(data)
-          val form  = formProvider(years)
+          val years = taxYears(data)
+          val form  = formProvider(validValues(years))
 
           form
             .bindFromRequest()
