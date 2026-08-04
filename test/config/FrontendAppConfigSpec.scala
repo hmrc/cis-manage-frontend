@@ -163,7 +163,7 @@ class FrontendAppConfigSpec extends SpecBase {
 
     "must contain the type of subcontractor URL" in new Setup {
       appConfig.cisTypeOfSubcontractorUrl mustBe
-        "http://localhost:6998/construction-industry-scheme/subcontractor/add/type-of-subcontractor"
+        "http://localhost:6998/construction-industry-scheme/subcontractor"
     }
   }
 
