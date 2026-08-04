@@ -20,6 +20,7 @@ import base.SpecBase
 import models.UserAnswers
 import models.response.GetSubmittedVerificationsResponse
 import models.verify.{VerificationHistoryData, VerificationRequestData}
+import models.verify.VerificationTaxYearSelection.{TaxYear, TaxYearPeriod}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
@@ -89,7 +90,7 @@ class GetSubmittedVerificationsControllerSpec extends SpecBase with MockitoSugar
     "must redirect to the select tax year page when there is more than one tax year" in new Setup {
       when(mockVerificationHistoryService.toVerificationHistoryData(response)).thenReturn(multiYearData)
       when(mockVerificationHistoryService.getSubmittedVerificationTaxYears(multiYearData))
-        .thenReturn(Seq(2026 -> 2027, 2024 -> 2025))
+        .thenReturn(Seq(TaxYearPeriod(2026), TaxYearPeriod(2024)))
 
       val app = application
 
@@ -105,7 +106,7 @@ class GetSubmittedVerificationsControllerSpec extends SpecBase with MockitoSugar
     "must redirect to single year history and store the only tax year when there is one tax year" in new Setup {
       when(mockVerificationHistoryService.toVerificationHistoryData(response)).thenReturn(singleYearData)
       when(mockVerificationHistoryService.getSubmittedVerificationTaxYears(singleYearData))
-        .thenReturn(Seq(2024 -> 2025))
+        .thenReturn(Seq(TaxYearPeriod(2024)))
 
       val app = application
 
@@ -118,7 +119,7 @@ class GetSubmittedVerificationsControllerSpec extends SpecBase with MockitoSugar
 
         val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
         verify(mockSessionRepository).set(captor.capture())
-        captor.getValue.get(VerificationHistorySelectTaxYearPage).value.toString mustEqual "2024 to 2025"
+        captor.getValue.get(VerificationHistorySelectTaxYearPage).value mustEqual TaxYear(2024)
       }
     }
 

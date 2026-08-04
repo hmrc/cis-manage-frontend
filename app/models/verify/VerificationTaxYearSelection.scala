@@ -17,23 +17,39 @@
 package models.verify
 
 import play.api.libs.json.*
-import models.verify.VerificationTaxYearSelection.TaxYear
+import models.verify.VerificationTaxYearSelection.{TaxYear, TaxYearPeriod}
 
 sealed trait VerificationTaxYearSelection
 
 object VerificationTaxYearSelection {
 
-  case class TaxYear(value: String) extends VerificationTaxYearSelection {
-    override def toString: String = value
+  case class TaxYearPeriod(startYear: Int) {
+    val endYear: Int = startYear + 1
+
+    override def toString: String = s"$startYear to $endYear"
+  }
+
+  case class TaxYear(startYear: Int) extends VerificationTaxYearSelection {
+    val period: TaxYearPeriod = TaxYearPeriod(startYear)
+
+    override def toString: String = period.toString
   }
 
   case object AllTaxYears extends VerificationTaxYearSelection {
     override def toString: String = "all"
   }
 
-  def fromString(value: String): VerificationTaxYearSelection =
-    if (value == "all") AllTaxYears
-    else TaxYear(value)
+  def fromString(value: String): VerificationTaxYearSelection = {
+    val taxYearRegex = """^(\d{4}) to \d{4}.*$""".r
+
+    value match {
+      case "all"                   => AllTaxYears
+      case taxYearRegex(startYear) => TaxYear(startYear.toInt)
+      case _                       => throw new IllegalArgumentException("Invalid tax year selection")
+    }
+  }
+
+  given OFormat[TaxYearPeriod] = Json.format[TaxYearPeriod]
 
   given OFormat[TaxYear] = Json.format[TaxYear]
 

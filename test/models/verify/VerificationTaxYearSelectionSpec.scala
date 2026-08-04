@@ -36,7 +36,16 @@ class VerificationTaxYearSelectionSpec extends AnyFreeSpec with Matchers {
 
         VerificationTaxYearSelection
           .fromString("2026 to 2027 (current tax year)") mustEqual
-          TaxYear("2026 to 2027 (current tax year)")
+          TaxYear(2026)
+      }
+    }
+
+    "TaxYearPeriod" - {
+
+      "must derive end year and display value from start year" in {
+
+        TaxYearPeriod(2026).endYear mustEqual 2027
+        TaxYearPeriod(2026).toString mustEqual "2026 to 2027"
       }
     }
 
@@ -44,9 +53,9 @@ class VerificationTaxYearSelectionSpec extends AnyFreeSpec with Matchers {
 
       "must serialise TaxYear" in {
 
-        Json.toJson(TaxYear("2026 to 2027")) mustEqual
+        Json.toJson(TaxYear(2026)) mustEqual
           Json.obj(
-            "value" -> "2026 to 2027"
+            "startYear" -> 2026
           )
       }
 
@@ -54,10 +63,10 @@ class VerificationTaxYearSelectionSpec extends AnyFreeSpec with Matchers {
 
         Json
           .obj(
-            "value" -> "2026 to 2027"
+            "startYear" -> 2026
           )
           .as[TaxYear] mustEqual
-          TaxYear("2026 to 2027")
+          TaxYear(2026)
       }
     }
 
@@ -96,11 +105,11 @@ class VerificationTaxYearSelectionSpec extends AnyFreeSpec with Matchers {
       "must serialise TaxYear selection" in {
 
         val value: VerificationTaxYearSelection =
-          TaxYear("2025 to 2026")
+          TaxYear(2025)
 
         Json.toJson(value) mustEqual
           Json.obj(
-            "value" -> "2025 to 2026"
+            "startYear" -> 2025
           )
       }
 
@@ -119,10 +128,10 @@ class VerificationTaxYearSelectionSpec extends AnyFreeSpec with Matchers {
 
         Json
           .obj(
-            "value" -> "2024 to 2025"
+            "startYear" -> 2024
           )
           .as[VerificationTaxYearSelection] mustEqual
-          TaxYear("2024 to 2025")
+          TaxYear(2024)
       }
 
       "must deserialise AllTaxYears selection" in {

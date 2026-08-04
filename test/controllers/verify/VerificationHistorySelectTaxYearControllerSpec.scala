@@ -124,7 +124,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
       val userAnswers = userAnswersWithVerificationHistoryData
         .set(
           VerificationHistorySelectTaxYearPage,
-          TaxYear(selectedYear)
+          TaxYear(2026)
         )
         .success
         .value

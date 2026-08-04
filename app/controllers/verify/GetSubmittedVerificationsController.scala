@@ -67,8 +67,8 @@ class GetSubmittedVerificationsController @Inject() (
                       Redirect(controllers.verify.routes.NoVerificationHistoryController.onPageLoad())
                     }
 
-                case Seq((start, end)) =>
-                  updatedAnswers.set(VerificationHistorySelectTaxYearPage, TaxYear(s"$start to $end")) match {
+                case Seq(taxYear) =>
+                  updatedAnswers.set(VerificationHistorySelectTaxYearPage, TaxYear(taxYear.startYear)) match {
                     case Success(answersWithTaxYear) =>
                       sessionRepository
                         .set(answersWithTaxYear)

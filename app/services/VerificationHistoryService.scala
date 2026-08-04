@@ -17,6 +17,7 @@
 package services
 
 import models.verify.*
+import models.verify.VerificationTaxYearSelection.TaxYearPeriod
 import viewmodels.*
 
 import java.time.format.DateTimeFormatter
@@ -31,11 +32,11 @@ class VerificationHistoryService @Inject() () {
 
   private val displayDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM yyyy")
 
-  def getSubmittedVerificationTaxYears(data: VerificationHistoryData): Seq[(Int, Int)] =
+  def getSubmittedVerificationTaxYears(data: VerificationHistoryData): Seq[TaxYearPeriod] =
     data.verificationRequests
-      .map(request => request.taxYear -> (request.taxYear + 1))
+      .map(request => TaxYearPeriod(request.taxYear))
       .distinct
-      .sortBy(_._1)(Ordering.Int.reverse)
+      .sortBy(_.startYear)(Ordering.Int.reverse)
 
   def buildAllYearsViewModel(
     data: VerificationHistoryData,

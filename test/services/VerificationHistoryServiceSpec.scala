@@ -17,6 +17,7 @@
 package services
 
 import models.verify.{VerificationHistoryData, VerificationRequestData}
+import models.verify.VerificationTaxYearSelection.TaxYearPeriod
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
@@ -386,8 +387,8 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers {
 
       "must return distinct tax years sorted descending" in {
         service.getSubmittedVerificationTaxYears(data) mustBe Seq(
-          2026 -> 2027,
-          2025 -> 2026
+          TaxYearPeriod(2026),
+          TaxYearPeriod(2025)
         )
       }
     }

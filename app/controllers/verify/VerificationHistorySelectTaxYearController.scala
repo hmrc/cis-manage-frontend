@@ -48,12 +48,12 @@ class VerificationHistorySelectTaxYearController @Inject() (
     with I18nSupport {
 
   private def selectionFrom(value: String): VerificationTaxYearSelection =
-    if (value == "all") AllTaxYears else TaxYear(value)
+    VerificationTaxYearSelection.fromString(value)
 
   private def taxYearStrings(data: VerificationHistoryData): Seq[String] =
     verificationHistoryService
       .getSubmittedVerificationTaxYears(data)
-      .map { case (start, end) => s"$start to $end" }
+      .map(_.toString)
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
@@ -65,7 +65,7 @@ class VerificationHistorySelectTaxYearController @Inject() (
           val preparedForm =
             request.userAnswers.get(VerificationHistorySelectTaxYearPage) match {
               case Some(AllTaxYears) => form.fill("all")
-              case Some(TaxYear(v))  => form.fill(v)
+              case Some(TaxYear(v))  => form.fill(TaxYear(v).toString)
               case None              => form
             }
 

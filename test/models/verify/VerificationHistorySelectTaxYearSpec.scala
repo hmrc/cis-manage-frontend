@@ -27,7 +27,7 @@ class VerificationHistorySelectTaxYearSpec extends AnyFreeSpec with Matchers {
 
     "must serialise and deserialise TaxYear" in {
 
-      val model = TaxYear("2026 to 2027")
+      val model = TaxYear(2026)
 
       val json = Json.toJson(model)
 
@@ -51,7 +51,7 @@ class VerificationHistorySelectTaxYearSpec extends AnyFreeSpec with Matchers {
     "fromString must return TaxYear for tax year value" in {
 
       VerificationTaxYearSelection
-        .fromString("2026 to 2027") mustEqual TaxYear("2026 to 2027")
+        .fromString("2026 to 2027") mustEqual TaxYear(2026)
     }
   }
 }
