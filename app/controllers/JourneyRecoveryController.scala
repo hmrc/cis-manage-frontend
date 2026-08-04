@@ -17,6 +17,7 @@
 package controllers
 
 import config.FrontendAppConfig
+import controllers.actions.{CisIdRequiredAction, DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -29,6 +30,10 @@ import javax.inject.Inject
 
 class JourneyRecoveryController @Inject() (
   val controllerComponents: MessagesControllerComponents,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  requireCisId: CisIdRequiredAction,
   continueView: JourneyRecoveryContinueView,
   startAgainView: JourneyRecoveryStartAgainView
 )(implicit appConfig: FrontendAppConfig)
@@ -36,7 +41,15 @@ class JourneyRecoveryController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(continueUrl: Option[RedirectUrl] = None): Action[AnyContent] = Action { implicit request =>
+  def onPageLoad(continueUrl: Option[RedirectUrl] = None): Action[AnyContent] = (identify andThen getData andThen
+    requireData andThen requireCisId) { implicit request =>
+
+    val cisAccountUrl =
+      if (request.isAgent) {
+        s"${appConfig.constructionIndustryAgentAccountUrl}${request.cisId}"
+      } else {
+        appConfig.constructionIndustryOrgAccountUrl
+      }
 
     val safeUrl: Option[String] = continueUrl.flatMap { unsafeUrl =>
       unsafeUrl.getEither(OnlyRelative) match {
@@ -50,6 +63,6 @@ class JourneyRecoveryController @Inject() (
 
     safeUrl
       .map(url => Ok(continueView(url)))
-      .getOrElse(Ok(startAgainView()))
+      .getOrElse(Ok(startAgainView(cisAccountUrl)))
   }
 }

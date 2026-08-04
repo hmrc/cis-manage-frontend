@@ -136,10 +136,9 @@ GET   /history/monthly-return-history/in-progress-return/:monthlyReturnId  contr
 GET   /history/amend/:taxYear/:taxMonth                                    controllers.history.SubmittedReturnsController.startAmendment(taxYear: Int, taxMonth: Int)
 GET   /monthly-return/confirmation-history                                 controllers.history.SubmittedReturnsController.viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String)
 
-GET   /no-return-submitted                                                      controllers.history.NoReturnsSubmittedController.onPageLoad()
-GET   /no-incomplete-returns                                                    controllers.history.NoIncompleteReturnsController.onPageLoad()
+GET   /no-return-submitted  controllers.history.NoReturnsSubmittedController.onPageLoad()
 
-# Amend
+GET   /no-incomplete-returns  controllers.history.NoIncompleteReturnsController.onPageLoad()
 
 # Notices & Statements
 GET  /manage-notices-statements/:instanceId  controllers.notices.ManageNoticesStatementsController.onPageLoad(instanceId: String)

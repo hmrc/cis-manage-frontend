@@ -74,6 +74,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("features.welsh-translation")
 
+  lazy val contactHMRCUrl: String = configuration.get[String]("urls.contactHMRC")
+
+  lazy val constructionIndustryAgentAccountUrl: String =
+    configuration.get[String]("urls.constructionIndustryAgentAccount")
+  lazy val constructionIndustryOrgAccountUrl: String   = configuration.get[String]("urls.constructionIndustryOrgAccount")
+
   def languageMap: Map[String, Lang] = Map(
     "en" -> Lang("en"),
     "cy" -> Lang("cy")
