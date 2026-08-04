@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.amend
+package controllers.history
 
 import controllers.actions.*
 import pages.CisIdPage
@@ -22,7 +22,7 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.amend.NoReturnsSubmittedView
+import views.html.history.NoReturnsSubmittedView
 
 import javax.inject.Inject
 

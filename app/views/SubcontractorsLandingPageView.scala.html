@@ -19,28 +19,24 @@
 
 @this(
     layout: templates.Layout,
-    govukButton: GovukButton,
     govukInsetText: GovukInsetText,
     h1: H1,
-    h2: H2,
     link: Link,
     paragraph: Paragraph,
     aside: Aside,
     nav: Nav,
     twoColumnGrid: TwoColumnGrid,
     oneColumnGrid: OneColumnGrid,
-    headingLink: HeadingLink,
-    sectionBreak: SectionBreak,
-    caption: Caption,
+    ptaCard: PtaCard
 )
 
-@(contractorName: String)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
+@()(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
 
 @sidebar = {
     @aside("contractorLanding.sidebar.title", nav(Seq(
-        "subcontractorsLandingPage.aside.link1" -> config.govUkCISGuidanceUrl,
-        "subcontractorsLandingPage.aside.link2" -> config.cisMonthlyReturnsGuidanceUrl,
-        "subcontractorsLandingPage.aside.link3" -> config.cis340PenaltiesForLateReturnsUrl,
+        "subcontractorsLandingPage.aside.link1" -> config.cisContractorsGuidanceUrl,
+        "subcontractorsLandingPage.aside.link2" -> config.cisUpdatesUrl,
+        "subcontractorsLandingPage.aside.link3" -> config.cisMoreInformationUrl,
     )))
 }
 
@@ -50,42 +46,56 @@
     sidebar = Some(sidebar)
 ) {
 
-    @caption(messages(contractorName))
     @h1(messages("subcontractorsLandingPage.heading"))
     @paragraph(messages("subcontractorsLandingPage.p1"))
 
     @govukInsetText(
-        InsetTextViewModel(content = HtmlContent(paragraph("subcontractorsLandingPage.hint")))
-    )
-
-    @twoColumnGrid(
-        HtmlFormat.fill(Seq(
-            headingLink("subcontractorsLandingPage.addSubcontractors", config.cisTypeOfSubcontractorUrl),
-            paragraph("subcontractorsLandingPage.addSubcontractors.p1")
-        )),
-        HtmlFormat.fill(Seq(
-            headingLink("subcontractorsLandingPage.verifySubcontractors", config.cisVerifySubcontractorUrl),
-            paragraph("subcontractorsLandingPage.verifySubcontractors.p1")
+        InsetTextViewModel(content = HtmlContent(
+            link(
+                linkTextKey = "subcontractorsLandingPage.hint.link",
+                linkUrl = config.commercialSoftwareSuppliersUrl,
+                prefixTextKey = "subcontractorsLandingPage.hint.prefix",
+                suffixTextKey = "subcontractorsLandingPage.hint.suffix"
+            )
         ))
     )
 
+    @twoColumnGrid(
+        ptaCard(
+            title = messages("subcontractorsLandingPage.addSubcontractors"),
+            link = config.cisTypeOfSubcontractorUrl,
+            content = Html(messages("subcontractorsLandingPage.addSubcontractors.p1")),
+            id = Some("add-new-subcontractor")
+        ),
+        ptaCard(
+            title = messages("subcontractorsLandingPage.viewSubcontractors"),
+            link = "#",
+            content = Html(messages("subcontractorsLandingPage.viewSubcontractors.p1")),
+            id = Some("view-your-subcontractors")
+        )
+    )
+
+    @twoColumnGrid(
+        ptaCard(
+            title = messages("subcontractorsLandingPage.viewVerificationHistory"),
+            link = "#",
+            content = Html(messages("subcontractorsLandingPage.viewVerificationHistory.p1")),
+            id = Some("review-your-verification-history")
+        ),
+        ptaCard(
+            title = messages("subcontractorsLandingPage.verifySubcontractors"),
+            link = config.cisVerifySubcontractorUrl,
+            content = Html(messages("subcontractorsLandingPage.verifySubcontractors.p1")),
+            id = Some("verify-subcontractors")
+        )
+    )
+
     @oneColumnGrid(
-        HtmlFormat.fill(Seq(
-            headingLink("subcontractorsLandingPage.subcontractorList",
-            controllers.subcontractors.routes.GetSubcontractorListController.onPageLoad().url
-          ),
-            paragraph("subcontractorsLandingPage.subcontractorList.p1")
-        )),
+        ptaCard(
+            title = messages("subcontractorsLandingPage.checkResults"),
+            link = "#",
+            content = Html(messages("subcontractorsLandingPage.checkResults.p1")),
+            id = Some("check-results")
+        )
     )
-
-    @sectionBreak()
-
-    @h2(messages("subcontractorsLandingPage.h2"))
-    @link(
-        linkTextKey = "subcontractorsLandingPage.p2.link",
-        linkUrl = config.cisSubcontractorGrossPaymentStatusUrl,
-        hasFullStop = true,
-        prefixTextKey = "subcontractorsLandingPage.p2"
-    )
-    @paragraph(messages("subcontractorsLandingPage.p3"))
 }

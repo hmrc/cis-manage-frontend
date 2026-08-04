@@ -41,6 +41,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val signOutUrl: String                                 = configuration.get[String]("urls.signOut")
   lazy val govUkCISGuidanceUrl: String                        = configuration.get[String]("urls.govUkCISGuidance")
   lazy val commercialSoftwareSuppliersUrl: String             = configuration.get[String]("urls.commercialSoftwareSuppliers")
+  lazy val cisContractorsGuidanceUrl: String                  = configuration.get[String]("urls.cisContractorsGuidance")
+  lazy val cisUpdatesUrl: String                              = configuration.get[String]("urls.cisUpdates")
+  lazy val cisMoreInformationUrl: String                      = configuration.get[String]("urls.cisMoreInformation")
   lazy val technicalSupportWithHmrcOnlineServicesUrl: String  =
     configuration.get[String]("urls.technicalSupportWithHmrcOnlineServices")
   lazy val registerAsAProfessionalTaxAgentWithHmrcUrl: String =
@@ -81,15 +84,16 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   lazy val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 
-  lazy val contractorLandingWhatIsUrl: String    = configuration.get[String]("urls.contractorLandingWhatIsUrl")
-  lazy val contractorLandingGuidanceUrl: String  = configuration.get[String]("urls.contractorLandingGuidanceUrl")
-  lazy val contractorLandingPenaltiesUrl: String = configuration.get[String]("urls.contractorLandingPenaltiesUrl")
+  lazy val contractorLandingWhatIsUrl: String    = configuration.get[String]("urls.cisGuideUrl")
+  lazy val contractorLandingGuidanceUrl: String  = configuration.get[String]("urls.cisPayEmployerPayeUrl")
+  lazy val contractorLandingPenaltiesUrl: String = configuration.get[String]("urls.cisCheckPenaltiesUrl")
 
   private lazy val cisFrontendBaseUrl: String                       = configuration.get[String]("cis-frontend.host")
   private lazy val portalAccountBaseUrl: String                     = configuration.get[String]("portal-account.host")
   private lazy val fileStandardReturnPath: String                   = configuration.get[String]("urls.fileStandardReturn")
   private lazy val fileNilReturnPath: String                        = configuration.get[String]("urls.fileNilReturn")
   private lazy val continueReturnJourneyPath: String                = configuration.get[String]("urls.continueReturnJourney")
+  private lazy val continueAmendReturnJourneyPath: String           = configuration.get[String]("urls.continueAmendReturnJourney")
   private lazy val confirmAmendmentPath: String                     = configuration.get[String]("urls.confirmAmendment")
   private lazy val submissionInProgressPath: String                 = configuration.get[String]("urls.submissionInProgress")
   private lazy val submissionUnsuccessfulCannotResubmitPath: String =
@@ -115,6 +119,15 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   def continueReturnJourneyUrl(instanceId: String, taxYear: String, taxMonth: String): String =
     s"$cisFrontendBaseUrl$continueReturnJourneyPath" +
       s"?instanceId=$instanceId&taxYear=$taxYear&taxMonth=$taxMonth"
+
+  def continueAmendReturnJourneyUrl(
+    instanceId: String,
+    taxYear: String,
+    taxMonth: String,
+    isOriginalNilReturn: Boolean
+  ): String =
+    s"$cisFrontendBaseUrl$continueAmendReturnJourneyPath" +
+      s"?instanceId=$instanceId&taxYear=$taxYear&taxMonth=$taxMonth&isOriginalNilReturn=$isOriginalNilReturn"
 
   def confirmAmendmentUrl(handoffId: String): String =
     s"$cisFrontendBaseUrl$confirmAmendmentPath?handoffId=$handoffId"

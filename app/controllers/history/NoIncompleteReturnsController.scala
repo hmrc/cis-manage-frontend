@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,34 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.history
 
-import config.FrontendAppConfig
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.*
+import pages.CisIdPage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.SubcontractorsLandingPageView
+import views.html.history.NoIncompleteReturnsView
 
 import javax.inject.Inject
 
-class SubcontractorsLandingPageController @Inject() (
+class NoIncompleteReturnsController @Inject() (
   override val messagesApi: MessagesApi,
-  val controllerComponents: MessagesControllerComponents,
-  view: SubcontractorsLandingPageView,
-  getData: DataRetrievalAction,
   identify: IdentifierAction,
-  requireData: DataRequiredAction
-)(implicit appConfig: FrontendAppConfig)
-    extends FrontendBaseController
-    with I18nSupport {
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: NoIncompleteReturnsView
+) extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
-  def onPageLoad(instanceId: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      Ok(view())
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    val cisId = request.userAnswers.get(CisIdPage).getOrElse {
+      logger.error("[NoIncompleteReturnsController] cisId missing from userAnswers")
+      throw new IllegalStateException("cisId missing from userAnswers")
     }
+    Ok(view(cisId))
+  }
 }

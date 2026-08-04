@@ -26,7 +26,7 @@
     bulletListWithLinks: BulletListWithLinks
 )
 
-@()(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
+@(authoriseClientRequestUrl: String)(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
 @layout(
     pageTitle = titleNoForm(messages("agent.noAuthorisedClients.title")),
@@ -43,7 +43,7 @@
     @bulletListWithLinks(Seq(
         link(
             "agent.noAuthorisedClients.listItem1.link",
-            appConfig.registerAsAProfessionalTaxAgentWithHmrcUrl,
+            authoriseClientRequestUrl,
             paragraphWrapped = false,
             prefixTextKey = "agent.noAuthorisedClients.listItem1",
         ),

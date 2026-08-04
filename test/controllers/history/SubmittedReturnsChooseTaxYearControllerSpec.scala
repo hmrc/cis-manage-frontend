@@ -125,7 +125,7 @@ class SubmittedReturnsChooseTaxYearControllerSpec extends SpecBase with MockitoS
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          controllers.amend.routes.NoReturnsSubmittedController.onPageLoad().url
+          controllers.history.routes.NoReturnsSubmittedController.onPageLoad().url
       }
     }
 
