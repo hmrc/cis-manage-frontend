@@ -20,6 +20,7 @@ import base.SpecBase
 import forms.subcontractors.SubcontractorsListFormProvider
 import models.{Mode, NormalMode, UserAnswers}
 import models.response.{GetSubcontractor, GetSubcontractorListResponse}
+import org.jsoup.Jsoup
 import pages.subcontractors.SubcontractorListPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -28,6 +29,7 @@ import viewmodels.subcontractors.{SubcontractorsListRow, TaxTreatment}
 import views.html.subcontractors.SubcontractorsListView
 
 import java.time.LocalDateTime
+import scala.jdk.CollectionConverters.*
 
 class SubcontractorsListControllerSpec extends SpecBase {
 
@@ -103,10 +105,12 @@ class SubcontractorsListControllerSpec extends SpecBase {
       subbieResourceRef = Some(20L),
       matched = None,
       autoVerified = None,
-      verified = Some("N"),
+      verified = Some("Y"),
       verificationNumber = Some("V000002"),
-      taxTreatment = Some("Higher Rate"),
-      verificationDate = None,
+      taxTreatment = Some("Gross"),
+      verificationDate = Some(
+        LocalDateTime.of(2026, 5, 1, 0, 0)
+      ),
       version = None,
       updatedTaxTreatment = None,
       lastMonthlyReturnDate = None,
@@ -133,9 +137,9 @@ class SubcontractorsListControllerSpec extends SpecBase {
       id = "2",
       name = "Jones, Brian",
       utr = "9876543210",
-      verified = false,
+      verified = true,
       verificationNumber = "V000002",
-      taxTreatment = TaxTreatment.Unknown,
+      taxTreatment = TaxTreatment.Gross,
       dateAdded = "6 May 2026",
       subbieResourceRef = 20L
     )
@@ -542,14 +546,29 @@ class SubcontractorsListControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
 
-        val page =
-          contentAsString(result)
+        val doc =
+          Jsoup.parse(contentAsString(result))
 
-        page must include("Smith, Alan")
+        val smithRow =
+          doc
+            .select("tr")
+            .asScala
+            .find(_.text().contains("Smith, Alan"))
+            .getOrElse(fail("Could not find row for Smith, Alan"))
 
-        page must include(messages(application)("site.no"))
+        smithRow.text() must include(messages(application)("site.no"))
+        smithRow.text() must include(messages(application)("site.unknown"))
+        smithRow.text() must not include "V000001"
 
-        page must include(messages(application)("site.unknown"))
+        val jonesRow =
+          doc
+            .select("tr")
+            .asScala
+            .find(_.text().contains("Jones, Brian"))
+            .getOrElse(fail("Could not find row for Jones, Brian"))
+
+        jonesRow.text() must include(messages(application)("site.yes"))
+        jonesRow.text() must include("V000002")
       }
     }
 

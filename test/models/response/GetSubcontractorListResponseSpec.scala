@@ -156,13 +156,13 @@ class GetSubcontractorListResponseSpec extends SpecBase {
         .displayName mustEqual Some("Smith, Alan")
     }
 
-    "must return None for an unknown subcontractor type" in {
+    "must return trading name for an unknown subcontractor type" in {
       subcontractor
         .copy(
           subcontractorType = Some("unknown"),
           tradingName = Some("Alan Smith Builders")
         )
-        .displayName mustEqual None
+        .displayName mustEqual Some("Alan Smith Builders")
     }
 
     "must return None where no applicable name is available" in {

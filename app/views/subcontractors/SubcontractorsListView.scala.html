@@ -242,31 +242,31 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
                  rows = rows.map { row =>
 
                 val displayName =
-                if (row.name.nonEmpty) {
-                row.name
-                } else {
-                messages("subcontractors.subcontractorsList.noNameProvided")
-                }
+                    if (row.name.nonEmpty) {
+                        row.name
+                    } else {
+                        messages("subcontractors.subcontractorsList.noNameProvided")
+                    }
 
                 Seq(
                 TableRow(
-                content = HtmlContent(
-                Html(
-                s"""
-                |<a href="#" class="govuk-link">
-                |  ${HtmlFormat.escape(displayName)}
-                |  <span class="govuk-visually-hidden">
-                |    ${HtmlFormat.escape(
-                          messages(
-                            "subcontractors.subcontractorsList.showDetailsFor",
-                            displayName
-                          )
-                        )}
-                |  </span>
-                |</a>
-                |""".stripMargin
-                )
-                ),
+                    content = HtmlContent(
+                        Html(
+                            s"""
+                            |<a href="#" class="govuk-link">
+                            |  ${HtmlFormat.escape(displayName)}
+                            |  <span class="govuk-visually-hidden">
+                            |    ${HtmlFormat.escape(
+                                      messages(
+                                        "subcontractors.subcontractorsList.showDetailsFor",
+                                        displayName
+                                      )
+                                    )}
+                            |  </span>
+                            |</a>
+                            |""".stripMargin
+                        )
+                    ),
                 attributes = Map(
                 "data-sort-value" -> displayName
                 )

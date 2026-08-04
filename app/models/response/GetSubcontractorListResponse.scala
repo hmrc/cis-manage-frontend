@@ -70,25 +70,27 @@ final case class GetSubcontractor(
   private def normalisedType: Option[String] =
     subcontractorType.map(_.trim.toLowerCase.replace(" ", ""))
 
+  private def personalNameValue: Option[String] =
+    surnameValue.map { surname =>
+      firstNameValue.fold(surname)(firstName => s"$surname, $firstName")
+    }
+
   def displayName: Option[String] =
     normalisedType match {
 
       case Some("individual") | Some("soletrader") =>
-        surnameValue
-          .map { surname =>
-            firstNameValue.fold(surname)(firstName => s"$surname, $firstName")
-          }
-          .orElse(tradingNameValue)
+        personalNameValue.orElse(tradingNameValue)
 
       case Some("company") | Some("trust") =>
         tradingNameValue
 
       case Some("partnership") =>
-        partnershipTradingNameValue
-          .orElse(tradingNameValue)
+        partnershipTradingNameValue.orElse(tradingNameValue)
 
       case _ =>
-        None
+        tradingNameValue
+          .orElse(partnershipTradingNameValue)
+          .orElse(personalNameValue)
     }
 
   private def tradingNameValue: Option[String] =

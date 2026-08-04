@@ -186,5 +186,29 @@ class ReverificationRulesSpec extends AnyWordSpec with Matchers {
 
       ReverificationRules.reverifyRequired(s, current) mustBe true
     }
+
+    "require reVerification when verificationDate is before startDate and lastMonthlyReturnDate is after currentDate" in {
+      val current = LocalDate.of(2026, 1, 25)
+      val start   = ReverificationRules.startDate(current)
+
+      val s = sub(
+        verificationDate = Some(start.minusDays(daysBeforeStart).atStartOfDay()),
+        lastMonthlyReturnDate = Some(current.plusDays(oneDay).atStartOfDay())
+      )
+
+      ReverificationRules.reverifyRequired(s, current) mustBe true
+    }
+
+    "not require reVerification when verificationDate is after currentDate but lastMonthlyReturnDate is between startDate and currentDate" in {
+      val current = LocalDate.of(2026, 1, 25)
+      val start   = ReverificationRules.startDate(current)
+
+      val s = sub(
+        verificationDate = Some(current.plusDays(oneDay).atStartOfDay()),
+        lastMonthlyReturnDate = Some(start.plusDays(daysAfterStart).atStartOfDay())
+      )
+
+      ReverificationRules.reverifyRequired(s, current) mustBe false
+    }
   }
 }
