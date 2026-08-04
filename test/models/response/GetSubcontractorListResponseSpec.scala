@@ -70,14 +70,14 @@ class GetSubcontractorListResponseSpec extends SpecBase {
 
   "GetSubcontractor" - {
 
-    "must return first name, second name and surname for a sole trader" in {
-      subcontractor.displayName mustEqual "Alan James Smith"
+    "must return surname and first name for a sole trader" in {
+      subcontractor.displayName mustEqual Some("Smith, Alan")
     }
 
-    "must return second name and surname when a sole trader has no first name" in {
+    "must return surname when a sole trader has no first name" in {
       subcontractor
         .copy(firstName = None)
-        .displayName mustEqual "James Smith"
+        .displayName mustEqual Some("Smith")
     }
 
     "must return surname when a sole trader has no first or second name" in {
@@ -86,7 +86,7 @@ class GetSubcontractorListResponseSpec extends SpecBase {
           firstName = None,
           secondName = None
         )
-        .displayName mustEqual "Smith"
+        .displayName mustEqual Some("Smith")
     }
 
     "must return trading name for a sole trader with no personal name" in {
@@ -96,7 +96,7 @@ class GetSubcontractorListResponseSpec extends SpecBase {
           secondName = None,
           surname = None
         )
-        .displayName mustEqual "Alan Smith Builders"
+        .displayName mustEqual Some("Alan Smith Builders")
     }
 
     "must return trading name for a company" in {
@@ -107,7 +107,7 @@ class GetSubcontractorListResponseSpec extends SpecBase {
           secondName = None,
           surname = None
         )
-        .displayName mustEqual "Alan Smith Builders"
+        .displayName mustEqual Some("Alan Smith Builders")
     }
 
     "must return trading name for a trust" in {
@@ -118,7 +118,7 @@ class GetSubcontractorListResponseSpec extends SpecBase {
           secondName = None,
           surname = None
         )
-        .displayName mustEqual "Alan Smith Builders"
+        .displayName mustEqual Some("Alan Smith Builders")
     }
 
     "must return partnership trading name for a partnership" in {
@@ -129,7 +129,7 @@ class GetSubcontractorListResponseSpec extends SpecBase {
           secondName = None,
           surname = None
         )
-        .displayName mustEqual "Alan Smith Partnership"
+        .displayName mustEqual Some("Alan Smith Partnership")
     }
 
     "must return trading name when partnership trading name is unavailable" in {
@@ -141,31 +141,31 @@ class GetSubcontractorListResponseSpec extends SpecBase {
           surname = None,
           partnershipTradingName = None
         )
-        .displayName mustEqual "Alan Smith Builders"
+        .displayName mustEqual Some("Alan Smith Builders")
     }
 
-    "must return personal name for an individual" in {
+    "must return personal name for soletrader" in {
       subcontractor
-        .copy(subcontractorType = Some("Individual"))
-        .displayName mustEqual "Alan James Smith"
+        .copy(subcontractorType = Some("soletrader"))
+        .displayName mustEqual Some("Smith, Alan")
     }
 
     "must return personal name for a sole trader with a spaced type value" in {
       subcontractor
         .copy(subcontractorType = Some("sole trader"))
-        .displayName mustEqual "Alan James Smith"
+        .displayName mustEqual Some("Smith, Alan")
     }
 
-    "must fall back to trading name for an unknown subcontractor type" in {
+    "must return trading name for an unknown subcontractor type" in {
       subcontractor
         .copy(
           subcontractorType = Some("unknown"),
           tradingName = Some("Alan Smith Builders")
         )
-        .displayName mustEqual "Alan Smith Builders"
+        .displayName mustEqual Some("Alan Smith Builders")
     }
 
-    "must return the default name where no applicable name is available" in {
+    "must return None where no applicable name is available" in {
       subcontractor
         .copy(
           subcontractorType = None,
@@ -175,8 +175,38 @@ class GetSubcontractorListResponseSpec extends SpecBase {
           tradingName = None,
           partnershipTradingName = None
         )
-        .displayName mustEqual "No name provided"
+        .displayName mustEqual None
     }
+
+    "must prefer surname and first name over trading name for soletrader" in {
+      subcontractor
+        .copy(
+          subcontractorType = Some("soletrader"),
+          tradingName = Some("Alan Smith Builders")
+        )
+        .displayName mustEqual Some("Smith, Alan")
+    }
+
+    "must return trading name when a soletrader has no surname" in {
+      subcontractor
+        .copy(
+          subcontractorType = Some("soletrader"),
+          surname = None,
+          tradingName = Some("Alan Smith Builders")
+        )
+        .displayName mustEqual Some("Alan Smith Builders")
+    }
+
+    "must not return first name only for a soletrader when surname is missing" in {
+      subcontractor
+        .copy(
+          subcontractorType = Some("soletrader"),
+          surname = None,
+          tradingName = None
+        )
+        .displayName mustEqual None
+    }
+
   }
 
   "GetSubcontractorListResponse" - {
@@ -197,7 +227,7 @@ class GetSubcontractorListResponseSpec extends SpecBase {
         subcontractorsJson.value.head.as[JsObject]
 
       subcontractorJson.value("subcontractorId") mustEqual Json.toJson(123L)
-      subcontractorJson.value("displayName") mustEqual JsString("Alan James Smith")
+      subcontractorJson.value("displayName") mustEqual JsString("Smith, Alan")
     }
 
     "must read a response from JSON" in {
