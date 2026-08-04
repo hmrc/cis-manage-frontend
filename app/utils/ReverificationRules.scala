@@ -33,9 +33,8 @@ object ReverificationRules {
     *         required.
     *       - else => required.
     */
-  def reverifyRequired(sub: GetSubcontractor, currentDate: LocalDate): Boolean = {
-    val isPreviouslyVerified = sub.verified.contains("Y")
-    if (!isPreviouslyVerified) {
+  def reverifyRequired(sub: GetSubcontractor, currentDate: LocalDate): Boolean =
+    if (!sub.isVerified) {
       false
     } else {
       val start = startDate(currentDate)
@@ -63,7 +62,6 @@ object ReverificationRules {
           }
       }
     }
-  }
 
   private def isBetweenInclusive(d: LocalDate, start: LocalDate, end: LocalDate): Boolean =
     !d.isBefore(start) && !d.isAfter(end)

@@ -16,6 +16,7 @@
 
 package models.response
 
+import models.subcontractors.TypeOfSubcontractor
 import play.api.libs.json.{JsString, Json, OFormat, Reads, Writes}
 
 import java.time.LocalDateTime
@@ -67,6 +68,9 @@ final case class GetSubcontractor(
   pendingVerifications: Option[Int]
 ) {
 
+  def isVerified: Boolean =
+    verified.exists(_.equalsIgnoreCase("Y"))
+
   private def normalisedType: Option[String] =
     subcontractorType.map(_.trim.toLowerCase.replace(" ", ""))
 
@@ -76,18 +80,20 @@ final case class GetSubcontractor(
     }
 
   def displayName: Option[String] =
-    normalisedType match {
+    normalisedType.flatMap(TypeOfSubcontractor.fromString) match {
 
-      case Some("individual") | Some("soletrader") =>
-        personalNameValue.orElse(tradingNameValue)
+      case Some(TypeOfSubcontractor.Individualorsoletrader) =>
+        personalNameValue
+          .orElse(tradingNameValue)
 
-      case Some("company") | Some("trust") =>
+      case Some(TypeOfSubcontractor.Limitedcompany) | Some(TypeOfSubcontractor.Trust) =>
         tradingNameValue
 
-      case Some("partnership") =>
-        partnershipTradingNameValue.orElse(tradingNameValue)
+      case Some(TypeOfSubcontractor.Partnership) =>
+        partnershipTradingNameValue
+          .orElse(tradingNameValue)
 
-      case _ =>
+      case None =>
         tradingNameValue
           .orElse(partnershipTradingNameValue)
           .orElse(personalNameValue)

@@ -128,9 +128,6 @@ class SubcontractorsListController @Inject() (
         LocalDate.now(clock)
       )
 
-    val isVerified =
-      subcontractor.verified.exists(_.equalsIgnoreCase("Y"))
-
     val verificationNumber =
       if (reverifyRequired) {
         ""
@@ -151,7 +148,7 @@ class SubcontractorsListController @Inject() (
       id = subcontractor.subcontractorId.toString,
       name = subcontractor.displayName.getOrElse(""),
       utr = subcontractor.utr.getOrElse(""),
-      verified = isVerified && !reverifyRequired,
+      verified = subcontractor.isVerified && !reverifyRequired,
       verificationNumber = verificationNumber,
       taxTreatment = taxTreatment,
       dateAdded = subcontractor.createDate
