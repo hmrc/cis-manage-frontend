@@ -75,7 +75,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     configuration.get[Boolean]("features.welsh-translation")
 
   lazy val contactHMRCUrl: String = configuration.get[String]("urls.contactHMRC")
-
+  lazy val signIntoCISURL: String = configuration.get[String]("urls.signIntoCIS")
   lazy val constructionIndustryAgentAccountUrl: String =
     configuration.get[String]("urls.constructionIndustryAgentAccount")
   lazy val constructionIndustryOrgAccountUrl: String   = configuration.get[String]("urls.constructionIndustryOrgAccount")
