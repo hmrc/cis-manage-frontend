@@ -17,7 +17,6 @@
 package controllers.history
 
 import base.SpecBase
-import controllers.history.NoReturnsSubmittedController
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.history.NoReturnsSubmittedView
