@@ -318,3 +318,20 @@
         display: block;
     }
 }
+
+@media print {
+  .govuk-link {
+    text-decoration: none !important;
+    color: black !important;
+  }
+
+  #print-this-page, .hmrc-sign-out-nav, .govuk-footer, #back-link  {
+    display: none !important;
+  }
+  .govuk-grid-column-two-thirds {
+    width:100%;
+  }
+  a[href]:after {
+    content: none !important;
+  }
+}
