@@ -32,6 +32,8 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
   private val service    = new VerificationHistoryService()
   private val instanceId = "900063"
 
+  private val receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw="
+
   private def verificationRequestData(
     verificationNumber: String,
     dateSubmitted: LocalDate,
@@ -57,8 +59,6 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
       verificationRequestData("V004", LocalDate.of(2025, 6, 6), 2025)
     )
   )
-
-  private val receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw="
 
   private def submittedScheme(): GetSubmittedContractorScheme =
     GetSubmittedContractorScheme(

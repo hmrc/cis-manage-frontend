@@ -80,7 +80,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
       submissionDate = "6 February 2027",
       contractorName = "Gary Construction Ltd",
       employerReference = "123PA000001",
-      receiptReferenceNumber = "H4WLKLISMHJZ3QAT5HXMVHIGEUPOQEJM",
+      receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
       verificationNumber = verificationNumber,
       cisId = cisId
     )

@@ -80,7 +80,7 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
     verificationNumber = verificationNumber,
     contractorName = "Gary Construction Ltd",
     employerReference = "123PA000001",
-    receiptReferenceNumber = "H4WLKLISMHJZ3QAT5HXMVHIGEUPOQEJM",
+    receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
     subcontractorsToVerify = Seq(
       SubcontractorRowViewModel("Amity Marine Contractors", "V0004528765"),
       SubcontractorRowViewModel("Brody, Martin", "V0004528765")
