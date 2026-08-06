@@ -572,6 +572,7 @@ manageNoticesStatements.searchResults.viewAll                   =  View all noti
 verify.verificationHistorySelectTaxYear.title                =  Which tax year do you want to view verification requests from?
 verify.verificationHistorySelectTaxYear.heading              =  Which tax year do you want to view verification requests from?
 verify.verificationHistorySelectTaxYear.or                   =  or
+verify.verificationHistorySelectTaxYear.currentTaxYear       =  (current tax year)
 verify.verificationHistorySelectTaxYear.viewAll              =  View all tax years
 verify.verificationHistorySelectTaxYear.error.required       =  Select a tax year
 
