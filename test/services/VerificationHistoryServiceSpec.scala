@@ -42,9 +42,9 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
       dateSubmitted = dateSubmitted,
       taxYear = taxYear,
       acceptedDateTime = dateSubmitted.atStartOfDay(),
-      contractorName = "",
-      employerReference = "",
-      receiptReferenceNumber = "",
+      contractorName = "Test Scheme",
+      employerReference = "123PA000001",
+      receiptReferenceNumber = receiptReferenceNumber,
       subcontractorsToVerify = Seq.empty,
       subcontractorsToReverify = Seq.empty
     )
@@ -58,8 +58,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
     )
   )
 
-  private val receiptReferenceNumber = "H4WLKLISMHJZ3QAT5HXMVHIGEUPOQEJM"
-  private val encodedIrMark          = "Pyy1LRJh053AE+nuyp0GJR7oESw="
+  private val receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw="
 
   private def submittedScheme(): GetSubmittedContractorScheme =
     GetSubmittedContractorScheme(
@@ -84,7 +83,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
       taxYear = taxYear,
       acceptedDateTime = acceptedDateTime,
       contractorName = "Test Scheme",
-      employerReference = "123/AB456",
+      employerReference = "123PA000001",
       receiptReferenceNumber = receiptReferenceNumber,
       subcontractorsToVerify = subcontractorsToVerify,
       subcontractorsToReverify = subcontractorsToReverify
@@ -146,7 +145,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
       activeObjectId = activeObjectId,
       status = None,
       hmrcMarkGenerated = None,
-      hmrcMarkGgis = Some(encodedIrMark),
+      hmrcMarkGgis = Some(receiptReferenceNumber),
       emailRecipient = None,
       acceptedTime = acceptedTime,
       createDate = createDate,
@@ -505,7 +504,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
         result.value.submittedDate mustBe "6 April 2026"
         result.value.verificationNumber mustBe "V001"
         result.value.contractorName mustBe "Test Scheme"
-        result.value.employerReference mustBe "123/AB456"
+        result.value.employerReference mustBe "123PA000001"
         result.value.receiptReferenceNumber mustBe receiptReferenceNumber
         result.value.subcontractorsToVerify mustBe Seq(SubcontractorRowViewModel("Amity Marine Contractors", "V001"))
         result.value.subcontractorsToReverify mustBe Seq(SubcontractorRowViewModel("Orca Industrial", "V001/L"))
@@ -530,7 +529,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
         result.value.submissionTime mustBe "14:30"
         result.value.submissionDate mustBe "6 April 2026"
         result.value.contractorName mustBe "Test Scheme"
-        result.value.employerReference mustBe "123/AB456"
+        result.value.employerReference mustBe "123PA000001"
         result.value.receiptReferenceNumber mustBe receiptReferenceNumber
         result.value.verificationNumber mustBe "V001"
       }

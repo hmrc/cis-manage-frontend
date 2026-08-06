@@ -20,7 +20,6 @@ import models.verify.*
 import models.verify.VerificationTaxYearSelection.TaxYearPeriod
 import models.response.GetSubmittedVerification
 import viewmodels.*
-import utils.IrMarkReferenceGenerator
 
 import java.time.format.DateTimeFormatter
 import javax.inject.{Inject, Singleton}
@@ -166,34 +165,35 @@ class VerificationHistoryService @Inject() () {
             verificationNumber <- batch.verificationNumber
             submission          = submissionFor(batch.verificationBatchId, response.submissions)
             acceptedDateTime    = acceptedDateTimeFor(batch.verificationBatchId, submission)
-          } yield VerificationRequestData(
-            verificationNumber = verificationNumber,
-            dateSubmitted = acceptedDateTime.toLocalDate,
-            taxYear = taxYearStart(acceptedDateTime.toLocalDate),
-            acceptedDateTime = acceptedDateTime,
-            contractorName = response.scheme.find(_.schemeId == batch.schemeId.toInt).flatMap(_.name).getOrElse(""),
-            employerReference = response.scheme
-              .find(_.schemeId == batch.schemeId.toInt)
-              .map(scheme => s"${scheme.taxOfficeNumber}/${scheme.taxOfficeReference}")
-              .getOrElse(""),
-            receiptReferenceNumber = submission.hmrcMarkGgis.map(receiptReferenceNumber).getOrElse(""),
-            subcontractorsToVerify = subcontractorsFor(
-              batch.verificationBatchId,
-              verificationNumber,
-              response.verifications,
-              response.subcontractors
+          } yield {
+            val scheme = schemeFor(batch.schemeId, response)
+
+            VerificationRequestData(
+              verificationNumber = verificationNumber,
+              dateSubmitted = acceptedDateTime.toLocalDate,
+              taxYear = taxYearStart(acceptedDateTime.toLocalDate),
+              acceptedDateTime = acceptedDateTime,
+              contractorName = contractorNameFor(scheme),
+              employerReference = scheme.accountsOfficeReference,
+              receiptReferenceNumber = receiptReferenceNumberFor(batch.verificationBatchId, submission),
+              subcontractorsToVerify = subcontractorsFor(
+                batch.verificationBatchId,
+                verificationNumber,
+                response.verifications,
+                response.subcontractors
+              )
+                .filterNot(_._1)
+                .map(_._2),
+              subcontractorsToReverify = subcontractorsFor(
+                batch.verificationBatchId,
+                verificationNumber,
+                response.verifications,
+                response.subcontractors
+              )
+                .filter(_._1)
+                .map(_._2)
             )
-              .filterNot(_._1)
-              .map(_._2),
-            subcontractorsToReverify = subcontractorsFor(
-              batch.verificationBatchId,
-              verificationNumber,
-              response.verifications,
-              response.subcontractors
-            )
-              .filter(_._1)
-              .map(_._2)
-          )
+          }
         }
         .sortBy(_.dateSubmitted)(Ordering[LocalDate].reverse)
 
@@ -201,6 +201,37 @@ class VerificationHistoryService @Inject() () {
       verificationRequests = verificationRequests
     )
   }
+
+  private def schemeFor(
+    schemeId: Long,
+    response: GetSubmittedVerificationsResponse
+  ): models.response.GetSubmittedContractorScheme =
+    response.scheme
+      .find(_.schemeId.toLong == schemeId)
+      .getOrElse {
+        throw new IllegalStateException(
+          s"Submitted verification scheme $schemeId is missing"
+        )
+      }
+
+  private def contractorNameFor(
+    scheme: models.response.GetSubmittedContractorScheme
+  ): String =
+    scheme.name.getOrElse {
+      throw new IllegalStateException(
+        s"Submitted verification scheme ${scheme.schemeId} is missing contractor name"
+      )
+    }
+
+  private def receiptReferenceNumberFor(
+    verificationBatchId: Long,
+    submission: GetSubmittedSubmission
+  ): String =
+    submission.hmrcMarkGgis.getOrElse {
+      throw new IllegalStateException(
+        s"Submitted verification $verificationBatchId is missing receipt reference number"
+      )
+    }
 
   private def taxYearStart(date: LocalDate): Int = {
     val taxYearStartDate =
@@ -249,9 +280,6 @@ class VerificationHistoryService @Inject() () {
       .getOrElse {
         throw new IllegalStateException("Unable to parse submitted verification accepted date")
       }
-
-  private def receiptReferenceNumber(irMark: String): String =
-    Try(IrMarkReferenceGenerator.fromBase64(irMark)).getOrElse(irMark)
 
   private def subcontractorsFor(
     verificationBatchId: Long,

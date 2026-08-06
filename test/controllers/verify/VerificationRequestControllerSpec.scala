@@ -52,9 +52,9 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
       dateSubmitted = dateSubmitted,
       taxYear = taxYear,
       acceptedDateTime = dateSubmitted.atStartOfDay(),
-      contractorName = "",
-      employerReference = "",
-      receiptReferenceNumber = "",
+      contractorName = "Test Scheme",
+      employerReference = "123PA000001",
+      receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
       subcontractorsToVerify = Seq.empty,
       subcontractorsToReverify = Seq.empty
     )
@@ -79,7 +79,7 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
     submittedDate = "6 February 2027",
     verificationNumber = verificationNumber,
     contractorName = "Gary Construction Ltd",
-    employerReference = "123/AB456",
+    employerReference = "123PA000001",
     receiptReferenceNumber = "H4WLKLISMHJZ3QAT5HXMVHIGEUPOQEJM",
     subcontractorsToVerify = Seq(
       SubcontractorRowViewModel("Amity Marine Contractors", "V0004528765"),

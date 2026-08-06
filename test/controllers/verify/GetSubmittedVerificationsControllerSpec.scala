@@ -50,9 +50,9 @@ class GetSubmittedVerificationsControllerSpec extends SpecBase with MockitoSugar
       dateSubmitted = dateSubmitted,
       taxYear = taxYear,
       acceptedDateTime = dateSubmitted.atStartOfDay(),
-      contractorName = "",
-      employerReference = "",
-      receiptReferenceNumber = "",
+      contractorName = "Test Scheme",
+      employerReference = "123PA000001",
+      receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
       subcontractorsToVerify = Seq.empty,
       subcontractorsToReverify = Seq.empty
     )
