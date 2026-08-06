@@ -1,59 +1,59 @@
 # Infrastructure
-service.name                              =  Construction Industry Scheme
+service.name                                            =  Construction Industry Scheme
 
-site.back                                 =  Back
-site.remove                               =  Remove
-site.change                               =  Change
-site.no                                   =  No
-site.yes                                  =  Yes
-site.continue                             =  Continue
-site.search                               =  Search
-site.start                                =  Start now
-site.startAgain                           =  Start again
-site.signIn                               =  Sign in
-site.govuk                                =  GOV.UK
-site.unknown                              =  Unknown
+site.back                                               =  Back
+site.remove                                             =  Remove
+site.change                                             =  Change
+site.no                                                 =  No
+site.yes                                                =  Yes
+site.continue                                           =  Continue
+site.search                                             =  Search
+site.start                                              =  Start now
+site.startAgain                                         =  Start again
+site.signIn                                             =  Sign in
+site.govuk                                              =  GOV.UK
+site.unknown                                            =  Unknown
 
-site.pagination.landmark                  =  Pagination
-site.pagination.previous                  =  Previous
-site.pagination.next                      =  Next
+site.pagination.landmark                                =  Pagination
+site.pagination.previous                                =  Previous
+site.pagination.next                                    =  Next
 
-site.delete                               =  Delete
-site.or                                   =  or
-site.view                                 =  View
-site.saveAndContinue                      =  Save and continue
+site.delete                                             =  Delete
+site.or                                                 =  or
+site.view                                               =  View
+site.saveAndContinue                                    =  Save and continue
 
-date.day                                  =  Day
-date.month                                =  Month
-date.year                                 =  Year
+date.day                                                =  Day
+date.month                                              =  Month
+date.year                                               =  Year
 
-date.error.day                            =  day
-date.error.month                          =  month
-date.error.year                           =  year
+date.error.day                                          =  day
+date.error.month                                        =  month
+date.error.year                                         =  year
 
-timeout.title                             =  You’re about to be signed out
-timeout.message                           =  For security reasons, you will be signed out of this service in
-timeout.keepAlive                         =  Stay signed in
-timeout.signOut                           =  Sign out
+timeout.title                                           =  You’re about to be signed out
+timeout.message                                         =  For security reasons, you will be signed out of this service in
+timeout.keepAlive                                       =  Stay signed in
+timeout.signOut                                         =  Sign out
 
-error.title.prefix                        =  Error:
+error.title.prefix                                      =  Error:
 
-error.prefix                              =  Error
+error.prefix                                            =  Error
 
-error.summary.title                       =  There is a problem
+error.summary.title                                     =  There is a problem
 
-index.title                               =  Construction Industry Scheme
-index.heading                             =  Construction Industry Scheme
-index.guidance                            =  Welcome to cis-manage-frontend. Please see the README file for a guide to getting started.
+index.title                                             =  Construction Industry Scheme
+index.heading                                           =  Construction Industry Scheme
+index.guidance                                          =  Welcome to cis-manage-frontend. Please see the README file for a guide to getting started.
 
-checkYourAnswers.title                    =  Check your answers
-checkYourAnswers.heading                  =  Check your answers
+checkYourAnswers.title                                  =  Check your answers
+checkYourAnswers.heading                                =  Check your answers
 
-journeyRecovery.continue.title            =  Sorry, there is a problem with this service
-journeyRecovery.continue.heading          =  Sorry, there is a problem with this service
-journeyRecovery.continue.guidance.p1      =  There is a problem with this service. You can return to
-journeyRecovery.continue.guidance.link    =  Construction Industry Scheme
-journeyRecovery.continue.guidance.p2      =  or try again later.
+journeyRecovery.continue.title                          =  Sorry, there is a problem with this service
+journeyRecovery.continue.heading                        =  Sorry, there is a problem with this service
+journeyRecovery.continue.guidance.p1                    =  There is a problem with this service. You can return to
+journeyRecovery.continue.guidance.link                  =  Construction Industry Scheme
+journeyRecovery.continue.guidance.p2                    =  or try again later.
 
 journeyRecovery.startAgain.title                        =  There is a problem with this service
 journeyRecovery.startAgain.heading                      =  Sorry, there is a problem with this service
@@ -64,9 +64,9 @@ journeyRecovery.startAgain.guidance.contactHMRC.suffix  =  for more help.
 journeyRecovery.startAgain.guidance.cisAccount.prefix   =  Back to
 journeyRecovery.startAgain.guidance.cisAccount.link     =  Manage your CIS account
 
-signedOut.title                           =  For your security, we signed you out
-signedOut.heading                         =  For your security, we signed you out
-signedOut.guidance                        =  We did not save your answers.
+signedOut.title                                         =  For your security, we signed you out
+signedOut.heading                                       =  For your security, we signed you out
+signedOut.guidance                                      =  We did not save your answers.
 
 # Errors & Auth
 pageNotFound.title                       =  Page not found
@@ -620,12 +620,12 @@ verify.subcontractorSubmissionReceipt.summaryList.key1       =  Contractor name
 verify.subcontractorSubmissionReceipt.summaryList.key2       =  Employer reference
 verify.subcontractorSubmissionReceipt.summaryList.key3       =  Receipt reference number
 
-verify.noVerificationHistory.title                           = No verification history
-verify.noVerificationHistory.heading                         = Verification history
-verify.noVerificationHistory.p1                              = You do not have any verification requests to show at the moment.
-verify.noVerificationHistory.p2                              = Once you create and submit one, you can print or download a copy from here.
-verify.noVerificationHistory.backTo                          = Back to
-verify.noVerificationHistory.manageYourSubcontractors.link   = Manage your subcontractors
+verify.noVerificationHistory.title                           =  No verification history
+verify.noVerificationHistory.heading                         =  Verification history
+verify.noVerificationHistory.p1                              =  You do not have any verification requests to show at the moment.
+verify.noVerificationHistory.p2                              =  Once you create and submit one, you can print or download a copy from here.
+verify.noVerificationHistory.backTo                          =  Back to
+verify.noVerificationHistory.manageYourSubcontractors.link   =  Manage your subcontractors
 
 # Client Details
 clientdetails.manageClientDetails.title                                  =  Client details
