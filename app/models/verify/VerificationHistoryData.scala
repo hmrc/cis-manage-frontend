@@ -18,7 +18,7 @@ package models.verify
 
 import play.api.libs.json.{Json, OFormat}
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 
 case class VerificationHistoryData(
   verificationRequests: Seq[VerificationRequestData]
@@ -31,7 +31,13 @@ object VerificationHistoryData {
 case class VerificationRequestData(
   verificationNumber: String,
   dateSubmitted: LocalDate,
-  taxYear: Int
+  taxYear: Int,
+  acceptedDateTime: LocalDateTime,
+  contractorName: String,
+  employerReference: String,
+  receiptReferenceNumber: String,
+  subcontractorsToVerify: Seq[SubcontractorVerificationData],
+  subcontractorsToReverify: Seq[SubcontractorVerificationData]
 )
 
 object VerificationRequestData {

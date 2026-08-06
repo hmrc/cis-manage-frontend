@@ -40,6 +40,23 @@ class GetSubmittedVerificationsControllerSpec extends SpecBase with MockitoSugar
 
   private val cisId = "1"
 
+  private def verificationRequestData(
+    verificationNumber: String,
+    dateSubmitted: LocalDate,
+    taxYear: Int
+  ): VerificationRequestData =
+    VerificationRequestData(
+      verificationNumber = verificationNumber,
+      dateSubmitted = dateSubmitted,
+      taxYear = taxYear,
+      acceptedDateTime = dateSubmitted.atStartOfDay(),
+      contractorName = "",
+      employerReference = "",
+      receiptReferenceNumber = "",
+      subcontractorsToVerify = Seq.empty,
+      subcontractorsToReverify = Seq.empty
+    )
+
   private val response =
     GetSubmittedVerificationsResponse(
       scheme = Seq.empty,
@@ -52,15 +69,15 @@ class GetSubmittedVerificationsControllerSpec extends SpecBase with MockitoSugar
   private val singleYearData =
     VerificationHistoryData(
       verificationRequests = Seq(
-        VerificationRequestData("V001", LocalDate.of(2025, 4, 5), 2024)
+        verificationRequestData("V001", LocalDate.of(2025, 4, 5), 2024)
       )
     )
 
   private val multiYearData =
     VerificationHistoryData(
       verificationRequests = Seq(
-        VerificationRequestData("V001", LocalDate.of(2026, 4, 6), 2026),
-        VerificationRequestData("V002", LocalDate.of(2025, 4, 5), 2024)
+        verificationRequestData("V001", LocalDate.of(2026, 4, 6), 2026),
+        verificationRequestData("V002", LocalDate.of(2025, 4, 5), 2024)
       )
     )
 

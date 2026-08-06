@@ -16,23 +16,12 @@
 
 package viewmodels
 
-case class VerificationRequestPageViewModel(
-  submittedTime: String,
-  submittedDate: String,
-  verificationNumber: String,
+case class SubcontractorSubmissionReceiptViewModel(
+  submissionTime: String,
+  submissionDate: String,
   contractorName: String,
   employerReference: String,
   receiptReferenceNumber: String,
-  subcontractorsToVerify: Seq[SubcontractorRowViewModel],
-  subcontractorsToReverify: Seq[SubcontractorRowViewModel],
-  manageSubcontractorsUrl: String
-) {
-  val totalSubcontractors: Int    = subcontractorsToVerify.size + subcontractorsToReverify.size
-  val hasReverifications: Boolean = subcontractorsToReverify.nonEmpty
-  val hasVerifications: Boolean   = subcontractorsToVerify.nonEmpty
-}
-
-case class SubcontractorRowViewModel(
-  name: String,
-  verificationNumber: String
+  verificationNumber: String,
+  cisId: String
 )

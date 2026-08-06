@@ -23,6 +23,7 @@ import play.api.Application
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
+import viewmodels.SubcontractorSubmissionReceiptViewModel
 import views.html.verify.SubcontractorSubmissionReceiptView
 
 class SubcontractorSubmissionReceiptViewSpec extends SpecBase {
@@ -30,20 +31,24 @@ class SubcontractorSubmissionReceiptViewSpec extends SpecBase {
   "SubcontractorSubmissionReceiptView" - {
 
     "must render the page with the correct content" in new Setup {
-      val submissionTime = "12:00"
-      val submissionDate = "18 May 2025"
-      val contractorName = "John Doe"
-      val employerRef    = "ABC12345"
-      val irNumber       = "123456"
-      val cisId          = "1"
+      val submissionTime     = "12:00"
+      val submissionDate     = "18 May 2025"
+      val contractorName     = "John Doe"
+      val employerRef        = "ABC12345"
+      val irNumber           = "123456"
+      val verificationNumber = "V0004528765"
+      val cisId              = "1"
 
       val html: HtmlFormat.Appendable = view(
-        submissionTime,
-        submissionDate,
-        contractorName,
-        employerRef,
-        irNumber,
-        cisId
+        SubcontractorSubmissionReceiptViewModel(
+          submissionTime,
+          submissionDate,
+          contractorName,
+          employerRef,
+          irNumber,
+          verificationNumber,
+          cisId
+        )
       )
       val doc: Document               = Jsoup.parse(html.toString)
 
@@ -74,6 +79,8 @@ class SubcontractorSubmissionReceiptViewSpec extends SpecBase {
       summaryText must include(employerRef)
       summaryText must include(messages("verify.subcontractorSubmissionReceipt.summaryList.key3"))
       summaryText must include(irNumber)
+      summaryText must include(messages("verify.subcontractorSubmissionReceipt.summaryList.key4"))
+      summaryText must include(verificationNumber)
 
       doc.select("p.govuk-body").text must include(
         messages("verify.subcontractorSubmissionReceipt.p2")

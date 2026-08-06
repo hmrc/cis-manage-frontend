@@ -18,21 +18,23 @@ package controllers.verify
 
 import base.SpecBase
 import models.UserAnswers
-import models.verify.{SubcontractorVerificationData, VerificationRequestDetailData}
+import models.response.GetSubmittedVerificationsResponse
+import models.verify.{VerificationHistoryData, VerificationRequestData}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify as mockVerify, when}
+import org.mockito.Mockito.{verify as mockVerify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CisIdPage
+import pages.verify.VerificationHistoryDataPage
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import services.{ManageService, VerificationRequestService}
+import services.{VerificationHistoryService, VerificationService}
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.*
 import views.html.verify.VerificationRequestView
 
-import java.time.LocalDateTime
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
@@ -40,22 +42,45 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
   private val cisId              = "900063"
   private val verificationNumber = "V0004528765"
 
-  private val detailData = VerificationRequestDetailData(
-    verificationNumber = verificationNumber,
-    dateTimeSubmitted = LocalDateTime.of(2027, 2, 6, 14, 30),
-    subcontractorsToVerify = Seq(
-      SubcontractorVerificationData("Amity Marine Contractors", "V0004528765"),
-      SubcontractorVerificationData("Brody, Martin", "V0004528765")
-    ),
-    subcontractorsToReverify = Seq(
-      SubcontractorVerificationData("Orca Industrial", "V0004528765/L")
+  private def verificationRequestData(
+    verificationNumber: String,
+    dateSubmitted: LocalDate,
+    taxYear: Int
+  ): VerificationRequestData =
+    VerificationRequestData(
+      verificationNumber = verificationNumber,
+      dateSubmitted = dateSubmitted,
+      taxYear = taxYear,
+      acceptedDateTime = dateSubmitted.atStartOfDay(),
+      contractorName = "",
+      employerReference = "",
+      receiptReferenceNumber = "",
+      subcontractorsToVerify = Seq.empty,
+      subcontractorsToReverify = Seq.empty
+    )
+
+  private val verificationHistoryData = VerificationHistoryData(
+    verificationRequests = Seq(
+      verificationRequestData(verificationNumber, LocalDate.of(2027, 2, 6), 2026)
     )
   )
+
+  private val submittedVerificationsResponse =
+    GetSubmittedVerificationsResponse(
+      scheme = Seq.empty,
+      subcontractors = Seq.empty,
+      verificationBatches = Seq.empty,
+      verifications = Seq.empty,
+      submissions = Seq.empty
+    )
 
   private val viewModel = VerificationRequestPageViewModel(
     submittedTime = "14:30",
     submittedDate = "6 February 2027",
     verificationNumber = verificationNumber,
+    contractorName = "Gary Construction Ltd",
+    employerReference = "123/AB456",
+    receiptReferenceNumber = "H4WLKLISMHJZ3QAT5HXMVHIGEUPOQEJM",
     subcontractorsToVerify = Seq(
       SubcontractorRowViewModel("Amity Marine Contractors", "V0004528765"),
       SubcontractorRowViewModel("Brody, Martin", "V0004528765")
@@ -68,20 +93,26 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
 
   trait Setup {
 
-    val mockVerificationRequestService: VerificationRequestService = mock[VerificationRequestService]
-    val mockManageService: ManageService                           = mock[ManageService]
+    val mockVerificationHistoryService: VerificationHistoryService = mock[VerificationHistoryService]
+    val mockVerificationService: VerificationService               = mock[VerificationService]
 
     def application(userAnswers: UserAnswers): Application =
       applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(
-          bind[VerificationRequestService].toInstance(mockVerificationRequestService),
-          bind[ManageService].toInstance(mockManageService)
+          bind[VerificationHistoryService].toInstance(mockVerificationHistoryService),
+          bind[VerificationService].toInstance(mockVerificationService)
         )
         .build()
 
     def userAnswersWithCisId: UserAnswers =
       emptyUserAnswers
         .set(CisIdPage, cisId)
+        .success
+        .value
+
+    def userAnswersWithVerificationHistoryData: UserAnswers =
+      userAnswersWithCisId
+        .set(VerificationHistoryDataPage, verificationHistoryData)
         .success
         .value
 
@@ -94,13 +125,16 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
 
   "VerificationRequestController" - {
 
-    "onPageLoad must return OK when data is available" in new Setup {
-      val userAnswers = userAnswersWithCisId
+    "onPageLoad must return OK using VerificationHistoryDataPage when data is available" in new Setup {
+      val userAnswers = userAnswersWithVerificationHistoryData
 
-      when(mockManageService.getVerificationRequestDetail(any[String], any[String])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(detailData))
-      when(mockVerificationRequestService.buildViewModel(any[VerificationRequestDetailData], any[String]))
-        .thenReturn(viewModel)
+      when(
+        mockVerificationHistoryService.buildVerificationRequestViewModel(
+          verificationHistoryData,
+          verificationNumber,
+          cisId
+        )
+      ).thenReturn(Some(viewModel))
 
       val app = application(userAnswers)
 
@@ -112,16 +146,50 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
 
-        mockVerify(mockManageService).getVerificationRequestDetail(any[String], any[String])(any[HeaderCarrier])
-        mockVerify(mockVerificationRequestService).buildViewModel(any[VerificationRequestDetailData], any[String])
+        mockVerify(mockVerificationHistoryService)
+          .buildVerificationRequestViewModel(verificationHistoryData, verificationNumber, cisId)
+        verifyNoInteractions(mockVerificationService)
       }
     }
 
-    "onPageLoad must redirect to JourneyRecovery when service fails" in new Setup {
+    "onPageLoad must retrieve submitted verifications when VerificationHistoryDataPage is missing" in new Setup {
       val userAnswers = userAnswersWithCisId
 
-      when(mockManageService.getVerificationRequestDetail(any[String], any[String])(any[HeaderCarrier]))
-        .thenReturn(Future.failed(new RuntimeException("boom")))
+      when(mockVerificationService.getSubmittedVerifications(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(submittedVerificationsResponse))
+      when(mockVerificationHistoryService.toVerificationHistoryData(submittedVerificationsResponse))
+        .thenReturn(verificationHistoryData)
+      when(
+        mockVerificationHistoryService.buildVerificationRequestViewModel(
+          verificationHistoryData,
+          verificationNumber,
+          cisId
+        )
+      ).thenReturn(Some(viewModel))
+
+      val app = application(userAnswers)
+
+      running(app) {
+        val request = FakeRequest(GET, routes.VerificationRequestController.onPageLoad(verificationNumber).url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual OK
+
+        mockVerify(mockVerificationService).getSubmittedVerifications(any[String])(any[HeaderCarrier])
+        mockVerify(mockVerificationHistoryService).toVerificationHistoryData(submittedVerificationsResponse)
+      }
+    }
+
+    "onPageLoad must redirect to JourneyRecovery when the verification number is not found" in new Setup {
+      val userAnswers = userAnswersWithVerificationHistoryData
+
+      when(
+        mockVerificationHistoryService.buildVerificationRequestViewModel(
+          verificationHistoryData,
+          verificationNumber,
+          cisId
+        )
+      ).thenReturn(None)
 
       val app = application(userAnswers)
 

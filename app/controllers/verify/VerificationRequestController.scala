@@ -17,17 +17,20 @@
 package controllers.verify
 
 import controllers.actions.*
+import models.requests.CisIdDataRequest
+import models.verify.VerificationHistoryData
+import pages.verify.VerificationHistoryDataPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{ManageService, VerificationRequestService}
+import services.{VerificationHistoryService, VerificationService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.verify.VerificationRequestView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class VerificationRequestController @Inject() (
   override val messagesApi: MessagesApi,
@@ -37,8 +40,8 @@ class VerificationRequestController @Inject() (
   requireCisId: CisIdRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: VerificationRequestView,
-  verificationRequestService: VerificationRequestService,
-  manageService: ManageService
+  verificationHistoryService: VerificationHistoryService,
+  verificationService: VerificationService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -49,14 +52,29 @@ class VerificationRequestController @Inject() (
 
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-      manageService
-        .getVerificationRequestDetail(request.cisId, verificationNumber)
+      resolveVerificationHistoryData
         .map { data =>
-          val vm = verificationRequestService.buildViewModel(data, request.cisId)
-          Ok(view(vm))
+          verificationHistoryService.buildVerificationRequestViewModel(data, verificationNumber, request.cisId) match {
+            case Some(vm) => Ok(view(vm))
+            case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
         }
         .recover { case _ =>
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
+    }
+
+  private def resolveVerificationHistoryData(implicit
+    request: CisIdDataRequest[AnyContent],
+    hc: HeaderCarrier
+  ): Future[VerificationHistoryData] =
+    request.userAnswers.get(VerificationHistoryDataPage) match {
+      case Some(data) =>
+        Future.successful(data)
+
+      case None =>
+        verificationService
+          .getSubmittedVerifications(request.cisId)
+          .map(verificationHistoryService.toVerificationHistoryData)
     }
 }

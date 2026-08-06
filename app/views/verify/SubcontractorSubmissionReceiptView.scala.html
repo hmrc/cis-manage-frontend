@@ -19,6 +19,7 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
 
 @import config.FrontendAppConfig
+@import viewmodels.SubcontractorSubmissionReceiptViewModel
 
 @this(
         layout: templates.Layout,
@@ -31,25 +32,19 @@
         govukButton: GovukButton
 )
 
-@(
-    submissionTime: String,
-    submissionDate: String,
-    contractorName: String,
-    employerRef: String,
-    irNumber: String,
-    cisId: String,
-)(implicit request: Request[_], messages: Messages)
+@(viewModel: SubcontractorSubmissionReceiptViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("verify.subcontractorSubmissionReceipt.title"))) {
     @h1(messages("verify.subcontractorSubmissionReceipt.heading"))
     @h2(messages("verify.subcontractorSubmissionReceipt.subheading"))
-    @paragraph(messages("verify.subcontractorSubmissionReceipt.p1",submissionTime, submissionDate))
+    @paragraph(messages("verify.subcontractorSubmissionReceipt.p1", viewModel.submissionTime, viewModel.submissionDate))
 
     @govukSummaryList(
         SummaryListViewModel(rows = Seq(
-            SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key1"), Value(contractorName)),
-            SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key2"), Value(employerRef)),
-            SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key3"), Value(irNumber)),
+            SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key1"), Value(viewModel.contractorName)),
+            SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key2"), Value(viewModel.employerReference)),
+            SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key3"), Value(viewModel.receiptReferenceNumber)),
+            SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key4"), Value(viewModel.verificationNumber)),
         ))
     )
 
@@ -59,7 +54,7 @@
     @printLink("verify.subcontractorSubmissionReceipt.link1")
     @link(
         linkTextKey = "verify.subcontractorSubmissionReceipt.link2.link",
-        linkUrl = controllers.routes.SubcontractorsLandingPageController.onPageLoad(cisId).url,
+        linkUrl = controllers.routes.SubcontractorsLandingPageController.onPageLoad(viewModel.cisId).url,
         prefixTextKey = "verify.subcontractorSubmissionReceipt.link2.prefix",
         hasFullStop = true
     )
