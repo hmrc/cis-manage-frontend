@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -35,7 +36,7 @@ class UnsuccessfulAutomaticSubcontractorUpdateController @Inject() (
   view: UnsuccessfulAutomaticSubcontractorUpdateView,
   requireSchemeAccess: AuthorizedForSchemeActionProvider,
   service: PrepopService
-)(implicit ec: ExecutionContext)
+)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
     with I18nSupport {
 
@@ -53,7 +54,7 @@ class UnsuccessfulAutomaticSubcontractorUpdateController @Inject() (
 
   def onSubmit(instanceId: String): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireSchemeAccess(instanceId)) { implicit request =>
-      Redirect(controllers.routes.AddContractorDetailsController.onPageLoad())
+      Redirect(appConfig.contractorDetailsIntroductionUrl)
     }
 
 }

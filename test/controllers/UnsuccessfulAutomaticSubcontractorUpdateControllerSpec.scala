@@ -157,7 +157,7 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to AddContractorDetailsController on submit" in {
+    "must redirect to contractor details introduction on submit" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
@@ -176,10 +176,11 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
         when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
           .thenReturn(new FakeAuthorizedForSchemeAction)
 
-        val result = route(application, request).value
+        val result    = route(application, request).value
+        val appConfig = application.injector.instanceOf[config.FrontendAppConfig]
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.AddContractorDetailsController.onPageLoad().url
+        redirectLocation(result).value mustEqual appConfig.contractorDetailsIntroductionUrl
       }
     }
   }
