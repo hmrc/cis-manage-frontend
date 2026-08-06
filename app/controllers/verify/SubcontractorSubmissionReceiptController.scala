@@ -45,14 +45,14 @@ class SubcontractorSubmissionReceiptController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(verificationNumber: String): Action[AnyContent] =
+  def onPageLoad(verificationBatchId: Long): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
 
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       resolveVerificationHistoryData
         .map { data =>
-          verificationHistoryService.buildSubmissionReceiptViewModel(data, verificationNumber, request.cisId) match {
+          verificationHistoryService.buildSubmissionReceiptViewModel(data, verificationBatchId, request.cisId) match {
             case Some(vm) => Ok(view(vm))
             case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }

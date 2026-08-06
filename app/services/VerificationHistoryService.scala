@@ -79,11 +79,11 @@ class VerificationHistoryService @Inject() () {
 
   def buildVerificationRequestViewModel(
     data: VerificationHistoryData,
-    verificationNumber: String,
+    verificationBatchId: Long,
     instanceId: String
   ): Option[VerificationRequestPageViewModel] =
     data.verificationRequests
-      .find(_.verificationNumber == verificationNumber)
+      .find(_.verificationBatchId == verificationBatchId)
       .map { request =>
         VerificationRequestPageViewModel(
           submittedTime = request.acceptedDateTime.format(timeFormatter),
@@ -102,11 +102,11 @@ class VerificationHistoryService @Inject() () {
 
   def buildSubmissionReceiptViewModel(
     data: VerificationHistoryData,
-    verificationNumber: String,
+    verificationBatchId: Long,
     instanceId: String
   ): Option[SubcontractorSubmissionReceiptViewModel] =
     data.verificationRequests
-      .find(_.verificationNumber == verificationNumber)
+      .find(_.verificationBatchId == verificationBatchId)
       .map { request =>
         SubcontractorSubmissionReceiptViewModel(
           submissionTime = request.acceptedDateTime.format(timeFormatter),
@@ -149,9 +149,9 @@ class VerificationHistoryService @Inject() () {
       verificationNumber = request.verificationNumber,
       dateSubmitted = request.dateSubmitted.format(displayDateFormatter),
       verificationRequestLink =
-        controllers.verify.routes.VerificationRequestController.onPageLoad(request.verificationNumber).url,
+        controllers.verify.routes.VerificationRequestController.onPageLoad(request.verificationBatchId).url,
       submissionReceiptLink =
-        controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(request.verificationNumber).url
+        controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(request.verificationBatchId).url
     )
 
   def toVerificationHistoryData(
@@ -169,6 +169,7 @@ class VerificationHistoryService @Inject() () {
             val scheme = schemeFor(batch.schemeId, response)
 
             VerificationRequestData(
+              verificationBatchId = batch.verificationBatchId,
               verificationNumber = verificationNumber,
               dateSubmitted = acceptedDateTime.toLocalDate,
               taxYear = taxYearStart(acceptedDateTime.toLocalDate),

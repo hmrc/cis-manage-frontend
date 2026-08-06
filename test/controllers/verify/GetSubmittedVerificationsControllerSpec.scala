@@ -46,6 +46,7 @@ class GetSubmittedVerificationsControllerSpec extends SpecBase with MockitoSugar
     taxYear: Int
   ): VerificationRequestData =
     VerificationRequestData(
+      verificationBatchId = 1L,
       verificationNumber = verificationNumber,
       dateSubmitted = dateSubmitted,
       taxYear = taxYear,

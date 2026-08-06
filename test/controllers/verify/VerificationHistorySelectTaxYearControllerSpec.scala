@@ -47,6 +47,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
     taxYear: Int
   ): VerificationRequestData =
     VerificationRequestData(
+      verificationBatchId = 1L,
       verificationNumber = verificationNumber,
       dateSubmitted = dateSubmitted,
       taxYear = taxYear,

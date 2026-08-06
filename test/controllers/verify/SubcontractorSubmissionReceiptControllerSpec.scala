@@ -39,8 +39,9 @@ import scala.concurrent.Future
 
 class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with MockitoSugar {
 
-  private val cisId              = "900063"
-  private val verificationNumber = "V0004528765"
+  private val cisId               = "900063"
+  private val verificationNumber  = "V0004528765"
+  private val verificationBatchId = 1L
 
   private def verificationRequestData(
     verificationNumber: String,
@@ -48,6 +49,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
     taxYear: Int
   ): VerificationRequestData =
     VerificationRequestData(
+      verificationBatchId = verificationBatchId,
       verificationNumber = verificationNumber,
       dateSubmitted = dateSubmitted,
       taxYear = taxYear,
@@ -80,7 +82,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
       submissionDate = "6 February 2027",
       contractorName = "Gary Construction Ltd",
       employerReference = "123PA000001",
-      receiptReferenceNumber = "H4WLKLISMHJZ3QAT5HXMVHIGEUPOQEJM",
+      receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
       verificationNumber = verificationNumber,
       cisId = cisId
     )
@@ -122,7 +124,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
       when(
         mockVerificationHistoryService.buildSubmissionReceiptViewModel(
           verificationHistoryData,
-          verificationNumber,
+          verificationBatchId,
           cisId
         )
       ).thenReturn(Some(viewModel))
@@ -133,7 +135,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
         val request =
           FakeRequest(
             GET,
-            controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(verificationNumber).url
+            controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(verificationBatchId).url
           )
 
         val result = route(app, request).value
@@ -143,7 +145,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
         contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
 
         mockVerify(mockVerificationHistoryService)
-          .buildSubmissionReceiptViewModel(verificationHistoryData, verificationNumber, cisId)
+          .buildSubmissionReceiptViewModel(verificationHistoryData, verificationBatchId, cisId)
         verifyNoInteractions(mockVerificationService)
       }
     }
@@ -156,7 +158,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
       when(
         mockVerificationHistoryService.buildSubmissionReceiptViewModel(
           verificationHistoryData,
-          verificationNumber,
+          verificationBatchId,
           cisId
         )
       ).thenReturn(Some(viewModel))
@@ -167,7 +169,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
         val request =
           FakeRequest(
             GET,
-            controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(verificationNumber).url
+            controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(verificationBatchId).url
           )
 
         val result = route(app, request).value
@@ -182,7 +184,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
       when(
         mockVerificationHistoryService.buildSubmissionReceiptViewModel(
           verificationHistoryData,
-          verificationNumber,
+          verificationBatchId,
           cisId
         )
       ).thenReturn(None)
@@ -193,7 +195,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
         val request =
           FakeRequest(
             GET,
-            controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(verificationNumber).url
+            controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(verificationBatchId).url
           )
 
         val result = route(app, request).value
@@ -210,7 +212,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
         val request =
           FakeRequest(
             GET,
-            controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(verificationNumber).url
+            controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(verificationBatchId).url
           )
 
         val result = route(app, request).value

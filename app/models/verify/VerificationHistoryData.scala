@@ -29,6 +29,7 @@ object VerificationHistoryData {
 }
 
 case class VerificationRequestData(
+  verificationBatchId: Long,
   verificationNumber: String,
   dateSubmitted: LocalDate,
   taxYear: Int,

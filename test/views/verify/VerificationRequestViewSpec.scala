@@ -33,8 +33,8 @@ class VerificationRequestViewSpec extends SpecBase {
     submittedDate = "6 February 2027",
     verificationNumber = "V0004528765",
     contractorName = "Gary Construction Ltd",
-    employerReference = "123/AB456",
-    receiptReferenceNumber = "H4WLKLISMHJZ3QAT5HXMVHIGEUPOQEJM",
+    employerReference = "123PA000001",
+    receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
     subcontractorsToVerify = Seq(
       SubcontractorRowViewModel("Amity Marine Contractors", "V0004528765"),
       SubcontractorRowViewModel("Brody, Martin", "V0004528765")
@@ -93,9 +93,9 @@ class VerificationRequestViewSpec extends SpecBase {
       doc.text() should include(messages(app)("verify.verificationRequest.contractorName"))
       doc.text() should include("Gary Construction Ltd")
       doc.text() should include(messages(app)("verify.verificationRequest.employerReference"))
-      doc.text() should include("123/AB456")
+      doc.text() should include("123PA000001")
       doc.text() should include(messages(app)("verify.verificationRequest.receiptReferenceNumber"))
-      doc.text() should include("H4WLKLISMHJZ3QAT5HXMVHIGEUPOQEJM")
+      doc.text() should include("Pyy1LRJh053AE+nuyp0GJR7oESw=")
     }
 
     "render the subcontractors count in the summary list" in {

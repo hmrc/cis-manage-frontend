@@ -32,12 +32,16 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
   private val service    = new VerificationHistoryService()
   private val instanceId = "900063"
 
+  private val receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw="
+
   private def verificationRequestData(
     verificationNumber: String,
     dateSubmitted: LocalDate,
-    taxYear: Int
+    taxYear: Int,
+    verificationBatchId: Long
   ): VerificationRequestData =
     VerificationRequestData(
+      verificationBatchId = verificationBatchId,
       verificationNumber = verificationNumber,
       dateSubmitted = dateSubmitted,
       taxYear = taxYear,
@@ -51,14 +55,12 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
 
   private val data = VerificationHistoryData(
     verificationRequests = Seq(
-      verificationRequestData("V001", LocalDate.of(2026, 4, 6), 2026),
-      verificationRequestData("V002", LocalDate.of(2026, 6, 6), 2026),
-      verificationRequestData("V003", LocalDate.of(2025, 4, 6), 2025),
-      verificationRequestData("V004", LocalDate.of(2025, 6, 6), 2025)
+      verificationRequestData("V001", LocalDate.of(2026, 4, 6), 2026, 1L),
+      verificationRequestData("V002", LocalDate.of(2026, 6, 6), 2026, 2L),
+      verificationRequestData("V003", LocalDate.of(2025, 4, 6), 2025, 3L),
+      verificationRequestData("V004", LocalDate.of(2025, 6, 6), 2025, 4L)
     )
   )
-
-  private val receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw="
 
   private def submittedScheme(): GetSubmittedContractorScheme =
     GetSubmittedContractorScheme(
@@ -71,6 +73,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
     )
 
   private def expectedRequest(
+    verificationBatchId: Long,
     verificationNumber: String,
     acceptedDateTime: LocalDateTime,
     taxYear: Int,
@@ -78,6 +81,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
     subcontractorsToReverify: Seq[SubcontractorVerificationData] = Seq.empty
   ): VerificationRequestData =
     VerificationRequestData(
+      verificationBatchId = verificationBatchId,
       verificationNumber = verificationNumber,
       dateSubmitted = acceptedDateTime.toLocalDate,
       taxYear = taxYear,
@@ -201,7 +205,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
         val vm  = result.get
         val row = vm.taxYears.head.rows.head
         row.verificationRequestLink must include("/verify/verification-request")
-        row.verificationRequestLink must include("verificationNumber=V002")
+        row.verificationRequestLink must include("verificationBatchId=2")
       }
 
       "must set submission receipt link to the submission receipt page" in {
@@ -210,7 +214,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
         val vm  = result.get
         val row = vm.taxYears.head.rows.head
         row.submissionReceiptLink must include("/verify/history/submission-receipt")
-        row.submissionReceiptLink must include("verificationNumber=V002")
+        row.submissionReceiptLink must include("verificationBatchId=2")
       }
 
       "must return None when there are no verification requests" in {
@@ -282,8 +286,8 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
 
         service.toVerificationHistoryData(response) mustBe VerificationHistoryData(
           verificationRequests = Seq(
-            expectedRequest("V001", LocalDateTime.of(2026, 4, 6, 10, 0), 2026),
-            expectedRequest("V002", LocalDateTime.of(2026, 2, 6, 10, 0), 2025)
+            expectedRequest(1L, "V001", LocalDateTime.of(2026, 4, 6, 10, 0), 2026),
+            expectedRequest(2L, "V002", LocalDateTime.of(2026, 2, 6, 10, 0), 2025)
           )
         )
       }
@@ -363,7 +367,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
 
         service.toVerificationHistoryData(response) mustBe VerificationHistoryData(
           verificationRequests = Seq(
-            expectedRequest("V002", LocalDateTime.of(2026, 4, 6, 10, 0), 2026)
+            expectedRequest(2L, "V002", LocalDateTime.of(2026, 4, 6, 10, 0), 2026)
           )
         )
       }
@@ -393,7 +397,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
 
         service.toVerificationHistoryData(response) mustBe VerificationHistoryData(
           verificationRequests = Seq(
-            expectedRequest("V001", LocalDateTime.of(2026, 6, 6, 10, 0), 2026)
+            expectedRequest(1L, "V001", LocalDateTime.of(2026, 6, 6, 10, 0), 2026)
           )
         )
       }
@@ -427,8 +431,8 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
 
         service.toVerificationHistoryData(response) mustBe VerificationHistoryData(
           verificationRequests = Seq(
-            expectedRequest("V002", LocalDateTime.of(2026, 4, 6, 10, 0), 2026),
-            expectedRequest("V001", LocalDateTime.of(2026, 4, 5, 10, 0), 2025)
+            expectedRequest(2L, "V002", LocalDateTime.of(2026, 4, 6, 10, 0), 2026),
+            expectedRequest(1L, "V001", LocalDateTime.of(2026, 4, 5, 10, 0), 2025)
           )
         )
       }
@@ -468,6 +472,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
         service.toVerificationHistoryData(response) mustBe VerificationHistoryData(
           verificationRequests = Seq(
             expectedRequest(
+              verificationBatchId = 1L,
               verificationNumber = "V001",
               acceptedDateTime = LocalDateTime.of(2026, 4, 6, 14, 30),
               taxYear = 2026,
@@ -487,6 +492,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
 
       "must build request details from the selected verification history row" in {
         val requestData = expectedRequest(
+          verificationBatchId = 1L,
           verificationNumber = "V001",
           acceptedDateTime = LocalDateTime.of(2026, 4, 6, 14, 30),
           taxYear = 2026,
@@ -496,7 +502,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
 
         val result = service.buildVerificationRequestViewModel(
           VerificationHistoryData(Seq(requestData)),
-          "V001",
+          1L,
           instanceId
         )
 
@@ -509,12 +515,38 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
         result.value.subcontractorsToVerify mustBe Seq(SubcontractorRowViewModel("Amity Marine Contractors", "V001"))
         result.value.subcontractorsToReverify mustBe Seq(SubcontractorRowViewModel("Orca Industrial", "V001/L"))
       }
+
+      "must select the matching batch when verification numbers are duplicated" in {
+        val firstRequest  = expectedRequest(
+          verificationBatchId = 1L,
+          verificationNumber = "V001",
+          acceptedDateTime = LocalDateTime.of(2026, 4, 6, 14, 30),
+          taxYear = 2026,
+          subcontractorsToVerify = Seq(SubcontractorVerificationData("First Subcontractor", "V001"))
+        )
+        val secondRequest = expectedRequest(
+          verificationBatchId = 2L,
+          verificationNumber = "V001",
+          acceptedDateTime = LocalDateTime.of(2026, 4, 7, 14, 30),
+          taxYear = 2026,
+          subcontractorsToVerify = Seq(SubcontractorVerificationData("Second Subcontractor", "V001"))
+        )
+
+        val result = service.buildVerificationRequestViewModel(
+          VerificationHistoryData(Seq(firstRequest, secondRequest)),
+          2L,
+          instanceId
+        )
+
+        result.value.subcontractorsToVerify mustBe Seq(SubcontractorRowViewModel("Second Subcontractor", "V001"))
+      }
     }
 
     "buildSubmissionReceiptViewModel" - {
 
       "must build receipt details from the selected verification history row" in {
         val requestData = expectedRequest(
+          verificationBatchId = 1L,
           verificationNumber = "V001",
           acceptedDateTime = LocalDateTime.of(2026, 4, 6, 14, 30),
           taxYear = 2026
@@ -522,7 +554,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
 
         val result = service.buildSubmissionReceiptViewModel(
           VerificationHistoryData(Seq(requestData)),
-          "V001",
+          1L,
           instanceId
         )
 

@@ -79,8 +79,7 @@ class SubcontractorSubmissionReceiptViewSpec extends SpecBase {
       summaryText must include(employerRef)
       summaryText must include(messages("verify.subcontractorSubmissionReceipt.summaryList.key3"))
       summaryText must include(irNumber)
-      summaryText must include(messages("verify.subcontractorSubmissionReceipt.summaryList.key4"))
-      summaryText must include(verificationNumber)
+      summaryText must not include messages("verify.subcontractorSubmissionReceipt.summaryList.key4")
 
       doc.select("p.govuk-body").text must include(
         messages("verify.subcontractorSubmissionReceipt.p2")

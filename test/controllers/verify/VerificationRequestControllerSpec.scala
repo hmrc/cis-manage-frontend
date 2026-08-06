@@ -39,8 +39,9 @@ import scala.concurrent.Future
 
 class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
 
-  private val cisId              = "900063"
-  private val verificationNumber = "V0004528765"
+  private val cisId               = "900063"
+  private val verificationNumber  = "V0004528765"
+  private val verificationBatchId = 1L
 
   private def verificationRequestData(
     verificationNumber: String,
@@ -48,6 +49,7 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
     taxYear: Int
   ): VerificationRequestData =
     VerificationRequestData(
+      verificationBatchId = verificationBatchId,
       verificationNumber = verificationNumber,
       dateSubmitted = dateSubmitted,
       taxYear = taxYear,
@@ -80,7 +82,7 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
     verificationNumber = verificationNumber,
     contractorName = "Gary Construction Ltd",
     employerReference = "123PA000001",
-    receiptReferenceNumber = "H4WLKLISMHJZ3QAT5HXMVHIGEUPOQEJM",
+    receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
     subcontractorsToVerify = Seq(
       SubcontractorRowViewModel("Amity Marine Contractors", "V0004528765"),
       SubcontractorRowViewModel("Brody, Martin", "V0004528765")
@@ -131,7 +133,7 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
       when(
         mockVerificationHistoryService.buildVerificationRequestViewModel(
           verificationHistoryData,
-          verificationNumber,
+          verificationBatchId,
           cisId
         )
       ).thenReturn(Some(viewModel))
@@ -139,7 +141,7 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
       val app = application(userAnswers)
 
       running(app) {
-        val request = FakeRequest(GET, routes.VerificationRequestController.onPageLoad(verificationNumber).url)
+        val request = FakeRequest(GET, routes.VerificationRequestController.onPageLoad(verificationBatchId).url)
         val result  = route(app, request).value
         val view    = app.injector.instanceOf[VerificationRequestView]
 
@@ -147,7 +149,7 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
 
         mockVerify(mockVerificationHistoryService)
-          .buildVerificationRequestViewModel(verificationHistoryData, verificationNumber, cisId)
+          .buildVerificationRequestViewModel(verificationHistoryData, verificationBatchId, cisId)
         verifyNoInteractions(mockVerificationService)
       }
     }
@@ -162,7 +164,7 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
       when(
         mockVerificationHistoryService.buildVerificationRequestViewModel(
           verificationHistoryData,
-          verificationNumber,
+          verificationBatchId,
           cisId
         )
       ).thenReturn(Some(viewModel))
@@ -170,7 +172,7 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
       val app = application(userAnswers)
 
       running(app) {
-        val request = FakeRequest(GET, routes.VerificationRequestController.onPageLoad(verificationNumber).url)
+        val request = FakeRequest(GET, routes.VerificationRequestController.onPageLoad(verificationBatchId).url)
         val result  = route(app, request).value
 
         status(result) mustEqual OK
@@ -186,7 +188,7 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
       when(
         mockVerificationHistoryService.buildVerificationRequestViewModel(
           verificationHistoryData,
-          verificationNumber,
+          verificationBatchId,
           cisId
         )
       ).thenReturn(None)
@@ -194,7 +196,7 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
       val app = application(userAnswers)
 
       running(app) {
-        val request = FakeRequest(GET, routes.VerificationRequestController.onPageLoad(verificationNumber).url)
+        val request = FakeRequest(GET, routes.VerificationRequestController.onPageLoad(verificationBatchId).url)
         val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -206,7 +208,7 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
       val app = application(emptyUserAnswers)
 
       running(app) {
-        val request = FakeRequest(GET, routes.VerificationRequestController.onPageLoad(verificationNumber).url)
+        val request = FakeRequest(GET, routes.VerificationRequestController.onPageLoad(verificationBatchId).url)
         val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER

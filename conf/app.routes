@@ -151,9 +151,9 @@ POST  /verify/select-tax-year-for-verification-requests     controllers.verify.V
 GET   /verify/history/verification-history-all-tax-years    controllers.verify.VerificationHistoryController.onPageLoadAllYears()
 GET   /verify/history/verification-history-single-tax-year  controllers.verify.VerificationHistoryController.onPageLoadSingleYear()
 
-GET   /verify/history/submission-receipt                    controllers.verify.SubcontractorSubmissionReceiptController.onPageLoad(verificationNumber: String)
+GET   /verify/history/submission-receipt                    controllers.verify.SubcontractorSubmissionReceiptController.onPageLoad(verificationBatchId: Long)
 
-GET   /verify/verification-request                          controllers.verify.VerificationRequestController.onPageLoad(verificationNumber: String)
+GET   /verify/verification-request                          controllers.verify.VerificationRequestController.onPageLoad(verificationBatchId: Long)
 
 GET   /verification-history/retrieve                        controllers.verify.GetSubmittedVerificationsController.onPageLoad()
 
