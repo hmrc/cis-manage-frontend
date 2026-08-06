@@ -18,7 +18,7 @@ package controllers.verify
 
 import controllers.actions.*
 import models.requests.CisIdDataRequest
-import models.verify.{VerificationHistoryData, VerificationTaxYearSelection}
+import models.verify.VerificationHistoryData
 import models.verify.VerificationTaxYearSelection.TaxYear
 import pages.verify.{VerificationHistoryDataPage, VerificationHistorySelectTaxYearPage}
 import play.api.Logging
@@ -54,11 +54,10 @@ class VerificationHistoryController @Inject() (
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       request.userAnswers.get(VerificationHistorySelectTaxYearPage) match {
-        case Some(TaxYear(v)) =>
-          val taxYear = v.takeWhile(_ != ' ')
+        case Some(TaxYear(startYear)) =>
           resolveVerificationHistoryData
             .map { data =>
-              verificationHistoryService.buildSingleYearViewModel(data, taxYear, request.cisId) match {
+              verificationHistoryService.buildSingleYearViewModel(data, startYear.toString, request.cisId) match {
                 case Some(vm) => Ok(view(vm))
                 case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
               }
@@ -66,7 +65,7 @@ class VerificationHistoryController @Inject() (
             .recover { case _ =>
               Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
             }
-        case _                =>
+        case _                        =>
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
     }
