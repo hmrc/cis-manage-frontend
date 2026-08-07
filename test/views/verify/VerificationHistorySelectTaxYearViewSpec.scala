@@ -26,6 +26,7 @@ import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.Request
 import models.NormalMode
+import models.verify.VerificationTaxYearSelection.TaxYearPeriod
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import views.html.verify.VerificationHistorySelectTaxYearView
@@ -49,8 +50,8 @@ class VerificationHistorySelectTaxYearViewSpec extends SpecBase {
       val doc: Document = Jsoup.parse(html.toString)
 
       taxYears.zipWithIndex.foreach { case (year, index) =>
-        doc.select(s"input[type=radio][value='$year']").size() mustBe 1
-        doc.select(s"label[for=value_$index]").text() must include(year)
+        doc.select(s"input[type=radio][value='${year.startYear}']").size() mustBe 1
+        doc.select(s"label[for=value_$index]").text() must include(year.toString)
       }
     }
 
@@ -84,11 +85,11 @@ class VerificationHistorySelectTaxYearViewSpec extends SpecBase {
     val view: VerificationHistorySelectTaxYearView =
       app.injector.instanceOf[VerificationHistorySelectTaxYearView]
 
-    val taxYears: Seq[String] =
-      Seq("2021 to 2022", "2022 to 2023", "2023 to 2024")
+    val taxYears: Seq[TaxYearPeriod] =
+      Seq(TaxYearPeriod(2021), TaxYearPeriod(2022), TaxYearPeriod(2023))
 
     val formProvider       = new VerificationHistorySelectTaxYearFormProvider()
-    val form: Form[String] = formProvider(taxYears)
+    val form: Form[String] = formProvider(taxYears.map(_.startYear.toString))
 
     val mode: Mode = NormalMode
 

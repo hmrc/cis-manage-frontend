@@ -154,6 +154,19 @@ class FrontendAppConfigSpec extends SpecBase {
     }
   }
 
+  "contractor details and subcontractor URLs" - {
+
+    "must contain the contractor details introduction URL" in new Setup {
+      appConfig.contractorDetailsIntroductionUrl mustBe
+        "http://localhost:6998/construction-industry-scheme/contractor-details/introduction"
+    }
+
+    "must contain the type of subcontractor URL" in new Setup {
+      appConfig.cisTypeOfSubcontractorUrl mustBe
+        "http://localhost:6998/construction-industry-scheme/subcontractor"
+    }
+  }
+
   trait Setup {
     val app: Application             = applicationBuilder().build()
     val appConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
