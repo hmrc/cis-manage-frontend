@@ -43,7 +43,7 @@ class AgentLostAccessViewSpec extends SpecBase {
       doc.select("p").text                      must include(messages("agent.agentLostAccess.bullet.title"))
       doc.select("li").text                     must include(messages("agent.agentLostAccess.bullet.item.1.prefix"))
       doc.getElementsByClass("govuk-link").text must include(messages("agent.agentLostAccess.bullet.item.1.link"))
-      doc.select("li a").first().attr("href") mustBe authoriseClientRequestUrl
+      doc.select("li a").get(1).attr("href") mustBe authoriseClientRequestUrl
       doc.select("li").text                     must include(messages("agent.agentLostAccess.bullet.item.2.prefix"))
       doc.getElementsByClass("govuk-link").text must include(messages("agent.agentLostAccess.bullet.item.2.link"))
       doc.select("li").text                     must include(messages("agent.agentLostAccess.bullet.item.2.suffix"))
