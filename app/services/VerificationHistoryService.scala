@@ -57,21 +57,19 @@ class VerificationHistoryService @Inject() () {
 
   def buildSingleYearViewModel(
     data: VerificationHistoryData,
-    taxYear: String,
+    taxYearStart: Int,
     instanceId: String
   ): Option[VerificationHistoryPageViewModel] =
-    taxYear.toIntOption.flatMap { taxYearInt =>
-      val taxYearSections = buildTaxYearSections(data).filter(_.fromYear == taxYearInt)
-      if (taxYearSections.isEmpty) None
-      else {
-        Some(
-          VerificationHistoryPageViewModel(
-            taxYears = taxYearSections,
-            selectedTaxYear = Some(taxYear),
-            instanceId = instanceId
-          )
+    val taxYearSections = buildTaxYearSections(data).filter(_.fromYear == taxYearStart)
+    if (taxYearSections.isEmpty) None
+    else {
+      Some(
+        VerificationHistoryPageViewModel(
+          taxYears = taxYearSections,
+          selectedTaxYear = Some(taxYearStart.toString),
+          instanceId = instanceId
         )
-      }
+      )
     }
 
   private def buildTaxYearSections(
@@ -117,7 +115,7 @@ class VerificationHistoryService @Inject() () {
         .flatMap { batch =>
           for {
             verificationNumber <- batch.verificationNumber
-            acceptedDate        = acceptedDateFor(batch.verificationBatchId, response.submissions)
+            acceptedDate       <- Try(acceptedDateFor(batch.verificationBatchId, response.submissions)).toOption
           } yield VerificationRequestData(
             verificationNumber = verificationNumber,
             dateSubmitted = acceptedDate,

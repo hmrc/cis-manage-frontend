@@ -57,7 +57,7 @@ class VerificationHistoryController @Inject() (
         case Some(TaxYear(startYear)) =>
           resolveVerificationHistoryData
             .map { data =>
-              verificationHistoryService.buildSingleYearViewModel(data, startYear.toString, request.cisId) match {
+              verificationHistoryService.buildSingleYearViewModel(data, startYear, request.cisId) match {
                 case Some(vm) => Ok(view(vm))
                 case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
               }

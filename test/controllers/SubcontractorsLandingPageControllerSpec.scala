@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import config.FrontendAppConfig
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.SubcontractorsLandingPageView
@@ -42,11 +41,8 @@ class SubcontractorsLandingPageControllerSpec extends SpecBase {
 
         status(result) mustBe OK
 
-        implicit val appConfig: FrontendAppConfig =
-          application.injector.instanceOf[FrontendAppConfig]
-
         contentAsString(result) mustEqual
-          view()(request, appConfig, messages(application)).toString
+          view()(request, messages(application)).toString
       }
     }
   }

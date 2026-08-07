@@ -144,8 +144,8 @@ GET   /no-incomplete-returns  controllers.history.NoIncompleteReturnsController.
 GET  /manage-notices-statements/:instanceId  controllers.notices.ManageNoticesStatementsController.onPageLoad(instanceId: String)
 
 # Verify
-GET   /verify/select-tax-year-for-verification-requests     controllers.verify.VerificationHistorySelectTaxYearController.onPageLoad(mode: Mode = NormalMode)
-POST  /verify/select-tax-year-for-verification-requests     controllers.verify.VerificationHistorySelectTaxYearController.onSubmit(mode: Mode = NormalMode)
+GET   /verify/select-tax-year-for-verification-requests     controllers.verify.VerificationHistorySelectTaxYearController.onPageLoad()
+POST  /verify/select-tax-year-for-verification-requests     controllers.verify.VerificationHistorySelectTaxYearController.onSubmit()
 
 GET   /verify/history/verification-history-all-tax-years    controllers.verify.VerificationHistoryController.onPageLoadAllYears()
 GET   /verify/history/verification-history-single-tax-year  controllers.verify.VerificationHistoryController.onPageLoadSingleYear()
