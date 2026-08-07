@@ -40,6 +40,9 @@ class SuccessfulNoRecordsFoundViewSpec extends SpecBase {
       doc.select("p").text                        must include(messages("successfulNoRecordsFound.p1"))
       doc.select("p").text                        must include(messages("successfulNoRecordsFound.p2"))
       doc.getElementsByClass("govuk-link").text   must include(messages("successfulNoRecordsFound.p2.link"))
+      doc
+        .select(s"a:contains(${messages("successfulNoRecordsFound.p2.link")})")
+        .attr("href") mustEqual app.injector.instanceOf[config.FrontendAppConfig].cisTypeOfSubcontractorUrl
       doc.getElementsByClass("govuk-button").text must include(messages("site.continue"))
     }
   }

@@ -16,18 +16,42 @@
 
 package models.verify
 
-import models.verify.VerificationTaxYearSelection.{AllTaxYears, TaxYear}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
+import base.SpecBase
+import models.verify.VerificationTaxYearSelection.{AllTaxYears, TaxYear, TaxYearPeriod}
 import play.api.libs.json.{JsSuccess, Json}
 
-class VerificationHistorySelectTaxYearSpec extends AnyFreeSpec with Matchers {
+import java.time.LocalDate
+
+class VerificationHistorySelectTaxYearSpec extends SpecBase {
+
+  "VerificationHistorySelectTaxYear" - {
+
+    "options must mark the matching current tax year" in {
+      val result = VerificationHistorySelectTaxYear.options(
+        Seq(TaxYearPeriod(2026), TaxYearPeriod(2025)),
+        currentDate = LocalDate.of(2026, 8, 6)
+      )(messages(app))
+
+      result.head.content.asHtml.toString must include("2026 to 2027 (current tax year)")
+      result(1).content.asHtml.toString mustBe "2025 to 2026"
+    }
+
+    "options must use the previous start year before 6 April" in {
+      val result = VerificationHistorySelectTaxYear.options(
+        Seq(TaxYearPeriod(2026), TaxYearPeriod(2025)),
+        currentDate = LocalDate.of(2026, 4, 5)
+      )(messages(app))
+
+      result.head.content.asHtml.toString mustBe "2026 to 2027"
+      result(1).content.asHtml.toString must include("2025 to 2026 (current tax year)")
+    }
+  }
 
   "VerificationTaxYearSelection" - {
 
     "must serialise and deserialise TaxYear" in {
 
-      val model = TaxYear("2026 to 2027")
+      val model = TaxYear(2026)
 
       val json = Json.toJson(model)
 
@@ -51,7 +75,7 @@ class VerificationHistorySelectTaxYearSpec extends AnyFreeSpec with Matchers {
     "fromString must return TaxYear for tax year value" in {
 
       VerificationTaxYearSelection
-        .fromString("2026 to 2027") mustEqual TaxYear("2026 to 2027")
+        .fromString("2026") mustEqual TaxYear(2026)
     }
   }
 }
