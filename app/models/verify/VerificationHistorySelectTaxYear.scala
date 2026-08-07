@@ -16,18 +16,25 @@
 
 package models.verify
 
+import models.verify.VerificationTaxYearSelection.TaxYearPeriod
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
+import java.time.LocalDate
+
 object VerificationHistorySelectTaxYear {
 
-  def options(taxYears: Seq[String])(implicit messages: Messages): Seq[RadioItem] = {
+  def options(taxYears: Seq[TaxYearPeriod], currentDate: LocalDate = LocalDate.now())(implicit
+    messages: Messages
+  ): Seq[RadioItem] = {
 
-    val yearItems = taxYears.zipWithIndex.map { case (year, index) =>
+    val currentTaxYearStart = taxYearStart(currentDate)
+
+    val yearItems = taxYears.zipWithIndex.map { case (taxYear, index) =>
       RadioItem(
-        content = Text(year),
-        value = Some(year),
+        content = Text(labelFor(taxYear, currentTaxYearStart)),
+        value = Some(taxYear.startYear.toString),
         id = Some(s"value_$index")
       )
     }
@@ -45,5 +52,22 @@ object VerificationHistorySelectTaxYear {
     )
 
     yearItems ++ divider ++ viewAll
+  }
+
+  private def labelFor(taxYear: TaxYearPeriod, currentTaxYearStart: Int)(implicit messages: Messages): String =
+    if (taxYear.startYear == currentTaxYearStart) {
+      s"${taxYear.toString} ${messages("verify.verificationHistorySelectTaxYear.currentTaxYear")}"
+    } else {
+      taxYear.toString
+    }
+
+  private def taxYearStart(date: LocalDate): Int = {
+    val taxYearStartDate = LocalDate.of(date.getYear, 4, 6)
+
+    if (date.isBefore(taxYearStartDate)) {
+      date.getYear - 1
+    } else {
+      date.getYear
+    }
   }
 }

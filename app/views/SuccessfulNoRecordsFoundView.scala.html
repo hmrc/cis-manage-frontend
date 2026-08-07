@@ -15,6 +15,7 @@
  *@
 
 @import views.html.components._
+@import config.FrontendAppConfig
 
 @this(
     layout: templates.Layout,
@@ -22,7 +23,8 @@
     govukButton: GovukButton,
     h1: H1,
     paragraph: Paragraph,
-    link: Link
+    link: Link,
+    appConfig: FrontendAppConfig
 )
 
 @(instanceId: String, targetKey: String)(implicit request: Request[_], messages: Messages)
@@ -36,7 +38,7 @@
     @paragraph(messages("successfulNoRecordsFound.p1"))
     @link(
         linkTextKey = "successfulNoRecordsFound.p2.link",
-        linkUrl = "#",
+        linkUrl = appConfig.cisTypeOfSubcontractorUrl,
         hasFullStop = true,
         prefixTextKey = "successfulNoRecordsFound.p2"
     )

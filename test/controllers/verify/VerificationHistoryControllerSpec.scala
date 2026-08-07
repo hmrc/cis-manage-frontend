@@ -18,7 +18,7 @@ package controllers.verify
 
 import base.SpecBase
 import models.UserAnswers
-import models.verify.{VerificationHistoryData, VerificationRequestData, VerificationTaxYearSelection}
+import models.verify.{VerificationHistoryData, VerificationRequestData}
 import models.verify.VerificationTaxYearSelection.TaxYear
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify as mockVerify, verifyNoInteractions, when}
@@ -96,7 +96,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
 
     def userAnswersWithCisIdAndTaxYearSelection: UserAnswers =
       userAnswersWithCisId
-        .set(VerificationHistorySelectTaxYearPage, TaxYear("2026 to 2027 (current tax year)"))
+        .set(VerificationHistorySelectTaxYearPage, TaxYear(2026))
         .success
         .value
 
