@@ -147,11 +147,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
 
     def mockSingleYearViewModelReturns(model: Option[VerificationHistoryPageViewModel]): Unit =
       when(
-        mockVerificationHistoryService.buildSingleYearViewModel(
-          any[VerificationHistoryData],
-          any[String],
-          any[String]
-        )
+        mockVerificationHistoryService.buildSingleYearViewModel(any, any, any)
       ).thenReturn(model)
 
     def mockAllYearsViewModelReturns(model: Option[VerificationHistoryPageViewModel]): Unit =
@@ -174,7 +170,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
     "onPageLoadSingleYear must return OK using VerificationHistoryDataPage when present" in new Setup {
       val userAnswers = userAnswersWithVerificationHistoryData
 
-      when(mockVerificationHistoryService.buildSingleYearViewModel(verificationHistoryData, "2026", cisId))
+      when(mockVerificationHistoryService.buildSingleYearViewModel(verificationHistoryData, any, cisId))
         .thenReturn(Some(viewModel))
 
       val app = application(userAnswers)
@@ -187,7 +183,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
 
-        mockVerify(mockVerificationHistoryService).buildSingleYearViewModel(verificationHistoryData, "2026", cisId)
+        mockVerify(mockVerificationHistoryService).buildSingleYearViewModel(verificationHistoryData, 2026, cisId)
         verifyNoInteractions(mockVerificationService)
       }
     }
@@ -233,7 +229,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
         mockVerify(mockVerificationHistoryService)
           .toVerificationHistoryData(submittedVerificationsResponse)
         mockVerify(mockVerificationHistoryService)
-          .buildSingleYearViewModel(any[VerificationHistoryData], any[String], any[String])
+          .buildSingleYearViewModel(any, any, any)
       }
     }
 
@@ -287,7 +283,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
     "onPageLoadSingleYear must redirect to JourneyRecovery when buildSingleYearViewModel returns None" in new Setup {
       val userAnswers = userAnswersWithVerificationHistoryData
 
-      when(mockVerificationHistoryService.buildSingleYearViewModel(verificationHistoryData, "2026", cisId))
+      when(mockVerificationHistoryService.buildSingleYearViewModel(verificationHistoryData, 2026, cisId))
         .thenReturn(None)
 
       val app = application(userAnswers)
@@ -299,7 +295,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual journeyRecoveryUrl
 
-        mockVerify(mockVerificationHistoryService).buildSingleYearViewModel(verificationHistoryData, "2026", cisId)
+        mockVerify(mockVerificationHistoryService).buildSingleYearViewModel(verificationHistoryData, 2026, cisId)
       }
     }
 

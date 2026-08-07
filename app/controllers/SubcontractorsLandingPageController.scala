@@ -16,9 +16,8 @@
 
 package controllers
 
-import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.SubcontractorsLandingPageView
@@ -26,14 +25,12 @@ import views.html.SubcontractorsLandingPageView
 import javax.inject.Inject
 
 class SubcontractorsLandingPageController @Inject() (
-  override val messagesApi: MessagesApi,
   val controllerComponents: MessagesControllerComponents,
   view: SubcontractorsLandingPageView,
   getData: DataRetrievalAction,
   identify: IdentifierAction,
   requireData: DataRequiredAction
-)(implicit appConfig: FrontendAppConfig)
-    extends FrontendBaseController
+) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(instanceId: String): Action[AnyContent] =

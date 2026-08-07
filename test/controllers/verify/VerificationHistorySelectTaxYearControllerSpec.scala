@@ -17,29 +17,27 @@
 package controllers.verify
 
 import base.SpecBase
-import forms.verify.VerificationHistorySelectTaxYearFormProvider
-import models.NormalMode
+import forms.verify.TaxYearFormProvider
 import models.UserAnswers
+import models.response.GetSubmittedVerificationsResponse
+import models.verify.VerificationTaxYearSelection.{AllTaxYears, TaxYear, TaxYearPeriod}
+import models.verify.{VerificationHistoryData, VerificationRequestData}
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.verify.{VerificationHistoryDataPage, VerificationHistorySelectTaxYearPage}
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
-import models.verify.{VerificationHistoryData, VerificationRequestData}
-import models.verify.VerificationTaxYearSelection.{AllTaxYears, TaxYear, TaxYearPeriod}
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import services.VerificationService
 import views.html.verify.VerificationHistorySelectTaxYearView
 
 import java.time.LocalDate
 import scala.concurrent.Future
 
 class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with MockitoSugar {
-
-  def onwardRoute = Call("GET", "/foo")
+  import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+  import org.mockito.Mockito.{verify, when}
 
   private def verificationRequestData(
     verificationNumber: String,
@@ -62,19 +60,11 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
   lazy val verificationHistorySelectTaxYearRoute =
     controllers.verify.routes.VerificationHistorySelectTaxYearController.onPageLoad().url
 
-  val taxYears: Seq[TaxYearPeriod] =
-    Seq(
-      TaxYearPeriod(2026),
-      TaxYearPeriod(2025),
-      TaxYearPeriod(2024)
-    )
+  private val taxYears     = 2024 to 2026 map TaxYearPeriod.apply
+  private val formProvider = new TaxYearFormProvider()
+  private val form         = formProvider(taxYears)
 
-  val formProvider = new VerificationHistorySelectTaxYearFormProvider()
-  val form         = formProvider(taxYears.map(_.startYear.toString))
-
-  val mode = NormalMode
-
-  val verificationHistoryData: VerificationHistoryData =
+  private val verificationHistoryData =
     VerificationHistoryData(
       verificationRequests = Seq(
         verificationRequestData("V001", LocalDate.of(2026, 4, 6), 2026),
@@ -83,7 +73,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
       )
     )
 
-  val userAnswersWithVerificationHistoryData =
+  private val userAnswersWithVerificationHistoryData =
     userAnswersWithCisId
       .set(VerificationHistoryDataPage, verificationHistoryData)
       .success
@@ -92,9 +82,23 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
   "VerificationHistorySelectTaxYear Controller" - {
 
     "must return OK and the correct view for a GET" in {
+      val mockVerificationHistory = GetSubmittedVerificationsResponse(
+        scheme = Seq.empty,
+        subcontractors = Seq.empty,
+        verificationBatches = Seq.empty,
+        verifications = Seq.empty,
+        submissions = Seq.empty
+      )
+
+      val mockVerificationService = mock[VerificationService]
+      when(
+        mockVerificationService.getSubmittedVerifications(any)(any)
+      ) thenReturn Future.successful(mockVerificationHistory)
 
       val application =
-        applicationBuilder(userAnswers = Some(userAnswersWithVerificationHistoryData)).build()
+        applicationBuilder(userAnswers = Some(userAnswersWithVerificationHistoryData))
+          .overrides(bind[VerificationService] toInstance mockVerificationService)
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, verificationHistorySelectTaxYearRoute)
@@ -106,7 +110,8 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(form, mode, taxYears)(request, messages(application)).toString
+          view(form, taxYears)(request, messages(application)).toString
+        verify(mockVerificationService).getSubmittedVerifications(eqTo(userAnswersId))(any)
       }
     }
 
@@ -133,7 +138,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(form.fill("all"), mode, taxYears)(request, messages(application)).toString
+          view(form.fill(AllTaxYears), taxYears)(request, messages(application)).toString
       }
     }
 
@@ -160,7 +165,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
-          view(form.fill("2026"), mode, taxYears)(request, messages(application)).toString
+          view(form.fill(TaxYear(2026)), taxYears)(request, messages(application)).toString
       }
     }
 
@@ -264,7 +269,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual
-          view(boundForm, mode, taxYears)(request, messages(application)).toString
+          view(boundForm, taxYears)(request, messages(application)).toString
       }
     }
 
