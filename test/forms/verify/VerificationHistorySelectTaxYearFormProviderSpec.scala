@@ -22,7 +22,7 @@ import play.api.data.FormError
 class VerificationHistorySelectTaxYearFormProviderSpec extends OptionFieldBehaviours {
 
   val taxYears: Seq[String] =
-    Seq("2021 to 2022", "2022 to 2023", "2023 to 2024", "2024 to 2025")
+    Seq("2021", "2022", "2023", "2024")
 
   val form = new VerificationHistorySelectTaxYearFormProvider()(taxYears)
 
@@ -43,5 +43,11 @@ class VerificationHistorySelectTaxYearFormProviderSpec extends OptionFieldBehavi
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "must reject tax year display labels" in {
+      val result = form.bind(Map(fieldName -> "2021 to 2022"))
+
+      result.errors must contain(FormError(fieldName, "verificationHistorySelectTaxYear.error.invalid"))
+    }
   }
 }
