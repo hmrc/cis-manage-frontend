@@ -43,8 +43,9 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
   val form                               = formProvider()
   val subcontractorName                  = "subcontractor Name"
   val cisId                              = "1"
+  val verificationNumber                 = "VN12345"
   lazy val deleteSubcontractorYesNoRoute =
-    controllers.subcontractors.routes.DeleteSubcontractorYesNoController.onPageLoad().url
+    controllers.subcontractors.routes.DeleteSubcontractorYesNoController.onPageLoad(verificationNumber).url
 
   private val journeyData =
     DeleteSubcontractorJourneyData(
@@ -75,7 +76,7 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
         val view = application.injector.instanceOf[DeleteSubcontractorYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(subcontractorName, form, NormalMode)(
+        contentAsString(result) mustEqual view(verificationNumber, subcontractorName, form, NormalMode)(
           request,
           messages(application)
         ).toString
@@ -105,6 +106,7 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(
+          verificationNumber,
           subcontractorName,
           form.fill(true),
           NormalMode
@@ -188,7 +190,7 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(subcontractorName, boundForm, NormalMode)(
+        contentAsString(result) mustEqual view(verificationNumber, subcontractorName, boundForm, NormalMode)(
           request,
           messages(application)
         ).toString

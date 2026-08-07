@@ -46,7 +46,7 @@ class DeleteSubcontractorYesNoController @Inject() (
 
   private val form: Form[Boolean] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
+  def onPageLoad(verificationNumber: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers
         .get(DeleteSubcontractorJourneyPage)
@@ -65,6 +65,7 @@ class DeleteSubcontractorYesNoController @Inject() (
 
             Ok(
               view(
+                verificationNumber,
                 journeyData.subcontractorName,
                 preparedForm,
                 mode
@@ -74,7 +75,7 @@ class DeleteSubcontractorYesNoController @Inject() (
         }
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] =
+  def onSubmit(verificationNumber: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
       form
         .bindFromRequest()
@@ -90,6 +91,7 @@ class DeleteSubcontractorYesNoController @Inject() (
                 Future.successful(
                   BadRequest(
                     view(
+                      verificationNumber,
                       journeyData.subcontractorName,
                       formWithErrors,
                       mode

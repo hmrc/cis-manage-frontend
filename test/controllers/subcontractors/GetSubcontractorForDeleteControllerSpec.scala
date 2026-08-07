@@ -92,7 +92,7 @@ class GetSubcontractorForDeleteControllerSpec extends SpecBase with MockitoSugar
 
         redirectLocation(result).value mustBe
           controllers.subcontractors.routes.DeleteSubcontractorYesNoController
-            .onPageLoad()
+            .onPageLoad(subbieResourceRef.toString)
             .url
 
         verify(mockService)

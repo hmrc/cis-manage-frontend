@@ -17,7 +17,7 @@
 package models.verify
 
 import play.api.libs.json.*
-import models.verify.VerificationTaxYearSelection.{TaxYear, TaxYearPeriod}
+import models.verify.VerificationTaxYearSelection.TaxYear
 
 sealed trait VerificationTaxYearSelection
 
