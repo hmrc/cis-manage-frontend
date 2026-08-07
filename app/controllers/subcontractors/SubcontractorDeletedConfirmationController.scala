@@ -17,6 +17,7 @@
 package controllers.subcontractors
 
 import controllers.actions.*
+import pages.subcontractors.DeletedSubcontractorPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -28,18 +29,37 @@ class SubcontractorDeletedConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  requireCisId: CisIdRequiredAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: SubcontractorDeletedConfirmationView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    // TODO: subcontractorName to be retrieved from F8 - Retrieve Subcontractor for Delete business function
-    // TODO: Once the SL-01-01 - Subcontractor List page is implemented, the url should be updated to point to the subcontractor details page
-    val url               = "#"
-    val surveyURL         = "#"
-    val subcontractorName = "subcontractor Name"
-    Ok(view(subcontractorName, url, surveyURL))
-  }
+  def onPageLoad: Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId) { implicit request =>
+      request.userAnswers
+        .get(DeletedSubcontractorPage)
+        .fold {
+          Redirect(
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+          )
+        } { subcontractorName =>
+
+          val url =
+            controllers.subcontractors.routes.GetSubcontractorListController
+              .onPageLoad()
+              .url
+
+          val surveyURL = "#"
+
+          Ok(
+            view(
+              subcontractorName,
+              url,
+              surveyURL
+            )
+          )
+        }
+    }
 }

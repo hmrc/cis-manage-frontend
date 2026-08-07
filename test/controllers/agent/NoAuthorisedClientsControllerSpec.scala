@@ -22,22 +22,45 @@ import play.api.test.Helpers.*
 import views.html.agent.NoAuthorisedClientsView
 
 class NoAuthorisedClientsControllerSpec extends SpecBase {
+  private val agentCode = "agentCode"
 
   "NoAuthorisedClients Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "when an agent code is returned" - {
+      "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), agentCode = Some(agentCode)).build()
 
-      running(application) {
-        val request = FakeRequest(GET, controllers.agent.routes.NoAuthorisedClientsController.onPageLoad().url)
+        running(application) {
+          val request     = FakeRequest(GET, controllers.agent.routes.NoAuthorisedClientsController.onPageLoad().url)
+          val result      = route(application, request).value
+          val view        = application.injector.instanceOf[NoAuthorisedClientsView]
+          val expectedUrl = applicationConfig.authoriseClientRequestUrl(agentCode)
 
-        val result = route(application, request).value
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(expectedUrl)(
+            request,
+            applicationConfig,
+            messages(application)
+          ).toString
+        }
+      }
+    }
 
-        val view = application.injector.instanceOf[NoAuthorisedClientsView]
+    "when an agent code is not returned" - {
+      "must redirect to the unauthorised agent affinity page" in {
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, applicationConfig, messages(application)).toString
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers), agentCode = None).build()
+
+        running(application) {
+          val request = FakeRequest(GET, controllers.agent.routes.NoAuthorisedClientsController.onPageLoad().url)
+          val result  = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual (
+            controllers.routes.UnauthorisedAgentAffinityController.onPageLoad().url
+          )
+        }
       }
     }
   }

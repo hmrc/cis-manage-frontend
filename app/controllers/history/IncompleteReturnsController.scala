@@ -51,7 +51,7 @@ class IncompleteReturnsController @Inject() (
     implicit request =>
       service.getUnsubmittedMonthlyReturnRows(request.cisId).map { rows =>
         if (rows.isEmpty) {
-          Redirect(controllers.amend.routes.NoIncompleteReturnsController.onPageLoad())
+          Redirect(controllers.history.routes.NoIncompleteReturnsController.onPageLoad())
         } else {
           Ok(view(rows))
         }

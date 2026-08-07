@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package controllers.amend
+package controllers.history
 
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.amend.NoReturnsSubmittedView
+import views.html.history.NoIncompleteReturnsView
 
-class NoReturnsSubmittedControllerSpec extends SpecBase {
+class NoIncompleteReturnsControllerSpec extends SpecBase {
 
-  "NoReturnsSubmitted Controller" - {
+  "NoIncompleteReturns Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId)).build()
 
       running(application) {
-        val request = FakeRequest(GET, controllers.amend.routes.NoReturnsSubmittedController.onPageLoad().url)
+        val request = FakeRequest(GET, controllers.history.routes.NoIncompleteReturnsController.onPageLoad().url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[NoReturnsSubmittedView]
+        val view = application.injector.instanceOf[NoIncompleteReturnsView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view("1")(request, messages(application)).toString
@@ -47,9 +47,9 @@ class NoReturnsSubmittedControllerSpec extends SpecBase {
 
       running(application) {
 
-        val request = FakeRequest(GET, controllers.amend.routes.NoReturnsSubmittedController.onPageLoad().url)
+        val request = FakeRequest(GET, controllers.history.routes.NoIncompleteReturnsController.onPageLoad().url)
 
-        val controller = application.injector.instanceOf[NoReturnsSubmittedController]
+        val controller = application.injector.instanceOf[NoIncompleteReturnsController]
 
         val exception = controller.onPageLoad()(request).failed.futureValue
 

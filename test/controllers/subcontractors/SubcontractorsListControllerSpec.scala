@@ -20,6 +20,7 @@ import base.SpecBase
 import forms.subcontractors.SubcontractorsListFormProvider
 import models.{Mode, NormalMode, UserAnswers}
 import models.response.{GetSubcontractor, GetSubcontractorListResponse}
+import org.jsoup.Jsoup
 import pages.subcontractors.SubcontractorListPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -28,6 +29,7 @@ import viewmodels.subcontractors.{SubcontractorsListRow, TaxTreatment}
 import views.html.subcontractors.SubcontractorsListView
 
 import java.time.LocalDateTime
+import scala.jdk.CollectionConverters.*
 
 class SubcontractorsListControllerSpec extends SpecBase {
 
@@ -103,10 +105,12 @@ class SubcontractorsListControllerSpec extends SpecBase {
       subbieResourceRef = Some(20L),
       matched = None,
       autoVerified = None,
-      verified = Some("N"),
+      verified = Some("Y"),
       verificationNumber = Some("V000002"),
-      taxTreatment = Some("Higher Rate"),
-      verificationDate = None,
+      taxTreatment = Some("Gross"),
+      verificationDate = Some(
+        LocalDateTime.of(2026, 5, 1, 0, 0)
+      ),
       version = None,
       updatedTaxTreatment = None,
       lastMonthlyReturnDate = None,
@@ -118,29 +122,28 @@ class SubcontractorsListControllerSpec extends SpecBase {
     subcontractors = subcontractors
   )
 
-  private val rows = Seq(
+  private val rows                                       = Seq(
     SubcontractorsListRow(
       id = "1",
-      name = "Alan Smith",
+      name = "Smith, Alan",
       utr = "1234567890",
-      verified = true,
-      verificationNumber = "V000001",
-      taxTreatment = TaxTreatment.Gross,
+      verified = false,
+      verificationNumber = "",
+      taxTreatment = TaxTreatment.Unknown,
       dateAdded = "6 Apr 2026",
       subbieResourceRef = 10L
     ),
     SubcontractorsListRow(
       id = "2",
-      name = "Brian Jones",
+      name = "Jones, Brian",
       utr = "9876543210",
-      verified = false,
+      verified = true,
       verificationNumber = "V000002",
-      taxTreatment = TaxTreatment.HigherRate,
+      taxTreatment = TaxTreatment.Gross,
       dateAdded = "6 May 2026",
       subbieResourceRef = 20L
     )
   )
-
   private def userAnswersWithSubcontractors: UserAnswers =
     emptyUserAnswers
       .set(SubcontractorListPage, listResponse)
@@ -150,15 +153,21 @@ class SubcontractorsListControllerSpec extends SpecBase {
   private def filterRows(
     searchTerm: String,
     verificationStatus: String,
-    taxTreatment: String
-  ): Seq[SubcontractorsListRow] =
-    filterByTaxTreatment(
-      filterByVerificationStatus(
-        filterBySearchTerm(rows, searchTerm),
-        verificationStatus
-      ),
-      taxTreatment
-    ).sortBy(_.name.toLowerCase)
+    taxTreatment: String,
+    sortBy: String = "name",
+    sortOrder: String = "ascending"
+  ): Seq[SubcontractorsListRow] = {
+    val searchFiltered =
+      filterBySearchTerm(rows, searchTerm)
+
+    val verificationFiltered =
+      filterByVerificationStatus(searchFiltered, verificationStatus)
+
+    val taxTreatmentFiltered =
+      filterByTaxTreatment(verificationFiltered, taxTreatment)
+
+    sortRows(taxTreatmentFiltered, sortBy, sortOrder)
+  }
 
   private def filterBySearchTerm(
     sourceRows: Seq[SubcontractorsListRow],
@@ -217,6 +226,42 @@ class SubcontractorsListControllerSpec extends SpecBase {
         sourceRows
     }
 
+  private def sortRows(
+    sourceRows: Seq[SubcontractorsListRow],
+    sortBy: String,
+    sortOrder: String
+  ): Seq[SubcontractorsListRow] =
+    sortBy match {
+      case "dateAdded" =>
+        val sortedRows =
+          sourceRows.sortBy(_.dateAdded)
+
+        if (sortOrder == "descending") {
+          sortedRows.reverse
+        } else {
+          sortedRows
+        }
+
+      case _ =>
+        val noNameRows =
+          sourceRows.filter(_.name.trim.equalsIgnoreCase("No name provided"))
+
+        val namedRows =
+          sourceRows.filterNot(_.name.trim.equalsIgnoreCase("No name provided"))
+
+        val sortedNamedRows =
+          namedRows.sortBy(_.name.trim.toLowerCase)
+
+        val orderedNamedRows =
+          if (sortOrder == "descending") {
+            sortedNamedRows.reverse
+          } else {
+            sortedNamedRows
+          }
+
+        noNameRows ++ orderedNamedRows
+    }
+
   "SubcontractorsListController" - {
 
     "must return OK and the correct view for a GET with default filters" in {
@@ -247,7 +292,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
             currentPage = 1,
             recordsPerPage = 8,
             baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
-            queryString = ""
+            queryString = "sortBy=name&sortOrder=ascending"
           )
 
         status(result) mustEqual OK
@@ -264,7 +309,9 @@ class SubcontractorsListControllerSpec extends SpecBase {
           instanceId,
           "",
           "all",
-          "all"
+          "all",
+          "name",
+          "ascending"
         )(request, messages(application)).toString
       }
     }
@@ -298,7 +345,8 @@ class SubcontractorsListControllerSpec extends SpecBase {
             currentPage = 1,
             recordsPerPage = 8,
             baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
-            queryString = "searchTerm=Alan&verificationStatus=verified&taxTreatment=gross"
+            queryString =
+              "searchTerm=Alan&verificationStatus=verified&taxTreatment=gross&sortBy=name&sortOrder=ascending"
           )
 
         status(result) mustEqual OK
@@ -315,7 +363,9 @@ class SubcontractorsListControllerSpec extends SpecBase {
           instanceId,
           "Alan",
           "verified",
-          "gross"
+          "gross",
+          "name",
+          "ascending"
         )(request, messages(application)).toString
       }
     }
@@ -335,7 +385,9 @@ class SubcontractorsListControllerSpec extends SpecBase {
             "gotoPage"           -> "2",
             "searchTerm"         -> "Alan",
             "verificationStatus" -> "verified",
-            "taxTreatment"       -> "gross"
+            "taxTreatment"       -> "gross",
+            "sortBy"             -> "name",
+            "sortOrder"          -> "ascending"
           )
 
         val result =
@@ -352,6 +404,8 @@ class SubcontractorsListControllerSpec extends SpecBase {
         redirectUrl must include("searchTerm=Alan")
         redirectUrl must include("verificationStatus=verified")
         redirectUrl must include("taxTreatment=gross")
+        redirectUrl must include("sortBy=name")
+        redirectUrl must include("sortOrder=ascending")
       }
     }
 
@@ -369,7 +423,9 @@ class SubcontractorsListControllerSpec extends SpecBase {
           ).withFormUrlEncodedBody(
             "searchTerm"         -> "Alan",
             "verificationStatus" -> "verified",
-            "taxTreatment"       -> "gross"
+            "taxTreatment"       -> "gross",
+            "sortBy"             -> "name",
+            "sortOrder"          -> "ascending"
           )
 
         val result =
@@ -386,6 +442,8 @@ class SubcontractorsListControllerSpec extends SpecBase {
         redirectUrl must include("searchTerm=Alan")
         redirectUrl must include("verificationStatus=verified")
         redirectUrl must include("taxTreatment=gross")
+        redirectUrl must include("sortBy=name")
+        redirectUrl must include("sortOrder=ascending")
       }
     }
 
@@ -450,15 +508,71 @@ class SubcontractorsListControllerSpec extends SpecBase {
         ).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url)
-        val result  = route(application, request).value
+        val request =
+          FakeRequest(
+            GET,
+            routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url
+          )
+
+        val result =
+          route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.NoSubcontractorsExistController.onPageLoad().url
+
+        redirectLocation(result).value mustEqual
+          routes.NoSubcontractorsExistController.onPageLoad().url
       }
     }
 
-    "must throw an exception when subbieResourceRef is missing" in {
+    "must apply reverification rules when rendering subcontractors" in {
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithSubcontractors)
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            routes.SubcontractorsListController
+              .onPageLoad(instanceId, mode)
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual OK
+
+        val doc =
+          Jsoup.parse(contentAsString(result))
+
+        val smithRow =
+          doc
+            .select("tr")
+            .asScala
+            .find(_.text().contains("Smith, Alan"))
+            .getOrElse(fail("Could not find row for Smith, Alan"))
+
+        smithRow.text() must include(messages(application)("site.no"))
+        smithRow.text() must include(messages(application)("site.unknown"))
+        smithRow.text() must not include "V000001"
+
+        val jonesRow =
+          doc
+            .select("tr")
+            .asScala
+            .find(_.text().contains("Jones, Brian"))
+            .getOrElse(fail("Could not find row for Jones, Brian"))
+
+        jonesRow.text() must include(messages(application)("site.yes"))
+        jonesRow.text() must include("V000002")
+      }
+    }
+
+    "must throw an IllegalStateException when subbieResourceRef is missing" in {
       val response =
         GetSubcontractorListResponse(
           subcontractors = Seq(
@@ -491,7 +605,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
 
         val exception =
           intercept[IllegalStateException] {
-            await(result)
+            status(result)
           }
 
         exception.getMessage mustEqual

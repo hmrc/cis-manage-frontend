@@ -46,13 +46,13 @@ class HelpAndGuidelineSidebarSpec extends SpecBase {
       val links = aside.select("a.govuk-link")
       links.size() shouldBe 3
 
-      links.get(0).attr("href") shouldBe appConfig.cisHelpWhatIsUrl
+      links.get(0).attr("href") shouldBe appConfig.contractorLandingWhatIsUrl
       links.get(0).text()       shouldBe msgs("agent.landing.help.link1")
 
-      links.get(1).attr("href") shouldBe appConfig.cisHelpMonthlyUrl
+      links.get(1).attr("href") shouldBe appConfig.contractorLandingGuidanceUrl
       links.get(1).text()       shouldBe msgs("agent.landing.help.link2")
 
-      links.get(2).attr("href") shouldBe appConfig.cisHelp340Url
+      links.get(2).attr("href") shouldBe appConfig.contractorLandingPenaltiesUrl
       links.get(2).text()       shouldBe msgs("agent.landing.help.link3")
     }
   }
