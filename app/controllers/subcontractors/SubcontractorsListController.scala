@@ -16,11 +16,13 @@
 
 package controllers.subcontractors
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import forms.subcontractors.SubcontractorsListFormProvider
 import models.response.GetSubcontractor
 import models.{Mode, UserAnswers}
 import pages.subcontractors.SubcontractorListPage
+import pages.CisIdPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.*
@@ -47,7 +49,8 @@ class SubcontractorsListController @Inject() (
   paginationService: PaginationSubcontractorsListService,
   clock: Clock,
   val controllerComponents: MessagesControllerComponents,
-  view: SubcontractorsListView
+  view: SubcontractorsListView,
+  config: FrontendAppConfig
 ) extends FrontendBaseController
     with I18nSupport {
 
@@ -114,13 +117,19 @@ class SubcontractorsListController @Inject() (
   private def rowsFromUserAnswers(
     userAnswers: UserAnswers
   ): Option[Seq[SubcontractorsListRow]] =
-    userAnswers
-      .get(SubcontractorListPage)
-      .map(_.subcontractors.map(toListRow))
+    for {
+      cisId          <- userAnswers.get(CisIdPage)
+      subcontractors <- userAnswers.get(SubcontractorListPage)
+    } yield subcontractors.subcontractors.map { subcontractor =>
+      toListRow(subcontractor, cisId)
+    }
 
   private def toListRow(
-    subcontractor: GetSubcontractor
+    subcontractor: GetSubcontractor,
+    cisId: String
   ): SubcontractorsListRow = {
+
+    val subbieResourceRef = getSubbieResourceRef(subcontractor)
 
     val reverifyRequired =
       ReverificationRules.reverifyRequired(
@@ -154,7 +163,8 @@ class SubcontractorsListController @Inject() (
       dateAdded = subcontractor.createDate
         .map(_.format(dateAddedFormatter))
         .getOrElse(""),
-      subbieResourceRef = getSubbieResourceRef(subcontractor)
+      subbieResourceRef = subbieResourceRef,
+      amendUrl = s"${config.cisTypeOfSubcontractorUrl}/amend/start/$cisId/$subbieResourceRef"
     )
   }
 

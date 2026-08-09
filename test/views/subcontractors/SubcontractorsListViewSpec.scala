@@ -157,7 +157,7 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       rows.zipWithIndex.foreach { case (row, index) =>
         val link = nameLinks.get(index)
 
-        link.attr("href") mustBe "#"
+        link.attr("href") mustBe "/foo"
 
         link.ownText().trim mustBe row.name
 

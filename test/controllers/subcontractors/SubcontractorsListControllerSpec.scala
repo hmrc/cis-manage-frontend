@@ -131,7 +131,8 @@ class SubcontractorsListControllerSpec extends SpecBase {
       verificationNumber = "",
       taxTreatment = TaxTreatment.Unknown,
       dateAdded = "6 Apr 2026",
-      subbieResourceRef = 10L
+      subbieResourceRef = 10L,
+      amendUrl = "/foo"
     ),
     SubcontractorsListRow(
       id = "2",
@@ -141,7 +142,8 @@ class SubcontractorsListControllerSpec extends SpecBase {
       verificationNumber = "V000002",
       taxTreatment = TaxTreatment.Gross,
       dateAdded = "6 May 2026",
-      subbieResourceRef = 20L
+      subbieResourceRef = 20L,
+      amendUrl = "/foo2"
     )
   )
   private def userAnswersWithSubcontractors: UserAnswers =
@@ -295,7 +297,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
             queryString = "sortBy=name&sortOrder=ascending"
           )
 
-        status(result) mustEqual OK
+        status(result) mustEqual SEE_OTHER
 
         contentAsString(result) mustEqual view(
           form.fill(""),
