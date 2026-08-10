@@ -250,7 +250,7 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
                     TableRow(
                         HtmlContent(
                             link(
-                                linkTextKey = displayName,
+                                linkContent = Some(HtmlFormat.escape(displayName)),
                                 linkUrl = row.amendUrl,
                                 paragraphWrapped = false,
                                 visuallyHiddenText = Some(
