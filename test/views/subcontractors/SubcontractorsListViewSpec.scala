@@ -121,12 +121,11 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
         messages(
           "subcontractors.subcontractorsList.showingResults",
           1,
-          1 + rows.size - 1,
+          rows.size,
           rows.size
         )
       )
     }
-
     "must render subcontractor name links with visually hidden text" in new Setup {
 
       val html =
@@ -157,7 +156,7 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       rows.zipWithIndex.foreach { case (row, index) =>
         val link = nameLinks.get(index)
 
-        link.attr("href") mustBe "/foo"
+        link.attr("href") mustBe row.amendUrl
 
         link.ownText().trim mustBe row.name
 
@@ -194,12 +193,14 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
 
       val doc = Jsoup.parse(html.body)
 
-      doc.text must not include messages(
-        "subcontractors.subcontractorsList.showingResults",
-        1,
-        1 + rows.size - 1,
-        rows.size
-      )
+      doc.text must not include
+        messages(
+          "subcontractors.subcontractorsList.showingResults",
+          1,
+          rows.size,
+          rows.size
+        )
+
     }
 
     "must render pagination when items exist" in new Setup {
