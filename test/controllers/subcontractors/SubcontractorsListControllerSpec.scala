@@ -139,22 +139,22 @@ class SubcontractorsListControllerSpec extends SpecBase {
     Seq(
       SubcontractorsListRow(
         id = "1",
-        name = "Alan Smith",
+        name = "Smith, Alan",
         utr = "1234567890",
-        verified = true,
-        verificationNumber = "V000001",
-        taxTreatment = TaxTreatment.Gross,
+        verified = false,
+        verificationNumber = "",
+        taxTreatment = TaxTreatment.Unknown,
         dateAdded = "6 Apr 2026",
         subbieResourceRef = 10L,
         amendUrl = s"$amendBaseUrl/amend/start/$cisId/10"
       ),
       SubcontractorsListRow(
         id = "2",
-        name = "Brian Jones",
+        name = "Jones, Brian",
         utr = "9876543210",
-        verified = false,
+        verified = true,
         verificationNumber = "V000002",
-        taxTreatment = TaxTreatment.HigherRate,
+        taxTreatment = TaxTreatment.Gross,
         dateAdded = "6 May 2026",
         subbieResourceRef = 20L,
         amendUrl = s"$amendBaseUrl/amend/start/$cisId/20"
@@ -342,12 +342,12 @@ class SubcontractorsListControllerSpec extends SpecBase {
 
       running(application) {
         val url =
-          routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url
+          routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
 
         val request =
           FakeRequest(
             GET,
-            url + "?searchTerm=Alan&verificationStatus=verified&taxTreatment=gross"
+            s"$url?searchTerm=Brian&verificationStatus=verified&taxTreatment=gross"
           )
 
         val result =
@@ -367,18 +367,18 @@ class SubcontractorsListControllerSpec extends SpecBase {
 
         val paginationResult =
           paginationService.paginate(
-            allItems = filterRows(rows, "Alan", "verified", "gross"),
+            allItems = filterRows(rows, "Brian", "verified", "gross"),
             currentPage = 1,
             recordsPerPage = 8,
             baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
             queryString =
-              "searchTerm=Alan&verificationStatus=verified&taxTreatment=gross&sortBy=name&sortOrder=ascending"
+              "searchTerm=Brian&verificationStatus=verified&taxTreatment=gross&sortBy=name&sortOrder=ascending"
           )
 
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(
-          form.fill("Alan"),
+          form.fill("Brian"),
           mode,
           paginationResult.items,
           paginationResult.pagination,
@@ -387,7 +387,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
           paginationResult.startIndex,
           paginationResult.totalCount,
           instanceId,
-          "Alan",
+          "Brian",
           "verified",
           "gross",
           "name",
