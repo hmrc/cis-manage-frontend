@@ -24,13 +24,17 @@ import play.api.mvc.*
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAction @Inject() (isAgent: Boolean, agentCode: Option[String] = Some("agentCode"))(
+class FakeIdentifierAction @Inject() (
+  isAgent: Boolean,
+  agentCode: Option[String] = Some("agentCode"),
+  itmpName: Option[String] = None
+)(
   bodyParsers: PlayBodyParsers
 ) extends IdentifierAction {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
     if (isAgent) {
-      block(IdentifierRequest(request, "id", None, Some("agentReferenceNumber"), true, agentCode))
+      block(IdentifierRequest(request, "id", None, Some("agentReferenceNumber"), true, agentCode, itmpName))
     } else {
       block(IdentifierRequest(request, "id", Some(EmployerReference("taxOfficeNumber", "taxOfficeReference")), None))
     }

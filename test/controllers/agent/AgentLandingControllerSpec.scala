@@ -17,17 +17,18 @@
 package controllers.agent
 
 import base.SpecBase
-import play.api.test.FakeRequest
-import play.api.test.Helpers.*
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.ArgumentCaptor
 import models.{CisTaxpayerSearchResult, Scheme, UserAnswers}
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{AgentClientsPage, CisIdPage}
 import play.api.Application
 import play.api.inject.bind
 import play.api.mvc.Call
+import play.api.test.FakeRequest
+import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.{ManageService, PrepopService}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
@@ -35,10 +36,14 @@ import viewmodels.agent.AgentLandingViewModel
 
 import scala.concurrent.Future
 
-class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
+class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterAll with BeforeAndAfterEach {
 
   private val userId   = "id"
   private val uniqueId = "some-unique-id"
+
+  private val mockManageService     = mock[ManageService]
+  private val mockSessionRepository = mock[SessionRepository]
+  private val mockPrepopService     = mock[PrepopService]
 
   private val landingViewModel = AgentLandingViewModel(
     schemeName = "Test scheme name",
@@ -60,11 +65,35 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
       .success
       .value
 
+  private val userAnswersWithoutAgentClient: UserAnswers =
+    emptyUserAnswers
+      .set(AgentClientsPage, List.empty[CisTaxpayerSearchResult])
+      .success
+      .value
+
+  private val commonBindings = Seq(
+    bind[ManageService].toInstance(mockManageService),
+    bind[SessionRepository].toInstance(mockSessionRepository),
+    bind[PrepopService].toInstance(mockPrepopService)
+  )
+
+  private def withApplication[T](application: Application)(block: => T): T =
+    try block
+    finally application.stop().futureValue
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    when(mockSessionRepository.set(any[UserAnswers])).thenReturn(Future.successful(true))
+  }
+
+  override def afterEach(): Unit = {
+    reset(mockManageService, mockSessionRepository, mockPrepopService)
+    super.afterEach()
+  }
+
   "AgentLandingController.onPageLoad" - {
 
     "must return OK and render the page when the service succeeds" in {
-      val mockManageService     = mock[ManageService]
-      val mockSessionRepository = mock[SessionRepository]
 
       when(
         mockManageService.getAgentLandingData(
@@ -74,26 +103,21 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
         )(using any[HeaderCarrier])
       ).thenReturn(Future.successful(landingViewModel))
 
-      when(mockSessionRepository.set(any[UserAnswers]))
-        .thenReturn(Future.successful(true))
-
       val application: Application =
         applicationBuilder(
           userAnswers = Some(userAnswersWithCisId),
-          additionalBindings = Seq(
-            bind[ManageService].toInstance(mockManageService),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          ),
+          additionalBindings = commonBindings,
           isAgent = true
         ).build()
 
-      try {
+      withApplication(application) {
         val request = FakeRequest(GET, controllers.agent.routes.AgentLandingController.onPageLoad(uniqueId).url)
         val result  = route(application, request).value
 
         status(result) mustBe OK
         val body = contentAsString(result)
 
+        body must include("No name")
         body must include("Test scheme name")
         body must include("123/AB456")
 
@@ -103,11 +127,48 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
 
         verify(mockManageService)
           .getAgentLandingData(eqTo(uniqueId), any[UserAnswers], eqTo(userId))(using any[HeaderCarrier])
-      } finally application.stop()
+      }
+    }
+
+    "must return OK and render the page when the service succeeds with ITMP name" in {
+
+      when(
+        mockManageService.getAgentLandingData(
+          eqTo(uniqueId),
+          any[UserAnswers],
+          eqTo(userId)
+        )(using any[HeaderCarrier])
+      ).thenReturn(Future.successful(landingViewModel))
+
+      val application: Application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithCisId),
+          additionalBindings = commonBindings,
+          isAgent = true,
+          itmpName = Some("Test name")
+        ).build()
+
+      withApplication(application) {
+        val request = FakeRequest(GET, controllers.agent.routes.AgentLandingController.onPageLoad(uniqueId).url)
+        val result  = route(application, request).value
+
+        status(result) mustBe OK
+        val body = contentAsString(result)
+
+        body must include("Test name")
+        body must include("Test scheme name")
+        body must include("123/AB456")
+
+        val savedAnswersCaptor = ArgumentCaptor.forClass(classOf[UserAnswers])
+        verify(mockSessionRepository).set(savedAnswersCaptor.capture())
+        savedAnswersCaptor.getValue.get(CisIdPage) mustBe Some(uniqueId)
+
+        verify(mockManageService)
+          .getAgentLandingData(eqTo(uniqueId), any[UserAnswers], eqTo(userId))(using any[HeaderCarrier])
+      }
     }
 
     "must redirect to JourneyRecoveryController when the service fails" in {
-      val mockManageService = mock[ManageService]
 
       when(
         mockManageService.getAgentLandingData(
@@ -120,13 +181,11 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
       val application: Application =
         applicationBuilder(
           userAnswers = Some(userAnswersWithCisId),
-          additionalBindings = Seq(
-            bind[ManageService].toInstance(mockManageService)
-          ),
+          additionalBindings = commonBindings,
           isAgent = true
         ).build()
 
-      try {
+      withApplication(application) {
         val request =
           FakeRequest(GET, controllers.agent.routes.AgentLandingController.onPageLoad(uniqueId).url)
 
@@ -135,8 +194,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
           controllers.routes.JourneyRecoveryController.onPageLoad().url
-
-      } finally application.stop()
+      }
     }
   }
 
@@ -145,7 +203,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
     val returnsTargetKey = "returnDue"
 
     "must call prepopulate + getScheme and redirect using determineLandingDestination when scheme is found" in {
-      val mockPrepopService = mock[PrepopService]
 
       val scheme = Scheme(
         schemeId = 123,
@@ -181,13 +238,11 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
       val application: Application =
         applicationBuilder(
           userAnswers = Some(userAnswersWithAgentClient),
-          additionalBindings = Seq(
-            bind[PrepopService].toInstance(mockPrepopService)
-          ),
+          additionalBindings = commonBindings,
           isAgent = true
         ).build()
 
-      try {
+      withApplication(application) {
         val request =
           FakeRequest(
             GET,
@@ -215,11 +270,10 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
             any[Call],
             any[Call]
           )
-      } finally application.stop()
+      }
     }
 
     "must redirect to SystemErrorController when prepopulateContractorKnownFacts fails with UpstreamErrorResponse" in {
-      val mockPrepopService = mock[PrepopService]
 
       when(
         mockPrepopService.prepopulateContractorKnownFacts(
@@ -234,13 +288,11 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
       val application: Application =
         applicationBuilder(
           userAnswers = Some(userAnswersWithAgentClient),
-          additionalBindings = Seq(
-            bind[PrepopService].toInstance(mockPrepopService)
-          ),
+          additionalBindings = commonBindings,
           isAgent = true
         ).build()
 
-      try {
+      withApplication(application) {
         val request =
           FakeRequest(
             GET,
@@ -252,12 +304,10 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
           controllers.routes.SystemErrorController.onPageLoad().url
-
-      } finally application.stop()
+      }
     }
 
     "must redirect to SystemErrorController when prepopulateContractorKnownFacts fails with an unexpected error" in {
-      val mockPrepopService = mock[PrepopService]
 
       when(
         mockPrepopService.prepopulateContractorKnownFacts(
@@ -272,13 +322,11 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
       val application: Application =
         applicationBuilder(
           userAnswers = Some(userAnswersWithAgentClient),
-          additionalBindings = Seq(
-            bind[PrepopService].toInstance(mockPrepopService)
-          ),
+          additionalBindings = commonBindings,
           isAgent = true
         ).build()
 
-      try {
+      withApplication(application) {
         val request =
           FakeRequest(
             GET,
@@ -290,29 +338,19 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
           controllers.routes.SystemErrorController.onPageLoad().url
-
-      } finally application.stop()
+      }
     }
 
     "must redirect to SystemErrorController when client is missing from AgentClientsPage" in {
-      val mockPrepopService = mock[PrepopService]
-
-      val uaWithoutClient =
-        emptyUserAnswers
-          .set(AgentClientsPage, List.empty[CisTaxpayerSearchResult])
-          .success
-          .value
 
       val application: Application =
         applicationBuilder(
-          userAnswers = Some(uaWithoutClient),
-          additionalBindings = Seq(
-            bind[PrepopService].toInstance(mockPrepopService)
-          ),
+          userAnswers = Some(userAnswersWithoutAgentClient),
+          additionalBindings = commonBindings,
           isAgent = true
         ).build()
 
-      try {
+      withApplication(application) {
         val request =
           FakeRequest(
             GET,
@@ -326,23 +364,19 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
           controllers.routes.SystemErrorController.onPageLoad().url
 
         verifyNoInteractions(mockPrepopService)
-
-      } finally application.stop()
+      }
     }
 
     "must return NotFound when targetKey is unknown" in {
-      val mockPrepopService = mock[PrepopService]
 
       val application: Application =
         applicationBuilder(
           userAnswers = Some(userAnswersWithAgentClient),
-          additionalBindings = Seq(
-            bind[PrepopService].toInstance(mockPrepopService)
-          ),
+          additionalBindings = commonBindings,
           isAgent = true
         ).build()
 
-      try {
+      withApplication(application) {
         val request =
           FakeRequest(
             GET,
@@ -353,12 +387,10 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe NOT_FOUND
         verifyNoInteractions(mockPrepopService)
-
-      } finally application.stop()
+      }
     }
 
     "must redirect to SystemErrorController when getScheme returns None" in {
-      val mockPrepopService = mock[PrepopService]
 
       when(
         mockPrepopService.prepopulateContractorKnownFacts(any[String], any[String], any[String])(any[HeaderCarrier])
@@ -371,11 +403,11 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
       val application: Application =
         applicationBuilder(
           userAnswers = Some(userAnswersWithAgentClient),
-          additionalBindings = Seq(bind[PrepopService].toInstance(mockPrepopService)),
+          additionalBindings = commonBindings,
           isAgent = true
         ).build()
 
-      try {
+      withApplication(application) {
         val request =
           FakeRequest(
             GET,
@@ -391,7 +423,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar {
           .prepopulateContractorKnownFacts(eqTo(uniqueId), eqTo("163"), eqTo("AB0063"))(any[HeaderCarrier])
         verify(mockPrepopService)
           .getScheme(eqTo(uniqueId))(any[HeaderCarrier])
-      } finally application.stop()
+      }
     }
   }
 }

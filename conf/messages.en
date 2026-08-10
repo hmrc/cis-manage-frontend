@@ -266,6 +266,7 @@ agent.clientListSearch.details.2.link                  =  Find commercial softwa
 agent.landing.title                                    =  Manage Construction Industry Scheme account
 agent.landing.h1                                       =  Manage Construction Industry Scheme account
 agent.landing.agentName.key                            =  Agent name
+agent.landing.agentName.noName                         =  No name
 agent.landing.schemeName.key                           =  Scheme name
 agent.landing.schemeName.key.notProvided               =  Not provided
 agent.landing.employerRef.key                          =  Employer reference
