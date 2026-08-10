@@ -117,11 +117,14 @@ class SubcontractorsListController @Inject() (
   private def rowsFromUserAnswers(
     userAnswers: UserAnswers
   ): Option[Seq[SubcontractorsListRow]] =
-    for {
-      cisId          <- userAnswers.get(CisIdPage)
-      subcontractors <- userAnswers.get(SubcontractorListPage)
-    } yield subcontractors.subcontractors.map { subcontractor =>
-      toListRow(subcontractor, cisId)
+    userAnswers.get(SubcontractorListPage).flatMap { subcontractors =>
+      if (subcontractors.subcontractors.isEmpty) {
+        Some(Seq.empty)
+      } else {
+        userAnswers.get(CisIdPage).map { cisId =>
+          subcontractors.subcontractors.map(toListRow(_, cisId))
+        }
+      }
     }
 
   private def toListRow(
