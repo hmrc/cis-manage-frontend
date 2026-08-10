@@ -88,7 +88,9 @@ class GetSubcontractorForDeleteController @Inject() (
     canBeDeleted: Boolean
   )(implicit request: DataRequest[_]): Future[Unit] = {
 
-    val journeyData =
+    val existingJourneyData = request.userAnswers.get(DeleteSubcontractorJourneyPage).getOrElse(List.empty)
+
+    val journeyData = existingJourneyData :+
       DeleteSubcontractorJourneyData(
         subcontractorName = displayName,
         subbieResourceRef = subbieResourceRef,
@@ -120,7 +122,7 @@ class GetSubcontractorForDeleteController @Inject() (
     if (canDelete) {
       Redirect(routes.DeleteSubcontractorYesNoController.onPageLoad(subbieResourceRef.toString))
     } else {
-      Redirect(routes.CannotDeleteSubcontractorController.onPageLoad())
+      Redirect(routes.CannotDeleteSubcontractorController.onPageLoad(subbieResourceRef.toString))
     }
 
   private def journeyRecoveryRedirect =

@@ -48,14 +48,18 @@ class DeleteSubcontractorYesNoController @Inject() (
 
   def onPageLoad(verificationNumber: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      request.userAnswers
+
+      val journeyPage = request.userAnswers
         .get(DeleteSubcontractorJourneyPage)
+        .flatMap(_.find(_.subbieResourceRef.toString == verificationNumber))
+
+      journeyPage
         .fold {
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         } { journeyData =>
           if (!journeyData.subcontractorCanBeDeleted) {
             Redirect(
-              controllers.subcontractors.routes.CannotDeleteSubcontractorController.onPageLoad()
+              controllers.subcontractors.routes.CannotDeleteSubcontractorController.onPageLoad(verificationNumber)
             )
           } else {
             val preparedForm =
@@ -77,12 +81,16 @@ class DeleteSubcontractorYesNoController @Inject() (
 
   def onSubmit(verificationNumber: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+
+      val journeyData = request.userAnswers
+        .get(DeleteSubcontractorJourneyPage)
+        .flatMap(_.find(_.subbieResourceRef.toString == verificationNumber))
+
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.userAnswers
-              .get(DeleteSubcontractorJourneyPage)
+            journeyData
               .fold(
                 Future.successful(
                   Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
@@ -111,7 +119,7 @@ class DeleteSubcontractorYesNoController @Inject() (
             } yield
               if (value) {
                 Redirect(
-                  controllers.subcontractors.routes.DeleteSubcontractorController.onPageLoad()
+                  controllers.subcontractors.routes.DeleteSubcontractorController.onPageLoad(verificationNumber)
                 )
               } else {
                 Redirect(

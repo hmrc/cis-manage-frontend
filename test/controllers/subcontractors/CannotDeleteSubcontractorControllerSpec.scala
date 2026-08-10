@@ -31,7 +31,7 @@ class CannotDeleteSubcontractorControllerSpec extends SpecBase {
   private val subcontractorName = "Gamma Builders"
 
   "CannotDeleteSubcontractorController" - {
-
+    val verificationNumber = "10"
     "must return OK and the correct view for a GET" in {
 
       val userAnswers =
@@ -41,15 +41,16 @@ class CannotDeleteSubcontractorControllerSpec extends SpecBase {
           .value
           .set(
             DeleteSubcontractorJourneyPage,
-            DeleteSubcontractorJourneyData(
-              subcontractorName = subcontractorName,
-              subbieResourceRef = 10L,
-              subcontractorCanBeDeleted = false
+            List(
+              DeleteSubcontractorJourneyData(
+                subcontractorName = subcontractorName,
+                subbieResourceRef = 10L,
+                subcontractorCanBeDeleted = false
+              )
             )
           )
           .success
           .value
-
       val application =
         applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -59,7 +60,7 @@ class CannotDeleteSubcontractorControllerSpec extends SpecBase {
           FakeRequest(
             GET,
             controllers.subcontractors.routes.CannotDeleteSubcontractorController
-              .onPageLoad()
+              .onPageLoad(verificationNumber)
               .url
           )
 
@@ -100,7 +101,7 @@ class CannotDeleteSubcontractorControllerSpec extends SpecBase {
           FakeRequest(
             GET,
             controllers.subcontractors.routes.CannotDeleteSubcontractorController
-              .onPageLoad()
+              .onPageLoad(verificationNumber)
               .url
           )
 
@@ -123,10 +124,12 @@ class CannotDeleteSubcontractorControllerSpec extends SpecBase {
           .value
           .set(
             DeleteSubcontractorJourneyPage,
-            DeleteSubcontractorJourneyData(
-              subcontractorName = subcontractorName,
-              subbieResourceRef = 10L,
-              subcontractorCanBeDeleted = true
+            List(
+              DeleteSubcontractorJourneyData(
+                subcontractorName = subcontractorName,
+                subbieResourceRef = 10L,
+                subcontractorCanBeDeleted = true
+              )
             )
           )
           .success
@@ -141,7 +144,7 @@ class CannotDeleteSubcontractorControllerSpec extends SpecBase {
           FakeRequest(
             GET,
             controllers.subcontractors.routes.CannotDeleteSubcontractorController
-              .onPageLoad()
+              .onPageLoad(verificationNumber)
               .url
           )
 

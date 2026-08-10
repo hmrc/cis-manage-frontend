@@ -33,10 +33,12 @@ class DeleteSubcontractorJourneyPageSpec extends SpecBase {
     "must allow a value to be set and retrieved" in {
 
       val journeyData =
-        DeleteSubcontractorJourneyData(
-          subcontractorName = "Gamma Builders",
-          subbieResourceRef = 10L,
-          subcontractorCanBeDeleted = true
+        List(
+          DeleteSubcontractorJourneyData(
+            subcontractorName = "Gamma Builders",
+            subbieResourceRef = 10L,
+            subcontractorCanBeDeleted = true
+          )
         )
 
       val answers =
@@ -58,17 +60,21 @@ class DeleteSubcontractorJourneyPageSpec extends SpecBase {
     "must overwrite an existing value" in {
 
       val original =
-        DeleteSubcontractorJourneyData(
-          subcontractorName = "Gamma Builders",
-          subbieResourceRef = 10L,
-          subcontractorCanBeDeleted = true
+        List(
+          DeleteSubcontractorJourneyData(
+            subcontractorName = "Gamma Builders",
+            subbieResourceRef = 10L,
+            subcontractorCanBeDeleted = true
+          )
         )
 
       val updated =
-        DeleteSubcontractorJourneyData(
-          subcontractorName = "Delta Group",
-          subbieResourceRef = 20L,
-          subcontractorCanBeDeleted = false
+        List(
+          DeleteSubcontractorJourneyData(
+            subcontractorName = "Delta Group",
+            subbieResourceRef = 20L,
+            subcontractorCanBeDeleted = false
+          )
         )
 
       val answers =

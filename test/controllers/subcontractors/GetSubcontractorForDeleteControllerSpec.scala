@@ -35,12 +35,12 @@ class GetSubcontractorForDeleteControllerSpec extends SpecBase with MockitoSugar
   val subbieResourceRef = 10L
   val cisId             = "123"
 
-  val okResponse =
+  val okResponse           =
     GetSubcontractorForDeleteResponse(
       subcontractorName = "Gamma Builders",
       subcontractorCanBeDeleted = true
     )
-
+  val verificationNumber   = "10"
   val cannotDeleteResponse =
     GetSubcontractorForDeleteResponse(
       subcontractorName = "Gamma Builders",
@@ -141,7 +141,7 @@ class GetSubcontractorForDeleteControllerSpec extends SpecBase with MockitoSugar
 
         redirectLocation(result).value mustBe
           controllers.subcontractors.routes.CannotDeleteSubcontractorController
-            .onPageLoad()
+            .onPageLoad(verificationNumber)
             .url
 
         verify(mockService)

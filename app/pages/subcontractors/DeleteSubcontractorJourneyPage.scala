@@ -20,7 +20,7 @@ import models.subcontractors.DeleteSubcontractorJourneyData
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object DeleteSubcontractorJourneyPage extends QuestionPage[DeleteSubcontractorJourneyData] {
+case object DeleteSubcontractorJourneyPage extends QuestionPage[List[DeleteSubcontractorJourneyData]] {
 
   override def path: JsPath =
     JsPath \ "deleteSubcontractorJourney"

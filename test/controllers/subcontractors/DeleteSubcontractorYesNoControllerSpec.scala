@@ -26,6 +26,7 @@ import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CisIdPage
 import pages.subcontractors.{DeleteSubcontractorJourneyPage, DeleteSubcontractorYesNoPage}
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -39,19 +40,21 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider                       = new DeleteSubcontractorYesNoFormProvider()
-  val form                               = formProvider()
-  val subcontractorName                  = "subcontractor Name"
-  val cisId                              = "1"
-  val verificationNumber                 = "VN12345"
-  lazy val deleteSubcontractorYesNoRoute =
+  val formProvider                               = new DeleteSubcontractorYesNoFormProvider()
+  val form: Form[Boolean]                        = formProvider()
+  val subcontractorName                          = "subcontractor Name"
+  val cisId                                      = "1"
+  val verificationNumber                         = "10"
+  lazy val deleteSubcontractorYesNoRoute: String =
     controllers.subcontractors.routes.DeleteSubcontractorYesNoController.onPageLoad(verificationNumber).url
 
   private val journeyData =
-    DeleteSubcontractorJourneyData(
-      subcontractorName = subcontractorName,
-      subbieResourceRef = 10L,
-      subcontractorCanBeDeleted = true
+    List(
+      DeleteSubcontractorJourneyData(
+        subcontractorName = subcontractorName,
+        subbieResourceRef = 10L,
+        subcontractorCanBeDeleted = true
+      )
     )
 
   private val userAnswersWithJourney =
@@ -72,8 +75,7 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
         val request = FakeRequest(GET, deleteSubcontractorYesNoRoute)
 
         val result = route(application, request).value
-
-        val view = application.injector.instanceOf[DeleteSubcontractorYesNoView]
+        val view   = application.injector.instanceOf[DeleteSubcontractorYesNoView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(verificationNumber, subcontractorName, form, NormalMode)(
@@ -139,7 +141,7 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
 
         redirectLocation(result).value mustEqual
           controllers.subcontractors.routes.DeleteSubcontractorController
-            .onPageLoad()
+            .onPageLoad(verificationNumber)
             .url
       }
     }
@@ -217,10 +219,12 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
         emptyUserAnswers
           .set(
             DeleteSubcontractorJourneyPage,
-            DeleteSubcontractorJourneyData(
-              subcontractorName = subcontractorName,
-              subbieResourceRef = 10L,
-              subcontractorCanBeDeleted = false
+            List(
+              DeleteSubcontractorJourneyData(
+                subcontractorName = subcontractorName,
+                subbieResourceRef = 10L,
+                subcontractorCanBeDeleted = false
+              )
             )
           )
           .success
@@ -241,7 +245,7 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
 
         redirectLocation(result).value mustEqual
           controllers.subcontractors.routes.CannotDeleteSubcontractorController
-            .onPageLoad()
+            .onPageLoad(verificationNumber)
             .url
       }
     }

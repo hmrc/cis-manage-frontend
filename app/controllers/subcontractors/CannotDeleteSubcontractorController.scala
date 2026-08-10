@@ -17,7 +17,7 @@
 package controllers.subcontractors
 
 import controllers.actions.*
-import models.NormalMode
+import models.{Mode, NormalMode}
 import pages.subcontractors.DeleteSubcontractorJourneyPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -37,10 +37,13 @@ class CannotDeleteSubcontractorController @Inject() (
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] =
+  def onPageLoad(verificationNumber: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId) { implicit request =>
-      request.userAnswers
+      val journeyPage = request.userAnswers
         .get(DeleteSubcontractorJourneyPage)
+        .flatMap(_.find(_.subbieResourceRef.toString == verificationNumber))
+
+      journeyPage
         .fold {
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         } { journeyData =>

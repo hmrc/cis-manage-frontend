@@ -13,14 +13,14 @@ GET   /refresh-session  controllers.KeepAliveController.keepAlive()
 
 GET   /check-your-answers  controllers.CheckYourAnswersController.onPageLoad()
 
-GET   /subcontractors/delete-subcontractor/submit  controllers.subcontractors.DeleteSubcontractorController.onPageLoad()
+GET   /subcontractors/delete-subcontractor/submit/:verificationNumber  controllers.subcontractors.DeleteSubcontractorController.onPageLoad(verificationNumber: String, mode: Mode = NormalMode)
 
 GET   /subcontractors/delete-subcontractor/:verificationNumber  controllers.subcontractors.DeleteSubcontractorYesNoController.onPageLoad(verificationNumber: String, mode: Mode = NormalMode)
 POST  /subcontractors/delete-subcontractor/:verificationNumber  controllers.subcontractors.DeleteSubcontractorYesNoController.onSubmit(verificationNumber: String, mode: Mode = NormalMode)
 
 GET   /subcontractors/subcontractor-deleted  controllers.subcontractors.SubcontractorDeletedConfirmationController.onPageLoad()
 
-GET   /subcontractors/cannot-delete-subcontractor-warning  controllers.subcontractors.CannotDeleteSubcontractorController.onPageLoad()
+GET   /subcontractors/cannot-delete-subcontractor-warning/:verificationNumber  controllers.subcontractors.CannotDeleteSubcontractorController.onPageLoad(verificationNumber: String, mode: Mode = NormalMode)
 
 GET   /subcontractors/no-subcontractors-to-view  controllers.subcontractors.NoSubcontractorsExistController.onPageLoad()
 

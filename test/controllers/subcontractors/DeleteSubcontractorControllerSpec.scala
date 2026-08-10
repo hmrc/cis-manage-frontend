@@ -33,16 +33,18 @@ import scala.concurrent.Future
 
 class DeleteSubcontractorControllerSpec extends SpecBase with MockitoSugar {
 
-  private val cisId             = "cis-123"
-  private val subcontractorName = "ABC Contractors"
-  private val subbieResourceRef = 10L
-
-  lazy val deleteSubcontractorRoute: String = "/subcontractors/delete-subcontractor/submit"
+  private val cisId                         = "cis-123"
+  private val subcontractorName             = "ABC Contractors"
+  private val subbieResourceRef             = 10L
+  private val verificationNumber            = "10"
+  lazy val deleteSubcontractorRoute: String = s"/subcontractors/delete-subcontractor/submit/$verificationNumber"
   private val journeyData                   =
-    DeleteSubcontractorJourneyData(
-      subcontractorName = subcontractorName,
-      subbieResourceRef = subbieResourceRef,
-      subcontractorCanBeDeleted = true
+    List(
+      DeleteSubcontractorJourneyData(
+        subcontractorName = subcontractorName,
+        subbieResourceRef = subbieResourceRef,
+        subcontractorCanBeDeleted = true
+      )
     )
 
   "DeleteSubcontractorController" - {
