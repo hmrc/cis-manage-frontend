@@ -35,12 +35,6 @@ GET   /subcontractors/delete-subcontractor/submit  controllers.subcontractors.De
 
 GET   /subcontractors/retrieve  controllers.subcontractors.GetSubcontractorListController.onPageLoad()
 
-GET   /remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
-POST  /remove-unmatched-subcontractor-from-request  controllers.unmatched.RemoveSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
-
-GET   /proceed-verifying-unmatched-subcontractor  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onPageLoad(mode: Mode = NormalMode)
-POST  /proceed-verifying-unmatched-subcontractor  controllers.unmatched.ProceedSubcontractorVerifyRequestController.onSubmit(mode: Mode = NormalMode)
-
 # Errors & Auth
 GET  /there-is-a-problem               controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
