@@ -30,7 +30,7 @@ import views.html.agent.AgentLandingView
 class AgentLandingViewSpec extends SpecBase {
 
   private val uniqueId    = "1"
-  private val agentName   = "Agent name"
+  private val agentName   = Some("Agent name")
   private val schemeName  = "UHD Contractor Control Group"
   private val employerRef = "123/AB45678"
 
@@ -58,7 +58,7 @@ class AgentLandingViewSpec extends SpecBase {
       val agentNameKey   = rows.get(0).selectFirst(".govuk-summary-list__key").text()
       val agentNameValue = rows.get(0).selectFirst(".govuk-summary-list__value").text()
       agentNameKey   shouldBe messages(app).apply("agent.landing.agentName.key")
-      agentNameValue shouldBe agentName
+      agentNameValue shouldBe "Agent name"
 
       val schemeNameKey   = rows.get(1).selectFirst(".govuk-summary-list__key").text()
       val schemeNameValue = rows.get(1).selectFirst(".govuk-summary-list__value").text()
@@ -69,6 +69,17 @@ class AgentLandingViewSpec extends SpecBase {
       val employerValue = rows.get(2).selectFirst(".govuk-summary-list__value").text()
       employerKey   shouldBe messages(app).apply("agent.landing.employerRef.key")
       employerValue shouldBe employerRef
+    }
+
+    "show no name when agent name is missing" in {
+      val (doc, _) = render(schemeName = "", agentName = None)
+
+      val rows = doc.select(".govuk-summary-list .govuk-summary-list__row")
+
+      val agentNameKey   = rows.get(0).selectFirst(".govuk-summary-list__key").text()
+      val agentNameValue = rows.get(0).selectFirst(".govuk-summary-list__value").text()
+      agentNameKey   shouldBe messages(app).apply("agent.landing.agentName.key")
+      agentNameValue shouldBe "No name"
     }
 
     "show 'Not provided' when scheme name is empty" in {
@@ -114,7 +125,10 @@ class AgentLandingViewSpec extends SpecBase {
     }
   }
 
-  private def render(schemeName: String = this.schemeName): (Document, FrontendAppConfig) = {
+  private def render(
+    schemeName: String = this.schemeName,
+    agentName: Option[String] = agentName
+  ): (Document, FrontendAppConfig) = {
     val application                           = app
     implicit val appConfig: FrontendAppConfig =
       application.injector.instanceOf[FrontendAppConfig]
