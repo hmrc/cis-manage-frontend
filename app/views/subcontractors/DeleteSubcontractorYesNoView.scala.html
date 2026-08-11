@@ -26,7 +26,7 @@
     govukButton: GovukButton
 )
 
-@(verificationNumber: String, subcontractorName: String, form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(verificationNumber: Long, subcontractorName: String, form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("subcontractors.deleteSubcontractorYesNo.title"))) {
 

@@ -118,7 +118,7 @@ class GetSubcontractorForDeleteController @Inject() (
     canDelete: Boolean
   ) =
     if (canDelete) {
-      Redirect(routes.DeleteSubcontractorYesNoController.onPageLoad(subbieResourceRef.toString))
+      Redirect(routes.DeleteSubcontractorYesNoController.onPageLoad(subbieResourceRef))
     } else {
       Redirect(routes.CannotDeleteSubcontractorController.onPageLoad())
     }
