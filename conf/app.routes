@@ -13,7 +13,7 @@ GET   /refresh-session  controllers.KeepAliveController.keepAlive()
 
 GET   /check-your-answers  controllers.CheckYourAnswersController.onPageLoad()
 
-GET   /subcontractors/delete-subcontractor/submit/:verificationNumber  controllers.subcontractors.DeleteSubcontractorController.onPageLoad(verificationNumber: String, mode: Mode = NormalMode)
+GET   /subcontractors/delete-subcontractor/submit/:verificationNumber  controllers.subcontractors.DeleteSubcontractorController.onPageLoad(verificationNumber: String)
 
 GET   /subcontractors/delete-subcontractor/:verificationNumber  controllers.subcontractors.DeleteSubcontractorYesNoController.onPageLoad(verificationNumber: String, mode: Mode = NormalMode)
 POST  /subcontractors/delete-subcontractor/:verificationNumber  controllers.subcontractors.DeleteSubcontractorYesNoController.onSubmit(verificationNumber: String, mode: Mode = NormalMode)

@@ -17,7 +17,6 @@
 package controllers.subcontractors
 
 import controllers.actions.*
-import models.Mode
 import models.requests.CisIdDataRequest
 import models.subcontractors.DeleteSubcontractorJourneyData
 import pages.subcontractors.{DeleteSubcontractorJourneyPage, DeleteSubcontractorYesNoPage, DeletedSubcontractorPage, SubcontractorListPage}
@@ -45,7 +44,7 @@ class DeleteSubcontractorController @Inject() (
   private def journeyRecoveryRedirect: Result =
     Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
 
-  def onPageLoad(verificationNumber: String, mode: Mode): Action[AnyContent] =
+  def onPageLoad(verificationNumber: String): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
       (
         request.userAnswers
