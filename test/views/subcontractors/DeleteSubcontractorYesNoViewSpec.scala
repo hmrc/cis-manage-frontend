@@ -30,7 +30,7 @@ class DeleteSubcontractorYesNoViewSpec extends SpecBase {
 
     "must render the content on the page" in new Setup {
 
-      val verificationNumber = "VN12345"
+      val verificationNumber = 12345L
       val subcontractorName  = "subcontractorName"
       val html               = view(verificationNumber, subcontractorName, form, NormalMode)
       val doc                = Jsoup.parse(html.body)

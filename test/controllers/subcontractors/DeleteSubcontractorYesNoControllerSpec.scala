@@ -46,7 +46,7 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
   val subcontractorName                  = "subcontractor Name"
   val cisId                              = "1"
   val subbieResourceRef                  = 10L
-  val verificationNumber                 = subbieResourceRef.toString
+  val verificationNumber                 = subbieResourceRef
   lazy val deleteSubcontractorYesNoRoute =
     controllers.subcontractors.routes.DeleteSubcontractorYesNoController.onPageLoad(verificationNumber).url
 

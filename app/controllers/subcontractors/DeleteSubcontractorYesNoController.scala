@@ -51,7 +51,7 @@ class DeleteSubcontractorYesNoController @Inject() (
 
   private val form: Form[Boolean] = formProvider()
 
-  def onPageLoad(verificationNumber: String, mode: Mode): Action[AnyContent] =
+  def onPageLoad(verificationNumber: Long, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers
         .get(DeleteSubcontractorJourneyPage)
@@ -68,13 +68,10 @@ class DeleteSubcontractorYesNoController @Inject() (
                 .get(DeleteSubcontractorYesNoPage)
                 .fold(form)(form.fill)
 
-            val subcontractorName = verificationNumber.toLongOption
-              .flatMap { subbieResourceRef =>
-                request.userAnswers
-                  .get(SubcontractorListPage)
-                  .flatMap(_.subcontractors.find(_.subbieResourceRef.contains(subbieResourceRef)))
-                  .flatMap(_.displayName)
-              }
+            val subcontractorName = request.userAnswers
+              .get(SubcontractorListPage)
+              .flatMap(_.subcontractors.find(_.subbieResourceRef.contains(verificationNumber)))
+              .flatMap(_.displayName)
               .getOrElse(journeyData.subcontractorName)
 
             Ok(
@@ -89,7 +86,7 @@ class DeleteSubcontractorYesNoController @Inject() (
         }
     }
 
-  def onSubmit(verificationNumber: String, mode: Mode): Action[AnyContent] =
+  def onSubmit(verificationNumber: Long, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
       form
         .bindFromRequest()
@@ -126,38 +123,30 @@ class DeleteSubcontractorYesNoController @Inject() (
                 .fold(
                   Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
                 ) { journeyData =>
-                  verificationNumber.toLongOption match {
-                    case Some(subbieResourceRef) =>
-                      val subcontractorName = request.userAnswers
-                        .get(SubcontractorListPage)
-                        .flatMap(_.subcontractors.find(_.subbieResourceRef.contains(subbieResourceRef)))
-                        .flatMap(_.displayName)
-                        .getOrElse(journeyData.subcontractorName)
-                      subcontractorService
-                        .deleteSubcontractor(request.cisId, subbieResourceRef)
-                        .flatMap { _ =>
-                          cleanupUserAnswers(subcontractorName)
-                            .map { _ =>
-                              Redirect(
-                                controllers.subcontractors.routes.SubcontractorDeletedConfirmationController
-                                  .onPageLoad()
-                              )
-                            }
-                        }
-                        .recover { case ex =>
-                          logger.error(
-                            s"[DeleteSubcontractorYesNoController] Failed to delete subcontractor " +
-                              s"(cisId=${request.cisId}, subbieResourceRef=$subbieResourceRef)",
-                            ex
+                  val subcontractorName = request.userAnswers
+                    .get(SubcontractorListPage)
+                    .flatMap(_.subcontractors.find(_.subbieResourceRef.contains(verificationNumber)))
+                    .flatMap(_.displayName)
+                    .getOrElse(journeyData.subcontractorName)
+                  subcontractorService
+                    .deleteSubcontractor(request.cisId, verificationNumber)
+                    .flatMap { _ =>
+                      cleanupUserAnswers(subcontractorName)
+                        .map { _ =>
+                          Redirect(
+                            controllers.subcontractors.routes.SubcontractorDeletedConfirmationController
+                              .onPageLoad()
                           )
-                          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
                         }
-                    case None                    =>
+                    }
+                    .recover { case ex =>
                       logger.error(
-                        s"[DeleteSubcontractorYesNoController] Invalid verificationNumber: $verificationNumber"
+                        s"[DeleteSubcontractorYesNoController] Failed to delete subcontractor " +
+                          s"(cisId=${request.cisId}, subbieResourceRef=$verificationNumber)",
+                        ex
                       )
-                      Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-                  }
+                      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                    }
                 }
             }
         )
