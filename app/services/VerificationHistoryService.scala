@@ -31,9 +31,9 @@ import scala.util.Try
 @Singleton
 class VerificationHistoryService @Inject() () {
 
-  private val displayDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM yyyy")
+  private val displayDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
   private val timeFormatter: DateTimeFormatter        = DateTimeFormatter.ofPattern("HH:mm")
-  private val fullDateFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("d MMMM yyyy")
+  private val fullDateFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("dd MMMM yyyy")
 
   def getSubmittedVerificationTaxYears(data: VerificationHistoryData): Seq[TaxYearPeriod] =
     data.verificationRequests
@@ -175,7 +175,7 @@ class VerificationHistoryService @Inject() () {
               taxYear = taxYearStart(acceptedDateTime.toLocalDate),
               acceptedDateTime = acceptedDateTime,
               contractorName = contractorNameFor(scheme),
-              employerReference = scheme.accountsOfficeReference,
+              employerReference = scheme.taxOfficeNumber,
               receiptReferenceNumber = receiptReferenceNumberFor(batch.verificationBatchId, submission),
               subcontractorsToVerify = subcontractorsFor(
                 batch.verificationBatchId,

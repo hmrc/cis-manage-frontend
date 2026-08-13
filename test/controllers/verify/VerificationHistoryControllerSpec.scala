@@ -68,7 +68,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
         rows = Seq(
           VerificationHistoryRowViewModel(
             verificationNumber = "V0004528765",
-            dateSubmitted = "6 Apr 2026",
+            dateSubmitted = "06 Apr 2026",
             verificationRequestLink = "#",
             submissionReceiptLink = "#"
           )

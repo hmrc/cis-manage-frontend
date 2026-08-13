@@ -30,10 +30,10 @@ class VerificationRequestViewSpec extends SpecBase {
 
   private val viewModelWithReverify = VerificationRequestPageViewModel(
     submittedTime = "14:30",
-    submittedDate = "6 February 2027",
+    submittedDate = "06 February 2027",
     verificationNumber = "V0004528765",
     contractorName = "Gary Construction Ltd",
-    employerReference = "123PA000001",
+    employerReference = "123",
     receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
     subcontractorsToVerify = Seq(
       SubcontractorRowViewModel("Amity Marine Contractors", "V0004528765"),
@@ -77,7 +77,7 @@ class VerificationRequestViewSpec extends SpecBase {
     "render the submitted at paragraph" in {
       val doc = render(viewModelWithReverify)
 
-      doc.text() should include("Submitted at 14:30 on 6 February 2027")
+      doc.text() should include("Submitted at 14:30 on 06 February 2027")
     }
 
     "render the verification number in the summary list" in {
@@ -93,7 +93,7 @@ class VerificationRequestViewSpec extends SpecBase {
       doc.text() should include(messages(app)("verify.verificationRequest.contractorName"))
       doc.text() should include("Gary Construction Ltd")
       doc.text() should include(messages(app)("verify.verificationRequest.employerReference"))
-      doc.text() should include("123PA000001")
+      doc.text() should include("123")
       doc.text() should include(messages(app)("verify.verificationRequest.receiptReferenceNumber"))
       doc.text() should include("Pyy1LRJh053AE+nuyp0GJR7oESw=")
     }

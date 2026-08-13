@@ -79,9 +79,9 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
   private val viewModel =
     SubcontractorSubmissionReceiptViewModel(
       submissionTime = "14:30",
-      submissionDate = "6 February 2027",
+      submissionDate = "06 February 2027",
       contractorName = "Gary Construction Ltd",
-      employerReference = "123PA000001",
+      employerReference = "123",
       receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
       verificationNumber = verificationNumber,
       cisId = cisId

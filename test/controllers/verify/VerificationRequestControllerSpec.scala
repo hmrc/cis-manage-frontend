@@ -78,10 +78,10 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
 
   private val viewModel = VerificationRequestPageViewModel(
     submittedTime = "14:30",
-    submittedDate = "6 February 2027",
+    submittedDate = "06 February 2027",
     verificationNumber = verificationNumber,
     contractorName = "Gary Construction Ltd",
-    employerReference = "123PA000001",
+    employerReference = "123",
     receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
     subcontractorsToVerify = Seq(
       SubcontractorRowViewModel("Amity Marine Contractors", "V0004528765"),

@@ -47,7 +47,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
       taxYear = taxYear,
       acceptedDateTime = dateSubmitted.atStartOfDay(),
       contractorName = "Test Scheme",
-      employerReference = "123PA000001",
+      employerReference = "123",
       receiptReferenceNumber = receiptReferenceNumber,
       subcontractorsToVerify = Seq.empty,
       subcontractorsToReverify = Seq.empty
@@ -87,7 +87,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
       taxYear = taxYear,
       acceptedDateTime = acceptedDateTime,
       contractorName = "Test Scheme",
-      employerReference = "123PA000001",
+      employerReference = "123",
       receiptReferenceNumber = receiptReferenceNumber,
       subcontractorsToVerify = subcontractorsToVerify,
       subcontractorsToReverify = subcontractorsToReverify
@@ -195,8 +195,8 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
 
         val vm   = result.get
         val rows = vm.taxYears.head.rows
-        rows.head.dateSubmitted mustBe "6 Jun 2026"
-        rows(1).dateSubmitted mustBe "6 Apr 2026"
+        rows.head.dateSubmitted mustBe "06 Jun 2026"
+        rows(1).dateSubmitted mustBe "06 Apr 2026"
       }
 
       "must set verification request link to the verification request page" in {
@@ -507,10 +507,10 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
         )
 
         result.value.submittedTime mustBe "14:30"
-        result.value.submittedDate mustBe "6 April 2026"
+        result.value.submittedDate mustBe "06 April 2026"
         result.value.verificationNumber mustBe "V001"
         result.value.contractorName mustBe "Test Scheme"
-        result.value.employerReference mustBe "123PA000001"
+        result.value.employerReference mustBe "123"
         result.value.receiptReferenceNumber mustBe receiptReferenceNumber
         result.value.subcontractorsToVerify mustBe Seq(SubcontractorRowViewModel("Amity Marine Contractors", "V001"))
         result.value.subcontractorsToReverify mustBe Seq(SubcontractorRowViewModel("Orca Industrial", "V001/L"))
@@ -559,9 +559,9 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
         )
 
         result.value.submissionTime mustBe "14:30"
-        result.value.submissionDate mustBe "6 April 2026"
+        result.value.submissionDate mustBe "06 April 2026"
         result.value.contractorName mustBe "Test Scheme"
-        result.value.employerReference mustBe "123PA000001"
+        result.value.employerReference mustBe "123"
         result.value.receiptReferenceNumber mustBe receiptReferenceNumber
         result.value.verificationNumber mustBe "V001"
       }
