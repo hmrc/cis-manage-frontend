@@ -19,18 +19,20 @@ package controllers.subcontractors
 import base.SpecBase
 import controllers.routes
 import forms.subcontractors.DeleteSubcontractorYesNoFormProvider
+import models.response.{GetSubcontractor, GetSubcontractorListResponse}
 import models.subcontractors.DeleteSubcontractorJourneyData
 import models.{NormalMode, UserAnswers}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CisIdPage
-import pages.subcontractors.{DeleteSubcontractorJourneyPage, DeleteSubcontractorYesNoPage}
+import pages.subcontractors.{DeleteSubcontractorJourneyPage, DeleteSubcontractorYesNoPage, SubcontractorListPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import services.SubcontractorService
 import views.html.subcontractors.DeleteSubcontractorYesNoView
 
 import scala.concurrent.Future
@@ -43,13 +45,15 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
   val form                               = formProvider()
   val subcontractorName                  = "subcontractor Name"
   val cisId                              = "1"
+  val subbieResourceRef                  = 10L
+  val verificationNumber                 = subbieResourceRef
   lazy val deleteSubcontractorYesNoRoute =
-    controllers.subcontractors.routes.DeleteSubcontractorYesNoController.onPageLoad().url
+    controllers.subcontractors.routes.DeleteSubcontractorYesNoController.onPageLoad(verificationNumber).url
 
   private val journeyData =
     DeleteSubcontractorJourneyData(
       subcontractorName = subcontractorName,
-      subbieResourceRef = 10L,
+      subbieResourceRef = subbieResourceRef,
       subcontractorCanBeDeleted = true
     )
 
@@ -75,7 +79,7 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
         val view = application.injector.instanceOf[DeleteSubcontractorYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(subcontractorName, form, NormalMode)(
+        contentAsString(result) mustEqual view(verificationNumber, subcontractorName, form, NormalMode)(
           request,
           messages(application)
         ).toString
@@ -105,6 +109,7 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(
+          verificationNumber,
           subcontractorName,
           form.fill(true),
           NormalMode
@@ -112,15 +117,96 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
       }
     }
 
-    "must redirect to DeleteSubcontractorController when Yes is submitted" in {
+    "must use the name from SubcontractorListPage on a GET, not the session journey name" in {
 
-      val mockSessionRepository = mock[SessionRepository]
+      val listSubcontractor = GetSubcontractor(
+        subcontractorId = 1L,
+        utr = None,
+        pageVisited = None,
+        partnerUtr = None,
+        crn = None,
+        firstName = None,
+        nino = None,
+        secondName = None,
+        surname = None,
+        partnershipTradingName = None,
+        tradingName = Some("Correct Name From List"),
+        subcontractorType = None,
+        addressLine1 = None,
+        addressLine2 = None,
+        addressLine3 = None,
+        addressLine4 = None,
+        country = None,
+        postcode = None,
+        emailAddress = None,
+        phoneNumber = None,
+        mobilePhoneNumber = None,
+        worksReferenceNumber = None,
+        createDate = None,
+        lastUpdate = None,
+        subbieResourceRef = Some(subbieResourceRef),
+        matched = None,
+        autoVerified = None,
+        verified = None,
+        verificationNumber = None,
+        taxTreatment = None,
+        verificationDate = None,
+        version = None,
+        updatedTaxTreatment = None,
+        lastMonthlyReturnDate = None,
+        pendingVerifications = None
+      )
+
+      val staleJourneyData =
+        DeleteSubcontractorJourneyData(
+          subcontractorName = "Stale Name From Overwritten Session",
+          subbieResourceRef = subbieResourceRef,
+          subcontractorCanBeDeleted = true
+        )
+
+      val userAnswersWithList =
+        emptyUserAnswers
+          .set(CisIdPage, cisId)
+          .success
+          .value
+          .set(DeleteSubcontractorJourneyPage, staleJourneyData)
+          .success
+          .value
+          .set(SubcontractorListPage, GetSubcontractorListResponse(Seq(listSubcontractor)))
+          .success
+          .value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithList)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, deleteSubcontractorYesNoRoute)
+        val view    = application.injector.instanceOf[DeleteSubcontractorYesNoView]
+        val result  = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(
+          verificationNumber,
+          "Correct Name From List",
+          form,
+          NormalMode
+        )(request, messages(application)).toString
+      }
+    }
+
+    "must delete the subcontractor and redirect to confirmation when Yes is submitted" in {
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+
+      when(mockSubcontractorService.deleteSubcontractor(eqTo(cisId), eqTo(subbieResourceRef))(any()))
+        .thenReturn(Future.unit)
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswersWithJourney))
           .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -136,9 +222,141 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.subcontractors.routes.DeleteSubcontractorController
+          controllers.subcontractors.routes.SubcontractorDeletedConfirmationController
             .onPageLoad()
             .url
+
+        verify(mockSubcontractorService)
+          .deleteSubcontractor(eqTo(cisId), eqTo(subbieResourceRef))(any())
+      }
+    }
+
+    "must redirect to Journey Recovery when Yes is submitted and delete fails" in {
+
+      val mockSubcontractorService = mock[SubcontractorService]
+
+      when(mockSubcontractorService.deleteSubcontractor(eqTo(cisId), eqTo(subbieResourceRef))(any()))
+        .thenReturn(Future.failed(new RuntimeException("delete failed")))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithJourney))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, deleteSubcontractorYesNoRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must use the name from SubcontractorListPage for the confirmation page, not the session journey name" in {
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+
+      when(mockSubcontractorService.deleteSubcontractor(eqTo(cisId), eqTo(subbieResourceRef))(any()))
+        .thenReturn(Future.unit)
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val listSubcontractor = GetSubcontractor(
+        subcontractorId = 1L,
+        utr = None,
+        pageVisited = None,
+        partnerUtr = None,
+        crn = None,
+        firstName = None,
+        nino = None,
+        secondName = None,
+        surname = None,
+        partnershipTradingName = None,
+        tradingName = Some("Correct Name From List"),
+        subcontractorType = None,
+        addressLine1 = None,
+        addressLine2 = None,
+        addressLine3 = None,
+        addressLine4 = None,
+        country = None,
+        postcode = None,
+        emailAddress = None,
+        phoneNumber = None,
+        mobilePhoneNumber = None,
+        worksReferenceNumber = None,
+        createDate = None,
+        lastUpdate = None,
+        subbieResourceRef = Some(subbieResourceRef),
+        matched = None,
+        autoVerified = None,
+        verified = None,
+        verificationNumber = None,
+        taxTreatment = None,
+        verificationDate = None,
+        version = None,
+        updatedTaxTreatment = None,
+        lastMonthlyReturnDate = None,
+        pendingVerifications = None
+      )
+
+      // journeyData has a stale name (simulating Tab 2 overwriting the session)
+      val staleJourneyData =
+        DeleteSubcontractorJourneyData(
+          subcontractorName = "Stale Name From Overwritten Session",
+          subbieResourceRef = subbieResourceRef,
+          subcontractorCanBeDeleted = true
+        )
+
+      val userAnswersWithList =
+        emptyUserAnswers
+          .set(CisIdPage, cisId)
+          .success
+          .value
+          .set(DeleteSubcontractorJourneyPage, staleJourneyData)
+          .success
+          .value
+          .set(SubcontractorListPage, GetSubcontractorListResponse(Seq(listSubcontractor)))
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithList))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, deleteSubcontractorYesNoRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.subcontractors.routes.SubcontractorDeletedConfirmationController
+            .onPageLoad()
+            .url
+
+        // verify the session was saved with the correct name from the list, not the stale journey name
+        verify(mockSessionRepository).set(
+          org.mockito.ArgumentMatchers.argThat((ua: models.UserAnswers) =>
+            ua.get(pages.subcontractors.DeletedSubcontractorPage).contains("Correct Name From List")
+          )
+        )
       }
     }
 
@@ -188,7 +406,7 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(subcontractorName, boundForm, NormalMode)(
+        contentAsString(result) mustEqual view(verificationNumber, subcontractorName, boundForm, NormalMode)(
           request,
           messages(application)
         ).toString

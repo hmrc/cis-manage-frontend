@@ -121,12 +121,11 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
         messages(
           "subcontractors.subcontractorsList.showingResults",
           1,
-          1 + rows.size - 1,
+          rows.size,
           rows.size
         )
       )
     }
-
     "must render subcontractor name links with visually hidden text" in new Setup {
 
       val html =
@@ -157,7 +156,7 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       rows.zipWithIndex.foreach { case (row, index) =>
         val link = nameLinks.get(index)
 
-        link.attr("href") mustBe "#"
+        link.attr("href") mustBe row.amendUrl
 
         link.ownText().trim mustBe row.name
 
@@ -194,12 +193,14 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
 
       val doc = Jsoup.parse(html.body)
 
-      doc.text must not include messages(
-        "subcontractors.subcontractorsList.showingResults",
-        1,
-        1 + rows.size - 1,
-        rows.size
-      )
+      doc.text must not include
+        messages(
+          "subcontractors.subcontractorsList.showingResults",
+          1,
+          rows.size,
+          rows.size
+        )
+
     }
 
     "must render pagination when items exist" in new Setup {
@@ -334,6 +335,96 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
           .text()
           .trim mustBe row.name
       }
+    }
+
+    "must display translated no name provided when name is empty" in new Setup {
+
+      val rowWithNoName =
+        rows.head.copy(name = "")
+
+      val html =
+        view(
+          form,
+          mode,
+          Seq(rowWithNoName),
+          pagination,
+          page = 1,
+          totalPages = 1,
+          startIndex = 1,
+          totalCount = 1,
+          instanceId = instanceId,
+          searchTerm = "",
+          verificationStatus = "all",
+          taxTreatment = "all",
+          sortBy = "name",
+          sortOrder = "ascending"
+        )
+
+      val doc = Jsoup.parse(html.body)
+
+      doc.text must include(
+        messages("subcontractors.subcontractorsList.noNameProvided")
+      )
+    }
+
+    "must display unknown when verification number is empty" in new Setup {
+
+      val row =
+        rows.head.copy(verificationNumber = "")
+
+      val html =
+        view(
+          form,
+          mode,
+          Seq(row),
+          pagination,
+          page = 1,
+          totalPages = 1,
+          startIndex = 1,
+          totalCount = 1,
+          instanceId = instanceId,
+          searchTerm = "",
+          verificationStatus = "all",
+          taxTreatment = "all",
+          sortBy = "name",
+          sortOrder = "ascending"
+        )
+
+      val doc = Jsoup.parse(html.body)
+
+      doc.text must include(
+        messages("site.unknown")
+      )
+    }
+
+    "must display unknown when date added is empty" in new Setup {
+
+      val row =
+        rows.head.copy(dateAdded = "")
+
+      val html =
+        view(
+          form,
+          mode,
+          Seq(row),
+          pagination,
+          page = 1,
+          totalPages = 1,
+          startIndex = 1,
+          totalCount = 1,
+          instanceId = instanceId,
+          searchTerm = "",
+          verificationStatus = "all",
+          taxTreatment = "all",
+          sortBy = "name",
+          sortOrder = "ascending"
+        )
+
+      val doc = Jsoup.parse(html.body)
+
+      doc.text must include(
+        messages("site.unknown")
+      )
     }
   }
 

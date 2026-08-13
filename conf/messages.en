@@ -12,6 +12,7 @@ site.start                                =  Start now
 site.startAgain                           =  Start again
 site.signIn                               =  Sign in
 site.govuk                                =  GOV.UK
+site.unknown                              =  Unknown
 
 site.pagination.landmark                  =  Pagination
 site.pagination.previous                  =  Previous
@@ -265,6 +266,7 @@ agent.clientListSearch.details.2.link                  =  Find commercial softwa
 agent.landing.title                                    =  Manage Construction Industry Scheme account
 agent.landing.h1                                       =  Manage Construction Industry Scheme account
 agent.landing.agentName.key                            =  Agent name
+agent.landing.agentName.noName                         =  No name
 agent.landing.schemeName.key                           =  Scheme name
 agent.landing.schemeName.key.notProvided               =  Not provided
 agent.landing.employerRef.key                          =  Employer reference
@@ -572,6 +574,7 @@ manageNoticesStatements.searchResults.viewAll                   =  View all noti
 verify.verificationHistorySelectTaxYear.title                =  Which tax year do you want to view verification requests from?
 verify.verificationHistorySelectTaxYear.heading              =  Which tax year do you want to view verification requests from?
 verify.verificationHistorySelectTaxYear.or                   =  or
+verify.verificationHistorySelectTaxYear.currentTaxYear       =  (current tax year)
 verify.verificationHistorySelectTaxYear.viewAll              =  View all tax years
 verify.verificationHistorySelectTaxYear.error.required       =  Select a tax year
 
@@ -584,7 +587,8 @@ verify.verificationHistory.table.verificationNumber          =  Verification num
 verify.verificationHistory.table.dateSubmitted               =  Date submitted
 verify.verificationHistory.table.verificationRequest         =  Verification request
 verify.verificationHistory.table.submissionReceipt           =  Submission receipt
-verify.verificationHistory.backToManage                      =  Back to Manage your subcontractors
+verify.verificationHistory.backToManagePrefix                =  Back to
+verify.verificationHistory.backToManage                      =  Manage your subcontractors
 verify.verificationHistory.noHistory                         =  No verification requests found.
 verify.verificationHistory.hidden.verificationRequest        =  verification request for {0}
 verify.verificationHistory.hidden.submissionReceipt          =  submission receipt for {0}
@@ -620,12 +624,12 @@ verify.subcontractorSubmissionReceipt.summaryList.key2       =  Employer referen
 verify.subcontractorSubmissionReceipt.summaryList.key3       =  Receipt reference number
 verify.subcontractorSubmissionReceipt.summaryList.key4       =  Verification reference number
 
-verify.noVerificationHistory.title                           = No verification history
-verify.noVerificationHistory.heading                         = Verification history
-verify.noVerificationHistory.p1                              = You do not have any verification requests to show at the moment.
-verify.noVerificationHistory.p2                              = Once you create and submit one, you can print or download a copy from here.
-verify.noVerificationHistory.backTo                          = Back to
-verify.noVerificationHistory.manageYourSubcontractors.link   = Manage your subcontractors
+verify.noVerificationHistory.title                           =  No verification history
+verify.noVerificationHistory.heading                         =  Verification history
+verify.noVerificationHistory.p1                              =  You do not have any verification requests to show at the moment.
+verify.noVerificationHistory.p2                              =  Once you create and submit one, you can print or download a copy from here.
+verify.noVerificationHistory.backTo                          =  Back to
+verify.noVerificationHistory.manageYourSubcontractors.link   =  Manage your subcontractors
 
 # Client Details
 clientdetails.manageClientDetails.title                                  =  Client details

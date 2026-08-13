@@ -17,9 +17,12 @@
 package controllers.subcontractors
 
 import base.SpecBase
+import config.FrontendAppConfig
 import forms.subcontractors.SubcontractorsListFormProvider
 import models.{Mode, NormalMode, UserAnswers}
 import models.response.{GetSubcontractor, GetSubcontractorListResponse}
+import org.jsoup.Jsoup
+import pages.CisIdPage
 import pages.subcontractors.SubcontractorListPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -28,6 +31,7 @@ import viewmodels.subcontractors.{SubcontractorsListRow, TaxTreatment}
 import views.html.subcontractors.SubcontractorsListView
 
 import java.time.LocalDateTime
+import scala.jdk.CollectionConverters.*
 
 class SubcontractorsListControllerSpec extends SpecBase {
 
@@ -103,10 +107,12 @@ class SubcontractorsListControllerSpec extends SpecBase {
       subbieResourceRef = Some(20L),
       matched = None,
       autoVerified = None,
-      verified = Some("N"),
+      verified = Some("Y"),
       verificationNumber = Some("V000002"),
-      taxTreatment = Some("Higher Rate"),
-      verificationDate = None,
+      taxTreatment = Some("Gross"),
+      verificationDate = Some(
+        LocalDateTime.of(2026, 5, 1, 0, 0)
+      ),
       version = None,
       updatedTaxTreatment = None,
       lastMonthlyReturnDate = None,
@@ -118,36 +124,45 @@ class SubcontractorsListControllerSpec extends SpecBase {
     subcontractors = subcontractors
   )
 
-  private val rows = Seq(
-    SubcontractorsListRow(
-      id = "1",
-      name = "Alan Smith",
-      utr = "1234567890",
-      verified = true,
-      verificationNumber = "V000001",
-      taxTreatment = TaxTreatment.Gross,
-      dateAdded = "6 Apr 2026",
-      subbieResourceRef = 10L
-    ),
-    SubcontractorsListRow(
-      id = "2",
-      name = "Brian Jones",
-      utr = "9876543210",
-      verified = false,
-      verificationNumber = "V000002",
-      taxTreatment = TaxTreatment.HigherRate,
-      dateAdded = "6 May 2026",
-      subbieResourceRef = 20L
-    )
-  )
+  private val cisId = "test-cis-id"
 
   private def userAnswersWithSubcontractors: UserAnswers =
     emptyUserAnswers
+      .set(CisIdPage, cisId)
+      .success
+      .value
       .set(SubcontractorListPage, listResponse)
       .success
       .value
 
+  private def expectedRows(amendBaseUrl: String): Seq[SubcontractorsListRow] =
+    Seq(
+      SubcontractorsListRow(
+        id = "1",
+        name = "Smith, Alan",
+        utr = "1234567890",
+        verified = false,
+        verificationNumber = "",
+        taxTreatment = TaxTreatment.Unknown,
+        dateAdded = "6 Apr 2026",
+        subbieResourceRef = 10L,
+        amendUrl = s"$amendBaseUrl/amend/start/$cisId/10"
+      ),
+      SubcontractorsListRow(
+        id = "2",
+        name = "Jones, Brian",
+        utr = "9876543210",
+        verified = true,
+        verificationNumber = "V000002",
+        taxTreatment = TaxTreatment.Gross,
+        dateAdded = "6 May 2026",
+        subbieResourceRef = 20L,
+        amendUrl = s"$amendBaseUrl/amend/start/$cisId/20"
+      )
+    )
+
   private def filterRows(
+    sourceRows: Seq[SubcontractorsListRow],
     searchTerm: String,
     verificationStatus: String,
     taxTreatment: String,
@@ -155,7 +170,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
     sortOrder: String = "ascending"
   ): Seq[SubcontractorsListRow] = {
     val searchFiltered =
-      filterBySearchTerm(rows, searchTerm)
+      filterBySearchTerm(sourceRows, searchTerm)
 
     val verificationFiltered =
       filterByVerificationStatus(searchFiltered, verificationStatus)
@@ -271,7 +286,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
         val request =
           FakeRequest(
             GET,
-            routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url
+            routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
           )
 
         val result =
@@ -283,9 +298,15 @@ class SubcontractorsListControllerSpec extends SpecBase {
         val paginationService =
           application.injector.instanceOf[PaginationSubcontractorsListService]
 
+        val config =
+          application.injector.instanceOf[FrontendAppConfig]
+
+        val rows =
+          expectedRows(config.cisTypeOfSubcontractorUrl)
+
         val paginationResult =
           paginationService.paginate(
-            allItems = filterRows("", "all", "all"),
+            allItems = filterRows(rows, "", "all", "all"),
             currentPage = 1,
             recordsPerPage = 8,
             baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
@@ -320,11 +341,13 @@ class SubcontractorsListControllerSpec extends SpecBase {
         ).build()
 
       running(application) {
+        val url =
+          routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
+
         val request =
           FakeRequest(
             GET,
-            routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url +
-              "?searchTerm=Alan&verificationStatus=verified&taxTreatment=gross"
+            s"$url?searchTerm=Brian&verificationStatus=verified&taxTreatment=gross"
           )
 
         val result =
@@ -336,20 +359,26 @@ class SubcontractorsListControllerSpec extends SpecBase {
         val paginationService =
           application.injector.instanceOf[PaginationSubcontractorsListService]
 
+        val config =
+          application.injector.instanceOf[FrontendAppConfig]
+
+        val rows =
+          expectedRows(config.cisTypeOfSubcontractorUrl)
+
         val paginationResult =
           paginationService.paginate(
-            allItems = filterRows("Alan", "verified", "gross"),
+            allItems = filterRows(rows, "Brian", "verified", "gross"),
             currentPage = 1,
             recordsPerPage = 8,
             baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
             queryString =
-              "searchTerm=Alan&verificationStatus=verified&taxTreatment=gross&sortBy=name&sortOrder=ascending"
+              "searchTerm=Brian&verificationStatus=verified&taxTreatment=gross&sortBy=name&sortOrder=ascending"
           )
 
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual view(
-          form.fill("Alan"),
+          form.fill("Brian"),
           mode,
           paginationResult.items,
           paginationResult.pagination,
@@ -358,7 +387,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
           paginationResult.startIndex,
           paginationResult.totalCount,
           instanceId,
-          "Alan",
+          "Brian",
           "verified",
           "gross",
           "name",
@@ -377,7 +406,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
         val request =
           FakeRequest(
             POST,
-            routes.SubcontractorsListController.onSubmit(instanceId, mode, 1).url
+            routes.SubcontractorsListController.onSubmit(instanceId, mode).url
           ).withFormUrlEncodedBody(
             "gotoPage"           -> "2",
             "searchTerm"         -> "Alan",
@@ -416,7 +445,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
         val request =
           FakeRequest(
             POST,
-            routes.SubcontractorsListController.onSubmit(instanceId, mode, 1).url
+            routes.SubcontractorsListController.onSubmit(instanceId, mode).url
           ).withFormUrlEncodedBody(
             "searchTerm"         -> "Alan",
             "verificationStatus" -> "verified",
@@ -434,7 +463,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
           redirectLocation(result).value
 
         redirectUrl must include(
-          routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url
+          routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
         )
         redirectUrl must include("searchTerm=Alan")
         redirectUrl must include("verificationStatus=verified")
@@ -454,7 +483,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
         val request =
           FakeRequest(
             GET,
-            routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url
+            routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
           )
 
         val result =
@@ -477,7 +506,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
         val request =
           FakeRequest(
             POST,
-            routes.SubcontractorsListController.onSubmit(instanceId, mode, 1).url
+            routes.SubcontractorsListController.onSubmit(instanceId, mode).url
           ).withFormUrlEncodedBody(
             "gotoPage"   -> "2",
             "searchTerm" -> "Alan"
@@ -494,21 +523,25 @@ class SubcontractorsListControllerSpec extends SpecBase {
     }
 
     "must redirect to no subcontractors exist when the stored list is empty" in {
+      val userAnswers =
+        emptyUserAnswers
+          .set(CisIdPage, cisId)
+          .success
+          .value
+          .set(SubcontractorListPage, GetSubcontractorListResponse(Seq.empty))
+          .success
+          .value
+
       val application =
         applicationBuilder(
-          userAnswers = Some(
-            emptyUserAnswers
-              .set(SubcontractorListPage, GetSubcontractorListResponse(Seq.empty))
-              .success
-              .value
-          )
+          userAnswers = Some(userAnswers)
         ).build()
 
       running(application) {
         val request =
           FakeRequest(
             GET,
-            routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url
+            routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
           )
 
         val result =
@@ -518,6 +551,54 @@ class SubcontractorsListControllerSpec extends SpecBase {
 
         redirectLocation(result).value mustEqual
           routes.NoSubcontractorsExistController.onPageLoad().url
+      }
+    }
+
+    "must apply reverification rules when rendering subcontractors" in {
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithSubcontractors)
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            routes.SubcontractorsListController
+              .onPageLoad(instanceId, mode)
+              .url
+          )
+
+        val result =
+          route(application, request).value
+
+        status(result) mustEqual OK
+
+        val doc =
+          Jsoup.parse(contentAsString(result))
+
+        val smithRow =
+          doc
+            .select("tr")
+            .asScala
+            .find(_.text().contains("Smith, Alan"))
+            .getOrElse(fail("Could not find row for Smith, Alan"))
+
+        smithRow.text() must include(messages(application)("site.no"))
+        smithRow.text() must include(messages(application)("site.unknown"))
+        smithRow.text() must not include "V000001"
+
+        val jonesRow =
+          doc
+            .select("tr")
+            .asScala
+            .find(_.text().contains("Jones, Brian"))
+            .getOrElse(fail("Could not find row for Jones, Brian"))
+
+        jonesRow.text() must include(messages(application)("site.yes"))
+        jonesRow.text() must include("V000002")
       }
     }
 
@@ -533,6 +614,9 @@ class SubcontractorsListControllerSpec extends SpecBase {
 
       val userAnswers =
         emptyUserAnswers
+          .set(CisIdPage, cisId)
+          .success
+          .value
           .set(SubcontractorListPage, response)
           .success
           .value
@@ -546,7 +630,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
         val request =
           FakeRequest(
             GET,
-            routes.SubcontractorsListController.onPageLoad(instanceId, mode, 1).url
+            routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
           )
 
         val result =

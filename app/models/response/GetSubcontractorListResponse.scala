@@ -16,6 +16,7 @@
 
 package models.response
 
+import models.subcontractors.TypeOfSubcontractor
 import play.api.libs.json.{JsString, Json, OFormat, Reads, Writes}
 
 import java.time.LocalDateTime
@@ -67,35 +68,48 @@ final case class GetSubcontractor(
   pendingVerifications: Option[Int]
 ) {
 
+  def isVerified: Boolean =
+    verified.exists(_.equalsIgnoreCase("Y"))
+
   private def normalisedType: Option[String] =
     subcontractorType.map(_.trim.toLowerCase.replace(" ", ""))
 
-  def displayName: String = {
-    val personalName =
-      Seq(firstName, secondName, surname).flatten.map(_.trim).filter(_.nonEmpty).mkString(" ")
-
-    normalisedType match {
-      case Some("soletrader" | "individual") if personalName.nonEmpty =>
-        personalName
-
-      case Some("partnership") =>
-        partnershipTradingName
-          .orElse(tradingName)
-          .filter(_.trim.nonEmpty)
-          .getOrElse(if (personalName.nonEmpty) personalName else "No name provided")
-
-      case Some("company" | "trust" | "soletrader" | "individual") =>
-        tradingName
-          .filter(_.trim.nonEmpty)
-          .getOrElse(if (personalName.nonEmpty) personalName else "No name provided")
-
-      case _ =>
-        tradingName
-          .orElse(partnershipTradingName)
-          .filter(_.trim.nonEmpty)
-          .getOrElse(if (personalName.nonEmpty) personalName else "No name provided")
+  private def personalNameValue: Option[String] =
+    surnameValue.map { surname =>
+      firstNameValue.fold(surname)(firstName => s"$surname, $firstName")
     }
-  }
+
+  def displayName: Option[String] =
+    normalisedType.flatMap(TypeOfSubcontractor.fromString) match {
+
+      case Some(TypeOfSubcontractor.Individualorsoletrader) =>
+        personalNameValue
+          .orElse(tradingNameValue)
+
+      case Some(TypeOfSubcontractor.Limitedcompany) | Some(TypeOfSubcontractor.Trust) =>
+        tradingNameValue
+
+      case Some(TypeOfSubcontractor.Partnership) =>
+        partnershipTradingNameValue
+          .orElse(tradingNameValue)
+
+      case None =>
+        tradingNameValue
+          .orElse(partnershipTradingNameValue)
+          .orElse(personalNameValue)
+    }
+
+  private def tradingNameValue: Option[String] =
+    tradingName.map(_.trim).filter(_.nonEmpty)
+
+  private def partnershipTradingNameValue: Option[String] =
+    partnershipTradingName.map(_.trim).filter(_.nonEmpty)
+
+  private def firstNameValue: Option[String] =
+    firstName.map(_.trim).filter(_.nonEmpty)
+
+  private def surnameValue: Option[String] =
+    surname.map(_.trim).filter(_.nonEmpty)
 
 }
 
@@ -106,5 +120,7 @@ object GetSubcontractor {
   given writes: Writes[GetSubcontractor] = subcontractor =>
     Json
       .writes[GetSubcontractor]
-      .writes(subcontractor) + ("displayName" -> JsString(subcontractor.displayName))
+      .writes(subcontractor) + ("displayName" -> JsString(
+      subcontractor.displayName.getOrElse("")
+    ))
 }

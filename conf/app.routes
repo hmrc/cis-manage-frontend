@@ -13,8 +13,8 @@ GET   /refresh-session  controllers.KeepAliveController.keepAlive()
 
 GET   /check-your-answers  controllers.CheckYourAnswersController.onPageLoad()
 
-GET   /subcontractors/delete-subcontractor  controllers.subcontractors.DeleteSubcontractorYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST  /subcontractors/delete-subcontractor  controllers.subcontractors.DeleteSubcontractorYesNoController.onSubmit(mode: Mode = NormalMode)
+GET   /subcontractors/delete-subcontractor/:verificationNumber  controllers.subcontractors.DeleteSubcontractorYesNoController.onPageLoad(verificationNumber: Long, mode: Mode = NormalMode)
+POST  /subcontractors/delete-subcontractor/:verificationNumber  controllers.subcontractors.DeleteSubcontractorYesNoController.onSubmit(verificationNumber: Long, mode: Mode = NormalMode)
 
 GET   /subcontractors/subcontractor-deleted  controllers.subcontractors.SubcontractorDeletedConfirmationController.onPageLoad()
 
@@ -30,8 +30,6 @@ GET   /subcontractors/:instanceId/your-subcontractors         controllers.subcon
 POST  /subcontractors/:instanceId/your-subcontractors         controllers.subcontractors.SubcontractorsListController.onSubmit(instanceId: String, mode: Mode = NormalMode, page: Int ?= 1)
 GET   /subcontractors/:instanceId/change-your-subcontractors  controllers.subcontractors.SubcontractorsListController.onPageLoad(instanceId: String, mode: Mode = CheckMode, page: Int ?= 1)
 POST  /subcontractors/:instanceId/change-your-subcontractors  controllers.subcontractors.SubcontractorsListController.onSubmit(instanceId: String, mode: Mode = CheckMode, page: Int ?= 1)
-
-GET   /subcontractors/delete-subcontractor/submit  controllers.subcontractors.DeleteSubcontractorController.onPageLoad()
 
 GET   /subcontractors/retrieve  controllers.subcontractors.GetSubcontractorListController.onPageLoad()
 
@@ -136,10 +134,9 @@ GET   /history/monthly-return-history/in-progress-return/:monthlyReturnId  contr
 GET   /history/amend/:taxYear/:taxMonth                                    controllers.history.SubmittedReturnsController.startAmendment(taxYear: Int, taxMonth: Int)
 GET   /monthly-return/confirmation-history                                 controllers.history.SubmittedReturnsController.viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String)
 
-GET   /no-return-submitted                                                      controllers.history.NoReturnsSubmittedController.onPageLoad()
-GET   /no-incomplete-returns                                                    controllers.history.NoIncompleteReturnsController.onPageLoad()
+GET   /no-return-submitted  controllers.history.NoReturnsSubmittedController.onPageLoad()
 
-# Amend
+GET   /no-incomplete-returns  controllers.history.NoIncompleteReturnsController.onPageLoad()
 
 # Notices & Statements
 GET  /manage-notices-statements/:instanceId  controllers.notices.ManageNoticesStatementsController.onPageLoad(instanceId: String)
