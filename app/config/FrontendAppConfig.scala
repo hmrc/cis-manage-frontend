@@ -143,9 +143,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val cisTypeOfSubcontractorUrl: String        =
     configuration.get[String]("urls.cis-contractor-frontend")
   lazy val cisVerifySubcontractorUrl: String        =
-    configuration.get[String]("urls.cis-contractor-frontend") + "/verify/newest"
+    configuration.get[String]("urls.cisVerifySubcontractor")
   lazy val cisCheckVerificationResultsUrl: String   =
-    configuration.get[String]("urls.cis-contractor-frontend") + "/verify/check-results"
+    configuration.get[String]("urls.cisCheckVerificationResults")
   lazy val contractorDetailsIntroductionUrl: String =
     configuration.get[String]("urls.contractorDetailsIntroduction")
 
