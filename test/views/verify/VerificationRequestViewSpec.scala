@@ -87,15 +87,14 @@ class VerificationRequestViewSpec extends SpecBase {
       doc.text() should include("V0004528765")
     }
 
-    "render the contractor name, employer reference and receipt reference number in the summary list" in {
+    "not render contractor name, employer reference or receipt reference number in the summary list" in {
       val doc = render(viewModelWithReverify)
 
-      doc.text() should include(messages(app)("verify.verificationRequest.contractorName"))
-      doc.text() should include("Gary Construction Ltd")
-      doc.text() should include(messages(app)("verify.verificationRequest.employerReference"))
-      doc.text() should include("123")
-      doc.text() should include(messages(app)("verify.verificationRequest.receiptReferenceNumber"))
-      doc.text() should include("Pyy1LRJh053AE+nuyp0GJR7oESw=")
+      doc.text() should not include messages(app)("verify.verificationRequest.contractorName")
+      doc.text() should not include "Gary Construction Ltd"
+      doc.text() should not include messages(app)("verify.verificationRequest.employerReference")
+      doc.text() should not include messages(app)("verify.verificationRequest.receiptReferenceNumber")
+      doc.text() should not include "Pyy1LRJh053AE+nuyp0GJR7oESw="
     }
 
     "render the subcontractors count in the summary list" in {

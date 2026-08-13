@@ -50,18 +50,6 @@
                             value = Value(content = Text(viewModel.verificationNumber))
                         ),
                         SummaryListRow(
-                            key = Key(content = Text(messages("verify.verificationRequest.contractorName"))),
-                            value = Value(content = Text(viewModel.contractorName))
-                        ),
-                        SummaryListRow(
-                            key = Key(content = Text(messages("verify.verificationRequest.employerReference"))),
-                            value = Value(content = Text(viewModel.employerReference))
-                        ),
-                        SummaryListRow(
-                            key = Key(content = Text(messages("verify.verificationRequest.receiptReferenceNumber"))),
-                            value = Value(content = Text(viewModel.receiptReferenceNumber))
-                        ),
-                        SummaryListRow(
                             key = Key(content = Text(messages("verify.verificationRequest.subcontractorsInRequest"))),
                             value = Value(content = Text(viewModel.totalSubcontractors.toString))
                         )
