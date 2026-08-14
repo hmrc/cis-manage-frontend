@@ -74,12 +74,18 @@
 @clientNameCell(agentClient: ClientListViewModel) = {
     @agentClient.clientLink.map { link =>
         <a href="@link.href" class="govuk-link">@link.text</a>
-    }
+        <span class="govuk-visually-hidden">
+            @{messages("agent.clientListSearch.td.clientName.hidden", link.text)}
+        </span>
+}
 }
 
 @removeLinkCell(agentClient: ClientListViewModel) = {
     @agentClient.removeLink.map { link =>
         <a href="@link.href" class="govuk-link">@link.text</a>
+        <span class="govuk-visually-hidden">
+            @{messages("agent.clientListSearch.td.actions.remove.hidden", agentClient.clientName)}
+        </span>
     }
 }
 
