@@ -122,14 +122,13 @@ class SubcontractorsListController @Inject() (
         Some(Seq.empty)
       } else {
         userAnswers.get(CisIdPage).map { cisId =>
-          subcontractors.subcontractors.map(toListRow(_, cisId))
+          subcontractors.subcontractors.map(toListRow(_))
         }
       }
     }
 
   private def toListRow(
-    subcontractor: GetSubcontractor,
-    cisId: String
+    subcontractor: GetSubcontractor
   ): SubcontractorsListRow = {
 
     val subbieResourceRef = getSubbieResourceRef(subcontractor)
@@ -167,7 +166,7 @@ class SubcontractorsListController @Inject() (
         .map(_.format(dateAddedFormatter))
         .getOrElse(""),
       subbieResourceRef = subbieResourceRef,
-      amendUrl = s"${config.cisTypeOfSubcontractorUrl}/amend/start/${encode(cisId)}/$subbieResourceRef"
+      amendUrl = s"${config.cisTypeOfSubcontractorUrl}/amend/start/$subbieResourceRef"
     )
   }
 
