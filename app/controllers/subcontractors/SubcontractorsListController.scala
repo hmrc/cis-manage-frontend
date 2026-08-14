@@ -121,8 +121,8 @@ class SubcontractorsListController @Inject() (
       if (subcontractors.subcontractors.isEmpty) {
         Some(Seq.empty)
       } else {
-        userAnswers.get(CisIdPage).map { cisId =>
-          subcontractors.subcontractors.map(toListRow(_))
+        userAnswers.get(CisIdPage).map { _ =>
+          subcontractors.subcontractors.map(toListRow)
         }
       }
     }
