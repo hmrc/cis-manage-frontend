@@ -22,7 +22,6 @@ import forms.subcontractors.SubcontractorsListFormProvider
 import models.response.GetSubcontractor
 import models.{Mode, UserAnswers}
 import pages.subcontractors.SubcontractorListPage
-import pages.CisIdPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.*
@@ -117,13 +116,11 @@ class SubcontractorsListController @Inject() (
   private def rowsFromUserAnswers(
     userAnswers: UserAnswers
   ): Option[Seq[SubcontractorsListRow]] =
-    userAnswers.get(SubcontractorListPage).flatMap { subcontractors =>
+    userAnswers.get(SubcontractorListPage).map { subcontractors =>
       if (subcontractors.subcontractors.isEmpty) {
-        Some(Seq.empty)
+        Seq.empty
       } else {
-        userAnswers.get(CisIdPage).map { _ =>
-          subcontractors.subcontractors.map(toListRow)
-        }
+        subcontractors.subcontractors.map(toListRow)
       }
     }
 
