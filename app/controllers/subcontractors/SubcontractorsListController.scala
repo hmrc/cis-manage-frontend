@@ -16,6 +16,7 @@
 
 package controllers.subcontractors
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import forms.subcontractors.SubcontractorsListFormProvider
 import models.response.GetSubcontractor
@@ -47,7 +48,8 @@ class SubcontractorsListController @Inject() (
   paginationService: PaginationSubcontractorsListService,
   clock: Clock,
   val controllerComponents: MessagesControllerComponents,
-  view: SubcontractorsListView
+  view: SubcontractorsListView,
+  config: FrontendAppConfig
 ) extends FrontendBaseController
     with I18nSupport {
 
@@ -114,13 +116,19 @@ class SubcontractorsListController @Inject() (
   private def rowsFromUserAnswers(
     userAnswers: UserAnswers
   ): Option[Seq[SubcontractorsListRow]] =
-    userAnswers
-      .get(SubcontractorListPage)
-      .map(_.subcontractors.map(toListRow))
+    userAnswers.get(SubcontractorListPage).map { subcontractors =>
+      if (subcontractors.subcontractors.isEmpty) {
+        Seq.empty
+      } else {
+        subcontractors.subcontractors.map(toListRow)
+      }
+    }
 
   private def toListRow(
     subcontractor: GetSubcontractor
   ): SubcontractorsListRow = {
+
+    val subbieResourceRef = getSubbieResourceRef(subcontractor)
 
     val reverifyRequired =
       ReverificationRules.reverifyRequired(
@@ -154,7 +162,8 @@ class SubcontractorsListController @Inject() (
       dateAdded = subcontractor.createDate
         .map(_.format(dateAddedFormatter))
         .getOrElse(""),
-      subbieResourceRef = getSubbieResourceRef(subcontractor)
+      subbieResourceRef = subbieResourceRef,
+      amendUrl = s"${config.cisTypeOfSubcontractorUrl}/amend/start/$subbieResourceRef"
     )
   }
 

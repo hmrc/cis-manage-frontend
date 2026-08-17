@@ -60,7 +60,7 @@ class GetSubcontractorForDeleteController @Inject() (
                 subbieResourceRef = subbieResourceRef,
                 canBeDeleted = response.subcontractorCanBeDeleted
               ).map { _ =>
-                redirectToNextPage(response.subcontractorCanBeDeleted)
+                redirectToNextPage(subbieResourceRef, response.subcontractorCanBeDeleted)
               }
             }
             .recover { case ex =>
@@ -114,10 +114,11 @@ class GetSubcontractorForDeleteController @Inject() (
   }
 
   private def redirectToNextPage(
+    subbieResourceRef: Long,
     canDelete: Boolean
   ) =
     if (canDelete) {
-      Redirect(routes.DeleteSubcontractorYesNoController.onPageLoad())
+      Redirect(routes.DeleteSubcontractorYesNoController.onPageLoad(subbieResourceRef))
     } else {
       Redirect(routes.CannotDeleteSubcontractorController.onPageLoad())
     }

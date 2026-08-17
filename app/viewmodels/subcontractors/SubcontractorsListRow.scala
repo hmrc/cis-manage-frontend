@@ -46,7 +46,8 @@ case class SubcontractorsListRow(
   verificationNumber: String,
   taxTreatment: TaxTreatment,
   dateAdded: String,
-  subbieResourceRef: Long
+  subbieResourceRef: Long,
+  amendUrl: String
 )
 
 object SubcontractorsListRow {
