@@ -57,8 +57,7 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
       contractorName = "Test Scheme",
       employerReference = "123PA000001",
       receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
-      subcontractorsToVerify = Seq.empty,
-      subcontractorsToReverify = Seq.empty
+      subcontractorsToVerify = Seq.empty
     )
 
   private val verificationHistoryData = VerificationHistoryData(
@@ -85,9 +84,7 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
     receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
     subcontractorsToVerify = Seq(
       SubcontractorRowViewModel("Amity Marine Contractors", "V0004528765"),
-      SubcontractorRowViewModel("Brody, Martin", "V0004528765")
-    ),
-    subcontractorsToReverify = Seq(
+      SubcontractorRowViewModel("Brody, Martin", "V0004528765"),
       SubcontractorRowViewModel("Orca Industrial", "V0004528765/L")
     ),
     manageSubcontractorsUrl = s"/manage-subcontractors/$cisId"

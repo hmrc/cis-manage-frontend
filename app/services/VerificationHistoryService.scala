@@ -94,8 +94,6 @@ class VerificationHistoryService @Inject() () {
           receiptReferenceNumber = request.receiptReferenceNumber,
           subcontractorsToVerify =
             request.subcontractorsToVerify.map(s => SubcontractorRowViewModel(s.name, s.verificationNumber)),
-          subcontractorsToReverify =
-            request.subcontractorsToReverify.map(s => SubcontractorRowViewModel(s.name, s.verificationNumber)),
           manageSubcontractorsUrl = controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId).url
         )
       }
@@ -183,16 +181,6 @@ class VerificationHistoryService @Inject() () {
                 response.verifications,
                 response.subcontractors
               )
-                .filterNot(_._1)
-                .map(_._2),
-              subcontractorsToReverify = subcontractorsFor(
-                batch.verificationBatchId,
-                verificationNumber,
-                response.verifications,
-                response.subcontractors
-              )
-                .filter(_._1)
-                .map(_._2)
             )
           }
         }
@@ -287,24 +275,20 @@ class VerificationHistoryService @Inject() () {
     batchVerificationNumber: String,
     verifications: Seq[GetSubmittedVerification],
     subcontractors: Seq[models.response.GetSubmittedSubcontractor]
-  ): Seq[(Boolean, SubcontractorVerificationData)] =
+  ): Seq[SubcontractorVerificationData] =
     verifications
       .filter(_.verificationBatchId.contains(verificationBatchId))
       .sortBy(_.verificationId)
       .map { verification =>
-        val isReverification =
-          verification.actionIndicator.exists(value => value.equalsIgnoreCase("R") || value.equalsIgnoreCase("L"))
-        val name             =
+        val name   =
           verification.subcontractorName
             .orElse(
               verification.subcontractorId
                 .flatMap(id => subcontractors.find(_.subcontractorId == id).map(_.displayName))
             )
             .getOrElse("No name provided")
-        val number           =
-          if (isReverification) verification.verificationNumber.getOrElse(batchVerificationNumber)
-          else batchVerificationNumber
+        val number = verification.verificationNumber.getOrElse(batchVerificationNumber)
 
-        isReverification -> SubcontractorVerificationData(name, number)
+        SubcontractorVerificationData(name, number)
       }
 }

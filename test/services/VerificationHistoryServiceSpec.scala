@@ -49,8 +49,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
       contractorName = "Test Scheme",
       employerReference = "123",
       receiptReferenceNumber = receiptReferenceNumber,
-      subcontractorsToVerify = Seq.empty,
-      subcontractorsToReverify = Seq.empty
+      subcontractorsToVerify = Seq.empty
     )
 
   private val data = VerificationHistoryData(
@@ -77,8 +76,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
     verificationNumber: String,
     acceptedDateTime: LocalDateTime,
     taxYear: Int,
-    subcontractorsToVerify: Seq[SubcontractorVerificationData] = Seq.empty,
-    subcontractorsToReverify: Seq[SubcontractorVerificationData] = Seq.empty
+    subcontractorsToVerify: Seq[SubcontractorVerificationData] = Seq.empty
   ): VerificationRequestData =
     VerificationRequestData(
       verificationBatchId = verificationBatchId,
@@ -89,8 +87,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
       contractorName = "Test Scheme",
       employerReference = "123",
       receiptReferenceNumber = receiptReferenceNumber,
-      subcontractorsToVerify = subcontractorsToVerify,
-      subcontractorsToReverify = subcontractorsToReverify
+      subcontractorsToVerify = subcontractorsToVerify
     )
 
   private def submittedVerificationBatch(
@@ -477,9 +474,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
               acceptedDateTime = LocalDateTime.of(2026, 4, 6, 14, 30),
               taxYear = 2026,
               subcontractorsToVerify = Seq(
-                SubcontractorVerificationData("Amity Marine Contractors", "V001")
-              ),
-              subcontractorsToReverify = Seq(
+                SubcontractorVerificationData("Amity Marine Contractors", "V001"),
                 SubcontractorVerificationData("Orca Industrial", "V001/L")
               )
             )
@@ -496,8 +491,10 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
           verificationNumber = "V001",
           acceptedDateTime = LocalDateTime.of(2026, 4, 6, 14, 30),
           taxYear = 2026,
-          subcontractorsToVerify = Seq(SubcontractorVerificationData("Amity Marine Contractors", "V001")),
-          subcontractorsToReverify = Seq(SubcontractorVerificationData("Orca Industrial", "V001/L"))
+          subcontractorsToVerify = Seq(
+            SubcontractorVerificationData("Amity Marine Contractors", "V001"),
+            SubcontractorVerificationData("Orca Industrial", "V001/L")
+          )
         )
 
         val result = service.buildVerificationRequestViewModel(
@@ -512,8 +509,10 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
         result.value.contractorName mustBe "Test Scheme"
         result.value.employerReference mustBe "123"
         result.value.receiptReferenceNumber mustBe receiptReferenceNumber
-        result.value.subcontractorsToVerify mustBe Seq(SubcontractorRowViewModel("Amity Marine Contractors", "V001"))
-        result.value.subcontractorsToReverify mustBe Seq(SubcontractorRowViewModel("Orca Industrial", "V001/L"))
+        result.value.subcontractorsToVerify mustBe Seq(
+          SubcontractorRowViewModel("Amity Marine Contractors", "V001"),
+          SubcontractorRowViewModel("Orca Industrial", "V001/L")
+        )
       }
 
       "must select the matching batch when verification numbers are duplicated" in {

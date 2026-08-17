@@ -55,8 +55,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
       contractorName = "Test Scheme",
       employerReference = "123PA000001",
       receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
-      subcontractorsToVerify = Seq.empty,
-      subcontractorsToReverify = Seq.empty
+      subcontractorsToVerify = Seq.empty
     )
 
   lazy val verificationHistorySelectTaxYearRoute =

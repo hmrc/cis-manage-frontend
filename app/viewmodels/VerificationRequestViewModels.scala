@@ -24,12 +24,10 @@ case class VerificationRequestPageViewModel(
   employerReference: String,
   receiptReferenceNumber: String,
   subcontractorsToVerify: Seq[SubcontractorRowViewModel],
-  subcontractorsToReverify: Seq[SubcontractorRowViewModel],
   manageSubcontractorsUrl: String
 ) {
-  val totalSubcontractors: Int    = subcontractorsToVerify.size + subcontractorsToReverify.size
-  val hasReverifications: Boolean = subcontractorsToReverify.nonEmpty
-  val hasVerifications: Boolean   = subcontractorsToVerify.nonEmpty
+  val totalSubcontractors: Int  = subcontractorsToVerify.size
+  val hasVerifications: Boolean = subcontractorsToVerify.nonEmpty
 }
 
 case class SubcontractorRowViewModel(

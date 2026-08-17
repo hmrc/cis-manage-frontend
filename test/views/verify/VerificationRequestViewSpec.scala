@@ -28,7 +28,7 @@ import views.html.verify.VerificationRequestView
 
 class VerificationRequestViewSpec extends SpecBase {
 
-  private val viewModelWithReverify = VerificationRequestPageViewModel(
+  private val viewModel = VerificationRequestPageViewModel(
     submittedTime = "14:30",
     submittedDate = "06 February 2027",
     verificationNumber = "V0004528765",
@@ -37,58 +37,52 @@ class VerificationRequestViewSpec extends SpecBase {
     receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
     subcontractorsToVerify = Seq(
       SubcontractorRowViewModel("Amity Marine Contractors", "V0004528765"),
-      SubcontractorRowViewModel("Brody, Martin", "V0004528765")
-    ),
-    subcontractorsToReverify = Seq(
+      SubcontractorRowViewModel("Brody, Martin", "V0004528765"),
       SubcontractorRowViewModel("Orca Industrial", "V0004528765/L")
     ),
     manageSubcontractorsUrl = "/manage-subcontractors/900063"
   )
 
-  private val viewModelWithoutReverify = viewModelWithReverify.copy(
-    subcontractorsToReverify = Seq.empty
-  )
-
-  private val viewModelWithoutVerify = viewModelWithReverify.copy(
+  private val viewModelWithoutVerify = viewModel.copy(
     subcontractorsToVerify = Seq.empty
   )
 
   "VerificationRequestView" - {
 
     "render the page with expected title" in {
-      val doc = render(viewModelWithReverify)
+      val doc = render(viewModel)
 
       doc.title() shouldBe
         s"${messages(app)("verify.verificationRequest.title")} - ${messages(app)("service.name")} - GOV.UK"
     }
 
     "render the H1 heading" in {
-      val doc = render(viewModelWithReverify)
+      val doc = render(viewModel)
 
       doc.selectFirst("h1").text() shouldBe messages(app)("verify.verificationRequest.heading")
     }
 
     "render the Submission details H2 heading" in {
-      val doc = render(viewModelWithReverify)
+      val doc = render(viewModel)
 
       doc.select("h2").eachText() should contain(messages(app)("verify.verificationRequest.submissionDetails.heading"))
     }
 
     "render the submitted at paragraph" in {
-      val doc = render(viewModelWithReverify)
+      val doc = render(viewModel)
 
       doc.text() should include("Submitted at 14:30 on 06 February 2027")
     }
 
     "render the verification number in the summary list" in {
-      val doc = render(viewModelWithReverify)
+      val doc = render(viewModel)
 
       doc.text() should include(messages(app)("verify.verificationRequest.verificationNumber"))
       doc.text() should include("V0004528765")
     }
 
     "not render contractor name, employer reference or receipt reference number in the summary list" in {
-      val doc = render(viewModelWithReverify)
+      val doc = render(viewModel)
 
       doc.text() should not include messages(app)("verify.verificationRequest.contractorName")
       doc.text() should not include "Gary Construction Ltd"
@@ -98,14 +92,14 @@ class VerificationRequestViewSpec extends SpecBase {
     }
 
     "render the subcontractors count in the summary list" in {
-      val doc = render(viewModelWithReverify)
+      val doc = render(viewModel)
 
       doc.text() should include(messages(app)("verify.verificationRequest.subcontractorsInRequest"))
       doc.text() should include("3")
     }
 
     "render the Subcontractors to verify heading" in {
-      val doc = render(viewModelWithReverify)
+      val doc = render(viewModel)
 
       doc.select("h2").eachText() should contain(
         messages(app)("verify.verificationRequest.subcontractorsToVerify.heading")
@@ -113,27 +107,28 @@ class VerificationRequestViewSpec extends SpecBase {
     }
 
     "render the subcontractors to verify table with correct data" in {
-      val doc = render(viewModelWithReverify)
+      val doc = render(viewModel)
 
       doc.text() should include("Amity Marine Contractors")
       doc.text() should include("Brody, Martin")
+      doc.text() should include("Orca Industrial")
+      doc.text() should include("V0004528765/L")
     }
 
     "render the table headers" in {
-      val doc = render(viewModelWithReverify)
+      val doc = render(viewModel)
 
       val headers = doc.select("thead th").eachText()
       headers should contain(messages(app)("verify.verificationRequest.table.name"))
       headers should contain(messages(app)("verify.verificationRequest.table.verificationNumber"))
     }
 
-    "render the Subcontractors to reverify section when reverifications exist" in {
-      val doc = render(viewModelWithReverify)
+    "not render the Subcontractors to reverify section" in {
+      val doc = render(viewModel)
 
-      doc.select("h2").eachText() should contain(
-        messages(app)("verify.verificationRequest.subcontractorsToReverify.heading")
+      doc.select("h2").eachText() should not contain messages(app)(
+        "verify.verificationRequest.subcontractorsToReverify.heading"
       )
-      doc.text()                  should include("Orca Industrial")
     }
 
     "not render the Subcontractors to verify section when no verifications exist" in {
@@ -146,17 +141,8 @@ class VerificationRequestViewSpec extends SpecBase {
       doc.select("table").text() should not include "Amity Marine Contractors"
     }
 
-    "not render the Subcontractors to reverify section when no reverifications exist" in {
-      val doc = render(viewModelWithoutReverify)
-
-      doc.select("h2").eachText() should not contain messages(app)(
-        "verify.verificationRequest.subcontractorsToReverify.heading"
-      )
-      doc.text()                  should not include "Orca Industrial"
-    }
-
     "render the print link" in {
-      val doc = render(viewModelWithReverify)
+      val doc = render(viewModel)
 
       val printLink = doc.select("a[data-module=hmrc-print-link]")
       printLink          should not be empty
@@ -164,7 +150,7 @@ class VerificationRequestViewSpec extends SpecBase {
     }
 
     "render the back to manage subcontractors link" in {
-      val doc = render(viewModelWithReverify)
+      val doc = render(viewModel)
 
       val manageLink = doc.select(s"a[href=/manage-subcontractors/900063]")
       manageLink          should not be empty
@@ -172,7 +158,7 @@ class VerificationRequestViewSpec extends SpecBase {
     }
 
     "render the back link" in {
-      val doc = render(viewModelWithReverify)
+      val doc = render(viewModel)
 
       val backLink = doc.select(".govuk-back-link")
       backLink should not be empty

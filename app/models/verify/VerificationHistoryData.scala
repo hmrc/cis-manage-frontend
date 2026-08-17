@@ -37,8 +37,7 @@ case class VerificationRequestData(
   contractorName: String,
   employerReference: String,
   receiptReferenceNumber: String,
-  subcontractorsToVerify: Seq[SubcontractorVerificationData],
-  subcontractorsToReverify: Seq[SubcontractorVerificationData]
+  subcontractorsToVerify: Seq[SubcontractorVerificationData]
 )
 
 object VerificationRequestData {
