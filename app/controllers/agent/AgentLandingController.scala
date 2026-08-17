@@ -16,26 +16,24 @@
 
 package controllers.agent
 
-import controllers.actions.*
 import config.FrontendAppConfig
-import models.{CisTaxpayerSearchResult, Target}
+import controllers.actions.*
 import models.Target.*
 import models.requests.DataRequest
+import models.{CisTaxpayerSearchResult, Target}
 import pages.{AgentClientsPage, CisIdPage}
 import play.api.Logging
-
-import javax.inject.{Inject, Named}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
+import play.api.mvc.*
 import repositories.SessionRepository
 import services.{ManageService, PrepopService}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.agent.AgentLandingView
 
-import scala.util.control.NonFatal
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class AgentLandingController @Inject() (
   override val messagesApi: MessagesApi,
@@ -46,18 +44,14 @@ class AgentLandingController @Inject() (
   prepopService: PrepopService,
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
-  view: AgentLandingView,
-  appConfig: FrontendAppConfig
-)(implicit ec: ExecutionContext)
+  view: AgentLandingView
+)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
   def onPageLoad(uniqueId: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      implicit val config: FrontendAppConfig = appConfig
-      implicit val hc: HeaderCarrier         = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
       (for {
         updatedUserAnswers <- Future.fromTry(request.userAnswers.set(CisIdPage, uniqueId))
         _                  <- sessionRepository.set(updatedUserAnswers)
@@ -65,7 +59,7 @@ class AgentLandingController @Inject() (
       } yield Ok(
         view(
           uniqueId = uniqueId,
-          agentName = "Agent name hardcoded", // TODO: Need to make it dynamic.
+          agentName = request.itmpName,
           schemeName = viewModel.schemeName,
           employerRef = viewModel.employerRef
         )
@@ -77,9 +71,6 @@ class AgentLandingController @Inject() (
 
   def onTargetClick(uniqueId: String, targetKey: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      implicit val hc: HeaderCarrier =
-        HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
       val systemErrorRedirect       = Redirect(controllers.routes.SystemErrorController.onPageLoad())
       val unauthorisedAgentRedirect = Redirect(controllers.routes.UnauthorisedAgentAffinityController.onPageLoad())
 

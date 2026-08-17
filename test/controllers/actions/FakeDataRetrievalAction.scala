@@ -32,7 +32,8 @@ class FakeDataRetrievalAction(dataToReturn: Option[UserAnswers]) extends DataRet
         employerReference = request.employerReference,
         agentReference = request.agentReference,
         isAgent = request.isAgent,
-        agentCode = request.agentCode
+        agentCode = request.agentCode,
+        itmpName = request.itmpName
       )
     )
   override protected implicit val executionContext: ExecutionContext                                 =

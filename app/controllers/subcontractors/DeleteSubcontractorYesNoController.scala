@@ -19,11 +19,14 @@ package controllers.subcontractors
 import controllers.actions.*
 import forms.subcontractors.DeleteSubcontractorYesNoFormProvider
 import models.Mode
-import pages.subcontractors.{DeleteSubcontractorJourneyPage, DeleteSubcontractorYesNoPage}
+import models.requests.CisIdDataRequest
+import pages.subcontractors.{DeleteSubcontractorJourneyPage, DeleteSubcontractorYesNoPage, DeletedSubcontractorPage, SubcontractorListPage}
+import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.SubcontractorService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.subcontractors.DeleteSubcontractorYesNoView
 
@@ -33,6 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class DeleteSubcontractorYesNoController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
+  subcontractorService: SubcontractorService,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -42,11 +46,12 @@ class DeleteSubcontractorYesNoController @Inject() (
   view: DeleteSubcontractorYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   private val form: Form[Boolean] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
+  def onPageLoad(verificationNumber: Long, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers
         .get(DeleteSubcontractorJourneyPage)
@@ -63,9 +68,16 @@ class DeleteSubcontractorYesNoController @Inject() (
                 .get(DeleteSubcontractorYesNoPage)
                 .fold(form)(form.fill)
 
+            val subcontractorName = request.userAnswers
+              .get(SubcontractorListPage)
+              .flatMap(_.subcontractors.find(_.subbieResourceRef.contains(verificationNumber)))
+              .flatMap(_.displayName)
+              .getOrElse(journeyData.subcontractorName)
+
             Ok(
               view(
-                journeyData.subcontractorName,
+                verificationNumber,
+                subcontractorName,
                 preparedForm,
                 mode
               )
@@ -74,7 +86,7 @@ class DeleteSubcontractorYesNoController @Inject() (
         }
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] =
+  def onSubmit(verificationNumber: Long, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
       form
         .bindFromRequest()
@@ -90,6 +102,7 @@ class DeleteSubcontractorYesNoController @Inject() (
                 Future.successful(
                   BadRequest(
                     view(
+                      verificationNumber,
                       journeyData.subcontractorName,
                       formWithErrors,
                       mode
@@ -98,24 +111,58 @@ class DeleteSubcontractorYesNoController @Inject() (
                 )
               },
           value =>
-            for {
-              updatedAnswers <- Future.fromTry(
-                                  request.userAnswers.set(
-                                    DeleteSubcontractorYesNoPage,
-                                    value
-                                  )
-                                )
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield
-              if (value) {
-                Redirect(
-                  controllers.subcontractors.routes.DeleteSubcontractorController.onPageLoad()
-                )
-              } else {
+            if (!value) {
+              Future.successful(
                 Redirect(
                   controllers.subcontractors.routes.SubcontractorsListController.onPageLoad(request.cisId, mode)
                 )
-              }
+              )
+            } else {
+              request.userAnswers
+                .get(DeleteSubcontractorJourneyPage)
+                .fold(
+                  Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+                ) { journeyData =>
+                  val subcontractorName = request.userAnswers
+                    .get(SubcontractorListPage)
+                    .flatMap(_.subcontractors.find(_.subbieResourceRef.contains(verificationNumber)))
+                    .flatMap(_.displayName)
+                    .getOrElse(journeyData.subcontractorName)
+                  subcontractorService
+                    .deleteSubcontractor(request.cisId, verificationNumber)
+                    .flatMap { _ =>
+                      cleanupUserAnswers(subcontractorName)
+                        .map { _ =>
+                          Redirect(
+                            controllers.subcontractors.routes.SubcontractorDeletedConfirmationController
+                              .onPageLoad()
+                          )
+                        }
+                    }
+                    .recover { case ex =>
+                      logger.error(
+                        s"[DeleteSubcontractorYesNoController] Failed to delete subcontractor " +
+                          s"(cisId=${request.cisId}, subbieResourceRef=$verificationNumber)",
+                        ex
+                      )
+                      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                    }
+                }
+            }
         )
     }
+
+  private def cleanupUserAnswers(
+    subcontractorName: String
+  )(implicit request: CisIdDataRequest[AnyContent]): Future[Boolean] =
+    Future
+      .fromTry {
+        for {
+          ua1 <- request.userAnswers.set(DeletedSubcontractorPage, subcontractorName)
+          ua2 <- ua1.remove(DeleteSubcontractorJourneyPage)
+          ua3 <- ua2.remove(DeleteSubcontractorYesNoPage)
+          ua4 <- ua3.remove(SubcontractorListPage)
+        } yield ua4
+      }
+      .flatMap(sessionRepository.set)
 }

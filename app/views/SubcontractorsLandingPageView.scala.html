@@ -69,7 +69,7 @@
         ),
         ptaCard(
             title = messages("subcontractorsLandingPage.viewSubcontractors"),
-            link = "#",
+            link = controllers.subcontractors.routes.GetSubcontractorListController.onPageLoad().url,
             content = Html(messages("subcontractorsLandingPage.viewSubcontractors.p1")),
             id = Some("view-your-subcontractors")
         )

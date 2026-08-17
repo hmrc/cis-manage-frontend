@@ -108,6 +108,32 @@ class LinkSpec extends SpecBase with Matchers {
       linkElement.size mustBe 1
       linkElement.text mustBe prefixText + " " + linkText + "."
     }
+
+    "must render custom link content when supplied" in new Setup {
+
+      val html = link(
+        linkUrl = linkUrl,
+        linkContent = Some(play.twirl.api.Html("<strong>Custom content</strong>"))
+      )
+
+      val linkRefElement = getLinkRefElement(html)
+
+      linkRefElement.text() mustBe "Custom content"
+    }
+
+    "must render custom content instead of linkTextKey when both are supplied" in new Setup {
+
+      val html = link(
+        linkTextKey = linkText,
+        linkUrl = linkUrl,
+        linkContent = Some(play.twirl.api.Html("<span>Override Text</span>"))
+      )
+
+      val linkRefElement = getLinkRefElement(html)
+
+      linkRefElement.text() mustBe "Override Text"
+    }
+
   }
 
   trait Setup {

@@ -19,7 +19,7 @@
 @this()
 
 @(
-    linkTextKey: String,
+    linkTextKey: String = emptyString,
     linkUrl: String,
     isNewTab: Boolean = false,
     hasFullStop: Boolean = false,
@@ -28,17 +28,18 @@
     suffixTextKey: String = emptyString,
     extraClasses: String = emptyString,
     bold: Boolean = false,
-    visuallyHiddenText: Option[String] = None
+    visuallyHiddenText: Option[String] = None,
+    linkContent: Option[Html] = None
 )(implicit messages: Messages)
 
 @defining {
     @if(prefixTextKey.nonEmpty) {
-        @{Html(messages(prefixTextKey))}
-    }
+    @{Html(messages(prefixTextKey))}
+}
 
-    <a href="@linkUrl"
-       class="govuk-link @if(bold){govuk-!-font-weight-bold}"
-       @if(isNewTab){rel="noreferrer noopener" target="_blank"}>@{Html(messages(linkTextKey))}@visuallyHiddenText.map { hidden =><span class="govuk-visually-hidden">@hidden</span>}</a>@if(hasFullStop){.}
+<a href="@linkUrl"
+   class="govuk-link @if(bold){govuk-!-font-weight-bold}"
+   @if(isNewTab){rel="noreferrer noopener" target="_blank"}>@{linkContent.getOrElse(Html(messages(linkTextKey)))}@visuallyHiddenText.map { hidden =><span class="govuk-visually-hidden">@hidden</span>}</a>@if(hasFullStop){.}
 
     @if(suffixTextKey.nonEmpty) {
         @{Html(messages(suffixTextKey))}
