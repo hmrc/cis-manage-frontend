@@ -263,7 +263,7 @@ agent.clientListSearch.details.2.p1                    =  You can send CIS month
 agent.clientListSearch.details.2.p2                    =  This service is only available using commercial software.
 agent.clientListSearch.details.2.link                  =  Find commercial software for CIS returns (opens in new tab)
 agent.clientListSearch.td.actions.remove.hidden        =  Remove {0}
-agent.clientListSearch.td.clientName.hidden            =  Search {0}
+agent.clientListSearch.td.clientName.hidden            =  Select {0}
 
 agent.landing.title                                    =  Manage Construction Industry Scheme account
 agent.landing.h1                                       =  Manage Construction Industry Scheme account

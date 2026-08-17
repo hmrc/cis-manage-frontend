@@ -115,10 +115,10 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
       rows.size mustBe clientList.size
 
       val firstRowCells = rows.head.select("td").asScala
-      firstRowCells(0).select("a").text() mustBe clientList.head.clientName
+      firstRowCells(0).select("a").first().ownText() mustBe clientList.head.clientName
       firstRowCells(1).text() mustBe clientList.head.employerReference
       firstRowCells(2).text() mustBe clientList.head.clientReference
-      firstRowCells(3).select("a").text() mustBe messages("agent.clientListSearch.td.actions.remove")
+      firstRowCells(3).select("a").first().ownText() mustBe messages("agent.clientListSearch.td.actions.remove")
     }
 
     "must include data-sort-value attribute on client name rows" in new Setup {
