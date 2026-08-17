@@ -36,7 +36,7 @@ successfulNoRecordsFound.heading                              =  Wedi llwyddo i 
 successfulNoRecordsFound.p1                                   =  Doedd dim modd dod o hyd i gofnodion am unrhyw is-gontractwyr.
 successfulNoRecordsFound.p2                                   =  Gallwch
 
-successfulNoRecordsFound.p2.link                              =  ychwanegu is-gontractwr.
+successfulNoRecordsFound.p2.link                              =  ychwanegu is-gontractwr
 
 # Delete
 delete.deleteMonthlyReturn.title           =  Ydych chi’n siŵr eich bod am ddileu’r adroddiad misol ar gyfer {0}?
