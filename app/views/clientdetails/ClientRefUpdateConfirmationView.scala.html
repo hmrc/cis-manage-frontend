@@ -38,8 +38,15 @@
 
         @link(
             linkTextKey = "clientdetails.clientRefUpdateConfirmation.p2.link",
-                        linkUrl = controllers.agent.routes.ClientListSearchController.onPageLoad().url,
-                        hasFullStop = true,
-            prefixTextKey = "clientdetails.clientRefUpdateConfirmation.p2"
+            linkUrl = controllers.agent.routes.ClientListSearchController.onPageLoad().url,
+            hasFullStop = true,
+            prefixTextKey = "clientdetails.clientRefUpdateConfirmation.p2",
+            suffixTextKey = "clientdetails.clientRefUpdateConfirmation.p3"
+        )
+
+        @link(
+            linkTextKey = "clientdetails.clientRefUpdateConfirmation.survey.link",
+            linkUrl = "#",
+            suffixTextKey = messages("clientdetails.clientRefUpdateConfirmation.survey.suffix")
         )
 }
