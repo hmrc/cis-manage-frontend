@@ -17,7 +17,7 @@
 package viewmodels.agent
 
 import ClientStatus.Active
-import models.{CisTaxpayerSearchResult, Enumerable, WithName}
+import models.{CisTaxpayerSearchResult, Enumerable, NormalMode, WithName}
 import play.api.i18n.Messages
 import viewmodels.Link
 import viewmodels.agent.SearchBy.*
@@ -34,7 +34,10 @@ case class ClientListViewModel(
     clientStatus match {
       case Active =>
         Some(
-          Link(messages("agent.clientListSearch.td.actions.remove"), "#")
+          Link(
+            messages("agent.clientListSearch.td.actions.remove"),
+            controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode).url
+          )
         )
       case _      => None
     }

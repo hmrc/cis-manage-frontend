@@ -17,7 +17,7 @@
 package viewmodels.agent
 
 import base.SpecBase
-import models.CisTaxpayerSearchResult
+import models.{CisTaxpayerSearchResult, NormalMode}
 import org.scalatest.matchers.should.Matchers.*
 import play.api.i18n.Messages
 import viewmodels.agent.ClientStatus.{Active, InActive}
@@ -63,7 +63,7 @@ class ClientListViewModelSpec extends SpecBase {
       val result = model.removeLink
       result.isDefined shouldBe true
       result.get.text  shouldBe messages("agent.clientListSearch.td.actions.remove")
-      result.get.href  shouldBe "#"
+      result.get.href  shouldBe controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode).url
     }
 
     "return None when status is NOT Active" in {
