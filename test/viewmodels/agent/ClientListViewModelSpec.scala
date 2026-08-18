@@ -63,7 +63,9 @@ class ClientListViewModelSpec extends SpecBase {
       val result = model.removeLink
       result.isDefined shouldBe true
       result.get.text  shouldBe messages("agent.clientListSearch.td.actions.remove")
-      result.get.href  shouldBe controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode).url
+      result.get.href  shouldBe controllers.clientdetails.routes.RemoveClientYesNoController
+        .onPageLoad("123", NormalMode)
+        .url
     }
 
     "return None when status is NOT Active" in {

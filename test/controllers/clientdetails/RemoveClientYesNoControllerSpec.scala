@@ -40,8 +40,10 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new RemoveClientYesNoFormProvider()
   val form         = formProvider()
+  val uniqueId     = "123"
 
-  lazy val removeClientRoute = controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode).url
+  lazy val removeClientRoute =
+    controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(uniqueId, NormalMode).url
 
   "RemoveClient Controller" - {
 
@@ -57,7 +59,10 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[RemoveClientYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(clientName, form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(clientName, uniqueId, form, NormalMode)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -75,7 +80,7 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(clientName, form.fill(true), NormalMode)(
+        contentAsString(result) mustEqual view(clientName, uniqueId, form.fill(true), NormalMode)(
           request,
           messages(application)
         ).toString
@@ -124,7 +129,7 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(clientName, boundForm, NormalMode)(
+        contentAsString(result) mustEqual view(clientName, uniqueId, boundForm, NormalMode)(
           request,
           messages(application)
         ).toString

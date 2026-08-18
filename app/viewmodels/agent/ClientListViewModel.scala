@@ -36,7 +36,7 @@ case class ClientListViewModel(
         Some(
           Link(
             messages("agent.clientListSearch.td.actions.remove"),
-            controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode).url
+            controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(uniqueId, NormalMode).url
           )
         )
       case _      => None
