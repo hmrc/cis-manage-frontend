@@ -598,6 +598,9 @@ verify.verificationRequest.heading                           =  Verification req
 verify.verificationRequest.submissionDetails.heading         =  Submission details
 verify.verificationRequest.submittedAt                       =  Submitted at {0} on {1}
 verify.verificationRequest.verificationNumber                =  Verification number
+verify.verificationRequest.contractorName                    =  Contractor name
+verify.verificationRequest.employerReference                 =  Employer reference
+verify.verificationRequest.receiptReferenceNumber            =  Receipt reference number
 verify.verificationRequest.subcontractorsInRequest           =  Subcontractors in this request
 verify.verificationRequest.subcontractorsToVerify.heading    =  Subcontractors to verify
 verify.verificationRequest.subcontractorsToReverify.heading  =  Subcontractors to reverify
@@ -619,6 +622,7 @@ verify.subcontractorSubmissionReceipt.link2.link             =  Manage your subc
 verify.subcontractorSubmissionReceipt.summaryList.key1       =  Contractor name
 verify.subcontractorSubmissionReceipt.summaryList.key2       =  Employer reference
 verify.subcontractorSubmissionReceipt.summaryList.key3       =  Receipt reference number
+verify.subcontractorSubmissionReceipt.summaryList.key4       =  Verification reference number
 
 verify.noVerificationHistory.title                           =  No verification history
 verify.noVerificationHistory.heading                         =  Verification history
