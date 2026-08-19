@@ -3,6 +3,7 @@ service.name   =  Cynllun y Diwydiant Adeiladu
 
 site.back      =  Yn ôl
 site.continue  =  Parhau
+site.govuk                                =  GOV.UK
 
 # Subcontractors
 retrievingSubcontractors.title                                =  Eich is-gontractwyr
