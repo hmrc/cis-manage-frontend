@@ -99,6 +99,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   private lazy val submissionUnsuccessfulCannotResubmitPath: String =
     configuration.get[String]("urls.submissionUnsuccessfulCannotResubmit")
   private lazy val authoriseClientRequestPath: String               = configuration.get[String]("urls.authoriseClientRequest")
+  private lazy val cisOrgAppealPath: String                         = configuration.get[String]("urls.cisOrgAppeal")
+  private lazy val cisOrgGenericNoticesPath: String                 = configuration.get[String]("urls.cisOrgGenericNotices")
 
   def fileStandardReturnUrl: String = s"$cisFrontendBaseUrl$fileStandardReturnPath"
 
@@ -139,6 +141,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   def authoriseClientRequestUrl(agentCode: String): String =
     s"$portalAccountBaseUrl${authoriseClientRequestPath.replace("{agentCode}", agentCode)}"
+
+  def cisOrgAppealUrl(taxOfficeNumber: String, taxOfficeReference: String): String =
+    s"$cisFrontendBaseUrl${cisOrgAppealPath.replace("taxOfficeNumber", taxOfficeNumber).replace("taxOfficeReference", taxOfficeReference)}"
+
+  def cisOrgGenericNoticesUrl(taxOfficeNumber: String, taxOfficeReference: String): String =
+    s"$cisFrontendBaseUrl${cisOrgGenericNoticesPath.replace("taxOfficeNumber", taxOfficeNumber).replace("taxOfficeReference", taxOfficeReference)}"
 
   lazy val cisTypeOfSubcontractorUrl: String        =
     configuration.get[String]("urls.cis-contractor-frontend")
