@@ -37,7 +37,7 @@ clientdetails.clientRefUpdateConfirmation.p2.link                        =  ar e
 clientdetails.clientRefUpdateConfirmation.p3                             =  Gall gymryd hyd at 5 diwrnod i’r newid hwn ddigwydd.
 clientdetails.clientRefUpdateConfirmation.h2                             =  Yr hyn sy’n digwydd nesaf
 clientdetails.clientRefUpdateConfirmation.survey.link                    =  Beth oedd eich barn am y gwasanaeth hwn?
-clientdetails.clientRefUpdateConfirmation.survey.suffix                  = (mae’n cymryd 30 eiliad)
+clientdetails.clientRefUpdateConfirmation.survey.suffix                  =  (mae’n cymryd 30 eiliad)
 
 clientdetails.removeClient.title                                         =  A ydych yn siŵr eich bod am dynnu’ch cleient?
 clientdetails.removeClient.heading                                       =  A ydych yn siŵr eich bod am dynnu {0}?

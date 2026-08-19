@@ -668,7 +668,7 @@ clientdetails.clientRefUpdateConfirmation.p2.link                        =  your
 clientdetails.clientRefUpdateConfirmation.p3                             =  It may take up to 5 days for this change to take place.
 clientdetails.clientRefUpdateConfirmation.h2                             =  What happens next
 clientdetails.clientRefUpdateConfirmation.survey.link                    =  What did you think of this service?
-clientdetails.clientRefUpdateConfirmation.survey.suffix                  = (takes 30 seconds)
+clientdetails.clientRefUpdateConfirmation.survey.suffix                  =  (takes 30 seconds)
 
 subcontractors.subcontractorsList.title                                  =  Your subcontractors
 subcontractors.subcontractorsList.heading                                =  Your subcontractors

@@ -24,7 +24,7 @@
         link: Link
 )
 
-@(oldClientReference: String, newClientReference: String)(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("clientdetails.clientRefUpdateConfirmation.title")), showBackLink = false) {
         @govukPanel(Panel(
@@ -32,7 +32,7 @@
              )
         )
 
-        @paragraph(messages("clientdetails.clientRefUpdateConfirmation.p1", oldClientReference, newClientReference))
+        @paragraph(messages("clientdetails.clientRefUpdateConfirmation.p1"))
 
         @h2(messages("clientdetails.clientRefUpdateConfirmation.h2"))
 
@@ -47,6 +47,6 @@
         @link(
             linkTextKey = "clientdetails.clientRefUpdateConfirmation.survey.link",
             linkUrl = "#",
-            suffixTextKey = messages("clientdetails.clientRefUpdateConfirmation.survey.suffix")
+            suffixTextKey = "clientdetails.clientRefUpdateConfirmation.survey.suffix"
         )
 }
