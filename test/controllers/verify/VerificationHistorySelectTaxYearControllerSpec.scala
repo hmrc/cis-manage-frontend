@@ -41,6 +41,23 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
 
   def onwardRoute = Call("GET", "/foo")
 
+  private def verificationRequestData(
+    verificationNumber: String,
+    dateSubmitted: LocalDate,
+    taxYear: Int
+  ): VerificationRequestData =
+    VerificationRequestData(
+      verificationBatchId = 1L,
+      verificationNumber = verificationNumber,
+      dateSubmitted = dateSubmitted,
+      taxYear = taxYear,
+      acceptedDateTime = dateSubmitted.atStartOfDay(),
+      contractorName = "Test Scheme",
+      employerReference = "123PA000001",
+      receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
+      subcontractorsToVerify = Seq.empty
+    )
+
   lazy val verificationHistorySelectTaxYearRoute =
     controllers.verify.routes.VerificationHistorySelectTaxYearController.onPageLoad().url
 
@@ -59,9 +76,9 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
   val verificationHistoryData: VerificationHistoryData =
     VerificationHistoryData(
       verificationRequests = Seq(
-        VerificationRequestData("V001", LocalDate.of(2026, 4, 6), 2026),
-        VerificationRequestData("V002", LocalDate.of(2025, 4, 6), 2025),
-        VerificationRequestData("V003", LocalDate.of(2025, 4, 5), 2024)
+        verificationRequestData("V001", LocalDate.of(2026, 4, 6), 2026),
+        verificationRequestData("V002", LocalDate.of(2025, 4, 6), 2025),
+        verificationRequestData("V003", LocalDate.of(2025, 4, 5), 2024)
       )
     )
 

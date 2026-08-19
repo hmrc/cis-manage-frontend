@@ -146,7 +146,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
         taxTreatment = TaxTreatment.Unknown,
         dateAdded = "6 Apr 2026",
         subbieResourceRef = 10L,
-        amendUrl = s"$amendBaseUrl/amend/start/$cisId/10"
+        amendUrl = s"$amendBaseUrl/amend/start/10"
       ),
       SubcontractorsListRow(
         id = "2",
@@ -157,7 +157,7 @@ class SubcontractorsListControllerSpec extends SpecBase {
         taxTreatment = TaxTreatment.Gross,
         dateAdded = "6 May 2026",
         subbieResourceRef = 20L,
-        amendUrl = s"$amendBaseUrl/amend/start/$cisId/20"
+        amendUrl = s"$amendBaseUrl/amend/start/20"
       )
     )
 

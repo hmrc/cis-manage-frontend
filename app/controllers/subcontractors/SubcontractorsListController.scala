@@ -22,7 +22,6 @@ import forms.subcontractors.SubcontractorsListFormProvider
 import models.response.GetSubcontractor
 import models.{Mode, UserAnswers}
 import pages.subcontractors.SubcontractorListPage
-import pages.CisIdPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.*
@@ -117,19 +116,16 @@ class SubcontractorsListController @Inject() (
   private def rowsFromUserAnswers(
     userAnswers: UserAnswers
   ): Option[Seq[SubcontractorsListRow]] =
-    userAnswers.get(SubcontractorListPage).flatMap { subcontractors =>
+    userAnswers.get(SubcontractorListPage).map { subcontractors =>
       if (subcontractors.subcontractors.isEmpty) {
-        Some(Seq.empty)
+        Seq.empty
       } else {
-        userAnswers.get(CisIdPage).map { cisId =>
-          subcontractors.subcontractors.map(toListRow(_, cisId))
-        }
+        subcontractors.subcontractors.map(toListRow)
       }
     }
 
   private def toListRow(
-    subcontractor: GetSubcontractor,
-    cisId: String
+    subcontractor: GetSubcontractor
   ): SubcontractorsListRow = {
 
     val subbieResourceRef = getSubbieResourceRef(subcontractor)
@@ -167,7 +163,7 @@ class SubcontractorsListController @Inject() (
         .map(_.format(dateAddedFormatter))
         .getOrElse(""),
       subbieResourceRef = subbieResourceRef,
-      amendUrl = s"${config.cisTypeOfSubcontractorUrl}/amend/start/${encode(cisId)}/$subbieResourceRef"
+      amendUrl = s"${config.cisTypeOfSubcontractorUrl}/amend/start/$subbieResourceRef"
     )
   }
 
