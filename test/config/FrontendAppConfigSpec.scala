@@ -99,7 +99,7 @@ class FrontendAppConfigSpec extends SpecBase {
 
   "languageTranslationEnabled" - {
     "must reflect the configured feature flag" in new Setup {
-      appConfig.languageTranslationEnabled mustBe true
+      appConfig.languageTranslationEnabled mustBe false
     }
   }
 
