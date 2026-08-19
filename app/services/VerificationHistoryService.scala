@@ -18,6 +18,7 @@ package services
 
 import models.verify.*
 import models.verify.VerificationTaxYearSelection.TaxYearPeriod
+import models.response.GetSubmittedVerification
 import viewmodels.*
 
 import java.time.format.DateTimeFormatter
@@ -30,7 +31,9 @@ import scala.util.Try
 @Singleton
 class VerificationHistoryService @Inject() () {
 
-  private val displayDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM yyyy")
+  private val displayDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
+  private val timeFormatter: DateTimeFormatter        = DateTimeFormatter.ofPattern("HH:mm")
+  private val fullDateFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("dd MMMM yyyy")
 
   def getSubmittedVerificationTaxYears(data: VerificationHistoryData): Seq[TaxYearPeriod] =
     data.verificationRequests
@@ -74,6 +77,46 @@ class VerificationHistoryService @Inject() () {
       }
     }
 
+  def buildVerificationRequestViewModel(
+    data: VerificationHistoryData,
+    verificationBatchId: Long,
+    instanceId: String
+  ): Option[VerificationRequestPageViewModel] =
+    data.verificationRequests
+      .find(_.verificationBatchId == verificationBatchId)
+      .map { request =>
+        VerificationRequestPageViewModel(
+          submittedTime = request.acceptedDateTime.format(timeFormatter),
+          submittedDate = request.acceptedDateTime.format(fullDateFormatter),
+          verificationNumber = request.verificationNumber,
+          contractorName = request.contractorName,
+          employerReference = request.employerReference,
+          receiptReferenceNumber = request.receiptReferenceNumber,
+          subcontractorsToVerify =
+            request.subcontractorsToVerify.map(s => SubcontractorRowViewModel(s.name, s.verificationNumber)),
+          manageSubcontractorsUrl = controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId).url
+        )
+      }
+
+  def buildSubmissionReceiptViewModel(
+    data: VerificationHistoryData,
+    verificationBatchId: Long,
+    instanceId: String
+  ): Option[SubcontractorSubmissionReceiptViewModel] =
+    data.verificationRequests
+      .find(_.verificationBatchId == verificationBatchId)
+      .map { request =>
+        SubcontractorSubmissionReceiptViewModel(
+          submissionTime = request.acceptedDateTime.format(timeFormatter),
+          submissionDate = request.acceptedDateTime.format(fullDateFormatter),
+          contractorName = request.contractorName,
+          employerReference = request.employerReference,
+          receiptReferenceNumber = request.receiptReferenceNumber,
+          verificationNumber = request.verificationNumber,
+          cisId = instanceId
+        )
+      }
+
   private def buildTaxYearSections(
     data: VerificationHistoryData
   ): Seq[VerificationTaxYearViewModel] = {
@@ -104,8 +147,9 @@ class VerificationHistoryService @Inject() () {
       verificationNumber = request.verificationNumber,
       dateSubmitted = request.dateSubmitted.format(displayDateFormatter),
       verificationRequestLink =
-        controllers.verify.routes.VerificationRequestController.onPageLoad(request.verificationNumber).url,
-      submissionReceiptLink = "#"
+        controllers.verify.routes.VerificationRequestController.onPageLoad(request.verificationBatchId).url,
+      submissionReceiptLink =
+        controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(request.verificationBatchId).url
     )
 
   def toVerificationHistoryData(
@@ -117,12 +161,28 @@ class VerificationHistoryService @Inject() () {
         .flatMap { batch =>
           for {
             verificationNumber <- batch.verificationNumber
-            acceptedDate        = acceptedDateFor(batch.verificationBatchId, response.submissions)
-          } yield VerificationRequestData(
-            verificationNumber = verificationNumber,
-            dateSubmitted = acceptedDate,
-            taxYear = taxYearStart(acceptedDate)
-          )
+            submission          = submissionFor(batch.verificationBatchId, response.submissions)
+            acceptedDateTime    = acceptedDateTimeFor(batch.verificationBatchId, submission)
+          } yield {
+            val scheme = schemeFor(batch.schemeId, response)
+
+            VerificationRequestData(
+              verificationBatchId = batch.verificationBatchId,
+              verificationNumber = verificationNumber,
+              dateSubmitted = acceptedDateTime.toLocalDate,
+              taxYear = taxYearStart(acceptedDateTime.toLocalDate),
+              acceptedDateTime = acceptedDateTime,
+              contractorName = contractorNameFor(scheme),
+              employerReference = scheme.taxOfficeNumber,
+              receiptReferenceNumber = receiptReferenceNumberFor(batch.verificationBatchId, submission),
+              subcontractorsToVerify = subcontractorsFor(
+                batch.verificationBatchId,
+                verificationNumber,
+                response.verifications,
+                response.subcontractors
+              )
+            )
+          }
         }
         .sortBy(_.dateSubmitted)(Ordering[LocalDate].reverse)
 
@@ -130,6 +190,37 @@ class VerificationHistoryService @Inject() () {
       verificationRequests = verificationRequests
     )
   }
+
+  private def schemeFor(
+    schemeId: Long,
+    response: GetSubmittedVerificationsResponse
+  ): models.response.GetSubmittedContractorScheme =
+    response.scheme
+      .find(_.schemeId.toLong == schemeId)
+      .getOrElse {
+        throw new IllegalStateException(
+          s"Submitted verification scheme $schemeId is missing"
+        )
+      }
+
+  private def contractorNameFor(
+    scheme: models.response.GetSubmittedContractorScheme
+  ): String =
+    scheme.name.getOrElse {
+      throw new IllegalStateException(
+        s"Submitted verification scheme ${scheme.schemeId} is missing contractor name"
+      )
+    }
+
+  private def receiptReferenceNumberFor(
+    verificationBatchId: Long,
+    submission: GetSubmittedSubmission
+  ): String =
+    submission.hmrcMarkGgis.getOrElse {
+      throw new IllegalStateException(
+        s"Submitted verification $verificationBatchId is missing receipt reference number"
+      )
+    }
 
   private def taxYearStart(date: LocalDate): Int = {
     val taxYearStartDate =
@@ -142,34 +233,62 @@ class VerificationHistoryService @Inject() () {
     }
   }
 
-  private def acceptedDateFor(
+  private def submissionFor(
     verificationBatchId: Long,
     submissions: Seq[GetSubmittedSubmission]
-  ): LocalDate =
+  ): GetSubmittedSubmission =
     submissions
       .filter(_.activeObjectId.contains(verificationBatchId))
-      .map { submission =>
-        submission.acceptedTime
-          .map(parseAcceptedDate)
-          .getOrElse {
-            throw new IllegalStateException(
-              s"Submitted verification $verificationBatchId is missing accepted date"
-            )
-          }
-      }
-      .maxOption
+      .map(submission => acceptedDateTimeFor(verificationBatchId, submission) -> submission)
+      .sortBy(_._1)
+      .map(_._2)
+      .lastOption
       .getOrElse {
         throw new IllegalStateException(
           s"Submitted verification $verificationBatchId has no matching accepted submission"
         )
       }
 
-  private def parseAcceptedDate(value: String): LocalDate =
-    Try(LocalDateTime.parse(value).toLocalDate)
-      .orElse(Try(OffsetDateTime.parse(value).toLocalDate))
-      .orElse(Try(Instant.parse(value).atZone(ZoneOffset.UTC).toLocalDate))
-      .orElse(Try(LocalDate.parse(value)))
+  private def acceptedDateTimeFor(
+    verificationBatchId: Long,
+    submission: GetSubmittedSubmission
+  ): LocalDateTime =
+    submission.acceptedTime
+      .map(parseAcceptedDateTime)
+      .getOrElse {
+        throw new IllegalStateException(
+          s"Submitted verification $verificationBatchId is missing accepted date"
+        )
+      }
+
+  private def parseAcceptedDateTime(value: String): LocalDateTime =
+    Try(LocalDateTime.parse(value))
+      .orElse(Try(OffsetDateTime.parse(value).toLocalDateTime))
+      .orElse(Try(Instant.parse(value).atZone(ZoneOffset.UTC).toLocalDateTime))
+      .orElse(Try(LocalDate.parse(value).atStartOfDay()))
       .getOrElse {
         throw new IllegalStateException("Unable to parse submitted verification accepted date")
+      }
+
+  private def subcontractorsFor(
+    verificationBatchId: Long,
+    batchVerificationNumber: String,
+    verifications: Seq[GetSubmittedVerification],
+    subcontractors: Seq[models.response.GetSubmittedSubcontractor]
+  ): Seq[SubcontractorVerificationData] =
+    verifications
+      .filter(_.verificationBatchId.contains(verificationBatchId))
+      .sortBy(_.verificationId)
+      .map { verification =>
+        val name   =
+          verification.subcontractorName
+            .orElse(
+              verification.subcontractorId
+                .flatMap(id => subcontractors.find(_.subcontractorId == id).map(_.displayName))
+            )
+            .getOrElse("No name provided")
+        val number = verification.verificationNumber.getOrElse(batchVerificationNumber)
+
+        SubcontractorVerificationData(name, number)
       }
 }

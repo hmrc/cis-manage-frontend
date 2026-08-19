@@ -42,6 +42,23 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
 
   private val cisId = "900063"
 
+  private def verificationRequestData(
+    verificationNumber: String,
+    dateSubmitted: LocalDate,
+    taxYear: Int
+  ): VerificationRequestData =
+    VerificationRequestData(
+      verificationBatchId = 1L,
+      verificationNumber = verificationNumber,
+      dateSubmitted = dateSubmitted,
+      taxYear = taxYear,
+      acceptedDateTime = dateSubmitted.atStartOfDay(),
+      contractorName = "Test Scheme",
+      employerReference = "123PA000001",
+      receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
+      subcontractorsToVerify = Seq.empty
+    )
+
   private val viewModel = VerificationHistoryPageViewModel(
     taxYears = Seq(
       VerificationTaxYearViewModel(
@@ -50,7 +67,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
         rows = Seq(
           VerificationHistoryRowViewModel(
             verificationNumber = "V0004528765",
-            dateSubmitted = "6 Apr 2026",
+            dateSubmitted = "06 Apr 2026",
             verificationRequestLink = "#",
             submissionReceiptLink = "#"
           )
@@ -71,7 +88,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
 
   private val verificationHistoryData = VerificationHistoryData(
     verificationRequests = Seq(
-      VerificationRequestData("V0004528765", LocalDate.of(2026, 4, 6), 2026)
+      verificationRequestData("V0004528765", LocalDate.of(2026, 4, 6), 2026)
     )
   )
 
