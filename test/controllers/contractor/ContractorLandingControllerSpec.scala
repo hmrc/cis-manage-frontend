@@ -46,7 +46,9 @@ class ContractorLandingControllerSpec extends SpecBase {
   "ContractorLandingController" - {
 
     "must return OK and the correct view for a GET" in {
-      val mockManageService = mock[ManageService]
+      val taxOfficeNumber    = "754"
+      val taxOfficeReference = "EZ00100"
+      val mockManageService  = mock[ManageService]
       when(mockManageService.resolveAndStoreCisId(any[UserAnswers])(any()))
         .thenReturn(Future.successful(("CIS-123", emptyUserAnswers)))
 
@@ -63,7 +65,7 @@ class ContractorLandingControllerSpec extends SpecBase {
         val request  = FakeRequest(GET, routes.ContractorLandingController.onPageLoad().url)
         val result   = route(application, request).value
         val view     = application.injector.instanceOf[ContractorLandingView]
-        val vm       = fromUserAnswers(emptyUserAnswers, appConfig)
+        val vm       = fromUserAnswers(emptyUserAnswers, appConfig, taxOfficeNumber, taxOfficeReference)
         val expected = view(vm)(request, messages(application))
 
         status(result)          shouldBe OK

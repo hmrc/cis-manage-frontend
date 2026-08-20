@@ -143,10 +143,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     s"$portalAccountBaseUrl${authoriseClientRequestPath.replace("{agentCode}", agentCode)}"
 
   def cisOrgAppealUrl(taxOfficeNumber: String, taxOfficeReference: String): String =
-    s"$cisFrontendBaseUrl${cisOrgAppealPath.replace("taxOfficeNumber", taxOfficeNumber).replace("taxOfficeReference", taxOfficeReference)}"
+    s"$cisFrontendBaseUrl${cisOrgAppealPath.replace("{taxOfficeNumber}", taxOfficeNumber).replace("{taxOfficeReference}", taxOfficeReference)}"
 
   def cisOrgGenericNoticesUrl(taxOfficeNumber: String, taxOfficeReference: String): String =
-    s"$cisFrontendBaseUrl${cisOrgGenericNoticesPath.replace("taxOfficeNumber", taxOfficeNumber).replace("taxOfficeReference", taxOfficeReference)}"
+    s"$cisFrontendBaseUrl${cisOrgGenericNoticesPath.replace("{taxOfficeNumber}", taxOfficeNumber).replace("{taxOfficeReference}", taxOfficeReference)}"
 
   lazy val cisTypeOfSubcontractorUrl: String        =
     configuration.get[String]("urls.cis-contractor-frontend")

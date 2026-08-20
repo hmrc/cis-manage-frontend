@@ -137,12 +137,16 @@ class AgentLandingViewSpec extends SpecBase {
       FakeRequest(GET, "/agent/authorised-client-manage-CIS-returns")
     implicit val msgs: Messages                               = messages(application)
 
-    val view = application.injector.instanceOf[AgentLandingView]
-    val html = view(
+    val view                    = application.injector.instanceOf[AgentLandingView]
+    val cisOrgAppealUrl         = "/foo/appeal"
+    val cisOrgGenericNoticesUrl = "/foo/notices"
+    val html                    = view(
       uniqueId = uniqueId,
       agentName = agentName,
       employerRef = employerRef,
-      schemeName = schemeName
+      schemeName = schemeName,
+      cisOrgAppealUrl = cisOrgAppealUrl,
+      cisOrgGenericNoticesUrl = cisOrgGenericNoticesUrl
     )
 
     (Jsoup.parse(html.body), appConfig)

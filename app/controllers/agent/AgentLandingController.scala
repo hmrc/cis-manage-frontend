@@ -52,20 +52,38 @@ class AgentLandingController @Inject() (
 
   def onPageLoad(uniqueId: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      (for {
-        updatedUserAnswers <- Future.fromTry(request.userAnswers.set(CisIdPage, uniqueId))
-        _                  <- sessionRepository.set(updatedUserAnswers)
-        viewModel          <- manageService.getAgentLandingData(uniqueId, updatedUserAnswers, request.userId)
-      } yield Ok(
-        view(
-          uniqueId = uniqueId,
-          agentName = request.itmpName,
-          schemeName = viewModel.schemeName,
-          employerRef = viewModel.employerRef
-        )
-      )).recover { case e =>
-        logger.error(s"[AgentLandingController][onPageLoad] Failed for uniqueId=$uniqueId", e)
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      request.employerReference match {
+        case None =>
+          logger.warn("[AgentLandingController][onPageLoad Missing employerReference on request")
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+
+        case Some(employerRef) =>
+          val cisOrgAppealUrl = appConfig.cisOrgAppealUrl(
+            taxOfficeNumber = employerRef.taxOfficeNumber,
+            taxOfficeReference = employerRef.taxOfficeReference
+          )
+
+          val cisOrgGenericNoticesUrl = appConfig.cisOrgGenericNoticesUrl(
+            taxOfficeNumber = employerRef.taxOfficeNumber,
+            taxOfficeReference = employerRef.taxOfficeReference
+          )
+          (for {
+            updatedUserAnswers <- Future.fromTry(request.userAnswers.set(CisIdPage, uniqueId))
+            _                  <- sessionRepository.set(updatedUserAnswers)
+            viewModel          <- manageService.getAgentLandingData(uniqueId, updatedUserAnswers, request.userId)
+          } yield Ok(
+            view(
+              uniqueId = uniqueId,
+              agentName = request.itmpName,
+              schemeName = viewModel.schemeName,
+              employerRef = viewModel.employerRef,
+              cisOrgAppealUrl = cisOrgAppealUrl,
+              cisOrgGenericNoticesUrl = cisOrgGenericNoticesUrl
+            )
+          )).recover { case e =>
+            logger.error(s"[AgentLandingController][onPageLoad] Failed for uniqueId=$uniqueId", e)
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
       }
     }
 
