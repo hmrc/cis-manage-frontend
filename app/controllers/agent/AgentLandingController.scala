@@ -52,20 +52,21 @@ class AgentLandingController @Inject() (
 
   def onPageLoad(uniqueId: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      request.employerReference match {
+      request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId)) match {
+
         case None =>
           logger.warn("[AgentLandingController][onPageLoad Missing employerReference on request")
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
-        case Some(employerRef) =>
+        case Some(client) =>
           val cisOrgAppealUrl = appConfig.cisOrgAppealUrl(
-            taxOfficeNumber = employerRef.taxOfficeNumber,
-            taxOfficeReference = employerRef.taxOfficeReference
+            taxOfficeNumber = client.taxOfficeNumber,
+            taxOfficeReference = client.taxOfficeRef
           )
 
           val cisOrgGenericNoticesUrl = appConfig.cisOrgGenericNoticesUrl(
-            taxOfficeNumber = employerRef.taxOfficeNumber,
-            taxOfficeReference = employerRef.taxOfficeReference
+            taxOfficeNumber = client.taxOfficeNumber,
+            taxOfficeReference = client.taxOfficeRef
           )
           (for {
             updatedUserAnswers <- Future.fromTry(request.userAnswers.set(CisIdPage, uniqueId))
