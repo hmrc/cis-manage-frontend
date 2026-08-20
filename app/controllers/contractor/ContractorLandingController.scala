@@ -124,8 +124,7 @@ class ContractorLandingController @Inject() (
     employerRef: EmployerReference,
     systemErrorRedirect: Result
   )(implicit hc: HeaderCarrier): Future[Result] = {
-    val addContractorDetailsCall =
-      controllers.routes.AddContractorDetailsController.onPageLoad()
+    val manageContractorDetails = Call(GET, appConfig.contractorDetailsManagementUrl)
 
     val checkSubcontractorRecordsCall =
       controllers.routes.CheckSubcontractorRecordsController.onPageLoad(
@@ -149,7 +148,7 @@ class ContractorLandingController @Inject() (
               targetCall = targetCall(target, instanceId),
               instanceId = instanceId,
               scheme = scheme,
-              addContractorDetailsCall = addContractorDetailsCall,
+              addContractorDetailsCall = manageContractorDetails,
               checkSubcontractorRecordsCall = checkSubcontractorRecordsCall
             )
           )

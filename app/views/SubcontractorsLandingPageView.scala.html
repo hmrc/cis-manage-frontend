@@ -78,7 +78,7 @@
     @twoColumnGrid(
         ptaCard(
             title = messages("subcontractorsLandingPage.viewVerificationHistory"),
-            link = "#",
+            link = controllers.verify.routes.GetSubmittedVerificationsController.onPageLoad().url,
             content = Html(messages("subcontractorsLandingPage.viewVerificationHistory.p1")),
             id = Some("review-your-verification-history")
         ),
