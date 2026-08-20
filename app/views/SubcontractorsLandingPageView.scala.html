@@ -42,7 +42,6 @@
 
 @layout(
     pageTitle = titleNoForm(messages("subcontractorsLandingPage.title")),
-    showSignOut = false,
     sidebar = Some(sidebar)
 ) {
 
@@ -78,7 +77,7 @@
     @twoColumnGrid(
         ptaCard(
             title = messages("subcontractorsLandingPage.viewVerificationHistory"),
-            link = "#",
+            link = controllers.verify.routes.GetSubmittedVerificationsController.onPageLoad().url,
             content = Html(messages("subcontractorsLandingPage.viewVerificationHistory.p1")),
             id = Some("review-your-verification-history")
         ),
@@ -93,7 +92,7 @@
     @oneColumnGrid(
         ptaCard(
             title = messages("subcontractorsLandingPage.checkResults"),
-            link = "#",
+            link = config.cisCheckVerificationResultsUrl,
             content = Html(messages("subcontractorsLandingPage.checkResults.p1")),
             id = Some("check-results")
         )
