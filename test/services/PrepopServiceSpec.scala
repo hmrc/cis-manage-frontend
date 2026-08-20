@@ -26,6 +26,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.HttpVerbs.GET
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,6 +35,8 @@ class PrepopServiceSpec extends AnyWordSpec with Matchers with MockitoSugar with
 
   implicit val hc: HeaderCarrier    = HeaderCarrier()
   implicit val ec: ExecutionContext = global
+
+  private val mockAppConfig = mock[config.FrontendAppConfig]
 
   "PrepopService.prepopulateContractorKnownFacts" should {
 
@@ -172,7 +175,7 @@ class PrepopServiceSpec extends AnyWordSpec with Matchers with MockitoSugar with
     val service       = new PrepopService(mockConnector)
 
     val targetCall: Call                    = controllers.routes.ReturnsLandingController.onPageLoad("CIS-123")
-    val addContractorDetailsCall: Call      = controllers.routes.AddContractorDetailsController.onPageLoad()
+    val manageContractorDetails             = Call(GET, mockAppConfig.contractorDetailsManagementUrl)
     val checkSubcontractorRecordsCall: Call =
       controllers.routes.CheckSubcontractorRecordsController.onPageLoad("163", "AB0063", "CIS-123", "returnDue")
 
@@ -182,29 +185,29 @@ class PrepopServiceSpec extends AnyWordSpec with Matchers with MockitoSugar with
         targetCall,
         "CIS-123",
         scheme,
-        addContractorDetailsCall,
+        manageContractorDetails,
         checkSubcontractorRecordsCall
       ) mustBe targetCall
     }
 
-    "return addContractorDetailsCall when exactly one of name/utr is present" in {
+    "return manageContractorDetails when exactly one of name/utr is present" in {
       val schemeNameOnly = Scheme(1, "CIS-123", None, Some("Name"), None, None)
       service.determineLandingDestination(
         targetCall,
         "CIS-123",
         schemeNameOnly,
-        addContractorDetailsCall,
+        manageContractorDetails,
         checkSubcontractorRecordsCall
-      ) mustBe addContractorDetailsCall
+      ) mustBe manageContractorDetails
 
       val schemeUtrOnly = Scheme(1, "CIS-123", Some("123"), None, None, None)
       service.determineLandingDestination(
         targetCall,
         "CIS-123",
         schemeUtrOnly,
-        addContractorDetailsCall,
+        manageContractorDetails,
         checkSubcontractorRecordsCall
-      ) mustBe addContractorDetailsCall
+      ) mustBe manageContractorDetails
     }
 
     "return checkSubcontractorRecordsCall when neither name nor utr is present and subCount is 0" in {
@@ -213,20 +216,20 @@ class PrepopServiceSpec extends AnyWordSpec with Matchers with MockitoSugar with
         targetCall,
         "CIS-123",
         scheme,
-        addContractorDetailsCall,
+        manageContractorDetails,
         checkSubcontractorRecordsCall
       ) mustBe checkSubcontractorRecordsCall
     }
 
-    "return addContractorDetailsCall when neither name nor utr is present and subCount > 0" in {
+    "return manageContractorDetails when neither name nor utr is present and subCount > 0" in {
       val scheme = Scheme(1, "CIS-123", None, None, None, Some(2))
       service.determineLandingDestination(
         targetCall,
         "CIS-123",
         scheme,
-        addContractorDetailsCall,
+        manageContractorDetails,
         checkSubcontractorRecordsCall
-      ) mustBe addContractorDetailsCall
+      ) mustBe manageContractorDetails
     }
   }
 }

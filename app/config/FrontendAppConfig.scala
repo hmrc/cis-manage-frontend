@@ -140,13 +140,17 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   def authoriseClientRequestUrl(agentCode: String): String =
     s"$portalAccountBaseUrl${authoriseClientRequestPath.replace("{agentCode}", agentCode)}"
 
+  private val cisContractorFrontendBaseUrl: String  =
+    configuration.get[Service]("microservice.services.cis-contractor-frontend").baseUrl
   lazy val cisTypeOfSubcontractorUrl: String        =
-    configuration.get[String]("urls.cis-contractor-frontend")
+    s"$cisContractorFrontendBaseUrl${configuration.get[String]("urls.cis-contractor-frontend")}"
   lazy val cisVerifySubcontractorUrl: String        =
-    configuration.get[String]("urls.cisVerifySubcontractor")
+    s"$cisContractorFrontendBaseUrl${configuration.get[String]("urls.cisVerifySubcontractor")}"
   lazy val cisCheckVerificationResultsUrl: String   =
-    configuration.get[String]("urls.cisCheckVerificationResults")
+    s"$cisContractorFrontendBaseUrl${configuration.get[String]("urls.cisCheckVerificationResults")}"
   lazy val contractorDetailsIntroductionUrl: String =
-    configuration.get[String]("urls.contractorDetailsIntroduction")
+    s"$cisContractorFrontendBaseUrl${configuration.get[String]("urls.contractorDetailsIntroduction")}"
+  lazy val contractorDetailsManagementUrl: String   =
+    s"$cisContractorFrontendBaseUrl${configuration.get[String]("urls.contractorDetailsManagement")}"
 
 }

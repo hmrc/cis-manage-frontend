@@ -27,6 +27,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.*
 import repositories.SessionRepository
 import services.{ManageService, PrepopService}
+import uk.gov.hmrc.http.HttpVerbs.GET
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.agent.AgentLandingView
@@ -118,7 +119,7 @@ class AgentLandingController @Inject() (
     systemErrorRedirect: Result
   )(implicit hc: HeaderCarrier): Future[Result] = {
     val instanceId                    = client.uniqueId
-    val addContractorDetailsCall      = controllers.routes.AddContractorDetailsController.onPageLoad()
+    val manageContractorDetails       = Call(GET, appConfig.contractorDetailsManagementUrl)
     val checkSubcontractorRecordsCall = controllers.routes.CheckSubcontractorRecordsController.onPageLoad(
       client.taxOfficeNumber,
       client.taxOfficeRef,
@@ -136,7 +137,7 @@ class AgentLandingController @Inject() (
               targetCall = targetCall(target, instanceId),
               instanceId = instanceId,
               scheme = scheme,
-              addContractorDetailsCall = addContractorDetailsCall,
+              addContractorDetailsCall = manageContractorDetails,
               checkSubcontractorRecordsCall = checkSubcontractorRecordsCall
             )
           )
@@ -163,8 +164,9 @@ class AgentLandingController @Inject() (
 
   private def targetCall(target: Target, instanceId: String): Call =
     target match {
-      case Returns       => controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
-      case Notices       => controllers.notices.routes.ManageNoticesStatementsController.onPageLoad(instanceId)
-      case Subcontractor => controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId)
+      case Returns                 => controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
+      case Notices                 => controllers.notices.routes.ManageNoticesStatementsController.onPageLoad(instanceId)
+      case Subcontractor           => controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId)
+      case ManageContractorDetails => Call(GET, appConfig.contractorDetailsManagementUrl)
     }
 }
