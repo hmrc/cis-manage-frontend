@@ -165,6 +165,16 @@ class FrontendAppConfigSpec extends SpecBase {
       appConfig.cisTypeOfSubcontractorUrl mustBe
         "http://localhost:6998/construction-industry-scheme/subcontractor"
     }
+
+    "must contain the verify subcontractor URL" in new Setup {
+      appConfig.cisVerifySubcontractorUrl mustBe
+        "http://localhost:6998/construction-industry-scheme/subcontractor/verify/newest"
+    }
+
+    "must contain the check verification results URL" in new Setup {
+      appConfig.cisCheckVerificationResultsUrl mustBe
+        "http://localhost:6998/construction-industry-scheme/subcontractor/verify/check-results"
+    }
   }
 
   trait Setup {
