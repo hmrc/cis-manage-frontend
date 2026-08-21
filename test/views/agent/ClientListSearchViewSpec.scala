@@ -115,10 +115,10 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
       rows.size mustBe clientList.size
 
       val firstRowCells = rows.head.select("td").asScala
-      firstRowCells(0).text() mustBe clientList.head.clientName
+      firstRowCells(0).select("a").first().ownText() mustBe clientList.head.clientName
       firstRowCells(1).text() mustBe clientList.head.employerReference
       firstRowCells(2).text() mustBe clientList.head.clientReference
-      firstRowCells(3).text() mustBe messages("agent.clientListSearch.td.actions.remove")
+      firstRowCells(3).select("a").first().ownText() mustBe messages("agent.clientListSearch.td.actions.remove")
     }
 
     "must include data-sort-value attribute on client name rows" in new Setup {
@@ -360,6 +360,48 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
       tableIndex      must be >= 0
       paginationIndex must be >= 0
       paginationIndex must be > tableIndex
+    }
+    "must render visually hidden text for the client name link" in new Setup {
+      val html: HtmlFormat.Appendable = view(
+        form = form,
+        searchByOptions = searchOptions,
+        clientList = clientList,
+        paginationViewModel = PaginationViewModel(),
+        sortBy = None,
+        sortOrder = None
+      )
+      val doc: Document               = Jsoup.parse(html.body)
+
+      val firstRow   = doc.select("#agent-client-list tbody tr").first()
+      val hiddenText = firstRow.select(".govuk-visually-hidden").first()
+
+      hiddenText must not be null
+      hiddenText.text mustBe messages(
+        "agent.clientListSearch.td.clientName.hidden",
+        clientList.head.clientName
+      )
+    }
+
+    "must render visually hidden text for the remove link" in new Setup {
+      val html: HtmlFormat.Appendable = view(
+        form = form,
+        searchByOptions = searchOptions,
+        clientList = clientList,
+        paginationViewModel = PaginationViewModel(),
+        sortBy = None,
+        sortOrder = None
+      )
+      val doc: Document               = Jsoup.parse(html.body)
+
+      val firstRow   = doc.select("#agent-client-list tbody tr").first()
+      val removeCell = firstRow.select("td").get(3)
+      val hiddenText = removeCell.select(".govuk-visually-hidden").first()
+
+      hiddenText must not be null
+      hiddenText.text mustBe messages(
+        "agent.clientListSearch.td.actions.remove.hidden",
+        clientList.head.clientName
+      )
     }
   }
 
