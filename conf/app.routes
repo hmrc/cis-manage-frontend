@@ -173,5 +173,3 @@ POST  /client-details/change-client-reference         controllers.clientdetails.
 GET   /client-details/change-change-client-reference  controllers.clientdetails.ChangeClientReferenceController.onPageLoad(mode: Mode = CheckMode)
 POST  /client-details/change-change-client-reference  controllers.clientdetails.ChangeClientReferenceController.onSubmit(mode: Mode = CheckMode)
 
-# Add Contractor Details
-GET  /add-contractor-details  controllers.AddContractorDetailsController.onPageLoad()
