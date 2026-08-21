@@ -1,12 +1,13 @@
 # Infrastructure
 service.name                              =  Cynllun y Diwydiant Adeiladu
-
+site.change                               =  Newid
 site.back                                 =  Yn ôl
 site.no                                   =  Na
 site.yes                                  =  Iawn
 site.continue                             =  Parhau
 site.saveAndContinue                      =  Cadw a pharhau
 site.govuk                                =  GOV.UK
+error.title.prefix                        =  Error:
 
 # Delete
 delete.deleteMonthlyReturn.title           =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ar gyfer {0}?
