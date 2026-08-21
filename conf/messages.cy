@@ -49,9 +49,6 @@ history.printSubmissionDetails.paymentsMadeToSubcontractors.taxDeducted      =  
 history.printSubmissionDetails.printThisPage.link                            =  Argraffu’r dudalen hon
 history.printSubmissionDetails.monthlyReturnHistory.link                     =  Dychwelyd i ‘Hanes datganiadau misol’
 
-delete.deleteNilMonthlyReturn.title        =  Ydych chi’n siŵr eich bod am ddileu’r adroddiad misol dim ar gyfer {0}?
-delete.deleteNilMonthlyReturn.heading      =  Ydych chi’n siŵr eich bod am ddileu’r adroddiad misol dim ar gyfer {0}?
-
 subcontractors.deleteSubcontractorYesNo.heading                          =  Ydych chi’n siŵr eich bod chi am ddileu {0}?
 subcontractors.deleteSubcontractorYesNo.p                                =  Bydd yr is-gontractwr hwn hefyd yn cael ei dynnu oddi ar unrhyw ddatganiad misol nad ydych wedi’i chyflwyno hyd yma.
 subcontractors.deleteSubcontractorYesNo.error.required                   =  Dewiswch ‘Iawn’ os ydych chi am ddileu’r is-gontractwr hwn
