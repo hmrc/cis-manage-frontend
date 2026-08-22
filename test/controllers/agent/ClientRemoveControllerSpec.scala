@@ -12,24 +12,23 @@ import services.AgentService
 
 import scala.concurrent.Future
 
-
-class ClientRemoveControllerSpec  extends SpecBase with MockitoSugar {
+class ClientRemoveControllerSpec extends SpecBase with MockitoSugar {
 
   val employerRef = "123456"
 
   val okResponse =
     CisTaxpayerSearchResult(
-      uniqueId =  "123",
+      uniqueId = "123",
       taxOfficeNumber = "111",
-      taxOfficeRef =  "test111",
-      agentOwnRef =  Option("TEST LTD"),
+      taxOfficeRef = "test111",
+      agentOwnRef = Option("TEST LTD"),
       schemeName = Option("ABCD"),
-      utr = Option("ABCD"),
+      utr = Option("ABCD")
     )
 
-    //lazy val routeUrl: String =
-     // controllers.agent.routes.ClientRemoveController
-      //  .onPageLoad(employerRef).url
+    // lazy val routeUrl: String =
+    // controllers.agent.routes.ClientRemoveController
+    //  .onPageLoad(employerRef).url
 
   "ClientRemoveControllerSpec" - {
 
@@ -54,9 +53,12 @@ class ClientRemoveControllerSpec  extends SpecBase with MockitoSugar {
       running(application) {
 
         val request =
-          FakeRequest(GET, controllers.agent.routes.ClientRemoveController
-      .onPageLoad(employerRef)
-          .url)
+          FakeRequest(
+            GET,
+            controllers.agent.routes.ClientRemoveController
+              .onPageLoad(employerRef)
+              .url
+          )
 
         val result =
           route(application, request).value
@@ -78,4 +80,3 @@ class ClientRemoveControllerSpec  extends SpecBase with MockitoSugar {
   }
 
 }
-

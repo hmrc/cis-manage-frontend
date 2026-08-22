@@ -24,10 +24,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AgentService @Inject() (
-    cisConnector: ConstructionIndustrySchemeConnector)(using ExecutionContext){
+class AgentService @Inject() (cisConnector: ConstructionIndustrySchemeConnector)(using ExecutionContext) {
   def getClientsByEmployersReference(
-                           empRef: String                           
-                         )(implicit hc: HeaderCarrier): Future[List[CisTaxpayerSearchResult]] =
+    empRef: String
+  )(implicit hc: HeaderCarrier): Future[List[CisTaxpayerSearchResult]] =
     cisConnector.getClientsByEmployersReference(empRef)
 }

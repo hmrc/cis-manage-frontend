@@ -39,7 +39,7 @@ class ClientRemoveController @Inject() (
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
-    with Logging{
+    with Logging {
 
   def onPageLoad(empRef: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
@@ -49,15 +49,15 @@ class ClientRemoveController @Inject() (
           if (response.length == 1) {
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(ClientRemovePage, response.head))
-              _ <- sessionRepository.set(updatedAnswers)
+              _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           } else {
             Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-            //Future.successful(Redirect(controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode)))
+            // Future.successful(Redirect(controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode)))
           }
-        }.recover { case ex: Exception =>
-          logger.error(
-            "[ClientRemoveController] Failed to fetch clients by employer reference", ex)
+        }
+        .recover { case ex: Exception =>
+          logger.error("[ClientRemoveController] Failed to fetch clients by employer reference", ex)
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }
