@@ -17,32 +17,70 @@
 package controllers.clientdetails
 
 import base.SpecBase
+import models.CisTaxpayerSearchResult
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import services.AgentService
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
 import views.html.clientdetails.ManageClientDetailsView
 
-class ManageClientDetailsControllerSpec extends SpecBase {
+import scala.concurrent.Future
+
+class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
+
+  val employerRef = "123456"
+
+  val okResponse =
+    CisTaxpayerSearchResult(
+      uniqueId = "123",
+      taxOfficeNumber = "111",
+      taxOfficeRef = "111/test111",
+      agentOwnRef = Option("TEST LTD"),
+      schemeName = Option("ABCD"),
+      utr = Option("ABCD")
+    )
 
   "ManageClientDetails Controller" - {
 
     "must return OK and the correct view for a GET" in {
+      val mockService = mock[AgentService]
+      when(
+        mockService.getClientsByEmployersReference(
+          eqTo(employerRef)
+        )(any())
+      ).thenReturn(
+        Future.successful(List(okResponse))
+      )
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(
+          bind[AgentService].toInstance(mockService)
+        )
+        .build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.ManageClientDetailsController.onPageLoad().url)
+        val request =
+          FakeRequest(GET, controllers.clientdetails.routes.ManageClientDetailsController.onPageLoad(employerRef).url)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[ManageClientDetailsView]
 
-        val fakeUniqueId: String    = "1"
-        val fakeClientName: String  = "{Client}"
-        val fakeEmployerRef: String = "{123/ab4}"
-        val fakeClientRef: String   = "{AOR1}"
+        val fakeUniqueId    = "123"
+        val fakeClientName  = Some("ABCD")
+        val fakeEmployerRef = "123456"
+        val fakeClientRef   = Some("TEST LTD")
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(fakeUniqueId, fakeClientName, fakeEmployerRef, fakeClientRef)(
+        contentAsString(result) mustEqual view(
+          fakeUniqueId,
+          fakeClientName.toString,
+          fakeEmployerRef,
+          fakeClientRef.toString
+        )(
           request,
           messages(application)
         ).toString

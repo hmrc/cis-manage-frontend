@@ -102,13 +102,13 @@
     @twoColumnGrid(
         ptaCard(
             title = messages("agent.landing.card.manageClientDetails.title"),
-            link = "#",
+            link = controllers.clientdetails.routes.ManageClientDetailsController.onPageLoad(employerRef).url,
             content = Html(messages("agent.landing.card.manageClientDetails.p")),
             id = Some("manage-client-details")
         ),
         ptaCard(
             title = messages("agent.landing.card.removeClient.title"),
-            link = "#",
+            link = controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(employerRef, NormalMode).url,
             content = Html(messages("agent.landing.card.removeClient.p")),
             id = Some("remove-client")
         )

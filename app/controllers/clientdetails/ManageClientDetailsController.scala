@@ -17,12 +17,14 @@
 package controllers.clientdetails
 
 import controllers.actions.*
-
 import javax.inject.{Inject, Named}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.AgentService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.clientdetails.ManageClientDetailsView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class ManageClientDetailsController @Inject() (
   override val messagesApi: MessagesApi,
@@ -30,15 +32,28 @@ class ManageClientDetailsController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
+  agentService: AgentService,
   view: ManageClientDetailsView
-) extends FrontendBaseController
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val uniqueId: String          = "1"
-    val clientName: String        = "{Client}"
-    val employerReference: String = "{123/ab4}"
-    val clientReference: String   = "{AOR1}"
-    Ok(view(uniqueId, clientName, employerReference, clientReference))
+  def onPageLoad(employerRef: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+      agentService
+        .getClientsByEmployersReference(employerRef)
+        .flatMap { response =>
+          if (response.length == 1) {
+            val uniqueId: String          = response.head.uniqueId
+            val clientName: String        = response.head.schemeName.toString
+            val employerReference: String = employerRef
+            val clientReference: String   = response.head.agentOwnRef.toString
+            Future.successful(Ok(view(uniqueId, clientName, employerReference, clientReference)))
+
+          } else {
+            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+
+          }
+        }
   }
 }
