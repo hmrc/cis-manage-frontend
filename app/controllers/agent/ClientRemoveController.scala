@@ -14,46 +14,51 @@
  * limitations under the License.
  */
 
-package controllers.clientdetails
+package controllers.agent
 
-import controllers.actions.*
-import javax.inject.{Inject, Named}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import pages.ClientRemovePage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
 import services.AgentService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.clientdetails.ManageClientDetailsView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ManageClientDetailsController @Inject() (
+class ClientRemoveController @Inject() (
   override val messagesApi: MessagesApi,
-  @Named("AgentIdentifier") identify: IdentifierAction,
+  identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  val controllerComponents: MessagesControllerComponents,
   agentService: AgentService,
-  view: ManageClientDetailsView
+  sessionRepository: SessionRepository,
+  val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging{
 
-  def onPageLoad(employerRef: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onPageLoad(empRef: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       agentService
-        .getClientsByEmployersReference(employerRef)
+        .getClientsByEmployersReference(empRef)
         .flatMap { response =>
           if (response.length == 1) {
-            val uniqueId: String          = response.head.uniqueId
-            val clientName: String        = response.head.schemeName.toString
-            val employerReference: String = employerRef
-            val clientReference: String   = response.head.agentOwnRef.toString
-            Future.successful(Ok(view(uniqueId, clientName, employerReference, clientReference)))
-
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(ClientRemovePage, response.head))
+              _ <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           } else {
             Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-
+            //Future.successful(Redirect(controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode)))
           }
+        }.recover { case ex: Exception =>
+          logger.error(
+            "[ClientRemoveController] Failed to fetch clients by employer reference", ex)
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
-  }
+    }
 }

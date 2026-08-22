@@ -208,6 +208,95 @@ class ConstructionIndustrySchemeConnectorSpec
     }
   }
 
+  "getClientsByEmployersReference" should {
+    val empRef = "123456"
+
+    "return a list of CisTaxpayerSearchResult with count 1 when BE returns 200 with valid JSON" in {
+      stubFor(
+        get(urlPathEqualTo(s"/cis/agent/client-empRef/:$empRef"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                """{
+                  |  "clients": [
+                  |    {
+                  |      "uniqueId": "123",
+                  |      "taxOfficeNumber": "111",
+                  |      "taxOfficeRef": "test111",
+                  |      "agentOwnRef": "abc123",
+                  |      "schemeName": "TEST LTD"
+                  |    }
+                  |  ]
+                  |}""".stripMargin
+              )
+          )
+      )
+
+      val result = connector.getClientsByEmployersReference(empRef).futureValue
+      result.length mustBe 1
+      result.head.uniqueId mustBe "123"
+      result.head.taxOfficeNumber mustBe "111"
+      result.head.taxOfficeRef mustBe "test111"
+      result.head.agentOwnRef mustBe Some("abc123")
+      result.head.schemeName mustBe Some("TEST LTD")
+    }
+
+    "return an empty list when BE returns 200 with empty clientsByEmpRef array" in {
+      stubFor(
+        get(urlPathEqualTo(s"/cis/agent/client-empRef/:$empRef"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody("""{ "clients": [] }""")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.getClientsByEmployersReference(empRef).futureValue
+      }
+      ex.getMessage must include("Expected exactly 1 client but found")
+    }
+
+    "fail when BE returns 200 with invalid JSON structure" in {
+      stubFor(
+        get(urlPathEqualTo(s"/cis/agent/client-empRef/:$empRef"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody("""{ "unexpectedField": true }""")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.getClientsByEmployersReference(empRef).futureValue
+      }
+      ex.getMessage must (include("clients") or include("NoSuchElementException"))
+    }
+
+    "fail when BE returns 200 with invalid client JSON" in {
+      stubFor(
+        get(urlPathEqualTo(s"/cis/agent/client-empRef/:$empRef"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                """{
+                  |  "clients": [
+                  |    { "invalidField": "invalid" }
+                  |  ]
+                  |}""".stripMargin
+              )
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.getClientsByEmployersReference(empRef).futureValue
+      }
+      ex.getMessage.toLowerCase must include("nosuchelementexception")
+    }
+  }
+
   "startClientList" should {
 
     "return GetClientListStatusResponse with 'succeeded' when BE returns succeeded" in {

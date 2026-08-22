@@ -20,10 +20,12 @@ import controllers.actions.*
 import forms.clientdetails.RemoveClientYesNoFormProvider
 import models.Mode
 import navigation.Navigator
+import pages.ClientRemovePage
 import pages.clientdetails.RemoveClientYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.AgentService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.clientdetails.RemoveClientYesNoView
 
@@ -39,6 +41,7 @@ class RemoveClientYesNoController @Inject() (
   requireData: DataRequiredAction,
   formProvider: RemoveClientYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
+  agentService: AgentService,
   view: RemoveClientYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -47,17 +50,33 @@ class RemoveClientYesNoController @Inject() (
   val form       = formProvider()
   val clientName = "clientName"
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val preparedForm = request.userAnswers.get(RemoveClientYesNoPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+  def onPageLoad(employerRef: String, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      agentService
+        .getClientsByEmployersReference(employerRef)
+        .flatMap { response =>
+          if (response.length == 1) {
+            val preparedForm = request.userAnswers.get(RemoveClientYesNoPage) match {
+              case None        => form
+              case Some(value) => form.fill(value)
+            }
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(ClientRemovePage, response.head))
+              _              <- sessionRepository.set(updatedAnswers)
+            } yield Ok(view(clientName, preparedForm, mode))
+
+          } else {
+            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+
+          }
+        }
+        .recover { case e: Exception =>
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
     }
 
-    Ok(view(clientName, preparedForm, mode))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
@@ -68,5 +87,5 @@ class RemoveClientYesNoController @Inject() (
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(RemoveClientYesNoPage, mode, updatedAnswers))
         )
-  }
+    }
 }

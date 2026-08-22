@@ -26,6 +26,7 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content._
 @import config.FrontendAppConfig
 @import forms.mappings.Constants
+@import models.NormalMode
 
 @this(
     layout: templates.Layout,
@@ -84,7 +85,7 @@
 
 @removeLinkCell(agentClient: ClientListViewModel) = {
     @agentClient.removeLink.map { link =>
-        <a href="@link.href" class="govuk-link">
+        <a href=@controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(agentClient.employerReference, NormalMode).url class="govuk-link">
             @link.text
             <span class="govuk-visually-hidden">
                 @{messages("agent.clientListSearch.td.actions.remove.hidden", agentClient.clientName)}

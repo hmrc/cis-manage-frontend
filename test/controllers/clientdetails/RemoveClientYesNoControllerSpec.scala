@@ -19,7 +19,7 @@ package controllers.clientdetails
 import base.SpecBase
 import controllers.routes
 import forms.clientdetails.RemoveClientYesNoFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{CisTaxpayerSearchResult, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -30,8 +30,11 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import services.AgentService
 import views.html.clientdetails.RemoveClientYesNoView
 
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{verify, when}
 import scala.concurrent.Future
 
 class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
@@ -41,11 +44,30 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new RemoveClientYesNoFormProvider()
   val form         = formProvider()
 
-  lazy val removeClientRoute = controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode).url
+  val employerRef            = "123456"
+  val okResponse             =
+    CisTaxpayerSearchResult(
+      uniqueId = "123",
+      taxOfficeNumber = "111",
+      taxOfficeRef = "test111",
+      agentOwnRef = Option("TEST LTD"),
+      schemeName = Option("ABCD"),
+      utr = Option("ABCD")
+    )
+  lazy val removeClientRoute =
+    controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(employerRef, NormalMode).url
 
   "RemoveClient Controller" - {
 
     "must return OK and the correct view for a GET" in {
+      val mockService = mock[AgentService]
+      when(
+        mockService.getClientsByEmployersReference(
+          eqTo(employerRef)
+        )(any())
+      ).thenReturn(
+        Future.successful(List(okResponse))
+      )
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
