@@ -19,12 +19,12 @@ package controllers.contractor
 import base.SpecBase
 import config.FrontendAppConfig
 import controllers.contractor.ContractorLandingController.fromUserAnswers
-import models.{Scheme, UserAnswers}
+import models.{EmployerReference, Scheme, UserAnswers}
 import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatestplus.mockito.MockitoSugar.mock
-import pages.CisIdPage
+import pages.{CisIdPage, EmployerReferencePage}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.api.inject.bind
@@ -43,16 +43,24 @@ class ContractorLandingControllerSpec extends SpecBase {
   def getRequest: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest(GET, contractorLandingRoute)
 
+  private val taxOfficeNumber    = "123"
+  private val taxOfficeReference = "ABC456"
+  private val employerReference  = EmployerReference(taxOfficeNumber, taxOfficeReference)
+
+  private val userAnswersWithEmployerRef: UserAnswers =
+    emptyUserAnswers
+    .set(EmployerReferencePage, "123/AB456")
+    .success
+    .value
+
   "ContractorLandingController" - {
 
     "must return OK and the correct view for a GET" in {
-      val taxOfficeNumber    = "754"
-      val taxOfficeReference = "EZ00100"
       val mockManageService  = mock[ManageService]
       when(mockManageService.resolveAndStoreCisId(any[UserAnswers])(any()))
         .thenReturn(Future.successful(("CIS-123", emptyUserAnswers)))
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithEmployerRef))
         .overrides(
           bind[ManageService].toInstance(mockManageService)
         )

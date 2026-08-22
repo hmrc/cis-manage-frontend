@@ -105,7 +105,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
 
       val application: Application =
         applicationBuilder(
-          userAnswers = Some(userAnswersWithCisId),
+          userAnswers = Some(userAnswersWithAgentClient),
           additionalBindings = commonBindings,
           isAgent = true
         ).build()
@@ -142,7 +142,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
 
       val application: Application =
         applicationBuilder(
-          userAnswers = Some(userAnswersWithCisId),
+          userAnswers = Some(userAnswersWithAgentClient),
           additionalBindings = commonBindings,
           isAgent = true,
           itmpName = Some("Test name")
@@ -165,6 +165,34 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
 
         verify(mockManageService)
           .getAgentLandingData(eqTo(uniqueId), any[UserAnswers], eqTo(userId))(using any[HeaderCarrier])
+      }
+    }
+
+    "must redirect to JourneyRecoveryController when client employee tax office number & tax office reference not available" in {
+
+      when(
+        mockManageService.getAgentLandingData(
+          eqTo(uniqueId),
+          any[UserAnswers],
+          eqTo(userId)
+        )(using any[HeaderCarrier])
+      ).thenReturn(Future.successful(landingViewModel))
+
+      val application: Application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithCisId),
+          additionalBindings = commonBindings,
+          isAgent = true,
+          itmpName = Some("Test name")
+        ).build()
+
+      withApplication(application) {
+        val request = FakeRequest(GET, controllers.agent.routes.AgentLandingController.onPageLoad(uniqueId).url)
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
+
       }
     }
 
