@@ -263,6 +263,20 @@ class ManageService @Inject() (
       GetSubmittedMonthlyReturnsDataRequest(instanceId, taxYear, taxMonth, amendment)
     )
 
+  def removeClient(ua: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] =
+    ua.get(CisIdPage) match {
+      case Some(instanceId) =>
+        ua.get(AgentClientsPage).flatMap(_.find(_.uniqueId == instanceId)) match {
+          case Some(client) => cisConnector.removeClient(client.taxOfficeNumber, client.taxOfficeRef)
+          case _            =>
+            logger.error(s"[removeClient] missing AgentClientsPage in user answers")
+            Future.failed(new RuntimeException("Missing AgentClientsPage in user answers"))
+        }
+      case _                =>
+        logger.error(s"[removeClient] missing CisIdPage in user answers")
+        Future.failed(new RuntimeException("Missing CisIdPage in user answers"))
+    }
+
   private def buildReturnPeriodEnd(taxMonth: Int, taxYear: Int): String =
     YearMonth.of(taxYear, taxMonth).format(shortMonthYearFormatter)
 

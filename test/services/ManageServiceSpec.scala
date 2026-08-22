@@ -1064,4 +1064,80 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       verifyNoInteractions(sessionRepo)
     }
   }
+
+  "removeClient" should {
+
+    "delegate to connector and return response (happy path)" in {
+      val (service, connector, sessionRepo) = newService()
+
+      val instanceId      = "900063"
+      val existingClients = List(createClient(instanceId, "123", "ABC123"), createClient("CLIENT-002", "456", "XYZ456"))
+
+      val userAnswers: UserAnswers = UserAnswers("userId")
+        .set(CisIdPage, instanceId)
+        .success
+        .value
+        .set(AgentClientsPage, existingClients)
+        .success
+        .value
+
+      when(connector.removeClient(eqTo("123"), eqTo("ABC123"))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(()))
+
+      service.removeClient(userAnswers).futureValue mustBe ()
+
+      verify(connector).removeClient(eqTo("123"), eqTo("ABC123"))(any[HeaderCarrier])
+    }
+
+    "return error when CisId is missing in the user answers" in {
+      val (service, connector, sessionRepo) = newService()
+
+      val userAnswers: UserAnswers = UserAnswers("userId")
+
+      val exception = service.removeClient(userAnswers).failed.futureValue
+      exception mustBe a[RuntimeException]
+      exception.getMessage mustBe "Missing CisIdPage in user answers"
+
+      verifyNoInteractions(connector)
+    }
+
+    "return error when AgentClientsPage is missing in the user answers" in {
+      val (service, connector, sessionRepo) = newService()
+
+      val instanceId = "900063"
+
+      val userAnswers: UserAnswers = UserAnswers("userId").set(CisIdPage, instanceId).success.value
+
+      val exception = service.removeClient(userAnswers).failed.futureValue
+      exception mustBe a[RuntimeException]
+      exception.getMessage mustBe "Missing AgentClientsPage in user answers"
+
+      verifyNoInteractions(connector)
+    }
+
+    "propagate failure from connector" in {
+      val (service, connector, sessionRepo) = newService()
+      val instanceId                        = "900063"
+      val existingClients                   = List(createClient(instanceId, "123", "ABC123"), createClient("CLIENT-002", "456", "XYZ456"))
+
+      val userAnswers: UserAnswers = UserAnswers("userId")
+        .set(CisIdPage, instanceId)
+        .success
+        .value
+        .set(AgentClientsPage, existingClients)
+        .success
+        .value
+
+      val boom = new RuntimeException("Backend error")
+
+      when(connector.removeClient(eqTo("123"), eqTo("ABC123"))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(boom))
+
+      val ex = service.removeClient(userAnswers).failed.futureValue
+      ex mustBe boom
+
+      verify(connector).removeClient(eqTo("123"), eqTo("ABC123"))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+  }
 }
