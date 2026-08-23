@@ -49,6 +49,8 @@ class SubcontractorsLandingPageViewSpec extends SpecBase {
       doc.select("p").text                      must include(messages("subcontractorsLandingPage.viewVerificationHistory.p1"))
       doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.checkResults"))
       doc.select("p").text                      must include(messages("subcontractorsLandingPage.checkResults.p1"))
+      doc.select("a#check-results").attr("href") mustEqual
+        app.injector.instanceOf[config.FrontendAppConfig].cisCheckVerificationResultsUrl
       doc.select("h2").text                     must include(messages("subcontractorsLandingPage.aside.h2"))
 
       doc.getElementsByClass("govuk-link").text must include(messages("subcontractorsLandingPage.aside.link1"))

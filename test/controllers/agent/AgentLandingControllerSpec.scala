@@ -188,7 +188,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
 
       withApplication(application) {
         val request = FakeRequest(GET, controllers.agent.routes.AgentLandingController.onPageLoad(uniqueId).url)
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url

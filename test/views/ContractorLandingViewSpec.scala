@@ -111,6 +111,34 @@ class ContractorLandingViewSpec extends SpecBase {
       links.select("[href=/foo/appeal]").size()                                                 shouldBe 1
       links.select("[href=/foo/notices]").size()                                                shouldBe 1
     }
+
+    "render all landing page cards with correct links" in {
+      val doc = render()
+
+      doc
+        .getElementById("manage-your-cis-return")
+        .selectFirst("a")
+        .attr("href") shouldBe
+        controllers.contractor.routes.ContractorLandingController
+          .onTargetClick("manageYourCisReturn")
+          .url
+
+      doc
+        .getElementById("manage-your-subcontractors")
+        .selectFirst("a")
+        .attr("href") shouldBe
+        controllers.contractor.routes.ContractorLandingController
+          .onTargetClick("subcontractors")
+          .url
+
+      doc
+        .getElementById("manage-your-contractor-details")
+        .selectFirst("a")
+        .attr("href") shouldBe
+        controllers.contractor.routes.ContractorLandingController
+          .onTargetClick("contractorDetails")
+          .url
+    }
   }
 
   private def render(): Document = {
