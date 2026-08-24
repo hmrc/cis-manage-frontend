@@ -72,6 +72,22 @@ class FrontendAppConfigSpec extends SpecBase {
     }
   }
 
+  "cisOrgAppealUrl" - {
+
+    "must build the URL with tax office number and reference interpolated" in new Setup {
+      appConfig.cisOrgAppealUrl(taxOfficeNumber = "163", taxOfficeReference = "AB0063") mustBe
+        "http://localhost:6993/pas/cis/org/163/AB0063/appeal"
+    }
+  }
+
+  "cisOrgGenericNoticesUrl" - {
+
+    "must build the URL with tax office number and reference interpolated" in new Setup {
+      appConfig.cisOrgGenericNoticesUrl(taxOfficeNumber = "163", taxOfficeReference = "AB0063") mustBe
+        "http://localhost:6993/notice-view/cis/org/163/AB0063/generic-notices"
+    }
+  }
+
   "feedbackUrl" - {
     "must include contact-frontend host, service id and request back url" in new Setup {
       implicit val request: RequestHeader = FakeRequest("GET", "/some-path")
