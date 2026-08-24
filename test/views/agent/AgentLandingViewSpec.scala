@@ -123,6 +123,16 @@ class AgentLandingViewSpec extends SpecBase {
       doc.text() should include(messages(app).apply("agent.landing.card.noticesAndStatements.title"))
       doc.text() should include(messages(app).apply("agent.landing.card.noticesAndStatements.p"))
     }
+
+    "link the contractor details card to the agent target click" in {
+      val (doc, _) = render()
+
+      doc
+        .getElementById("manage-your-contractor-details")
+        .selectFirst("a")
+        .attr("href") shouldBe
+        controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "contractorDetails").url
+    }
   }
 
   private def render(

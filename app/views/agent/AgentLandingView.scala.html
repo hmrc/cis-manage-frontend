@@ -87,7 +87,7 @@
     @twoColumnGrid(
         ptaCard(
             title = messages("agent.landing.card.manageYourContractorDetails.title"),
-            link = "#",
+            link = controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "contractorDetails").url,
             content = Html(messages("agent.landing.card.manageYourContractorDetails.p")),
             id = Some("manage-your-contractor-details")
         ),
