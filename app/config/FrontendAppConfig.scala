@@ -89,6 +89,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val contractorLandingPenaltiesUrl: String = configuration.get[String]("urls.cisCheckPenaltiesUrl")
 
   private lazy val cisFrontendBaseUrl: String                       = configuration.get[String]("cis-frontend.host")
+  private lazy val pasBaseUrl: String                               = configuration.get[String]("pas.host")
+  private lazy val noticeViewerBaseUrl: String                      = configuration.get[String]("notice-viewer.host")
   private lazy val portalAccountBaseUrl: String                     = configuration.get[String]("portal-account.host")
   private lazy val fileStandardReturnPath: String                   = configuration.get[String]("urls.fileStandardReturn")
   private lazy val fileNilReturnPath: String                        = configuration.get[String]("urls.fileNilReturn")
@@ -145,10 +147,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   private val cisContractorFrontendBaseUrl: String                                 =
     configuration.get[String]("microservice.services.cis-contractor-frontend.baseUrl")
   def cisOrgAppealUrl(taxOfficeNumber: String, taxOfficeReference: String): String =
-    s"$cisFrontendBaseUrl${cisOrgAppealPath.replace("{taxOfficeNumber}", taxOfficeNumber).replace("{taxOfficeReference}", taxOfficeReference)}"
+    s"$pasBaseUrl${cisOrgAppealPath.replace("{taxOfficeNumber}", taxOfficeNumber).replace("{taxOfficeReference}", taxOfficeReference)}"
 
   def cisOrgGenericNoticesUrl(taxOfficeNumber: String, taxOfficeReference: String): String =
-    s"$cisFrontendBaseUrl${cisOrgGenericNoticesPath.replace("{taxOfficeNumber}", taxOfficeNumber).replace("{taxOfficeReference}", taxOfficeReference)}"
+    s"$noticeViewerBaseUrl${cisOrgGenericNoticesPath.replace("{taxOfficeNumber}", taxOfficeNumber).replace("{taxOfficeReference}", taxOfficeReference)}"
 
   lazy val cisTypeOfSubcontractorUrl: String        =
     s"$cisContractorFrontendBaseUrl${configuration.get[String]("urls.addSubcontractor")}"

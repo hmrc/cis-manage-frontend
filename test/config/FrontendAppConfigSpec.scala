@@ -76,7 +76,7 @@ class FrontendAppConfigSpec extends SpecBase {
 
     "must build the URL with tax office number and reference interpolated" in new Setup {
       appConfig.cisOrgAppealUrl(taxOfficeNumber = "163", taxOfficeReference = "AB0063") mustBe
-        "http://localhost:6993/pas/cis/org/163/AB0063/appeal"
+        "http://localhost:8081/pas/cis/org/163/AB0063/appeal"
     }
   }
 
@@ -84,7 +84,7 @@ class FrontendAppConfigSpec extends SpecBase {
 
     "must build the URL with tax office number and reference interpolated" in new Setup {
       appConfig.cisOrgGenericNoticesUrl(taxOfficeNumber = "163", taxOfficeReference = "AB0063") mustBe
-        "http://localhost:6993/notice-view/cis/org/163/AB0063/generic-notices"
+        "http://localhost:8080/notice-view/cis/org/163/AB0063/generic-notices"
     }
   }
 
