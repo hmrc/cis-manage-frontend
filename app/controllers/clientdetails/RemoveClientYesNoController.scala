@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.clientdetails.RemoveClientYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.ClientRemovePage
+import pages.{AgentClientsPage, CisIdPage}
 import pages.clientdetails.RemoveClientYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -47,45 +47,66 @@ class RemoveClientYesNoController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form       = formProvider()
-  val clientName = "clientName"
+  val form = formProvider()
 
-  def onPageLoad(employerRef: String, mode: Mode): Action[AnyContent] =
+  def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      agentService
-        .getClientsByEmployersReference(employerRef)
-        .flatMap { response =>
-          if (response.length == 1) {
-            val preparedForm = request.userAnswers.get(RemoveClientYesNoPage) match {
-              case None        => form
-              case Some(value) => form.fill(value)
-            }
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(ClientRemovePage, response.head))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Ok(view(clientName, preparedForm, mode))
+      request.userAnswers.get(CisIdPage) match {
+        case Some(instanceId) =>
+          request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == instanceId)) match {
+            case Some(client) =>
+              val employerRef = s"${client.taxOfficeNumber}/${client.taxOfficeRef}"
+              agentService.getClientsByEmployersReference(employerRef).flatMap { response =>
+                if (response.length == 1) {
+                  val clientName   = response.head.schemeName.getOrElse("")
+                  val preparedForm = request.userAnswers.get(RemoveClientYesNoPage) match {
+                    case None        => form
+                    case Some(value) => form.fill(value)
+                  }
+                  Future(Ok(view(clientName, preparedForm, mode)))
 
-          } else {
-            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+                } else {
+                  Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
+                }
+              }
+            case None         =>
+              Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
           }
-        }
-        .recover { case e: Exception =>
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
+        case _                =>
+          Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(clientName, formWithErrors, mode))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveClientYesNoPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(RemoveClientYesNoPage, mode, updatedAnswers))
-        )
+      request.userAnswers.get(CisIdPage) match {
+        case Some(instanceId) =>
+          request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == instanceId)) match {
+            case Some(client) =>
+              val employerRef = s"${client.taxOfficeNumber}/${client.taxOfficeRef}"
+              agentService.getClientsByEmployersReference(employerRef).flatMap { response =>
+                if (response.length == 1) {
+                  val clientName = response.head.schemeName.getOrElse("")
+                  form
+                    .bindFromRequest()
+                    .fold(
+                      formWithErrors => Future.successful(BadRequest(view(clientName, formWithErrors, mode))),
+                      value =>
+                        for {
+                          updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveClientYesNoPage, value))
+                          _              <- sessionRepository.set(updatedAnswers)
+                        } yield Redirect(navigator.nextPage(RemoveClientYesNoPage, mode, updatedAnswers))
+                    )
+                } else {
+                  Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+                }
+              }
+            case None         =>
+              Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          }
+        case _                =>
+          Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
     }
 }

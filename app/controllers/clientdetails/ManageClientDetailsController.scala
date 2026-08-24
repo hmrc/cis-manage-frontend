@@ -17,6 +17,8 @@
 package controllers.clientdetails
 
 import controllers.actions.*
+import pages.{AgentClientsPage, CisIdPage}
+
 import javax.inject.{Inject, Named}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -38,22 +40,32 @@ class ManageClientDetailsController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(employerRef: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      agentService
-        .getClientsByEmployersReference(employerRef)
-        .flatMap { response =>
-          if (response.length == 1) {
-            val uniqueId: String          = response.head.uniqueId
-            val clientName: String        = response.head.schemeName.toString
-            val employerReference: String = employerRef
-            val clientReference: String   = response.head.agentOwnRef.toString
-            Future.successful(Ok(view(uniqueId, clientName, employerReference, clientReference)))
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+    request.userAnswers.get(CisIdPage) match {
+      case Some(instanceId) =>
+        request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == instanceId)) match {
+          case Some(client) =>
+            val employerRef = s"${client.taxOfficeNumber}/${client.taxOfficeRef}"
+            agentService
+              .getClientsByEmployersReference(employerRef)
+              .flatMap { response =>
+                if (response.length == 1) {
+                  val uniqueId: String          = response.head.uniqueId
+                  val clientName: String        = response.head.schemeName.toString
+                  val employerReference: String = employerRef
+                  val clientReference: String   = response.head.agentOwnRef.toString
+                  Future.successful(Ok(view(uniqueId, clientName, employerReference, clientReference)))
 
-          } else {
+                } else {
+                  Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+                }
+              }
+          case None         =>
             Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-
-          }
         }
+      case _                =>
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
+
   }
 }

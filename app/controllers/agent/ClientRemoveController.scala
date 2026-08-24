@@ -17,7 +17,8 @@
 package controllers.agent
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import pages.ClientRemovePage
+import models.NormalMode
+import pages.{AgentClientsPage, CisIdPage, ClientRemovePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -41,24 +42,36 @@ class ClientRemoveController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(empRef: String): Action[AnyContent] =
+  def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      agentService
-        .getClientsByEmployersReference(empRef)
-        .flatMap { response =>
-          if (response.length == 1) {
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(ClientRemovePage, response.head))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          } else {
-            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-            // Future.successful(Redirect(controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode)))
+      request.userAnswers.get(CisIdPage) match {
+        case Some(instanceId) =>
+          request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == instanceId)) match {
+            case Some(client) =>
+              val employerRef = s"${client.taxOfficeNumber}/${client.taxOfficeRef}"
+              agentService
+                .getClientsByEmployersReference(employerRef)
+                .flatMap { response =>
+                  if (response.length == 1) {
+                    for {
+                      updatedAnswers <- Future.fromTry(request.userAnswers.set(ClientRemovePage, response.head))
+                      _              <- sessionRepository.set(updatedAnswers)
+                    } yield Redirect(
+                      controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode)
+                    )
+                  } else {
+                    Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+                    // Future.successful(Redirect(controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode)))
+                  }
+                }
+                .recover { case ex: Exception =>
+                  logger.error("[ClientRemoveController] Failed to fetch clients by employer reference", ex)
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                }
+            case None         => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+
           }
-        }
-        .recover { case ex: Exception =>
-          logger.error("[ClientRemoveController] Failed to fetch clients by employer reference", ex)
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
+        case None             => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
     }
 }

@@ -32,9 +32,10 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.AgentService
 import views.html.clientdetails.RemoveClientYesNoView
+import org.mockito.Mockito
+import pages.{AgentClientsPage, CisIdPage}
+import uk.gov.hmrc.http.HeaderCarrier
 
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{verify, when}
 import scala.concurrent.Future
 
 class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
@@ -54,40 +55,74 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
       schemeName = Option("ABCD"),
       utr = Option("ABCD")
     )
-  lazy val removeClientRoute =
-    controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(employerRef, NormalMode).url
+  lazy val removeClientRoute = controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode).url
+
+  val mockAgentService      = mock[AgentService]
+  val mockSessionRepository = mock[SessionRepository]
+
+  val client = CisTaxpayerSearchResult(
+    uniqueId = "123",
+    taxOfficeNumber = "163",
+    taxOfficeRef = "AB0063",
+    agentOwnRef = Some("ref123"),
+    schemeName = Some("Test Client"),
+    utr = Some("1234567890")
+  )
 
   "RemoveClient Controller" - {
 
     "must return OK and the correct view for a GET" in {
-      val mockService = mock[AgentService]
-      when(
-        mockService.getClientsByEmployersReference(
-          eqTo(employerRef)
-        )(any())
-      ).thenReturn(
-        Future.successful(List(okResponse))
-      )
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      when(mockAgentService.getClientsByEmployersReference(any)(using any[HeaderCarrier]))
+        .thenReturn(Future.successful(List(client)))
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(CisIdPage, "123")
+        .success
+        .value
+        .set(AgentClientsPage, List(client))
+        .success
+        .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[AgentService].toInstance(mockAgentService)
+          )
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, removeClientRoute)
 
         val result = route(application, request).value
-
-        val view = application.injector.instanceOf[RemoveClientYesNoView]
-
+        val view   = application.injector.instanceOf[RemoveClientYesNoView]
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(clientName, form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view("Test Client", form, NormalMode)(request, messages(application)).toString
+
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
+      when(mockAgentService.getClientsByEmployersReference(any)(using any[HeaderCarrier]))
+        .thenReturn(Future.successful(List(client)))
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(RemoveClientYesNoPage, true)
+        .success
+        .value
+        .set(CisIdPage, "123")
+        .success
+        .value
+        .set(AgentClientsPage, List(client))
+        .success
+        .value
 
-      val userAnswers = UserAnswers(userAnswersId).set(RemoveClientYesNoPage, true).success.value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[AgentService].toInstance(mockAgentService)
+          )
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, removeClientRoute)
@@ -97,7 +132,7 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(clientName, form.fill(true), NormalMode)(
+        contentAsString(result) mustEqual view("Test Client", form.fill(true), NormalMode)(
           request,
           messages(application)
         ).toString
@@ -106,15 +141,26 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val mockSessionRepository = mock[SessionRepository]
-
+      when(mockAgentService.getClientsByEmployersReference(any)(using any[HeaderCarrier]))
+        .thenReturn(Future.successful(List(client)))
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(RemoveClientYesNoPage, true)
+        .success
+        .value
+        .set(CisIdPage, "123")
+        .success
+        .value
+        .set(AgentClientsPage, List(client))
+        .success
+        .value
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AgentService].toInstance(mockAgentService)
           )
           .build()
 
@@ -138,18 +184,10 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
         val request =
           FakeRequest(POST, removeClientRoute)
             .withFormUrlEncodedBody(("value", ""))
+        val result  = route(application, request).value
 
-        val boundForm = form.bind(Map("value" -> ""))
-
-        val view = application.injector.instanceOf[RemoveClientYesNoView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(clientName, boundForm, NormalMode)(
-          request,
-          messages(application)
-        ).toString
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 

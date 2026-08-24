@@ -75,7 +75,7 @@ GET   /agent/file-monthly-cis-returns           controllers.agent.ClientListSear
 POST  /agent/file-monthly-cis-returns           controllers.agent.ClientListSearchController.onSubmit()
 GET   /agent/file-monthly-cis-returns/clear     controllers.agent.ClientListSearchController.clearFilter()
 GET   /agent/file-monthly-cis-returns/download  controllers.agent.ClientListSearchController.downloadClientList()
-GET   /agent/file-monthly-cis-returns-remove    controllers.agent.ClientRemoveController.onPageLoad(empRef: String)
+GET   /agent/file-monthly-cis-returns-remove    controllers.agent.ClientRemoveController.onPageLoad()
 
 # Contractor Landing
 GET  /org/manage-construction-industry-scheme-account                    controllers.contractor.ContractorLandingController.onPageLoad()
@@ -158,15 +158,15 @@ GET   /verification-history/retrieve                        controllers.verify.G
 GET   /verify/no-verification-history                       controllers.verify.NoVerificationHistoryController.onPageLoad()
 
 # Client Details
-GET   /client-details/manage-client-details           controllers.clientdetails.ManageClientDetailsController.onPageLoad(employerRef: String)
+GET   /client-details/manage-client-details           controllers.clientdetails.ManageClientDetailsController.onPageLoad()
 
 GET   /client-details/client-removed                  controllers.clientdetails.ClientRemovedController.onPageLoad()
 
 GET   /client-details/client-reference-updated        controllers.clientdetails.ClientRefUpdateConfirmationController.onPageLoad()
 
-GET   /client-details/remove-client                   controllers.clientdetails.RemoveClientYesNoController.onPageLoad(employerRef: String, mode: Mode = NormalMode)
+GET   /client-details/remove-client                   controllers.clientdetails.RemoveClientYesNoController.onPageLoad(mode: Mode = NormalMode)
 POST  /client-details/remove-client                   controllers.clientdetails.RemoveClientYesNoController.onSubmit(mode: Mode = NormalMode)
-GET   /client-details/change-remove-client            controllers.clientdetails.RemoveClientYesNoController.onPageLoad(employerRef: String,mode: Mode = CheckMode)
+GET   /client-details/change-remove-client            controllers.clientdetails.RemoveClientYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST  /client-details/change-remove-client            controllers.clientdetails.RemoveClientYesNoController.onSubmit(mode: Mode = CheckMode)
 
 GET   /client-details/change-client-reference         controllers.clientdetails.ChangeClientReferenceController.onPageLoad(mode: Mode = NormalMode)

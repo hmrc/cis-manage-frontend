@@ -1,14 +1,32 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package controllers.agent
 
 import base.SpecBase
-import models.CisTaxpayerSearchResult
+import models.{CisTaxpayerSearchResult, NormalMode, UserAnswers}
 import org.scalatestplus.mockito.MockitoSugar
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
+import pages.{AgentClientsPage, CisIdPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.AgentService
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -26,27 +44,26 @@ class ClientRemoveControllerSpec extends SpecBase with MockitoSugar {
       utr = Option("ABCD")
     )
 
-    // lazy val routeUrl: String =
-    // controllers.agent.routes.ClientRemoveController
-    //  .onPageLoad(employerRef).url
-
   "ClientRemoveControllerSpec" - {
 
     "must redirect to ClientRemoveYesNoController when clientSearchResultByEmpRef size is 1" in {
 
-      val mockService = mock[AgentService]
-      when(
-        mockService.getClientsByEmployersReference(
-          eqTo(employerRef)
-        )(any())
-      ).thenReturn(
-        Future.successful(List(okResponse))
-      )
+      val mockAgentService = mock[AgentService]
+      when(mockAgentService.getClientsByEmployersReference(any)(using any[HeaderCarrier]))
+        .thenReturn(Future.successful(List(okResponse)))
+
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(CisIdPage, "123")
+        .success
+        .value
+        .set(AgentClientsPage, List(okResponse))
+        .success
+        .value
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
-            bind[AgentService].toInstance(mockService)
+            bind[AgentService].toInstance(mockAgentService)
           )
           .build()
 
@@ -56,7 +73,7 @@ class ClientRemoveControllerSpec extends SpecBase with MockitoSugar {
           FakeRequest(
             GET,
             controllers.agent.routes.ClientRemoveController
-              .onPageLoad(employerRef)
+              .onPageLoad()
               .url
           )
 
@@ -66,13 +83,11 @@ class ClientRemoveControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustBe SEE_OTHER
 
         redirectLocation(result).value mustBe
-          controllers.routes.JourneyRecoveryController
-            .onPageLoad()
-            .url
+          controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode).url
 
-        verify(mockService)
+        verify(mockAgentService)
           .getClientsByEmployersReference(
-            eqTo(employerRef)
+            eqTo("111/test111")
           )(any())
       }
     }
