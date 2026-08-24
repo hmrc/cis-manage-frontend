@@ -22,6 +22,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.test.Helpers.stubMessagesApi
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 
 class SubmittedReturnsChooseTaxYearSpec
     extends AnyFreeSpec
@@ -50,6 +51,20 @@ class SubmittedReturnsChooseTaxYearSpec
 
       result(1).value mustBe Some("2022 to 2023")
       result(1).id mustBe Some("value_1")
+    }
+
+    "must display the tax year using messages" in {
+      val taxYears = Seq("2021 to 2022")
+
+      val result = SubmittedReturnsChooseTaxYear.options(taxYears)
+
+      result.head.content mustBe Text(
+        messages(
+          "history.submittedReturnsChooseTaxYear.taxYear",
+          "2021",
+          "2022"
+        )
+      )
     }
 
     "must include a divider after the tax years" in {

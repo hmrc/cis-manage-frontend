@@ -24,7 +24,18 @@ object SubmittedReturnsChooseTaxYear {
   def options(taxYears: Seq[String])(implicit messages: Messages): Seq[RadioItem] = {
     val yearItems = taxYears.zipWithIndex.map { case (year, index) =>
       RadioItem(
-        content = Text(year),
+        content = Text(
+          year.split(" to ") match {
+            case Array(start, end) =>
+              messages(
+                "history.submittedReturnsChooseTaxYear.taxYear",
+                start,
+                end
+              )
+            case _                 =>
+              year
+          }
+        ),
         value = Some(year),
         id = Some(s"value_$index")
       )
