@@ -25,10 +25,21 @@ case object NormalMode extends Mode
 
 object Mode {
 
-  implicit val jsLiteral: JavascriptLiteral[Mode] = new JavascriptLiteral[Mode] {
-    override def to(value: Mode): String = value match {
+  def asString(value: Mode): String =
+    value match {
       case NormalMode => "NormalMode"
       case CheckMode  => "CheckMode"
     }
+
+  def fromString(value: String): Option[Mode] =
+    value match {
+      case "NormalMode" => Some(NormalMode)
+      case "CheckMode"  => Some(CheckMode)
+      case _            => None
+    }
+
+  implicit val jsLiteral: JavascriptLiteral[Mode] = new JavascriptLiteral[Mode] {
+    override def to(value: Mode): String =
+      asString(value)
   }
 }

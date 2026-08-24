@@ -17,6 +17,7 @@
 package controllers.agent
 
 import base.SpecBase
+import models.agent.ClientListStatus
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -33,7 +34,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val view: RetrievingClientView = app.injector.instanceOf[RetrievingClientView]
 
-  private def buildAppWithStatus(statusF: Future[String]) = {
+  private def buildAppWithStatus(statusF: Future[ClientListStatus]) = {
     val mockCisService = mock[ConstructionIndustrySchemeService]
     when(mockCisService.getClientListStatus(using any[HeaderCarrier]))
       .thenReturn(statusF)
@@ -48,13 +49,13 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
     (application, mockCisService)
   }
 
-  private def buildAppWithStartStatus(startStatusF: Future[String]) = {
+  private def buildAppWithStartStatus(startStatusF: Future[ClientListStatus]) = {
     val mockCisService = mock[ConstructionIndustrySchemeService]
     when(mockCisService.startClientListRetrieval(using any[HeaderCarrier]))
       .thenReturn(startStatusF)
 
     when(mockCisService.getClientListStatus(using any[HeaderCarrier]))
-      .thenReturn(Future.successful("in-progress"))
+      .thenReturn(Future.successful(ClientListStatus.InProgress))
 
     val application =
       applicationBuilder(
@@ -91,7 +92,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
   "RetrievingClientController.start" - {
 
     "must redirect to client list search when start status is succeeded" in {
-      val (application, _) = buildAppWithStartStatus(Future.successful("succeeded"))
+      val (application, _) = buildAppWithStartStatus(Future.successful(ClientListStatus.Succeeded))
 
       running(application) {
         val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.start().url)
@@ -104,7 +105,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to failed-to-retrieve when start status is failed" in {
-      val (application, _) = buildAppWithStartStatus(Future.successful("failed"))
+      val (application, _) = buildAppWithStartStatus(Future.successful(ClientListStatus.Failed))
 
       running(application) {
         val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.start().url)
@@ -117,7 +118,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return OK with Refresh header to poll with RetryCount=1 when start status is in-progress" in {
-      val (application, _) = buildAppWithStartStatus(Future.successful("in-progress"))
+      val (application, _) = buildAppWithStartStatus(Future.successful(ClientListStatus.InProgress))
 
       running(application) {
         val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.start().url)
@@ -136,7 +137,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to system error for any other start status" in {
-      val (application, _) = buildAppWithStartStatus(Future.successful("weird-status"))
+      val (application, _) = buildAppWithStartStatus(Future.successful(ClientListStatus.InitiateDownload))
 
       running(application) {
         val request = FakeRequest(GET, controllers.agent.routes.RetrievingClientController.start().url)
@@ -165,7 +166,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
   "RetrievingClientController.poll" - {
 
     "must redirect to client list search when status is succeeded" in {
-      val (application, _) = buildAppWithStatus(Future.successful("succeeded"))
+      val (application, _) = buildAppWithStatus(Future.successful(ClientListStatus.Succeeded))
 
       running(application) {
         val request = FakeRequest(
@@ -181,7 +182,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to failed-to-retrieve when status is failed" in {
-      val (application, _) = buildAppWithStatus(Future.successful("failed"))
+      val (application, _) = buildAppWithStatus(Future.successful(ClientListStatus.Failed))
 
       running(application) {
         val request = FakeRequest(
@@ -197,7 +198,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return OK with Refresh header when status is in-progress (first retry)" in {
-      val (application, _) = buildAppWithStatus(Future.successful("in-progress"))
+      val (application, _) = buildAppWithStatus(Future.successful(ClientListStatus.InProgress))
 
       running(application) {
         val request = FakeRequest(
@@ -219,7 +220,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must increment RetryCount and refresh again when still in-progress" in {
-      val (application, _) = buildAppWithStatus(Future.successful("in-progress"))
+      val (application, _) = buildAppWithStatus(Future.successful(ClientListStatus.InProgress))
 
       running(application) {
         val request = FakeRequest(
@@ -239,7 +240,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to failed-to-retrieve when max retries exceeded" in {
       val (application, mockCisService) =
-        buildAppWithStatus(Future.successful("in-progress"))
+        buildAppWithStatus(Future.successful(ClientListStatus.InProgress))
 
       running(application) {
         val request = FakeRequest(
@@ -257,7 +258,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to system error for any other/terminal status" in {
-      val terminalStatuses = Seq("system-error", "initiate-download", "weird-status")
+      val terminalStatuses = Seq(ClientListStatus.InitiateDownload)
 
       terminalStatuses.foreach { s =>
         val (application, _) = buildAppWithStatus(Future.successful(s))

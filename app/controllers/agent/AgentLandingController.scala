@@ -21,6 +21,7 @@ import controllers.actions.*
 import models.Target.*
 import models.requests.DataRequest
 import models.{CisTaxpayerSearchResult, Target}
+import navigation.ClientListCheckNavigator
 import pages.{AgentClientsPage, CisIdPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -40,6 +41,9 @@ class AgentLandingController @Inject() (
   @Named("AgentIdentifier") identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  clientListStatusGuard: ClientListStatusGuard,
+  hasClientGuard: HasClientGuard,
+  clientListCheckNavigator: ClientListCheckNavigator,
   manageService: ManageService,
   prepopService: PrepopService,
   sessionRepository: SessionRepository,
@@ -51,7 +55,11 @@ class AgentLandingController @Inject() (
     with Logging {
 
   def onPageLoad(uniqueId: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify
+      andThen clientListStatusGuard.groupB(clientListCheckNavigator.agentDashboard(uniqueId))
+      andThen getData
+      andThen requireData
+      andThen hasClientGuard.forInstanceId(uniqueId)).async { implicit request =>
       (for {
         updatedUserAnswers <- Future.fromTry(request.userAnswers.set(CisIdPage, uniqueId))
         _                  <- sessionRepository.set(updatedUserAnswers)
@@ -70,7 +78,10 @@ class AgentLandingController @Inject() (
     }
 
   def onTargetClick(uniqueId: String, targetKey: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify
+      andThen getData
+      andThen requireData
+      andThen hasClientGuard.forInstanceId(uniqueId)).async { implicit request =>
       val systemErrorRedirect       = Redirect(controllers.routes.SystemErrorController.onPageLoad())
       val unauthorisedAgentRedirect = Redirect(controllers.routes.UnauthorisedAgentAffinityController.onPageLoad())
 
@@ -94,7 +105,7 @@ class AgentLandingController @Inject() (
         Left(NotFound("Unknown target"))
 
       case Some(target) =>
-        request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId)) match {
+        AgentClientsPage.findClient(request.userAnswers, uniqueId) match {
           case None =>
             logger.warn(s"[AgentLandingController][onTargetClick] Missing client in userAnswers for uniqueId=$uniqueId")
             Left(systemErrorRedirect)

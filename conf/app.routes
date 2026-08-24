@@ -24,7 +24,10 @@ GET   /subcontractors/no-subcontractors-to-view  controllers.subcontractors.NoSu
 
 GET   /subcontractors/:subbieResourceRef/delete-status  controllers.subcontractors.GetSubcontractorForDeleteController.onPageLoad(subbieResourceRef: Long)
 
-GET   /authorisation-check-in-progress  controllers.SecurityCheckController.onPageLoad()
+GET   /authorisation-check-in-progress                        controllers.SecurityCheckController.onPageLoad()
+GET   /authorisation-check-in-progress/client-list/:returnTo  controllers.SecurityCheckController.onClientListCheck(returnTo: String, instanceId: Option[String] ?= None, mode: Option[String] ?= None)
+GET   /authorisation-check-in-progress/:returnTo/poll         controllers.SecurityCheckController.pollClientListCheck(returnTo: String, instanceId: Option[String] ?= None, mode: Option[String] ?= None, retryCount: Int ?= 0)
+
 
 GET   /subcontractors/:instanceId/your-subcontractors         controllers.subcontractors.SubcontractorsListController.onPageLoad(instanceId: String, mode: Mode = NormalMode, page: Int ?= 1)
 POST  /subcontractors/:instanceId/your-subcontractors         controllers.subcontractors.SubcontractorsListController.onSubmit(instanceId: String, mode: Mode = NormalMode, page: Int ?= 1)

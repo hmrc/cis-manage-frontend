@@ -16,11 +16,14 @@
 
 package pages
 
-import models.CisTaxpayerSearchResult
+import models.{CisTaxpayerSearchResult, UserAnswers}
 import play.api.libs.json.JsPath
 
 case object AgentClientsPage extends QuestionPage[List[CisTaxpayerSearchResult]] {
 
   override def path: JsPath     = JsPath \ toString
   override def toString: String = "agentClients"
+
+  def findClient(ua: UserAnswers, instanceId: String): Option[CisTaxpayerSearchResult] =
+    ua.get(AgentClientsPage).flatMap(_.find(_.uniqueId == instanceId))
 }

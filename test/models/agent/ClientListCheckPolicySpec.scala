@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package models
+package models.agent
 
-import models.agent.ClientListStatus
-import play.api.libs.json.{Json, Reads}
+import base.SpecBase
 
-case class GetClientListStatusResponse(result: ClientListStatus)
+class ClientListCheckPolicySpec extends SpecBase {
 
-object GetClientListStatusResponse {
-  implicit val reads: Reads[GetClientListStatusResponse] = Json.reads[GetClientListStatusResponse]
+  "ClientListCheckPolicy" - {
+
+    "must expose GroupA, GroupB and Exempt policies" in {
+      ClientListCheckPolicy.GroupA mustBe a[ClientListCheckPolicy]
+      ClientListCheckPolicy.GroupB mustBe a[ClientListCheckPolicy]
+      ClientListCheckPolicy.Exempt mustBe a[ClientListCheckPolicy]
+    }
+  }
 }

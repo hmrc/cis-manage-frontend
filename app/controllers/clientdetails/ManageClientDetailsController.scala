@@ -17,6 +17,7 @@
 package controllers.clientdetails
 
 import controllers.actions.*
+import navigation.ClientListCheckNavigator
 
 import javax.inject.{Inject, Named}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -29,12 +30,21 @@ class ManageClientDetailsController @Inject() (
   @Named("AgentIdentifier") identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  clientListStatusGuard: ClientListStatusGuard,
+  clientListCheckNavigator: ClientListCheckNavigator,
+  hasClientGuard: HasClientGuard,
   val controllerComponents: MessagesControllerComponents,
   view: ManageClientDetailsView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad: Action[AnyContent] = (
+    identify
+      andThen clientListStatusGuard.groupB(clientListCheckNavigator.manageClientDetails)
+      andThen getData
+      andThen requireData
+      andThen hasClientGuard.currentClient
+  ) { implicit request =>
     val uniqueId: String          = "1"
     val clientName: String        = "{Client}"
     val employerReference: String = "{123/ab4}"

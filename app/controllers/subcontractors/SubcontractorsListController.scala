@@ -44,6 +44,7 @@ class SubcontractorsListController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  hasClientGuard: HasClientGuard,
   formProvider: SubcontractorsListFormProvider,
   paginationService: PaginationSubcontractorsListService,
   clock: Clock,
@@ -512,25 +513,26 @@ class SubcontractorsListController @Inject() (
     mode: Mode,
     page: Int = 1
   ): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      rowsFromUserAnswers(request.userAnswers) match {
-        case Some(allRows) if allRows.nonEmpty =>
-          renderPage(
-            allRows,
-            instanceId,
-            mode,
-            page,
-            getListFilters(request)
-          )
+    (identify andThen getData andThen requireData andThen hasClientGuard.forInstanceId(instanceId)) {
+      implicit request =>
+        rowsFromUserAnswers(request.userAnswers) match {
+          case Some(allRows) if allRows.nonEmpty =>
+            renderPage(
+              allRows,
+              instanceId,
+              mode,
+              page,
+              getListFilters(request)
+            )
 
-        case Some(_) =>
-          Redirect(routes.NoSubcontractorsExistController.onPageLoad())
+          case Some(_) =>
+            Redirect(routes.NoSubcontractorsExistController.onPageLoad())
 
-        case None =>
-          Redirect(
-            controllers.routes.JourneyRecoveryController.onPageLoad()
-          )
-      }
+          case None =>
+            Redirect(
+              controllers.routes.JourneyRecoveryController.onPageLoad()
+            )
+        }
     }
 
   def onSubmit(
