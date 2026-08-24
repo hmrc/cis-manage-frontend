@@ -28,7 +28,7 @@ class JourneyRecoveryStartAgainViewSpec extends SpecBase with Matchers {
   "JourneyRecoveryStartAgainView" - {
 
     Seq(
-      ("AGENT", applicationConfig.constructionIndustryAgentAccountUrl + "1"),
+      ("AGENT",        applicationConfig.constructionIndustryAgentAccountUrl + "1"),
       ("ORGANISATION", applicationConfig.constructionIndustryOrgAccountUrl)
     ).foreach { case (accountTypeSTR, cisAccountURL) =>
       s"when accountType is '$accountTypeSTR'" - {

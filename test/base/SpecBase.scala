@@ -36,6 +36,7 @@ import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.PlayBodyParsers
 import play.api.test.Helpers.stubControllerComponents
 import repositories.SessionRepository
+import views.html.PageNotFoundView
 
 import scala.concurrent.Future
 
@@ -47,6 +48,7 @@ trait SpecBase
     with ScalaFutures
     with GuiceOneAppPerSuite
     with IntegrationPatience {
+  protected lazy val notFoundView: PageNotFoundView = app.injector.instanceOf[PageNotFoundView]
 
   override def fakeApplication(): Application = applicationBuilder().build()
 
@@ -54,7 +56,8 @@ trait SpecBase
 
   val userAnswersId: String    = "id"
   val parsers: PlayBodyParsers = stubControllerComponents().parsers
-  val cisIdData: JsObject      = Json.obj("cisId" -> "1")
+  val givenCisId               = "1"
+  val cisIdData: JsObject      = Json.obj("cisId" -> givenCisId)
 
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 

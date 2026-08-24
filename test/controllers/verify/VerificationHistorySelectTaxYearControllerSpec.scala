@@ -17,27 +17,30 @@
 package controllers.verify
 
 import base.SpecBase
+import controllers.actions.{FakeIdentifierAction, IdentifierAction}
 import forms.verify.TaxYearFormProvider
 import models.UserAnswers
 import models.response.GetSubmittedVerificationsResponse
 import models.verify.VerificationTaxYearSelection.{AllTaxYears, TaxYear, TaxYearPeriod}
 import models.verify.{VerificationHistoryData, VerificationRequestData}
-import org.mockito.ArgumentCaptor
+import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages.verify.{VerificationHistoryDataPage, VerificationHistorySelectTaxYearPage}
+import pages.verify.VerificationHistoryDataPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.VerificationService
+import services.{VerificationHistoryService, VerificationService}
 import views.html.verify.VerificationHistorySelectTaxYearView
 
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with MockitoSugar {
+class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
   import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-  import org.mockito.Mockito.{verify, when}
+  import org.mockito.Mockito.{clearInvocations, verify, verifyNoMoreInteractions, when}
+  import play.api.Application
+  import play.api.inject.guice.GuiceApplicationBuilder
 
   private def verificationRequestData(
     verificationNumber: String,
@@ -60,9 +63,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
   lazy val verificationHistorySelectTaxYearRoute =
     controllers.verify.routes.VerificationHistorySelectTaxYearController.onPageLoad().url
 
-  private val taxYears     = 2024 to 2026 map TaxYearPeriod.apply
   private val formProvider = new TaxYearFormProvider()
-  private val form         = formProvider(taxYears)
 
   private val verificationHistoryData =
     VerificationHistoryData(
@@ -79,228 +80,163 @@ class VerificationHistorySelectTaxYearControllerSpec extends SpecBase with Mocki
       .success
       .value
 
+  private val stubSubmittedVerificationsResponse = GetSubmittedVerificationsResponse(
+    scheme = Seq.empty,
+    subcontractors = Seq.empty,
+    verificationBatches = Seq.empty,
+    verifications = Seq.empty,
+    submissions = Seq.empty
+  )
+
+  private val mockSessionRepository          = mock[SessionRepository]
+  private val mockVerificationService        = mock[VerificationService]
+  private val mockVerificationHistoryService = mock[VerificationHistoryService]
+
+  when(mockSessionRepository.set(any)) thenReturn Future.successful(true)
+  when(mockVerificationService.getSubmittedVerifications(any)(any)) thenReturn Future.successful(
+    stubSubmittedVerificationsResponse
+  )
+  when(mockVerificationHistoryService.toVerificationHistoryData(any)) thenReturn verificationHistoryData
+
+  private lazy val view = app.injector.instanceOf[VerificationHistorySelectTaxYearView]
+
+  override lazy val app: Application = new GuiceApplicationBuilder()
+    .overrides(
+      bind[IdentifierAction] toInstance FakeIdentifierAction(isAgent = false)(parsers),
+      bind[SessionRepository] toInstance mockSessionRepository,
+      bind[VerificationService] toInstance mockVerificationService,
+      bind[VerificationHistoryService] toInstance mockVerificationHistoryService
+    )
+    .build()
+
   "VerificationHistorySelectTaxYear Controller" - {
 
-    "must return OK and the correct view for a GET" in {
-      val mockVerificationHistory = GetSubmittedVerificationsResponse(
-        scheme = Seq.empty,
-        subcontractors = Seq.empty,
-        verificationBatches = Seq.empty,
-        verifications = Seq.empty,
-        submissions = Seq.empty
-      )
+    "must redirect to verification history page when history has 0 tax years" in {
+      mockSessionData(Some(userAnswersWithVerificationHistoryData))
+      mockVerificationTaxYears(Seq.empty)
 
-      val mockVerificationService = mock[VerificationService]
-      when(
-        mockVerificationService.getSubmittedVerifications(any)(any)
-      ) thenReturn Future.successful(mockVerificationHistory)
+      val request = FakeRequest(GET, verificationHistorySelectTaxYearRoute)
+      val result  = route(app, request).value
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswersWithVerificationHistoryData))
-          .overrides(bind[VerificationService] toInstance mockVerificationService)
-          .build()
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.VerificationHistoryController.onPageLoad(AllTaxYears.toPath).url
+      contentAsString(result) mustBe empty
 
-      running(application) {
-        val request = FakeRequest(GET, verificationHistorySelectTaxYearRoute)
-
-        val result = route(application, request).value
-
-        val view =
-          application.injector.instanceOf[VerificationHistorySelectTaxYearView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual
-          view(form, taxYears)(request, messages(application)).toString
-        verify(mockVerificationService).getSubmittedVerifications(eqTo(userAnswersId))(any)
-      }
+      verify(mockVerificationService).getSubmittedVerifications(eqTo(givenCisId))(any)
+      verifyNoMoreInteractions(mockVerificationService)
     }
 
-    "must populate the view correctly when previously answered with AllTaxYears" in {
+    "must redirect to verification history page when history has 1 tax year" in {
+      mockSessionData(Some(userAnswersWithVerificationHistoryData))
+      mockVerificationTaxYears(Seq(TaxYearPeriod(1999)))
 
-      val userAnswers = userAnswersWithVerificationHistoryData
-        .set(
-          VerificationHistorySelectTaxYearPage,
-          AllTaxYears
-        )
-        .success
-        .value
+      val request = FakeRequest(GET, verificationHistorySelectTaxYearRoute)
+      val result  = route(app, request).value
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers)).build()
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.VerificationHistoryController.onPageLoad(AllTaxYears.toPath).url
+      contentAsString(result) mustBe empty
 
-      running(application) {
-        val request = FakeRequest(GET, verificationHistorySelectTaxYearRoute)
-
-        val result = route(application, request).value
-
-        val view =
-          application.injector.instanceOf[VerificationHistorySelectTaxYearView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual
-          view(form.fill(AllTaxYears), taxYears)(request, messages(application)).toString
-      }
+      verify(mockVerificationService).getSubmittedVerifications(eqTo(givenCisId))(any)
+      verifyNoMoreInteractions(mockVerificationService)
     }
 
-    "must populate the view correctly when previously answered with a tax year" in {
+    "must show select tax year page when history has 2 tax years" in {
+      val givenTaxYears = Seq(TaxYearPeriod(1999), TaxYearPeriod(2000))
 
-      val userAnswers = userAnswersWithVerificationHistoryData
-        .set(
-          VerificationHistorySelectTaxYearPage,
-          TaxYear(2026)
-        )
-        .success
-        .value
+      mockSessionData(Some(userAnswersWithVerificationHistoryData))
+      mockVerificationTaxYears(givenTaxYears)
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val request = FakeRequest(GET, verificationHistorySelectTaxYearRoute)
+      val result  = route(app, request).value
 
-      running(application) {
-        val request = FakeRequest(GET, verificationHistorySelectTaxYearRoute)
+      status(result) mustEqual OK
+      redirectLocation(result) mustBe empty
+      contentAsString(result) mustBe view(formProvider(givenTaxYears), givenTaxYears)(request, messages(app)).toString
 
-        val result = route(application, request).value
-
-        val view =
-          application.injector.instanceOf[VerificationHistorySelectTaxYearView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual
-          view(form.fill(TaxYear(2026)), taxYears)(request, messages(application)).toString
-      }
+      verify(mockVerificationService).getSubmittedVerifications(eqTo(givenCisId))(any)
+      verifyNoMoreInteractions(mockVerificationService)
     }
 
     "must redirect to Journey Recovery when no user answers exist and form submitted" in {
+      mockSessionData(None)
 
-      val application =
-        applicationBuilder(userAnswers = None).build()
+      val request = FakeRequest(POST, verificationHistorySelectTaxYearRoute).withFormUrlEncodedBody("value" -> "all")
+      val result  = route(app, request).value
 
-      running(application) {
-        val request =
-          FakeRequest(POST, verificationHistorySelectTaxYearRoute)
-            .withFormUrlEncodedBody("value" -> "all")
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
     }
 
     "must treat 'all' as AllTaxYears and redirect to all tax years verification history" in {
+      mockSessionData(Some(userAnswersWithVerificationHistoryData))
 
-      val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      val request = FakeRequest(POST, verificationHistorySelectTaxYearRoute).withFormUrlEncodedBody("value" -> "all")
+      val result  = route(app, request).value
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswersWithVerificationHistoryData))
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(POST, verificationHistorySelectTaxYearRoute)
-            .withFormUrlEncodedBody("value" -> "all")
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual
-          controllers.verify.routes.VerificationHistoryController
-            .onPageLoadAllYears()
-            .url
-      }
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.VerificationHistoryController.onPageLoad(AllTaxYears.toPath).url
     }
 
     "must redirect to single year verification history when a tax year is submitted" in {
+      mockSessionData(Some(userAnswersWithVerificationHistoryData))
+      mockVerificationTaxYears(Seq(TaxYearPeriod(2026)))
 
-      val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      val request = FakeRequest(POST, verificationHistorySelectTaxYearRoute).withFormUrlEncodedBody("value" -> "2026")
+      val result  = route(app, request).value
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswersWithVerificationHistoryData))
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(POST, verificationHistorySelectTaxYearRoute)
-            .withFormUrlEncodedBody(
-              "value" -> "2026"
-            )
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual
-          controllers.verify.routes.VerificationHistoryController
-            .onPageLoadSingleYear()
-            .url
-
-        val captor = ArgumentCaptor.forClass(classOf[UserAnswers])
-        verify(mockSessionRepository).set(captor.capture())
-        captor.getValue.get(VerificationHistorySelectTaxYearPage).value mustEqual TaxYear(2026)
-      }
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.VerificationHistoryController.onPageLoad(TaxYear(2026).toPath).url
     }
 
     "must return BAD_REQUEST when invalid data is submitted" in {
+      val taxYears = 2024 to 2026 map TaxYearPeriod.apply
+      val form     = formProvider(taxYears)
 
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswersWithVerificationHistoryData)).build()
+      mockSessionData(Some(userAnswersWithVerificationHistoryData))
+      mockVerificationTaxYears(taxYears)
 
-      running(application) {
-        val request =
-          FakeRequest(POST, verificationHistorySelectTaxYearRoute)
-            .withFormUrlEncodedBody("value" -> "invalid")
+      val invalidFormData = Map("value" -> "invalid")
+      val request         =
+        FakeRequest(POST, verificationHistorySelectTaxYearRoute).withFormUrlEncodedBody(invalidFormData.toSeq*)
+      val boundForm       = form.bind(invalidFormData)
 
-        val boundForm = form.bind(Map("value" -> "invalid"))
+      val result = route(app, request).value
 
-        val view =
-          application.injector.instanceOf[VerificationHistorySelectTaxYearView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual
-          view(boundForm, taxYears)(request, messages(application)).toString
-      }
+      status(result) mustEqual BAD_REQUEST
+      contentAsString(result) mustEqual view(boundForm, taxYears)(request, messages(app)).toString
     }
 
     "must redirect to Journey Recovery for a GET when no existing data is found" in {
+      mockSessionData(None)
 
-      val application =
-        applicationBuilder(userAnswers = None).build()
+      val request = FakeRequest(GET, verificationHistorySelectTaxYearRoute)
+      val result  = route(app, request).value
 
-      running(application) {
-        val request = FakeRequest(GET, verificationHistorySelectTaxYearRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
     }
 
     "redirect to Journey Recovery for a POST if no existing data is found" in {
+      mockSessionData(None)
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val request = FakeRequest(POST, verificationHistorySelectTaxYearRoute).withFormUrlEncodedBody("value" -> "all")
+      val result  = route(app, request).value
 
-      running(application) {
-        val request =
-          FakeRequest(POST, verificationHistorySelectTaxYearRoute)
-            .withFormUrlEncodedBody("value" -> "all")
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-      }
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
     }
   }
+
+  override def afterEach(): Unit = clearInvocations(
+    mockSessionRepository,
+    mockVerificationService,
+    mockVerificationHistoryService
+  )
+
+  private def mockSessionData(userAnswersOpt: Option[UserAnswers]) =
+    when(mockSessionRepository.get(any)) thenReturn Future.successful(userAnswersOpt)
+
+  private def mockVerificationTaxYears(taxYears: Seq[TaxYearPeriod]) =
+    when(mockVerificationHistoryService.getSubmittedVerificationTaxYears(any)) thenReturn taxYears
 }

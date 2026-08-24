@@ -18,9 +18,9 @@ package controllers.verify
 
 import controllers.actions.*
 import forms.verify.TaxYearFormProvider
-import models.verify.VerificationTaxYearSelection.{AllTaxYears, TaxYear, given}
+import models.verify.VerificationTaxYearSelection.AllTaxYears
 import models.verify.{VerificationHistoryData, VerificationTaxYearSelection}
-import pages.verify.{VerificationHistoryDataPage, VerificationHistorySelectTaxYearPage}
+import pages.verify.VerificationHistoryDataPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -54,12 +54,13 @@ class VerificationHistorySelectTaxYearController @Inject() (
         userAnswers <- Future.fromTry(request.userAnswers.set(VerificationHistoryDataPage, historyData))
         _           <- sessionRepository.set(userAnswers)
         taxYears     = verificationHistoryService.getSubmittedVerificationTaxYears(historyData)
-        form         = formProvider(taxYears)
-      yield Ok(view(formProvider(taxYears), taxYears))
+        response     = if taxYears.length > 1 then Ok(view(formProvider(taxYears), taxYears))
+                       else Redirect(routes.VerificationHistoryController.onPageLoad(AllTaxYears.toPath))
+      yield response
     }
 
   def onSubmit(): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData) { implicit request =>
       request.userAnswers.get(VerificationHistoryDataPage) match {
         case Some(data) =>
           val years = verificationHistoryService.getSubmittedVerificationTaxYears(data)
@@ -68,22 +69,10 @@ class VerificationHistorySelectTaxYearController @Inject() (
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, years))),
-              value =>
-                for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(VerificationHistorySelectTaxYearPage, value))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield value match {
-                  case AllTaxYears =>
-                    Redirect(controllers.verify.routes.VerificationHistoryController.onPageLoadAllYears())
-                  case TaxYear(_)  =>
-                    Redirect(controllers.verify.routes.VerificationHistoryController.onPageLoadSingleYear())
-                }
+              formWithErrors => BadRequest(view(formWithErrors, years)),
+              selection => Redirect(routes.VerificationHistoryController.onPageLoad(selection.toPath))
             )
-
-        case None =>
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        case None       => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     }
-
 }

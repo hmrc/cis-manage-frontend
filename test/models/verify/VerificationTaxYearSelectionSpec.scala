@@ -16,12 +16,26 @@
 
 package models.verify
 
-import models.verify.VerificationTaxYearSelection._
+import models.verify.VerificationTaxYearSelection.*
+import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import play.api.libs.json._
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import play.api.libs.json.*
 
-class VerificationTaxYearSelectionSpec extends AnyFreeSpec with Matchers {
+class VerificationTaxYearSelectionSpec
+    extends AnyFreeSpec
+    with Matchers
+    with OptionValues
+    with ScalaCheckPropertyChecks {
+  import org.scalacheck.*
+
+  given Arbitrary[VerificationTaxYearSelection] = Arbitrary {
+    Gen.option(Gen.chooseNum(0, 999999)).map {
+      case Some(startYear) => TaxYear(startYear)
+      case None            => AllTaxYears
+    }
+  }
 
   "VerificationTaxYearSelection" - {
 
@@ -152,6 +166,26 @@ class VerificationTaxYearSelectionSpec extends AnyFreeSpec with Matchers {
           )
           .validate[VerificationTaxYearSelection]
           .isError mustEqual true
+      }
+    }
+
+    "path decoder" - {
+      "must recover an path-encoded tax year selection" in forAll { (givenSelection: VerificationTaxYearSelection) =>
+        val encodedSelection = givenSelection.toPath
+        val decodedSelection = VerificationTaxYearSelection fromPath encodedSelection
+        decodedSelection.value mustBe givenSelection
+      }
+
+      val invalidPaths = Table(
+        "Scenario"                           -> "Invalid Path",
+        "start year isn't a number"          -> "asdf-to-2000",
+        "end year isn't a number"            -> "1999-to-ghjk",
+        "start year isn't 1 before end year" -> "1999-to-2001"
+      )
+
+      forAll(invalidPaths) { (scenario, invalidPath) =>
+        val result = VerificationTaxYearSelection fromPath invalidPath
+        result mustBe empty
       }
     }
   }
