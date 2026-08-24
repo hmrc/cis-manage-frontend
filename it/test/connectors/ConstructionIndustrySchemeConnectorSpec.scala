@@ -1244,7 +1244,7 @@ class ConstructionIndustrySchemeConnectorSpec
       val ex = intercept[Exception] {
         connector.removeClient(taxOfficeNumber, taxOfficeRef).futureValue
       }
-      ex.getMessage must include("returned 500")
+      ex.getMessage must include("boom")
     }
   }
 }
