@@ -56,15 +56,13 @@ class SubmittedReturnsChooseTaxYearSpec
     "must display the tax year using messages" in {
       val taxYears = Seq("2021 to 2022")
 
-      val result = SubmittedReturnsChooseTaxYear.options(taxYears)
+      val filledMessages: Messages = stubMessagesApi(
+        Map("en" -> Map("history.submittedReturnsChooseTaxYear.taxYear" -> "{0} to {1}"))
+      ).preferred(Seq.empty)
 
-      result.head.content mustBe Text(
-        messages(
-          "history.submittedReturnsChooseTaxYear.taxYear",
-          "2021",
-          "2022"
-        )
-      )
+      val result = SubmittedReturnsChooseTaxYear.options(taxYears)(filledMessages)
+
+      result.head.content mustBe Text("2021 to 2022")
     }
 
     "must include a divider after the tax years" in {

@@ -98,7 +98,7 @@ verify.verificationRequest.heading                           =  Cais dilysu
 verify.verificationRequest.submissionDetails.heading         =  Manylion y cyflwyniad
 verify.verificationRequest.submittedAt                       =  Cyflwynwyd am {0} ar {1}
 verify.verificationRequest.verificationNumber                =  Rhif dilysu
-verify.verificationRequest.contractorName                    =  Enw’r contractwr Contractor name
+verify.verificationRequest.contractorName                    =  Enw’r contractwr
 verify.verificationRequest.employerReference                 =  Cyfeirnod y Cyflogwr
 verify.verificationRequest.receiptReferenceNumber            =  Cyfeirnod y dderbynneb
 verify.verificationRequest.subcontractorsInRequest           =  Is-gontractwyr yn y cais hwn
@@ -123,6 +123,3 @@ verify.subcontractorSubmissionReceipt.summaryList.key1       =  Enw’r contract
 verify.subcontractorSubmissionReceipt.summaryList.key2       =  Cyfeirnod y Cyflogwr
 verify.subcontractorSubmissionReceipt.summaryList.key3       =  Cyfeirnod y dderbynneb
 verify.subcontractorSubmissionReceipt.summaryList.key4       =  cyfeirnod dilysu rhif
-
-
-
