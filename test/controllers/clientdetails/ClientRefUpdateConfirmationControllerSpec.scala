@@ -37,7 +37,7 @@ class ClientRefUpdateConfirmationControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[ClientRefUpdateConfirmationView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view("ABC123", "XYZ456")(request, messages(application)).toString
+        contentAsString(result) mustEqual view()(request, messages(application)).toString
       }
     }
 
