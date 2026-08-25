@@ -85,7 +85,7 @@
 
 @removeLinkCell(agentClient: ClientListViewModel) = {
     @agentClient.removeLink.map { link =>
-        <a href=@controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode).url class="govuk-link">
+        <a href="@link.href" class="govuk-link">
             @link.text
             <span class="govuk-visually-hidden">
                 @{messages("agent.clientListSearch.td.actions.remove.hidden", agentClient.clientName)}
