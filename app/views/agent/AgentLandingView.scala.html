@@ -110,7 +110,7 @@
         ),
         ptaCard(
             title = messages("agent.landing.card.removeClient.title"),
-            link = controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode).url,
+            link = controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(uniqueId, NormalMode).url,
             content = Html(messages("agent.landing.card.removeClient.p")),
             id = Some("remove-client")
         )

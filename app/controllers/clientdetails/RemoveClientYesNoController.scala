@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.clientdetails.RemoveClientYesNoFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.{AgentClientsPage, CisIdPage}
+import pages.AgentClientsPage
 import pages.clientdetails.RemoveClientYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -49,63 +49,53 @@ class RemoveClientYesNoController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
+  def onPageLoad(uniqueId: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      request.userAnswers.get(CisIdPage) match {
-        case Some(instanceId) =>
-          request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == instanceId)) match {
-            case Some(client) =>
-              val employerRef = s"${client.taxOfficeNumber}/${client.taxOfficeRef}"
-              agentService.getClientsByEmployersReference(employerRef).flatMap { response =>
-                if (response.length == 1) {
-                  val clientName   = response.head.schemeName.getOrElse("")
-                  val preparedForm = request.userAnswers.get(RemoveClientYesNoPage) match {
-                    case None        => form
-                    case Some(value) => form.fill(value)
-                  }
-                  Future(Ok(view(clientName, preparedForm, mode)))
-
-                } else {
-                  Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-
-                }
+      request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId)) match {
+        case Some(client) =>
+          val employerRef = s"${client.taxOfficeNumber}/${client.taxOfficeRef}"
+          agentService.getClientsByEmployersReference(employerRef).flatMap { response =>
+            if (response.length == 1) {
+              val clientName   = response.head.schemeName.getOrElse("")
+              val preparedForm = request.userAnswers.get(RemoveClientYesNoPage) match {
+                case None        => form
+                case Some(value) => form.fill(value)
               }
-            case None         =>
+              Future(Ok(view(clientName, preparedForm, mode, uniqueId)))
+
+            } else {
               Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+
+            }
           }
-        case _                =>
+        case _            =>
           Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] =
+  def onSubmit(uniqueId: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      request.userAnswers.get(CisIdPage) match {
-        case Some(instanceId) =>
-          request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == instanceId)) match {
-            case Some(client) =>
-              val employerRef = s"${client.taxOfficeNumber}/${client.taxOfficeRef}"
-              agentService.getClientsByEmployersReference(employerRef).flatMap { response =>
-                if (response.length == 1) {
-                  val clientName = response.head.schemeName.getOrElse("")
-                  form
-                    .bindFromRequest()
-                    .fold(
-                      formWithErrors => Future.successful(BadRequest(view(clientName, formWithErrors, mode))),
-                      value =>
-                        for {
-                          updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveClientYesNoPage, value))
-                          _              <- sessionRepository.set(updatedAnswers)
-                        } yield Redirect(navigator.nextPage(RemoveClientYesNoPage, mode, updatedAnswers))
-                    )
-                } else {
-                  Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-                }
-              }
-            case None         =>
+      request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId)) match {
+        case Some(client) =>
+          val employerRef = s"${client.taxOfficeNumber}/${client.taxOfficeRef}"
+          agentService.getClientsByEmployersReference(employerRef).flatMap { response =>
+            if (response.length == 1) {
+              val clientName = response.head.schemeName.getOrElse("")
+              form
+                .bindFromRequest()
+                .fold(
+                  formWithErrors => Future.successful(BadRequest(view(clientName, formWithErrors, mode, uniqueId))),
+                  value =>
+                    for {
+                      updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveClientYesNoPage, value))
+                      _              <- sessionRepository.set(updatedAnswers)
+                    } yield Redirect(navigator.nextPage(RemoveClientYesNoPage, mode, updatedAnswers))
+                )
+            } else {
               Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            }
           }
-        case _                =>
+        case _            =>
           Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
     }

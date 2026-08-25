@@ -51,9 +51,9 @@ class ManageClientDetailsController @Inject() (
               .flatMap { response =>
                 if (response.length == 1) {
                   val uniqueId: String          = response.head.uniqueId
-                  val clientName: String        = response.head.schemeName.toString
+                  val clientName: String        = response.head.schemeName.get
                   val employerReference: String = employerRef
-                  val clientReference: String   = response.head.agentOwnRef.toString
+                  val clientReference           = response.head.agentOwnRef.get
                   Future.successful(Ok(view(uniqueId, clientName, employerReference, clientReference)))
 
                 } else {

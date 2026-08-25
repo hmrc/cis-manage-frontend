@@ -45,8 +45,9 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new RemoveClientYesNoFormProvider()
   val form         = formProvider()
 
-  val employerRef            = "123456"
-  val okResponse             =
+  val employerRef = "123456"
+  val uniqueId    = "123"
+  val okResponse  =
     CisTaxpayerSearchResult(
       uniqueId = "123",
       taxOfficeNumber = "111",
@@ -55,7 +56,9 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
       schemeName = Option("ABCD"),
       utr = Option("ABCD")
     )
-  lazy val removeClientRoute = controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode).url
+
+  lazy val removeClientRoute =
+    controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(uniqueId, NormalMode).url
 
   val mockAgentService      = mock[AgentService]
   val mockSessionRepository = mock[SessionRepository]
@@ -97,7 +100,10 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
         val view   = application.injector.instanceOf[RemoveClientYesNoView]
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view("Test Client", form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view("Test Client", form, NormalMode, uniqueId)(
+          request,
+          messages(application)
+        ).toString
 
       }
     }
@@ -132,7 +138,7 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view("Test Client", form.fill(true), NormalMode)(
+        contentAsString(result) mustEqual view("Test Client", form.fill(true), NormalMode, uniqueId)(
           request,
           messages(application)
         ).toString
