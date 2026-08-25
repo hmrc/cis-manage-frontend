@@ -1,69 +1,72 @@
 # Infrastructure
-service.name                              =  Construction Industry Scheme
+service.name                                            =  Construction Industry Scheme
 
-site.back                                 =  Back
-site.remove                               =  Remove
-site.change                               =  Change
-site.no                                   =  No
-site.yes                                  =  Yes
-site.continue                             =  Continue
-site.search                               =  Search
-site.start                                =  Start now
-site.startAgain                           =  Start again
-site.signIn                               =  Sign in
-site.govuk                                =  GOV.UK
-site.unknown                              =  Unknown
+site.back                                               =  Back
+site.remove                                             =  Remove
+site.change                                             =  Change
+site.no                                                 =  No
+site.yes                                                =  Yes
+site.continue                                           =  Continue
+site.search                                             =  Search
+site.start                                              =  Start now
+site.startAgain                                         =  Start again
+site.signIn                                             =  Sign in
+site.govuk                                              =  GOV.UK
+site.unknown                                            =  Unknown
 
-site.pagination.landmark                  =  Pagination
-site.pagination.previous                  =  Previous
-site.pagination.next                      =  Next
+site.pagination.landmark                                =  Pagination
+site.pagination.previous                                =  Previous
+site.pagination.next                                    =  Next
 
-site.delete                               =  Delete
-site.or                                   =  or
-site.view                                 =  View
-site.saveAndContinue                      =  Save and continue
+site.delete                                             =  Delete
+site.or                                                 =  or
+site.view                                               =  View
+site.saveAndContinue                                    =  Save and continue
 
-date.day                                  =  Day
-date.month                                =  Month
-date.year                                 =  Year
+date.day                                                =  Day
+date.month                                              =  Month
+date.year                                               =  Year
 
-date.error.day                            =  day
-date.error.month                          =  month
-date.error.year                           =  year
+date.error.day                                          =  day
+date.error.month                                        =  month
+date.error.year                                         =  year
 
-timeout.title                             =  You’re about to be signed out
-timeout.message                           =  For security reasons, you will be signed out of this service in
-timeout.keepAlive                         =  Stay signed in
-timeout.signOut                           =  Sign out
+timeout.title                                           =  You’re about to be signed out
+timeout.message                                         =  For security reasons, you will be signed out of this service in
+timeout.keepAlive                                       =  Stay signed in
+timeout.signOut                                         =  Sign out
 
-error.title.prefix                        =  Error:
+error.title.prefix                                      =  Error:
 
-error.prefix                              =  Error
+error.prefix                                            =  Error
 
-error.summary.title                       =  There is a problem
+error.summary.title                                     =  There is a problem
 
-index.title                               =  Construction Industry Scheme
-index.heading                             =  Construction Industry Scheme
-index.guidance                            =  Welcome to cis-manage-frontend. Please see the README file for a guide to getting started.
+index.title                                             =  Construction Industry Scheme
+index.heading                                           =  Construction Industry Scheme
+index.guidance                                          =  Welcome to cis-manage-frontend. Please see the README file for a guide to getting started.
 
-checkYourAnswers.title                    =  Check your answers
-checkYourAnswers.heading                  =  Check your answers
+checkYourAnswers.title                                  =  Check your answers
+checkYourAnswers.heading                                =  Check your answers
 
-journeyRecovery.continue.title            =  Sorry, there is a problem with this service
-journeyRecovery.continue.heading          =  Sorry, there is a problem with this service
-journeyRecovery.continue.guidance.p1      =  There is problem with this service. You can return to
-journeyRecovery.continue.guidance.link    =  Construction Industry Scheme
-journeyRecovery.continue.guidance.p2      =  or try again later.
+journeyRecovery.continue.title                          =  Sorry, there is a problem with this service
+journeyRecovery.continue.heading                        =  Sorry, there is a problem with this service
+journeyRecovery.continue.guidance.p1                    =  There is a problem with this service. You can return to
+journeyRecovery.continue.guidance.link                  =  Construction Industry Scheme
+journeyRecovery.continue.guidance.p2                    =  or try again later.
 
-journeyRecovery.startAgain.title          =  Sorry, there is a problem with this service
-journeyRecovery.startAgain.heading        =  Sorry, there is a problem with this service
-journeyRecovery.startAgain.guidance.p1    =  There is problem with this service. You can return to
-journeyRecovery.startAgain.guidance.link  =  Construction Industry Scheme
-journeyRecovery.startAgain.guidance.p2    =  or try again later.
+journeyRecovery.startAgain.title                        =  There is a problem with this service
+journeyRecovery.startAgain.heading                      =  Sorry, there is a problem with this service
+journeyRecovery.startAgain.guidance.p1                  =  Try again later.
+journeyRecovery.startAgain.guidance.p2                  =  Any information you have provided has not been saved. When the service is available, you will have to start again.
+journeyRecovery.startAgain.guidance.contactHMRC.link    =  Contact HMRC
+journeyRecovery.startAgain.guidance.contactHMRC.suffix  =  for more help.
+journeyRecovery.startAgain.guidance.cisAccount.prefix   =  Back to
+journeyRecovery.startAgain.guidance.cisAccount.link     =  Manage your CIS account
 
-signedOut.title                           =  For your security, we signed you out
-signedOut.heading                         =  For your security, we signed you out
-signedOut.guidance                        =  We did not save your answers.
+signedOut.title                                         =  For your security, we signed you out
+signedOut.heading                                       =  For your security, we signed you out
+signedOut.guidance                                      =  We did not save your answers.
 
 # Errors & Auth
 pageNotFound.title                       =  Page not found
@@ -262,6 +265,8 @@ agent.clientListSearch.details.2.summary               =  Filing only service
 agent.clientListSearch.details.2.p1                    =  You can send CIS monthly returns on behalf of a client without completing an authorisation online or form 64-8.
 agent.clientListSearch.details.2.p2                    =  This service is only available using commercial software.
 agent.clientListSearch.details.2.link                  =  Find commercial software for CIS returns (opens in new tab)
+agent.clientListSearch.td.actions.remove.hidden        =  Remove {0}
+agent.clientListSearch.td.clientName.hidden            =  Select {0}
 
 agent.landing.title                                    =  Manage Construction Industry Scheme account
 agent.landing.h1                                       =  Manage Construction Industry Scheme account
