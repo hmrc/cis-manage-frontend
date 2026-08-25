@@ -1,28 +1,11 @@
 # Infrastructure
-service.name                              =  Cynllun y Diwydiant Adeiladu
+service.name   =  Cynllun y Diwydiant Adeiladu
 
-site.back                                 =  Yn ôl
-site.no                                   =  Na
-site.yes                                  =  Iawn
-site.continue                             =  Parhau
-site.govuk                                =  GOV.UK
-
-# Delete
-delete.deleteMonthlyReturn.title           =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ar gyfer {0}?
-delete.deleteMonthlyReturn.heading         =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ar gyfer {0}?
-delete.deleteMonthlyReturn.error.required  =  Dewiswch ‘Iawn’ i ddileu’r datganiad hwn
-
-delete.deleteNilMonthlyReturn.title        =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ‘dim’ ar gyfer {0}?
-delete.deleteNilMonthlyReturn.heading      =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ‘dim’ ar gyfer {0}?
-delete.deleteNilMonthlyReturn.error.required         =  Dewiswch ‘Iawn’ i ddileu’r datganiad misol ‘dim’ hwn
-
-delete.deleteAmendedMonthlyReturn.title    =  A ydych yn siŵr eich bod am ddileu’r datganiad misol diwygiedig ar gyfer {0}?
-delete.deleteAmendedMonthlyReturn.heading  =  A ydych yn siŵr eich bod am ddileu’r datganiad misol diwygiedig ar gyfer {0}?
-delete.deleteAmendedMonthlyReturn.error.required     =  Dewiswch ‘Iawn’ i ddileu’r datganiad misol diwygiedig hwn
-
-delete.deleteAmendedNilMonthlyReturn.title           =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ‘dim’ diwygiedig ar gyfer {0}?
-delete.deleteAmendedNilMonthlyReturn.heading         =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ‘dim’ diwygiedig ar gyfer {0}?
-delete.deleteAmendedNilMonthlyReturn.error.required  =  Dewiswch ‘Iawn’ i ddileu’r datganiad misol ‘dim’ diwygiedig hwn
+site.back      =  Yn ôl
+site.no        =  Na
+site.yes       =  Iawn
+site.continue  =  Parhau
+site.govuk     =  GOV.UK
 
 # History
 history.submittedReturnsChooseTaxYear.title                                  =  Pa flwyddyn dreth ydych am fwrw golwg drosti?
@@ -64,3 +47,20 @@ history.returnHistory.backLink                                               =  
 history.returnHistory.status.awaitingConfirmation                            =  Yn aros am gadarnhad
 history.returnHistory.status.amend                                           =  Diwygio
 history.returnHistory.status.notAvailable                                    =  Ddim ar gael
+
+# Delete
+delete.deleteMonthlyReturn.title                     =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ar gyfer {0}?
+delete.deleteMonthlyReturn.heading                   =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ar gyfer {0}?
+delete.deleteMonthlyReturn.error.required            =  Dewiswch ‘Iawn’ i ddileu’r datganiad hwn
+
+delete.deleteNilMonthlyReturn.title                  =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ‘dim’ ar gyfer {0}?
+delete.deleteNilMonthlyReturn.heading                =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ‘dim’ ar gyfer {0}?
+delete.deleteNilMonthlyReturn.error.required         =  Dewiswch ‘Iawn’ i ddileu’r datganiad misol ‘dim’ hwn
+
+delete.deleteAmendedMonthlyReturn.title              =  A ydych yn siŵr eich bod am ddileu’r datganiad misol diwygiedig ar gyfer {0}?
+delete.deleteAmendedMonthlyReturn.heading            =  A ydych yn siŵr eich bod am ddileu’r datganiad misol diwygiedig ar gyfer {0}?
+delete.deleteAmendedMonthlyReturn.error.required     =  Dewiswch ‘Iawn’ i ddileu’r datganiad misol diwygiedig hwn
+
+delete.deleteAmendedNilMonthlyReturn.title           =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ‘dim’ diwygiedig ar gyfer {0}?
+delete.deleteAmendedNilMonthlyReturn.heading         =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ‘dim’ diwygiedig ar gyfer {0}?
+delete.deleteAmendedNilMonthlyReturn.error.required  =  Dewiswch ‘Iawn’ i ddileu’r datganiad misol ‘dim’ diwygiedig hwn
