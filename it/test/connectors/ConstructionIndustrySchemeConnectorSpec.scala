@@ -213,7 +213,7 @@ class ConstructionIndustrySchemeConnectorSpec
 
     "return a list of CisTaxpayerSearchResult with count 1 when BE returns 200 with valid JSON" in {
       stubFor(
-        get(urlPathEqualTo(s"/cis/agent/client-empRef/:$empRef"))
+        get(urlPathEqualTo(s"/cis/agent/client-empRef/$empRef"))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -243,8 +243,9 @@ class ConstructionIndustrySchemeConnectorSpec
     }
 
     "return an empty list when BE returns 200 with empty clientsByEmpRef array" in {
+      val empReference = ""
       stubFor(
-        get(urlPathEqualTo(s"/cis/agent/client-empRef/:$empRef"))
+        get(urlPathEqualTo(s"/cis/agent/client-empRef/$empReference"))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -252,15 +253,14 @@ class ConstructionIndustrySchemeConnectorSpec
           )
       )
 
-      val ex = intercept[Exception] {
-        connector.getClientsByEmployersReference(empRef).futureValue
-      }
-      ex.getMessage must include("Expected exactly 1 client but found")
+      val result = connector.getClientsByEmployersReference(empReference).futureValue
+      result mustBe empty
     }
 
     "fail when BE returns 200 with invalid JSON structure" in {
+      val empReference = ""
       stubFor(
-        get(urlPathEqualTo(s"/cis/agent/client-empRef/:$empRef"))
+        get(urlPathEqualTo(s"/cis/agent/client-empRef/$empReference"))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -269,14 +269,14 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val ex = intercept[Exception] {
-        connector.getClientsByEmployersReference(empRef).futureValue
+        connector.getClientsByEmployersReference(empReference).futureValue
       }
       ex.getMessage must (include("clients") or include("NoSuchElementException"))
     }
 
     "fail when BE returns 200 with invalid client JSON" in {
       stubFor(
-        get(urlPathEqualTo(s"/cis/agent/client-empRef/:$empRef"))
+        get(urlPathEqualTo(s"/cis/agent/client-empRef/$empRef"))
           .willReturn(
             aResponse()
               .withStatus(OK)
