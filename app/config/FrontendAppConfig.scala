@@ -74,6 +74,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("features.welsh-translation")
 
+  lazy val contactHMRCUrl: String                      = configuration.get[String]("urls.contactHMRC")
+  lazy val signIntoCISURL: String                      = configuration.get[String]("urls.signIntoCIS")
+  lazy val constructionIndustryAgentAccountUrl: String =
+    configuration.get[String]("urls.constructionIndustryAgentAccount")
+  lazy val constructionIndustryOrgAccountUrl: String   = configuration.get[String]("urls.constructionIndustryOrgAccount")
+
   def languageMap: Map[String, Lang] = Map(
     "en" -> Lang("en"),
     "cy" -> Lang("cy")
@@ -140,11 +146,17 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   def authoriseClientRequestUrl(agentCode: String): String =
     s"$portalAccountBaseUrl${authoriseClientRequestPath.replace("{agentCode}", agentCode)}"
 
+  private val cisContractorFrontendBaseUrl: String  =
+    configuration.get[String]("microservice.services.cis-contractor-frontend.baseUrl")
   lazy val cisTypeOfSubcontractorUrl: String        =
-    configuration.get[String]("urls.cis-contractor-frontend")
+    s"$cisContractorFrontendBaseUrl${configuration.get[String]("urls.addSubcontractor")}"
   lazy val cisVerifySubcontractorUrl: String        =
-    configuration.get[String]("urls.cis-contractor-frontend") + "/verify/newest"
+    s"$cisContractorFrontendBaseUrl${configuration.get[String]("urls.cisVerifySubcontractor")}"
+  lazy val cisCheckVerificationResultsUrl: String   =
+    s"$cisContractorFrontendBaseUrl${configuration.get[String]("urls.cisCheckVerificationResults")}"
   lazy val contractorDetailsIntroductionUrl: String =
-    configuration.get[String]("urls.contractorDetailsIntroduction")
+    s"$cisContractorFrontendBaseUrl${configuration.get[String]("urls.contractorDetailsIntroduction")}"
+  lazy val contractorDetailsManagementUrl: String   =
+    s"$cisContractorFrontendBaseUrl${configuration.get[String]("urls.contractorDetailsManagement")}"
 
 }
