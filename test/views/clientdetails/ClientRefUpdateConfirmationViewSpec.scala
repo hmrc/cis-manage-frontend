@@ -30,23 +30,23 @@ class ClientRefUpdateConfirmationViewSpec extends SpecBase {
   "ClientRefUpdateConfirmationView" - {
 
     "must render the page with panel, next steps heading and dashboard link" in new Setup {
-      val html: HtmlFormat.Appendable = view("ABC123", "XYZ456")
+      val html: HtmlFormat.Appendable = view()
       val doc: Document               = Jsoup.parse(html.body)
 
-      doc.title()             must include(messages("clientdetails.clientRefUpdateConfirmation.title"))
+      doc.title()                      must include(messages("clientdetails.clientRefUpdateConfirmation.title"))
       doc.select(".govuk-panel__title").text() mustBe messages("clientdetails.clientRefUpdateConfirmation.heading")
-      doc.select("p").text()  must include("You changed this client reference from ABC123 to XYZ456.")
-      doc.select("h2").text() must include(messages("clientdetails.clientRefUpdateConfirmation.h2"))
-      doc.select("p").text()  must include(messages("clientdetails.clientRefUpdateConfirmation.p2"))
+      doc.select("p").text()           must include(messages("clientdetails.clientRefUpdateConfirmation.p1"))
+      doc.select("h2").text()          must include(messages("clientdetails.clientRefUpdateConfirmation.h2"))
+      doc.select("p").text()           must include(messages("clientdetails.clientRefUpdateConfirmation.p2"))
+      doc.select(".govuk-link").text() must include(messages("clientdetails.clientRefUpdateConfirmation.p2.link"))
+      doc.select("p").text()           must include(messages("clientdetails.clientRefUpdateConfirmation.p3"))
 
-      val dashboardHref = controllers.agent.routes.ClientListSearchController.onPageLoad().url
-      val dashboardLink = doc.select(s"a.govuk-link[href='$dashboardHref']")
-      dashboardLink.text() mustBe messages("clientdetails.clientRefUpdateConfirmation.p2.link")
-      dashboardLink.attr("href") mustBe dashboardHref
+      doc.select(".govuk-link").text must include(messages("clientdetails.clientRefUpdateConfirmation.survey.link"))
+      doc.select("p").text           must include(messages("clientdetails.clientRefUpdateConfirmation.survey.suffix"))
     }
 
     "must not show a back link" in new Setup {
-      val html: HtmlFormat.Appendable = view("ABC123", "XYZ456")
+      val html: HtmlFormat.Appendable = view()
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.select(".govuk-back-link").size() mustBe 0
