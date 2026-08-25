@@ -276,7 +276,7 @@ class SubmittedReturnsService @Inject() (
         link = LinkViewModel(
           url =
             s"/construction-industry-scheme/management/monthly-return/confirmation-history?taxYear=$taxYear&taxMonth=$taxMonth&amendment=N",
-          hiddenText = s"submission receipt for $periodEndText"
+          hiddenText = periodEndText
         ),
         textKey = "site.view",
         hiddenTextKey = "history.returnHistory.hidden.submissionReceipt"
