@@ -42,7 +42,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
   private val instanceId = "1"
 
-  private val amendUrl = "/construction-industry-scheme/management/history/amend/2023/3"
+  private val amendUrl = "/history/amend/2023/3"
 
   private val baseScheme = SubmittedSchemeData(
     name = "Test Scheme",

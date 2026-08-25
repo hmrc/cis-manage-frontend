@@ -48,6 +48,8 @@ trait SpecBase
     with GuiceOneAppPerSuite
     with IntegrationPatience {
 
+  override def fakeApplication(): Application = applicationBuilder().build()
+
   implicit lazy val applicationConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
 
   val userAnswersId: String    = "id"
