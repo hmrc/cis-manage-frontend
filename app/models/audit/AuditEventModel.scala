@@ -36,3 +36,17 @@ case class AuthFailureAuditEventModel() extends AuditEventModel {
 object AuthFailureAuditEventModel {
   implicit val formats: Format[AuthFailureAuditEventModel] = Json.format[AuthFailureAuditEventModel]
 }
+
+case class ClientDetailsRetrievedAuditEventModel(
+  agentReference: String,
+  taxOfficeNumber: String,
+  taxOfficeReference: String
+) extends AuditEventModel {
+  override val auditType: String   = "clientDetailsRetrieved"
+  override val detailJson: JsValue = Json.toJson(this)(ClientDetailsRetrievedAuditEventModel.formats)
+}
+
+object ClientDetailsRetrievedAuditEventModel {
+  implicit val formats: Format[ClientDetailsRetrievedAuditEventModel] =
+    Json.format[ClientDetailsRetrievedAuditEventModel]
+}

@@ -19,6 +19,7 @@ package controllers.agent
 import config.FrontendAppConfig
 import controllers.actions.*
 import models.Target.*
+import models.audit.ClientDetailsRetrievedAuditEventModel
 import models.requests.DataRequest
 import models.{CisTaxpayerSearchResult, Target}
 import navigation.ClientListCheckNavigator
@@ -27,9 +28,10 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.*
 import repositories.SessionRepository
-import services.{ManageService, PrepopService}
+import services.{AuditService, ManageService, PrepopService}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.agent.AgentLandingView
 
 import javax.inject.{Inject, Named}
@@ -46,6 +48,7 @@ class AgentLandingController @Inject() (
   clientListCheckNavigator: ClientListCheckNavigator,
   manageService: ManageService,
   prepopService: PrepopService,
+  auditService: AuditService,
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: AgentLandingView
@@ -60,20 +63,16 @@ class AgentLandingController @Inject() (
       andThen getData
       andThen requireData
       andThen hasClientGuard.forInstanceId(uniqueId)).async { implicit request =>
-      (for {
-        updatedUserAnswers <- Future.fromTry(request.userAnswers.set(CisIdPage, uniqueId))
-        _                  <- sessionRepository.set(updatedUserAnswers)
-        viewModel          <- manageService.getAgentLandingData(uniqueId, updatedUserAnswers, request.userId)
-      } yield Ok(
-        view(
-          uniqueId = uniqueId,
-          agentName = request.itmpName,
-          schemeName = viewModel.schemeName,
-          employerRef = viewModel.employerRef
-        )
-      )).recover { case e =>
-        logger.error(s"[AgentLandingController][onPageLoad] Failed for uniqueId=$uniqueId", e)
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+
+      given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
+      AgentClientsPage.findClient(request.userAnswers, uniqueId) match {
+        case Some(client) =>
+          loadLandingPage(uniqueId, client)
+
+        case None =>
+          logger.error(s"[AgentLandingController] Client not found in userAnswers for uniqueId=$uniqueId")
+          Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
       }
     }
 
@@ -91,6 +90,58 @@ class AgentLandingController @Inject() (
         case Right((target, client)) =>
           handleTargetClick(uniqueId, targetKey, target, client, systemErrorRedirect)
       }
+    }
+
+  private def loadLandingPage(
+    uniqueId: String,
+    client: CisTaxpayerSearchResult
+  )(using request: DataRequest[?], hc: HeaderCarrier): Future[Result] =
+    (for {
+      _                  <- auditClientDetailsRetrieved(client, uniqueId)
+      updatedUserAnswers <- Future.fromTry(request.userAnswers.set(CisIdPage, uniqueId))
+      _                  <- sessionRepository.set(updatedUserAnswers)
+      viewModel          <- manageService.getAgentLandingData(uniqueId, updatedUserAnswers, request.userId)
+    } yield Ok(
+      view(
+        uniqueId = uniqueId,
+        agentName = request.itmpName,
+        schemeName = viewModel.schemeName,
+        employerRef = viewModel.employerRef
+      )
+    )).recover { case NonFatal(ex) =>
+      logger.error(s"[AgentLandingController] unexpected error for uniqueId=$uniqueId", ex)
+      Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
+
+  private def auditClientDetailsRetrieved(
+    client: CisTaxpayerSearchResult,
+    uniqueId: String
+  )(using request: DataRequest[?], hc: HeaderCarrier): Future[Unit] =
+    request.agentReference match {
+
+      case Some(agentRef) =>
+        val auditEvent = ClientDetailsRetrievedAuditEventModel(
+          agentReference = agentRef,
+          taxOfficeNumber = client.taxOfficeNumber,
+          taxOfficeReference = client.taxOfficeRef
+        )
+        auditService
+          .sendEvent(auditEvent)
+          .map(_ => ())
+          .recover { case NonFatal(ex) =>
+            logger.error(
+              s"[AgentLandingController] failed to send ClientDetailsRetrieved audit for uniqueId=$uniqueId",
+              ex
+            )
+            ()
+          }
+
+      case None =>
+        Future.failed(
+          new IllegalStateException(
+            s"[AgentLandingController] Missing agent reference in request for uniqueId=$uniqueId"
+          )
+        )
     }
 
   private def resolveInputs(

@@ -23,7 +23,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status.SEE_OTHER
 import play.api.mvc.AnyContent
 import repositories.SessionRepository
-import services.ConstructionIndustrySchemeService
+import services.{AuditService, ConstructionIndustrySchemeService}
 import scala.concurrent.ExecutionContext
 
 class HasClientGuardSpec extends SpecBase with MockitoSugar {
@@ -32,21 +32,12 @@ class HasClientGuardSpec extends SpecBase with MockitoSugar {
 
   private val cisService        = mock[ConstructionIndustrySchemeService]
   private val sessionRepository = mock[SessionRepository]
+  private val auditService      = mock[AuditService]
 
   private val guard =
-    new HasClientGuard(cisService, sessionRepository)
+    new HasClientGuard(cisService, sessionRepository, auditService)
 
   "HasClientGuard.checkCurrentClient" - {
-
-    "must allow the request when the user is not an agent" in {
-      val request = mock[DataRequest[AnyContent]]
-
-      when(request.isAgent).thenReturn(false)
-
-      guard.checkCurrentClient(request).futureValue mustBe None
-
-      verifyNoInteractions(cisService)
-    }
 
     "must redirect to the system error page when CisId is missing" in {
       val request = mock[DataRequest[AnyContent]]

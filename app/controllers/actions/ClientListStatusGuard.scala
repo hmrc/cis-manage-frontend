@@ -16,6 +16,7 @@
 
 package controllers.actions
 
+import controllers.actions.ClientListCheckRedirects.{agentLostAccess, systemError}
 import models.agent.ClientListStatus
 import models.requests.IdentifierRequest
 import play.api.Logging
@@ -40,7 +41,7 @@ class ClientListStatusGuard @Inject() (
       case ClientListStatus.Succeeded                                                                =>
         None
       case ClientListStatus.InProgress | ClientListStatus.Failed | ClientListStatus.InitiateDownload =>
-        Some(Redirect(controllers.agent.routes.AgentLostAccessController.onPageLoad()))
+        Some(agentLostAccess)
     }
 
   def groupB(securityCheckCall: Call): ActionFilter[IdentifierRequest] =
@@ -62,18 +63,12 @@ class ClientListStatusGuard @Inject() (
   private def check[A](
     request: IdentifierRequest[A]
   )(handleStatus: ClientListStatus => Option[Result]): Future[Option[Result]] =
-    if !request.isAgent then Future.successful(None)
-    else {
-      given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-      cisService.startClientListRetrieval
-        .map(handleStatus)
-        .recover { case NonFatal(e) =>
-          logger.error("[ClientListStatusGuard] client list check failed", e)
-          Some(systemError)
-        }
-    }
-
-  private def systemError: Result =
-    Redirect(controllers.routes.SystemErrorController.onPageLoad())
+    cisService.startClientListRetrieval
+      .map(handleStatus)
+      .recover { case NonFatal(e) =>
+        logger.error("[ClientListStatusGuard] client list check failed", e)
+        Some(systemError)
+      }
 }

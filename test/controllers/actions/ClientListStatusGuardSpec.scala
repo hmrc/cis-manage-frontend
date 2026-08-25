@@ -53,10 +53,6 @@ class ClientListStatusGuardSpec extends SpecBase with MockitoSugar {
 
   "ClientListStatusGuard" - {
 
-    "must bypass the check for a non-agent" in {
-      guard.checkGroupA(request(isAgent = false)).futureValue mustBe None
-    }
-
     "must continue for GroupA when retrieval succeeds" in {
       when(
         cisService.startClientListRetrieval(using any[HeaderCarrier])

@@ -16,13 +16,14 @@
 
 package controllers.actions
 
+import controllers.actions.ClientListCheckRedirects.systemError
 import models.UserAnswers
+import models.audit.AuthFailureAuditEventModel
 import models.requests.{DataRequest, IdentifierRequest}
 import pages.{AgentClientsPage, CisIdPage}
 import play.api.Logging
-import play.api.mvc.Results.Redirect
-import play.api.mvc.{ActionFilter, Result}
-import services.ConstructionIndustrySchemeService
+import play.api.mvc.{ActionFilter, Request, Result}
+import services.{AuditService, ConstructionIndustrySchemeService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import repositories.SessionRepository
@@ -34,43 +35,43 @@ import scala.util.control.NonFatal
 @Singleton
 class HasClientGuard @Inject() (
   cisService: ConstructionIndustrySchemeService,
-  sessionRepository: SessionRepository
+  sessionRepository: SessionRepository,
+  auditService: AuditService
 )(using ec: ExecutionContext)
     extends Logging {
 
   private[actions] def check[A](request: IdentifierRequest[A]): Future[Option[Result]] =
-    if !request.isAgent then Future.successful(None)
-    else
-      given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    given Request[?]    = request
 
-      sessionRepository
-        .get(request.userId)
-        .flatMap {
-          case None =>
-            logger.warn(s"[HasClientGuard] UserAnswers missing")
-            Future.successful(Some(systemError))
+    sessionRepository
+      .get(request.userId)
+      .flatMap {
+        case None =>
+          logger.warn(s"[HasClientGuard] UserAnswers missing")
+          Future.successful(Some(systemError))
 
-          case Some(userAnswers) =>
-            userAnswers.get(CisIdPage) match {
-              case None =>
-                logger.warn(s"[HasClientGuard] CisId missing in UserAnswers")
-                Future.successful(Some(systemError))
+        case Some(userAnswers) =>
+          userAnswers.get(CisIdPage) match {
+            case None =>
+              logger.warn(s"[HasClientGuard] CisId missing in UserAnswers")
+              Future.successful(Some(systemError))
 
-              case Some(instanceId) =>
-                AgentClientsPage.findClient(userAnswers, instanceId) match {
-                  case None =>
-                    logger.warn(s"[HasClientGuard] client not found for instanceId: $instanceId")
-                    Future.successful(Some(systemError))
+            case Some(instanceId) =>
+              AgentClientsPage.findClient(userAnswers, instanceId) match {
+                case None =>
+                  logger.warn(s"[HasClientGuard] client not found for instanceId: $instanceId")
+                  Future.successful(Some(systemError))
 
-                  case Some(client) =>
-                    checkClient(client.taxOfficeNumber, client.taxOfficeRef, instanceId)
-                }
-            }
-        }
-        .recover { case NonFatal(ex) =>
-          logger.error(s"[HasClientGuard] hasClient check failed", ex)
-          Some(systemError)
-        }
+                case Some(client) =>
+                  checkClient(client.taxOfficeNumber, client.taxOfficeRef, instanceId)
+              }
+          }
+      }
+      .recover { case NonFatal(ex) =>
+        logger.error(s"[HasClientGuard] hasClient check failed", ex)
+        Some(systemError)
+      }
 
   def forInstanceId(instanceId: String): ActionFilter[DataRequest] =
     new ActionFilter[DataRequest] {
@@ -93,6 +94,7 @@ class HasClientGuard @Inject() (
     if !request.isAgent then Future.successful(None)
     else {
       given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+      given Request[?]    = request
 
       AgentClientsPage.findClient(request.userAnswers, instanceId) match {
 
@@ -106,39 +108,41 @@ class HasClientGuard @Inject() (
     }
 
   private[actions] def checkCurrentClient[A](request: DataRequest[A]): Future[Option[Result]] =
-    if !request.isAgent then Future.successful(None)
-    else
-      request.userAnswers.get(CisIdPage) match {
-        case Some(instanceId) =>
-          checkForInstanceId(request, instanceId)
-        case None             =>
-          logger.warn(s"[HasClientGuard] CisId missing in UserAnswers")
-          Future.successful(Some(systemError))
-      }
+    request.userAnswers.get(CisIdPage) match {
+      case Some(instanceId) =>
+        checkForInstanceId(request, instanceId)
+      case None             =>
+        logger.warn(s"[HasClientGuard] CisId missing in UserAnswers")
+        Future.successful(Some(systemError))
+    }
 
   private def checkClient(
     taxOfficeNumber: String,
     taxOfficeReference: String,
     instanceId: String
-  )(using HeaderCarrier): Future[Option[Result]] =
+  )(using HeaderCarrier, Request[?]): Future[Option[Result]] =
     if taxOfficeNumber.isEmpty || taxOfficeReference.isEmpty then
       logger.warn(s"[HasClientGuard] Tax office number/reference is empty for instanceId: $instanceId")
       Future.successful(Some(systemError))
     else
       cisService
         .hasClient(taxOfficeNumber, taxOfficeReference)
-        .map {
-          case true  =>
-            None
+        .flatMap {
+          case true =>
+            Future.successful(None)
+
           case false =>
             logger.warn(s"[HasClientGuard] Agent no longer authorised for instanceId: $instanceId")
-            Some(systemError)
+            auditService
+              .sendEvent(AuthFailureAuditEventModel())
+              .map(_ => Some(systemError))
+              .recover { case NonFatal(ex) =>
+                logger.error(s"[HasClientGuard] failed to send authoriseServiceGuardFailure audit", ex)
+                Some(systemError)
+              }
         }
         .recover { case NonFatal(ex) =>
           logger.error(s"[HasClientGuard] hasClient check failed for instanceId: $instanceId", ex)
           Some(systemError)
         }
-
-  private def systemError: Result =
-    Redirect(controllers.routes.SystemErrorController.onPageLoad())
 }
