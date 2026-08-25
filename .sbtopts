@@ -1,1 +1,5 @@
 -Dsbt.supershell=false
+-J-Xms512m
+-J-Xmx4g
+-J-XX:MaxMetaspaceSize=1g
+-J-Xss8m
