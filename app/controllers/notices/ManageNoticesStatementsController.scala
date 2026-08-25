@@ -33,6 +33,7 @@ class ManageNoticesStatementsController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  hasClientGuard: HasClientGuard,
   val controllerComponents: MessagesControllerComponents,
   view: ManageNoticesStatementsView
 )(implicit appConfig: FrontendAppConfig)
@@ -40,57 +41,58 @@ class ManageNoticesStatementsController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(instanceId: String): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      implicit val messages: Messages = messagesApi.preferred(request)
+  def onPageLoad(instanceId: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen hasClientGuard.forInstanceId(instanceId)) {
+      implicit request =>
+        implicit val messages: Messages = messagesApi.preferred(request)
 
-      val contractorNameOpt: Option[String] =
-        if (request.isAgent) {
-          for {
-            clients <- request.userAnswers.get(AgentClientsPage)
-            client  <- clients.find(_.uniqueId == instanceId)
-            name    <- client.schemeName
-          } yield name
-        } else {
-          request.userAnswers.get(ContractorNamePage)
-        }
+        val contractorNameOpt: Option[String] =
+          if (request.isAgent) {
+            for {
+              clients <- request.userAnswers.get(AgentClientsPage)
+              client  <- clients.find(_.uniqueId == instanceId)
+              name    <- client.schemeName
+            } yield name
+          } else {
+            request.userAnswers.get(ContractorNamePage)
+          }
 
-      val notices = Seq(
-        ManageNoticesStatementsRowViewModel(
-          date = "15 October 2025",
-          noticeType = messages("manageNoticesStatements.noticeType.penaltyWarnings"),
-          description = messages("manageNoticesStatements.description.penaltyWarning", "5 October 2025"),
-          status = messages("manageNoticesStatements.status.unread"),
-          statusColour = "govuk-tag--red",
-          actionUrl = appConfig.noticesAndStatementsUrl
-        ),
-        ManageNoticesStatementsRowViewModel(
-          date = "20 September 2025",
-          noticeType = messages("manageNoticesStatements.noticeType.confirmationStatements"),
-          description = messages("manageNoticesStatements.description.confirmation", "August 2025"),
-          status = messages("manageNoticesStatements.status.read"),
-          statusColour = "govuk-tag--blue",
-          actionUrl = appConfig.noticesAndStatementsUrl
-        ),
-        ManageNoticesStatementsRowViewModel(
-          date = "20 August 2025",
-          noticeType = messages("manageNoticesStatements.noticeType.confirmationStatements"),
-          description = messages("manageNoticesStatements.description.confirmation", "July 2025"),
-          status = messages("manageNoticesStatements.status.read"),
-          statusColour = "govuk-tag--blue",
-          actionUrl = appConfig.noticesAndStatementsUrl
+        val notices = Seq(
+          ManageNoticesStatementsRowViewModel(
+            date = "15 October 2025",
+            noticeType = messages("manageNoticesStatements.noticeType.penaltyWarnings"),
+            description = messages("manageNoticesStatements.description.penaltyWarning", "5 October 2025"),
+            status = messages("manageNoticesStatements.status.unread"),
+            statusColour = "govuk-tag--red",
+            actionUrl = appConfig.noticesAndStatementsUrl
+          ),
+          ManageNoticesStatementsRowViewModel(
+            date = "20 September 2025",
+            noticeType = messages("manageNoticesStatements.noticeType.confirmationStatements"),
+            description = messages("manageNoticesStatements.description.confirmation", "August 2025"),
+            status = messages("manageNoticesStatements.status.read"),
+            statusColour = "govuk-tag--blue",
+            actionUrl = appConfig.noticesAndStatementsUrl
+          ),
+          ManageNoticesStatementsRowViewModel(
+            date = "20 August 2025",
+            noticeType = messages("manageNoticesStatements.noticeType.confirmationStatements"),
+            description = messages("manageNoticesStatements.description.confirmation", "July 2025"),
+            status = messages("manageNoticesStatements.status.read"),
+            statusColour = "govuk-tag--blue",
+            actionUrl = appConfig.noticesAndStatementsUrl
+          )
         )
-      )
 
-      val pageViewModel = ManageNoticesStatementsPageViewModel(notices)
+        val pageViewModel = ManageNoticesStatementsPageViewModel(notices)
 
-      contractorNameOpt match {
-        case Some(contractorName) =>
-          Ok(view(contractorName, instanceId, pageViewModel))
+        contractorNameOpt match {
+          case Some(contractorName) =>
+            Ok(view(contractorName, instanceId, pageViewModel))
 
-        case None =>
-          logger.warn(s"[ManageNoticesStatementsController] contractorName missing (isAgent=${request.isAgent})")
-          Redirect(controllers.routes.SystemErrorController.onPageLoad())
-      }
-  }
+          case None =>
+            logger.warn(s"[ManageNoticesStatementsController] contractorName missing (isAgent=${request.isAgent})")
+            Redirect(controllers.routes.SystemErrorController.onPageLoad())
+        }
+    }
 }

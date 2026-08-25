@@ -17,24 +17,28 @@
 package controllers.clientdetails
 
 import base.SpecBase
+import controllers.actions.{ClientListStatusGuard, HasClientGuard}
 import controllers.routes
 import forms.clientdetails.RemoveClientYesNoFormProvider
 import models.{NormalMode, UserAnswers}
+import models.requests.{DataRequest, IdentifierRequest}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.clientdetails.RemoveClientYesNoPage
 import play.api.inject.bind
-import play.api.mvc.Call
+import play.api.mvc.{ActionFilter, Call, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.clientdetails.RemoveClientYesNoView
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
+  implicit val ec: ExecutionContext = ExecutionContext.global
+
   val clientName  = "clientName"
   def onwardRoute = Call("GET", "/foo")
 
@@ -43,11 +47,45 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val removeClientRoute = controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode).url
 
+  private val clientListStatusGuard = mock[ClientListStatusGuard]
+  private val hasClientGuard        = mock[HasClientGuard]
+
+  private val passThroughIdentifierFilter =
+    new ActionFilter[IdentifierRequest] {
+      override protected def executionContext: ExecutionContext                               = ec
+      override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] =
+        Future.successful(None)
+    }
+
+  private val passThroughDataFilter =
+    new ActionFilter[DataRequest] {
+      override protected def executionContext: ExecutionContext                         = ec
+      override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
+        Future.successful(None)
+    }
+
+  private def mockGuards(): Unit = {
+    when(clientListStatusGuard.groupB(any[Call]))
+      .thenReturn(passThroughIdentifierFilter)
+
+    when(hasClientGuard.currentClient)
+      .thenReturn(passThroughDataFilter)
+  }
+
   "RemoveClient Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      mockGuards()
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          additionalBindings = Seq(
+            bind[ClientListStatusGuard].toInstance(clientListStatusGuard),
+            bind[HasClientGuard].toInstance(hasClientGuard)
+          )
+        ).build()
 
       running(application) {
         val request = FakeRequest(GET, removeClientRoute)
@@ -65,7 +103,16 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(userAnswersId).set(RemoveClientYesNoPage, true).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      mockGuards()
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers),
+          additionalBindings = Seq(
+            bind[ClientListStatusGuard].toInstance(clientListStatusGuard),
+            bind[HasClientGuard].toInstance(hasClientGuard)
+          )
+        ).build()
 
       running(application) {
         val request = FakeRequest(GET, removeClientRoute)
@@ -133,7 +180,16 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      mockGuards()
+
+      val application =
+        applicationBuilder(
+          userAnswers = None,
+          additionalBindings = Seq(
+            bind[ClientListStatusGuard].toInstance(clientListStatusGuard),
+            bind[HasClientGuard].toInstance(hasClientGuard)
+          )
+        ).build()
 
       running(application) {
         val request = FakeRequest(GET, removeClientRoute)

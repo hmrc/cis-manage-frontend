@@ -17,17 +17,57 @@
 package controllers.clientdetails
 
 import base.SpecBase
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import views.html.clientdetails.ManageClientDetailsView
+import controllers.actions.{ClientListStatusGuard, HasClientGuard}
+import models.requests.{DataRequest, IdentifierRequest}
+import play.api.mvc.{ActionFilter, Result}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import play.api.inject.bind
+import scala.concurrent.{ExecutionContext, Future}
 
-class ManageClientDetailsControllerSpec extends SpecBase {
+class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
+
+  implicit val ec: ExecutionContext = ExecutionContext.global
+
+  private val clientListStatusGuard = mock[ClientListStatusGuard]
+  private val hasClientGuard        = mock[HasClientGuard]
+
+  private val passThroughIdentifierFilter =
+    new ActionFilter[IdentifierRequest] {
+      override protected def executionContext: ExecutionContext                               = ec
+      override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] =
+        Future.successful(None)
+    }
+
+  private val passThroughDataFilter =
+    new ActionFilter[DataRequest] {
+      override protected def executionContext: ExecutionContext                         = ec
+      override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
+        Future.successful(None)
+    }
 
   "ManageClientDetails Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      when(clientListStatusGuard.groupB(any()))
+        .thenReturn(passThroughIdentifierFilter)
+
+      when(hasClientGuard.currentClient)
+        .thenReturn(passThroughDataFilter)
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          additionalBindings = Seq(
+            bind[ClientListStatusGuard].toInstance(clientListStatusGuard),
+            bind[HasClientGuard].toInstance(hasClientGuard)
+          )
+        ).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.ManageClientDetailsController.onPageLoad().url)

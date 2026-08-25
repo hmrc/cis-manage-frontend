@@ -38,8 +38,6 @@ import scala.concurrent.Future
 
 class GetSubmittedVerificationsControllerSpec extends SpecBase with MockitoSugar {
 
-  private val cisId = "1"
-
   private def verificationRequestData(
     verificationNumber: String,
     dateSubmitted: LocalDate,

@@ -19,7 +19,7 @@ package controllers.clientdetails
 import controllers.actions.*
 import forms.clientdetails.RemoveClientYesNoFormProvider
 import models.Mode
-import navigation.Navigator
+import navigation.{ClientListCheckNavigator, Navigator}
 import pages.clientdetails.RemoveClientYesNoPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -37,6 +37,9 @@ class RemoveClientYesNoController @Inject() (
   @Named("AgentIdentifier") identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  hasClientGuard: HasClientGuard,
+  clientListStatusGuard: ClientListStatusGuard,
+  clientListCheckNavigator: ClientListCheckNavigator,
   formProvider: RemoveClientYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: RemoveClientYesNoView
@@ -47,7 +50,14 @@ class RemoveClientYesNoController @Inject() (
   val form       = formProvider()
   val clientName = "clientName"
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (
+    identify
+      andThen clientListStatusGuard.groupB(clientListCheckNavigator.removeClient(mode))
+      andThen getData
+      andThen requireData
+      andThen hasClientGuard.currentClient
+  ) { implicit request =>
+
     val preparedForm = request.userAnswers.get(RemoveClientYesNoPage) match {
       case None        => form
       case Some(value) => form.fill(value)

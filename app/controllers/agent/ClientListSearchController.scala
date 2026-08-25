@@ -21,6 +21,7 @@ import forms.ClientListSearchFormProvider
 import models.UserAnswers
 import models.agent.ClientListFormData
 import models.requests.DataRequest
+import navigation.ClientListCheckNavigator
 import pages.ClientListSearchPage
 import play.api.Logging
 import play.api.data.Form
@@ -43,6 +44,8 @@ class ClientListSearchController @Inject() (
   @Named("AgentIdentifier") identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  clientListStatusGuard: ClientListStatusGuard,
+  clientListCheckNavigator: ClientListCheckNavigator,
   formProvider: ClientListSearchFormProvider,
   manageService: ManageService,
   paginationService: PaginationService,
@@ -56,7 +59,10 @@ class ClientListSearchController @Inject() (
   val form: Form[ClientListFormData] = formProvider()
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify
+      andThen clientListStatusGuard.groupB(clientListCheckNavigator.fileMonthlyReturns)
+      andThen getData
+      andThen requireData).async { implicit request =>
 
       implicit val hc: HeaderCarrier =
         HeaderCarrierConverter.fromRequestAndSession(request, request.session)

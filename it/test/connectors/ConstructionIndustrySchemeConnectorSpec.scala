@@ -19,7 +19,7 @@ package connectors
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import itutil.ApplicationWithWiremock
 import models.Scheme
-import models.agent.AgentClientData
+import models.agent.{AgentClientData, ClientListStatus}
 import models.history.{SubmittedSchemeData, SubmittedSubmissionData}
 import models.requests.{DeleteSubcontractorRequest, DeleteUnsubmittedMonthlyReturnRequest, GetSubmittedMonthlyReturnsDataRequest}
 import models.response.{GetSubcontractorForDeleteResponse, GetSubmittedMonthlyReturnsDataResponse}
@@ -95,6 +95,43 @@ class ConstructionIndustrySchemeConnectorSpec
         connector.getCisTaxpayer().futureValue
       }
       ex.getMessage must include("returned 500")
+    }
+  }
+
+  "hasClient" should {
+
+    "return HasClientResponse when BE returns 200" in {
+      stubFor(
+        get(urlPathEqualTo("/cis/agent/has-client/163/AB0063"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody("""{ "hasClient": true }""")
+          )
+      )
+
+      val result =
+        connector.hasClient("163", "AB0063").futureValue
+
+      result.hasClient mustBe true
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      stubFor(
+        get(urlPathEqualTo("/cis/agent/has-client/163/AB0063"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody("boom")
+          )
+      )
+
+      val ex =
+        connector.hasClient("163", "AB0063").failed.futureValue
+
+      ex mustBe a[UpstreamErrorResponse]
+      ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe INTERNAL_SERVER_ERROR
     }
   }
 
@@ -217,7 +254,7 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val result = connector.startClientList(using hc).futureValue
-      result.result mustBe "succeeded"
+      result.result mustBe ClientListStatus.Succeeded
     }
 
     "return GetClientListStatusResponse with 'in-progress' when BE returns in-progress" in {
@@ -227,7 +264,7 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val result = connector.startClientList(using hc).futureValue
-      result.result mustBe "in-progress"
+      result.result mustBe ClientListStatus.InProgress
     }
 
     "return GetClientListStatusResponse with 'failed' when BE returns failed" in {
@@ -237,7 +274,7 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val result = connector.startClientList(using hc).futureValue
-      result.result mustBe "failed"
+      result.result mustBe ClientListStatus.Failed
     }
 
     "return GetClientListStatusResponse with 'initiate-download' when BE returns initiate-download" in {
@@ -247,7 +284,7 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val result = connector.startClientList(using hc).futureValue
-      result.result mustBe "initiate-download"
+      result.result mustBe ClientListStatus.InitiateDownload
     }
 
     "propagate an upstream error when BE returns 500" in {
@@ -288,7 +325,7 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val result = connector.getClientListStatus(using hc).futureValue
-      result.result mustBe "succeeded"
+      result.result mustBe ClientListStatus.Succeeded
     }
 
     "return GetClientListStatusResponse with 'in-progress' when BE returns 200 with in-progress status" in {
@@ -302,7 +339,7 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val result = connector.getClientListStatus(using hc).futureValue
-      result.result mustBe "in-progress"
+      result.result mustBe ClientListStatus.InProgress
     }
 
     "return GetClientListStatusResponse with 'failed' when BE returns 200 with failed status" in {
@@ -316,7 +353,7 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val result = connector.getClientListStatus(using hc).futureValue
-      result.result mustBe "failed"
+      result.result mustBe ClientListStatus.Failed
     }
 
     "return GetClientListStatusResponse with 'initiate-download' when BE returns 200 with initiate-download status" in {
@@ -330,7 +367,7 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val result = connector.getClientListStatus(using hc).futureValue
-      result.result mustBe "initiate-download"
+      result.result mustBe ClientListStatus.InitiateDownload
     }
 
     "propagate an upstream error when BE returns 500" in {
