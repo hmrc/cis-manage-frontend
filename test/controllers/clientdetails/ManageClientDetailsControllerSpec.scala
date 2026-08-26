@@ -40,9 +40,9 @@ class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
       uniqueId = "123",
       taxOfficeNumber = "111",
       taxOfficeRef = "test111",
-      agentOwnRef = Option("TEST LTD"),
-      schemeName = Option("ABCD"),
-      utr = Option("ABCD")
+      agentOwnRef = Some("TEST LTD"),
+      schemeName = Some("ABCD"),
+      utr = Some("ABCD")
     )
   val request    =
     FakeRequest(GET, controllers.clientdetails.routes.ManageClientDetailsController.onPageLoad().url)
@@ -73,16 +73,16 @@ class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[ManageClientDetailsView]
 
         val fakeUniqueId    = "123"
-        val fakeClientName  = Some("ABCD")
+        val fakeClientName  = "ABCD"
         val fakeEmployerRef = "111/test111"
-        val fakeClientRef   = Some("TEST LTD")
+        val fakeClientRef   = "TEST LTD"
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
           fakeUniqueId,
-          fakeClientName.toString,
+          fakeClientName,
           fakeEmployerRef,
-          fakeClientRef.toString
+          fakeClientRef
         )(
           request,
           messages(application)
