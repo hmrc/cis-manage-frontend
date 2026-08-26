@@ -95,9 +95,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val contractorLandingPenaltiesUrl: String = configuration.get[String]("urls.cisCheckPenaltiesUrl")
 
   private lazy val cisFrontendBaseUrl: String                       = configuration.get[String]("cis-frontend.host")
-  private lazy val pasBaseUrl: String                               = configuration.get[Service]("microservice.services.pas").baseUrl
+  private lazy val pasBaseUrl: String                               = configuration.get[String]("microservice.services.pas.baseUrl")
   private lazy val noticeViewerBaseUrl: String                      =
-    configuration.get[Service]("microservice.services.notice-viewer").baseUrl
+    configuration.get[String]("microservice.services.notice-viewer.baseUrl")
   private lazy val portalAccountBaseUrl: String                     = configuration.get[String]("portal-account.host")
   private lazy val fileStandardReturnPath: String                   = configuration.get[String]("urls.fileStandardReturn")
   private lazy val fileNilReturnPath: String                        = configuration.get[String]("urls.fileNilReturn")
