@@ -158,8 +158,8 @@ class VerificationHistoryViewSpec extends SpecBase {
         .select("tbody tr")
         .first()
 
-      row.select("td").size()                                    shouldBe 3
-      row.select(s"""a[href="$submissionReceiptUrl"]""").isEmpty shouldBe true
+      row.select("td").size()                            shouldBe 3
+      row.select(s"""a[href="$submissionReceiptUrl"]""") shouldBe empty
     }
 
     "render the mobile stacked version" in {
@@ -200,7 +200,7 @@ class VerificationHistoryViewSpec extends SpecBase {
         messages(app)("verify.verificationHistory.table.submissionReceipt")
 
       mobile.select(".govuk-summary-list__row").get(2).select(".govuk-summary-list__value").text() shouldBe ""
-      mobile.select(s"""a[href="$submissionReceiptUrl"]""").isEmpty                                shouldBe true
+      mobile.select(s"""a[href="$submissionReceiptUrl"]""")                                        shouldBe empty
     }
 
     "render the back to manage subcontractors link" in {
