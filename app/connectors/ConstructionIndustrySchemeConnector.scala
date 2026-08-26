@@ -273,14 +273,15 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .get(url"$cisBaseUrl/subcontractors/$cisId")
       .execute[GetSubcontractorListResponse]
 
-  def removeClient(taxOfficeNumber: String, taxOfficeReference: String)(implicit hc: HeaderCarrier): Future[Unit] =
+  def removeClient(request: RemoveAgentClientRequest)(implicit hc: HeaderCarrier): Future[Unit] =
     http
-      .get(url"$cisBaseUrl/agent/remove-client/$taxOfficeNumber/$taxOfficeReference")
+      .post(url"$cisBaseUrl/agent/remove-client")
+      .withBody(Json.toJson(request))
       .execute[HttpResponse]
       .flatMap { response =>
         response.status match {
-          case OK     => Future.unit
-          case status => Future.failed(UpstreamErrorResponse(response.body, status, status))
+          case NO_CONTENT => Future.unit
+          case status     => Future.failed(UpstreamErrorResponse(response.body, status, status))
         }
       }
 }

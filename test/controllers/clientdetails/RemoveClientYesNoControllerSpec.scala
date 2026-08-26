@@ -19,11 +19,13 @@ package controllers.clientdetails
 import base.SpecBase
 import controllers.routes
 import forms.clientdetails.RemoveClientYesNoFormProvider
-import models.{NormalMode, UserAnswers}
+import models.agent.ClientListFormData
+import models.{CisTaxpayerSearchResult, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import pages.ClientListSearchPage
 import pages.clientdetails.RemoveClientYesNoPage
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -89,9 +91,33 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
       val mockSessionRepository = mock[SessionRepository]
       val mockManageService     = mock[ManageService]
 
+      val cisClients: List[CisTaxpayerSearchResult] = List(
+        CisTaxpayerSearchResult(
+          uniqueId = "UID-001",
+          taxOfficeNumber = "123",
+          taxOfficeRef = "AB45678",
+          agentOwnRef = Some("ABC-001"),
+          schemeName = Some("ABC Construction Ltd"),
+          utr = Some("1234567890")
+        ),
+        CisTaxpayerSearchResult(
+          uniqueId = "UID-002",
+          taxOfficeNumber = "789",
+          taxOfficeRef = "EF23456",
+          agentOwnRef = Some("ABC-002"),
+          schemeName = Some("ABC Property Services"),
+          utr = Some("1234567890")
+        )
+      )
+
+      val uaWithClients =
+        emptyUserAnswers.set(ClientListSearchPage, ClientListFormData("CN", "ABC")).success.value
+
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockManageService.removeClient(any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
+      when(mockManageService.resolveAndStoreAgentClients(any[UserAnswers])(using any[HeaderCarrier]))
+        .thenReturn(Future.successful((cisClients, uaWithClients)))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))

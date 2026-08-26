@@ -21,7 +21,7 @@ import itutil.ApplicationWithWiremock
 import models.Scheme
 import models.agent.AgentClientData
 import models.history.{SubmittedSchemeData, SubmittedSubmissionData}
-import models.requests.{DeleteSubcontractorRequest, DeleteUnsubmittedMonthlyReturnRequest, GetSubmittedMonthlyReturnsDataRequest}
+import models.requests.{DeleteSubcontractorRequest, DeleteUnsubmittedMonthlyReturnRequest, GetSubmittedMonthlyReturnsDataRequest, RemoveAgentClientRequest}
 import models.response.{GetSubcontractorForDeleteResponse, GetSubmittedMonthlyReturnsDataResponse}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
@@ -1223,26 +1223,29 @@ class ConstructionIndustrySchemeConnectorSpec
 
   "removeClient" should {
 
-    val taxOfficeNumber = "111"
-    val taxOfficeRef    = "test111"
+    val request = RemoveAgentClientRequest(taxOfficeNumber = "123", taxOfficeReference = "AB456")
 
-    "return Unit when BE returns 200" in {
+    "return Unit when BE returns 204" in {
       stubFor(
-        get(urlPathEqualTo(s"/cis/agent/remove-client/$taxOfficeNumber/$taxOfficeRef"))
-          .willReturn(aResponse().withStatus(OK))
+        post(urlPathEqualTo(s"/cis/agent/remove-client"))
+          .withHeader("Content-Type", containing("application/json"))
+          .withRequestBody(equalToJson(Json.toJson(request).toString(), true, true))
+          .willReturn(aResponse().withStatus(NO_CONTENT))
       )
 
-      connector.removeClient(taxOfficeNumber, taxOfficeRef).futureValue mustBe ((): Unit)
+      connector.removeClient(request).futureValue mustBe ((): Unit)
     }
 
     "propagate an upstream error when BE returns 500" in {
       stubFor(
-        get(urlPathEqualTo(s"/cis/agent/remove-client/$taxOfficeNumber/$taxOfficeRef"))
+        post(urlPathEqualTo(s"/cis/agent/remove-client"))
+          .withHeader("Content-Type", containing("application/json"))
+          .withRequestBody(equalToJson(Json.toJson(request).toString(), true, true))
           .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
       )
 
       val ex = intercept[Exception] {
-        connector.removeClient(taxOfficeNumber, taxOfficeRef).futureValue
+        connector.removeClient(request).futureValue
       }
       ex.getMessage must include("boom")
     }
