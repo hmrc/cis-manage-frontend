@@ -74,6 +74,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("features.welsh-translation")
 
+  lazy val contactHMRCUrl: String                      = configuration.get[String]("urls.contactHMRC")
+  lazy val signIntoCISURL: String                      = configuration.get[String]("urls.signIntoCIS")
+  lazy val constructionIndustryAgentAccountUrl: String =
+    configuration.get[String]("urls.constructionIndustryAgentAccount")
+  lazy val constructionIndustryOrgAccountUrl: String   = configuration.get[String]("urls.constructionIndustryOrgAccount")
+
   def languageMap: Map[String, Lang] = Map(
     "en" -> Lang("en"),
     "cy" -> Lang("cy")
@@ -89,6 +95,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val contractorLandingPenaltiesUrl: String = configuration.get[String]("urls.cisCheckPenaltiesUrl")
 
   private lazy val cisFrontendBaseUrl: String                       = configuration.get[String]("cis-frontend.host")
+  private lazy val pasBaseUrl: String                               = configuration.get[String]("microservice.services.pas.baseUrl")
+  private lazy val noticeViewerBaseUrl: String                      =
+    configuration.get[String]("microservice.services.notice-viewer.baseUrl")
   private lazy val portalAccountBaseUrl: String                     = configuration.get[String]("portal-account.host")
   private lazy val fileStandardReturnPath: String                   = configuration.get[String]("urls.fileStandardReturn")
   private lazy val fileNilReturnPath: String                        = configuration.get[String]("urls.fileNilReturn")
@@ -99,6 +108,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   private lazy val submissionUnsuccessfulCannotResubmitPath: String =
     configuration.get[String]("urls.submissionUnsuccessfulCannotResubmit")
   private lazy val authoriseClientRequestPath: String               = configuration.get[String]("urls.authoriseClientRequest")
+  private lazy val cisOrgAppealPath: String                         = configuration.get[String]("urls.cisOrgAppeal")
+  private lazy val cisOrgGenericNoticesPath: String                 = configuration.get[String]("urls.cisOrgGenericNotices")
 
   def fileStandardReturnUrl: String = s"$cisFrontendBaseUrl$fileStandardReturnPath"
 
@@ -140,8 +151,14 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   def authoriseClientRequestUrl(agentCode: String): String =
     s"$portalAccountBaseUrl${authoriseClientRequestPath.replace("{agentCode}", agentCode)}"
 
-  private val cisContractorFrontendBaseUrl: String  =
+  private val cisContractorFrontendBaseUrl: String                                 =
     configuration.get[String]("microservice.services.cis-contractor-frontend.baseUrl")
+  def cisOrgAppealUrl(taxOfficeNumber: String, taxOfficeReference: String): String =
+    s"$pasBaseUrl${cisOrgAppealPath.replace("{taxOfficeNumber}", taxOfficeNumber).replace("{taxOfficeReference}", taxOfficeReference)}"
+
+  def cisOrgGenericNoticesUrl(taxOfficeNumber: String, taxOfficeReference: String): String =
+    s"$noticeViewerBaseUrl${cisOrgGenericNoticesPath.replace("{taxOfficeNumber}", taxOfficeNumber).replace("{taxOfficeReference}", taxOfficeReference)}"
+
   lazy val cisTypeOfSubcontractorUrl: String        =
     s"$cisContractorFrontendBaseUrl${configuration.get[String]("urls.addSubcontractor")}"
   lazy val cisVerifySubcontractorUrl: String        =
