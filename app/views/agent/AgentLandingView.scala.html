@@ -35,6 +35,8 @@
     agentName: Option[String],
     schemeName: String,
     employerRef: String,
+    cisOrgAppealUrl: String,
+    cisOrgGenericNoticesUrl: String
     )(implicit request: RequestHeader,
     appConfig: FrontendAppConfig,
     messages: Messages
@@ -93,7 +95,7 @@
         ),
         ptaCard(
             title = messages("agent.landing.card.appealPenalty.title"),
-            link = "#",
+            link = cisOrgAppealUrl,
             content = Html(messages("agent.landing.card.appealPenalty.p")),
             id = Some("appeal-a-penalty")
         )
@@ -117,7 +119,7 @@
     @oneColumnGrid(
         ptaCard(
             title = messages("agent.landing.card.noticesAndStatements.title"),
-            link = "#",
+            link = cisOrgGenericNoticesUrl,
             content = Html(messages("agent.landing.card.noticesAndStatements.p")),
             id = Some("notices-and-statements")
         )
