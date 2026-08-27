@@ -34,5 +34,5 @@ case class VerificationHistoryRowViewModel(
   verificationNumber: String,
   dateSubmitted: String,
   verificationRequestLink: String,
-  submissionReceiptLink: String
+  submissionReceiptLink: Option[String]
 )

@@ -49,6 +49,7 @@ class GetSubmittedVerificationsControllerSpec extends SpecBase with MockitoSugar
       verificationBatchId = 1L,
       verificationNumber = verificationNumber,
       dateSubmitted = dateSubmitted,
+      status = "SUBMITTED",
       taxYear = taxYear,
       acceptedDateTime = dateSubmitted.atStartOfDay(),
       contractorName = "Test Scheme",

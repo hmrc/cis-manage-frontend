@@ -148,8 +148,9 @@ class VerificationHistoryService @Inject() () {
       dateSubmitted = request.dateSubmitted.format(displayDateFormatter),
       verificationRequestLink =
         controllers.verify.routes.VerificationRequestController.onPageLoad(request.verificationBatchId).url,
-      submissionReceiptLink =
+      submissionReceiptLink = Option.when(request.status != "SUBMITTED_NO_RECEIPT") {
         controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(request.verificationBatchId).url
+      }
     )
 
   def toVerificationHistoryData(
@@ -161,6 +162,7 @@ class VerificationHistoryService @Inject() () {
         .flatMap { batch =>
           for {
             verificationNumber <- batch.verificationNumber
+            batchStatus        <- batch.status
             submission          = submissionFor(batch.verificationBatchId, response.submissions)
             acceptedDateTime    = acceptedDateTimeFor(batch.verificationBatchId, submission)
           } yield {
@@ -170,10 +172,11 @@ class VerificationHistoryService @Inject() () {
               verificationBatchId = batch.verificationBatchId,
               verificationNumber = verificationNumber,
               dateSubmitted = acceptedDateTime.toLocalDate,
+              status = batchStatus,
               taxYear = taxYearStart(acceptedDateTime.toLocalDate),
               acceptedDateTime = acceptedDateTime,
               contractorName = contractorNameFor(scheme),
-              employerReference = scheme.taxOfficeNumber,
+              employerReference = s"${scheme.taxOfficeNumber}/${scheme.taxOfficeReference}",
               receiptReferenceNumber = receiptReferenceNumberFor(batch.verificationBatchId, submission),
               subcontractorsToVerify = subcontractorsFor(
                 batch.verificationBatchId,
