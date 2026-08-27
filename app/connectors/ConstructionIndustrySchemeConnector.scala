@@ -67,17 +67,6 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
         clientListJson.get
       }
 
-  def getClientsByEmployersReference(
-    employerRef: String
-  )(implicit hc: HeaderCarrier): Future[List[CisTaxpayerSearchResult]] =
-    http
-      .get(url"$cisBaseUrl/agent/client-empRef/$employerRef")
-      .execute[JsObject]
-      .map { x =>
-        val clientListJson = Json.fromJson[List[CisTaxpayerSearchResult]](x("clients"))
-        clientListJson.get
-      }
-
   def getAgentClientTaxpayer(taxOfficeNumber: String, taxOfficeReference: String)(implicit
     hc: HeaderCarrier
   ): Future[CisTaxpayer] =

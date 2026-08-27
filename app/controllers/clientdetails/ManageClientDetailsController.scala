@@ -17,12 +17,15 @@
 package controllers.clientdetails
 
 import controllers.actions.*
+import pages.clientdetails.ChangeClientReferencePage
 import pages.{AgentClientsPage, CisIdPage}
+import play.api.i18n.Lang.logger
 
 import javax.inject.{Inject, Named}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.AgentService
+import repositories.SessionRepository
+import services.ManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.clientdetails.ManageClientDetailsView
 
@@ -34,7 +37,8 @@ class ManageClientDetailsController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  agentService: AgentService,
+  manageService: ManageService,
+  sessionRepository: SessionRepository,
   view: ManageClientDetailsView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -45,20 +49,22 @@ class ManageClientDetailsController @Inject() (
       case Some(instanceId) =>
         request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == instanceId)) match {
           case Some(client) =>
-            val employerRef = s"${client.taxOfficeNumber}/${client.taxOfficeRef}"
-            agentService
-              .getClientsByEmployersReference(employerRef)
+            manageService
+              .getClientByEmployerReference(client.taxOfficeNumber, client.taxOfficeRef)
               .flatMap { response =>
-                if (response.length == 1) {
-                  val uniqueId: String          = response.head.uniqueId
-                  val clientName: String        = response.head.schemeName.getOrElse("")
-                  val employerReference: String = employerRef
-                  val clientReference           = response.head.agentOwnRef.getOrElse("")
-                  Future.successful(Ok(view(uniqueId, clientName, employerReference, clientReference)))
-
-                } else {
-                  Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-                }
+                val uniqueId: String          = response.uniqueId
+                val clientName: String        = response.schemeName.getOrElse("")
+                val employerReference: String = s"${response.taxOfficeNumber}/${response.taxOfficeRef}"
+                val clientReference           = response.agentOwnRef.getOrElse("")
+                for {
+                  updatedAnswers <-
+                    Future.fromTry(request.userAnswers.set(ChangeClientReferencePage, clientReference))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Ok(view(uniqueId, clientName, employerReference, clientReference))
+              }
+              .recover { case e =>
+                logger.error(s"[ManageClientDetailsController][onPageLoad] Failed for uniqueId=$instanceId", e)
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
               }
           case None         =>
             Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))

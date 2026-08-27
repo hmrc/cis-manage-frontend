@@ -17,15 +17,18 @@
 package controllers.clientdetails
 
 import base.SpecBase
-import models.{CisTaxpayerSearchResult, UserAnswers}
+import models.{CisTaxpayer, CisTaxpayerSearchResult, UserAnswers}
+import navigation.{FakeNavigator, Navigator}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import services.AgentService
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{AgentClientsPage, CisIdPage}
 import play.api.inject.bind
+import play.api.mvc.Call
+import repositories.SessionRepository
+import services.ManageService
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.clientdetails.ManageClientDetailsView
 
@@ -35,34 +38,58 @@ class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   val employerRef = "123456"
 
-  val okResponse =
+  val okResponse  = CisTaxpayer(
+    uniqueId = "CIS-123",
+    taxOfficeNumber = "111",
+    taxOfficeRef = "test111",
+    aoDistrict = None,
+    aoPayType = None,
+    aoCheckCode = None,
+    aoReference = None,
+    validBusinessAddr = None,
+    correlation = None,
+    ggAgentId = None,
+    employerName1 = Some("TEST LTD"),
+    employerName2 = None,
+    agentOwnRef = Some("TEST LTD"),
+    schemeName = Option("ABCD"),
+    utr = Some("1234567890"),
+    enrolledSig = None
+  )
+  val clients     =
     CisTaxpayerSearchResult(
-      uniqueId = "123",
+      uniqueId = "CIS-123",
       taxOfficeNumber = "111",
       taxOfficeRef = "test111",
       agentOwnRef = Some("TEST LTD"),
       schemeName = Some("ABCD"),
-      utr = Some("ABCD")
+      utr = Some("1234567890")
     )
-  val request    =
+  val request     =
     FakeRequest(GET, controllers.clientdetails.routes.ManageClientDetailsController.onPageLoad().url)
+  def onwardRoute = Call("GET", "/foo")
+
   "ManageClientDetails Controller" - {
 
     "must return OK and the correct view for a GET" in {
-      val mockAgentService = mock[AgentService]
-      when(mockAgentService.getClientsByEmployersReference(any)(using any[HeaderCarrier]))
-        .thenReturn(Future.successful(List(okResponse)))
+      val mockSessionRepository = mock[SessionRepository]
+      val mockAgentService      = mock[ManageService]
+      when(mockAgentService.getClientByEmployerReference(any, any)(using any[HeaderCarrier]))
+        .thenReturn(Future.successful(okResponse))
 
       val userAnswers = UserAnswers(userAnswersId)
-        .set(CisIdPage, "123")
+        .set(CisIdPage, "CIS-123")
         .success
         .value
-        .set(AgentClientsPage, List(okResponse))
+        .set(AgentClientsPage, List(clients))
         .success
         .value
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(
-          bind[AgentService].toInstance(mockAgentService)
+          bind[ManageService].toInstance(mockAgentService),
+          bind[SessionRepository].toInstance(mockSessionRepository),
+          bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
         )
         .build()
 
@@ -72,7 +99,7 @@ class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val view = application.injector.instanceOf[ManageClientDetailsView]
 
-        val fakeUniqueId    = "123"
+        val fakeUniqueId    = "CIS-123"
         val fakeClientName  = "ABCD"
         val fakeEmployerRef = "111/test111"
         val fakeClientRef   = "TEST LTD"

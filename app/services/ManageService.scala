@@ -123,6 +123,12 @@ class ManageService @Inject() (
         }
     }
 
+  def getClientByEmployerReference(
+    taxOfficeNumber: String,
+    taxOfficeRef: String
+  )(implicit hc: HeaderCarrier): Future[CisTaxpayer] =
+    cisConnector.getAgentClientTaxpayer(taxOfficeNumber, taxOfficeRef)
+
   def getUnsubmittedMonthlyReturns(instanceId: String)(implicit
     hc: HeaderCarrier
   ): Future[UnsubmittedMonthlyReturnsResponse] =

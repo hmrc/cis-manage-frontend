@@ -372,6 +372,41 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
     }
   }
 
+  "getClientByEmployerReference" should {
+
+    "must return tax payer search result by empRef key" in {
+
+      val okResponse = CisTaxpayer(
+        uniqueId = "CIS-123",
+        taxOfficeNumber = "111",
+        taxOfficeRef = "test111",
+        aoDistrict = None,
+        aoPayType = None,
+        aoCheckCode = None,
+        aoReference = None,
+        validBusinessAddr = None,
+        correlation = None,
+        ggAgentId = None,
+        employerName1 = Some("TEST LTD"),
+        employerName2 = None,
+        agentOwnRef = None,
+        schemeName = Option("ABCD"),
+        utr = Some("1234567890"),
+        enrolledSig = None
+      )
+
+      val (service, connector, sessionRepo) = newService()
+
+      when(connector.getAgentClientTaxpayer(any[String], any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(okResponse))
+
+      service.getClientByEmployerReference(any[String], any[String])(any[HeaderCarrier]).futureValue mustBe okResponse
+
+      verify(connector).getAgentClientTaxpayer(any[String], any[String])(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+  }
+
   "getUnsubmittedMonthlyReturns" should {
 
     "delegate to connector and return raw response" in {

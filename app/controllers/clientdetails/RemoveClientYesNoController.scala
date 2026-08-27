@@ -22,10 +22,11 @@ import models.Mode
 import navigation.Navigator
 import pages.AgentClientsPage
 import pages.clientdetails.RemoveClientYesNoPage
+import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.AgentService
+import services.ManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.clientdetails.RemoveClientYesNoView
 
@@ -41,7 +42,7 @@ class RemoveClientYesNoController @Inject() (
   requireData: DataRequiredAction,
   formProvider: RemoveClientYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  agentService: AgentService,
+  manageService: ManageService,
   view: RemoveClientYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -53,21 +54,20 @@ class RemoveClientYesNoController @Inject() (
     (identify andThen getData andThen requireData).async { implicit request =>
       request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId)) match {
         case Some(client) =>
-          val employerRef = s"${client.taxOfficeNumber}/${client.taxOfficeRef}"
-          agentService.getClientsByEmployersReference(employerRef).flatMap { response =>
-            if (response.length == 1) {
-              val clientName   = response.head.schemeName.getOrElse("")
+          manageService
+            .getClientByEmployerReference(client.taxOfficeNumber, client.taxOfficeRef)
+            .flatMap { response =>
+              val clientName   = response.schemeName.getOrElse("")
               val preparedForm = request.userAnswers.get(RemoveClientYesNoPage) match {
                 case None        => form
                 case Some(value) => form.fill(value)
               }
               Future(Ok(view(clientName, preparedForm, mode, uniqueId)))
-
-            } else {
-              Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-
             }
-          }
+            .recover { case e =>
+              logger.error(s"[RemoveClientYesNoController][onPageLoad] Failed for uniqueId=$uniqueId", e)
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
         case _            =>
           Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
@@ -77,10 +77,10 @@ class RemoveClientYesNoController @Inject() (
     (identify andThen getData andThen requireData).async { implicit request =>
       request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId)) match {
         case Some(client) =>
-          val employerRef = s"${client.taxOfficeNumber}/${client.taxOfficeRef}"
-          agentService.getClientsByEmployersReference(employerRef).flatMap { response =>
-            if (response.length == 1) {
-              val clientName = response.head.schemeName.getOrElse("")
+          manageService
+            .getClientByEmployerReference(client.taxOfficeNumber, client.taxOfficeRef)
+            .flatMap { response =>
+              val clientName = response.schemeName.getOrElse("")
               form
                 .bindFromRequest()
                 .fold(
@@ -91,10 +91,11 @@ class RemoveClientYesNoController @Inject() (
                       _              <- sessionRepository.set(updatedAnswers)
                     } yield Redirect(navigator.nextPage(RemoveClientYesNoPage, mode, updatedAnswers))
                 )
-            } else {
-              Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
             }
-          }
+            .recover { case e =>
+              logger.error(s"[RemoveClientYesNoController][onSubmit] Failed for uniqueId=$uniqueId", e)
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
         case _            =>
           Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
