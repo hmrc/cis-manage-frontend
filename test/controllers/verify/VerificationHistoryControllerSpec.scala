@@ -51,6 +51,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
       verificationBatchId = 1L,
       verificationNumber = verificationNumber,
       dateSubmitted = dateSubmitted,
+      status = "SUBMITTED",
       taxYear = taxYear,
       acceptedDateTime = dateSubmitted.atStartOfDay(),
       contractorName = "Test Scheme",
@@ -69,7 +70,7 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
             verificationNumber = "V0004528765",
             dateSubmitted = "06 Apr 2026",
             verificationRequestLink = "#",
-            submissionReceiptLink = "#"
+            submissionReceiptLink = Some("#")
           )
         )
       )
