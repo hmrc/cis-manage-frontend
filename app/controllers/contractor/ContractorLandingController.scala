@@ -54,23 +54,34 @@ class ContractorLandingController @Inject() (
     with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    manageService
-      .resolveAndStoreCisId(request.userAnswers)
-      .map { case (_, updatedUa) =>
-        val viewModel = fromUserAnswers(updatedUa, appConfig)
-        Ok(view(viewModel))
-      }
-      .recover {
-        case e: UpstreamErrorResponse if e.statusCode == NOT_FOUND =>
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        case exception                                             =>
-          logger.error(
-            s"[ContractorLandingController] Failed to retrieve cisId: ${exception.getMessage}",
-            exception
-          )
-          Redirect(controllers.routes.SystemErrorController.onPageLoad())
-      }
+    request.employerReference match {
+      case None =>
+        logger.warn("[ContractorLandingController][onPageLoad Missing employerReference on request")
+        Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
 
+      case Some(employerRef) =>
+        manageService
+          .resolveAndStoreCisId(request.userAnswers)
+          .map { case (_, updatedUa) =>
+            val viewModel = fromUserAnswers(
+              updatedUa,
+              appConfig,
+              employerRef.taxOfficeNumber,
+              employerRef.taxOfficeReference
+            )
+            Ok(view(viewModel))
+          }
+          .recover {
+            case e: UpstreamErrorResponse if e.statusCode == NOT_FOUND =>
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            case exception                                             =>
+              logger.error(
+                s"[ContractorLandingController] Failed to retrieve cisId: ${exception.getMessage}",
+                exception
+              )
+              Redirect(controllers.routes.SystemErrorController.onPageLoad())
+          }
+    }
   }
 
   def onTargetClick(targetKey: String): Action[AnyContent] =
@@ -179,12 +190,25 @@ class ContractorLandingController @Inject() (
 
 object ContractorLandingController {
 
-  def fromUserAnswers(ua: UserAnswers, appConfig: FrontendAppConfig): ContractorLandingViewModel =
+  def fromUserAnswers(
+    ua: UserAnswers,
+    appConfig: FrontendAppConfig,
+    taxOfficeNumber: String,
+    taxOfficeReference: String
+  ): ContractorLandingViewModel =
     ContractorLandingViewModel(
       schemeName = ua.get(ContractorNamePage).getOrElse(""),
       employerReference = ua.get(EmployerReferencePage).getOrElse(""),
       whatIsUrl = appConfig.contractorLandingWhatIsUrl,
       guidanceUrl = appConfig.contractorLandingGuidanceUrl,
-      penaltiesUrl = appConfig.contractorLandingPenaltiesUrl
+      penaltiesUrl = appConfig.contractorLandingPenaltiesUrl,
+      cisOrgAppealUrl = appConfig.cisOrgAppealUrl(
+        taxOfficeNumber = taxOfficeNumber,
+        taxOfficeReference = taxOfficeReference
+      ),
+      cisOrgGenericNoticesUrl = appConfig.cisOrgGenericNoticesUrl(
+        taxOfficeNumber = taxOfficeNumber,
+        taxOfficeReference = taxOfficeReference
+      )
     )
 }

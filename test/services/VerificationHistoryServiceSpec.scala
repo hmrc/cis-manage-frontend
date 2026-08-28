@@ -38,16 +38,18 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
     verificationNumber: String,
     dateSubmitted: LocalDate,
     taxYear: Int,
-    verificationBatchId: Long
+    verificationBatchId: Long,
+    status: String = "SUBMITTED"
   ): VerificationRequestData =
     VerificationRequestData(
       verificationBatchId = verificationBatchId,
       verificationNumber = verificationNumber,
       dateSubmitted = dateSubmitted,
+      status = status,
       taxYear = taxYear,
       acceptedDateTime = dateSubmitted.atStartOfDay(),
       contractorName = "Test Scheme",
-      employerReference = "123",
+      employerReference = "123/AB456",
       receiptReferenceNumber = receiptReferenceNumber,
       subcontractorsToVerify = Seq.empty
     )
@@ -55,7 +57,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
   private val data = VerificationHistoryData(
     verificationRequests = Seq(
       verificationRequestData("V001", LocalDate.of(2026, 4, 6), 2026, 1L),
-      verificationRequestData("V002", LocalDate.of(2026, 6, 6), 2026, 2L),
+      verificationRequestData("V002", LocalDate.of(2026, 6, 6), 2026, 2L, "SUBMITTED_NO_RECEIPT"),
       verificationRequestData("V003", LocalDate.of(2025, 4, 6), 2025, 3L),
       verificationRequestData("V004", LocalDate.of(2025, 6, 6), 2025, 4L)
     )
@@ -82,10 +84,11 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
       verificationBatchId = verificationBatchId,
       verificationNumber = verificationNumber,
       dateSubmitted = acceptedDateTime.toLocalDate,
+      status = "SUBMITTED",
       taxYear = taxYear,
       acceptedDateTime = acceptedDateTime,
       contractorName = "Test Scheme",
-      employerReference = "123",
+      employerReference = "123/AB456",
       receiptReferenceNumber = receiptReferenceNumber,
       subcontractorsToVerify = subcontractorsToVerify
     )
@@ -103,7 +106,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
       proceedSession = None,
       confirmArrangement = None,
       confirmCorrect = None,
-      status = None,
+      status = Some("SUBMITTED"),
       verificationNumber = verificationNumber,
       createDate = createDate,
       lastUpdate = None,
@@ -209,9 +212,17 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
         val result = service.buildAllYearsViewModel(data, instanceId)
 
         val vm  = result.get
+        val row = vm.taxYears.head.rows(1)
+        row.submissionReceiptLink.value must include("/verify/history/submission-receipt")
+        row.submissionReceiptLink.value must include("verificationBatchId=1")
+      }
+
+      "must set submission receipt link to None when the status is 'SUBMITTED_NO_RECEIPT'" in {
+        val result = service.buildAllYearsViewModel(data, instanceId)
+
+        val vm  = result.get
         val row = vm.taxYears.head.rows.head
-        row.submissionReceiptLink must include("/verify/history/submission-receipt")
-        row.submissionReceiptLink must include("verificationBatchId=2")
+        row.submissionReceiptLink mustBe None
       }
 
       "must return None when there are no verification requests" in {
@@ -507,7 +518,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
         result.value.submittedDate mustBe "06 April 2026"
         result.value.verificationNumber mustBe "V001"
         result.value.contractorName mustBe "Test Scheme"
-        result.value.employerReference mustBe "123"
+        result.value.employerReference mustBe "123/AB456"
         result.value.receiptReferenceNumber mustBe receiptReferenceNumber
         result.value.subcontractorsToVerify mustBe Seq(
           SubcontractorRowViewModel("Amity Marine Contractors", "V001"),
@@ -560,7 +571,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
         result.value.submissionTime mustBe "14:30"
         result.value.submissionDate mustBe "06 April 2026"
         result.value.contractorName mustBe "Test Scheme"
-        result.value.employerReference mustBe "123"
+        result.value.employerReference mustBe "123/AB456"
         result.value.receiptReferenceNumber mustBe receiptReferenceNumber
         result.value.verificationNumber mustBe "V001"
       }

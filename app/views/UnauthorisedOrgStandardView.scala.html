@@ -27,10 +27,11 @@
 
 @layout(
     pageTitle = titleNoForm(messages("unauthorised.org.standard.title")),
-    showSignOut = false,
     showBackLink = false
 ) {
     @heading(messages("unauthorised.org.standard.heading"), classes = "govuk-heading-xl")
-    @link("unauthorised.org.standard.guidance.link", appConfig.govUkCISGuidanceUrl, prefixTextKey = "unauthorised.org.standard.paragraph")
+    @link("unauthorised.org.standard.guidance.link",
+      appConfig.signIntoCISURL,
+      prefixTextKey = "unauthorised.org.standard.paragraph")
 
 }
