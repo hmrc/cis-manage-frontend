@@ -38,6 +38,7 @@ class IncompleteReturnsController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   requireCisId: CisIdRequiredAction,
+  reconcileFormpRds: FormpRdsReconcileAction,
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: IncompleteReturnsView,
@@ -47,16 +48,17 @@ class IncompleteReturnsController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData andThen requireCisId).async {
-    implicit request =>
-      service.getUnsubmittedMonthlyReturnRows(request.cisId).map { rows =>
-        if (rows.isEmpty) {
-          Redirect(controllers.history.routes.NoIncompleteReturnsController.onPageLoad())
-        } else {
-          Ok(view(rows))
+  def onPageLoad: Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId andThen reconcileFormpRds).async {
+      implicit request =>
+        service.getUnsubmittedMonthlyReturnRows(request.cisId).map { rows =>
+          if (rows.isEmpty) {
+            Redirect(controllers.history.routes.NoIncompleteReturnsController.onPageLoad())
+          } else {
+            Ok(view(rows))
+          }
         }
-      }
-  }
+    }
 
   def onDeleteRedirect(monthlyReturnId: Long): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>

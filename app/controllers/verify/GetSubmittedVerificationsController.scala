@@ -37,6 +37,7 @@ class GetSubmittedVerificationsController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   requireCisId: CisIdRequiredAction,
+  reconcileFormpRds: FormpRdsReconcileAction,
   sessionRepository: SessionRepository,
   verificationService: VerificationService,
   verificationHistoryService: VerificationHistoryService,
@@ -46,60 +47,61 @@ class GetSubmittedVerificationsController @Inject() (
     with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+    (identify andThen getData andThen requireData andThen requireCisId andThen reconcileFormpRds).async {
+      implicit request =>
 
-      implicit val hc: HeaderCarrier =
-        HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+        implicit val hc: HeaderCarrier =
+          HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-      verificationService
-        .getSubmittedVerifications(request.cisId)
-        .map(verificationHistoryService.toVerificationHistoryData)
-        .flatMap { historyData =>
-          val taxYears = verificationHistoryService.getSubmittedVerificationTaxYears(historyData)
+        verificationService
+          .getSubmittedVerifications(request.cisId)
+          .map(verificationHistoryService.toVerificationHistoryData)
+          .flatMap { historyData =>
+            val taxYears = verificationHistoryService.getSubmittedVerificationTaxYears(historyData)
 
-          request.userAnswers.set(VerificationHistoryDataPage, historyData) match {
-            case Success(updatedAnswers) =>
-              taxYears match {
-                case Nil =>
-                  sessionRepository
-                    .set(updatedAnswers)
-                    .map { _ =>
-                      Redirect(controllers.verify.routes.NoVerificationHistoryController.onPageLoad())
+            request.userAnswers.set(VerificationHistoryDataPage, historyData) match {
+              case Success(updatedAnswers) =>
+                taxYears match {
+                  case Nil =>
+                    sessionRepository
+                      .set(updatedAnswers)
+                      .map { _ =>
+                        Redirect(controllers.verify.routes.NoVerificationHistoryController.onPageLoad())
+                      }
+
+                  case Seq(taxYear) =>
+                    updatedAnswers.set(VerificationHistorySelectTaxYearPage, TaxYear(taxYear.startYear)) match {
+                      case Success(answersWithTaxYear) =>
+                        sessionRepository
+                          .set(answersWithTaxYear)
+                          .map { _ =>
+                            Redirect(controllers.verify.routes.VerificationHistoryController.onPageLoadSingleYear())
+                          }
+
+                      case Failure(_) =>
+                        Future.successful(
+                          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                        )
                     }
 
-                case Seq(taxYear) =>
-                  updatedAnswers.set(VerificationHistorySelectTaxYearPage, TaxYear(taxYear.startYear)) match {
-                    case Success(answersWithTaxYear) =>
-                      sessionRepository
-                        .set(answersWithTaxYear)
-                        .map { _ =>
-                          Redirect(controllers.verify.routes.VerificationHistoryController.onPageLoadSingleYear())
-                        }
+                  case _ =>
+                    sessionRepository
+                      .set(updatedAnswers)
+                      .map { _ =>
+                        Redirect(
+                          controllers.verify.routes.VerificationHistorySelectTaxYearController.onPageLoad()
+                        )
+                      }
+                }
 
-                    case Failure(_) =>
-                      Future.successful(
-                        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                      )
-                  }
-
-                case _ =>
-                  sessionRepository
-                    .set(updatedAnswers)
-                    .map { _ =>
-                      Redirect(
-                        controllers.verify.routes.VerificationHistorySelectTaxYearController.onPageLoad()
-                      )
-                    }
-              }
-
-            case Failure(_) =>
-              Future.successful(
-                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-              )
+              case Failure(_) =>
+                Future.successful(
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                )
+            }
           }
-        }
-        .recover { case _ =>
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
+          .recover { case _ =>
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
     }
 }
