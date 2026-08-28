@@ -40,12 +40,14 @@ import scala.concurrent.Future
 
 class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
   val clientName  = "clientName"
+  val uniqueId    = "123"
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new RemoveClientYesNoFormProvider()
   val form         = formProvider()
 
-  lazy val removeClientRoute = controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(NormalMode).url
+  lazy val removeClientRoute =
+    controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(uniqueId, NormalMode).url
 
   "RemoveClient Controller" - {
 
@@ -61,7 +63,10 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[RemoveClientYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(clientName, form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(clientName, form, NormalMode, uniqueId)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -79,7 +84,7 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(clientName, form.fill(true), NormalMode)(
+        contentAsString(result) mustEqual view(clientName, form.fill(true), NormalMode, uniqueId)(
           request,
           messages(application)
         ).toString
@@ -114,7 +119,7 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
         emptyUserAnswers.set(ClientListSearchPage, ClientListFormData("CN", "ABC")).success.value
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockManageService.removeClient(any[UserAnswers])(any[HeaderCarrier]))
+      when(mockManageService.removeClient(any[String], any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
       when(mockManageService.resolveAndStoreAgentClients(any[UserAnswers])(using any[HeaderCarrier]))
         .thenReturn(Future.successful((cisClients, uaWithClients)))
@@ -182,7 +187,7 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(clientName, boundForm, NormalMode)(
+        contentAsString(result) mustEqual view(clientName, boundForm, NormalMode, uniqueId)(
           request,
           messages(application)
         ).toString
@@ -225,7 +230,7 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
       val mockManageService     = mock[ManageService]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockManageService.removeClient(any[UserAnswers])(any[HeaderCarrier]))
+      when(mockManageService.removeClient(any[String], any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val application =

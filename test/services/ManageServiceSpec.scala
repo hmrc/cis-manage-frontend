@@ -1072,13 +1072,10 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       val request = RemoveAgentClientRequest(taxOfficeNumber = "123", taxOfficeReference = "ABC123")
 
-      val instanceId      = "900063"
-      val existingClients = List(createClient(instanceId, "123", "ABC123"), createClient("CLIENT-002", "456", "XYZ456"))
+      val uniqueId        = "900063"
+      val existingClients = List(createClient(uniqueId, "123", "ABC123"), createClient("CLIENT-002", "456", "XYZ456"))
 
       val userAnswers: UserAnswers = UserAnswers("userId")
-        .set(CisIdPage, instanceId)
-        .success
-        .value
         .set(AgentClientsPage, existingClients)
         .success
         .value
@@ -1086,31 +1083,19 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       when(connector.removeClient(eqTo(request))(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
 
-      service.removeClient(userAnswers).futureValue mustBe ()
+      service.removeClient(uniqueId, userAnswers).futureValue mustBe ()
 
       verify(connector).removeClient(eqTo(request))(any[HeaderCarrier])
-    }
-
-    "return error when CisId is missing in the user answers" in {
-      val (service, connector, sessionRepo) = newService()
-
-      val userAnswers: UserAnswers = UserAnswers("userId")
-
-      val exception = service.removeClient(userAnswers).failed.futureValue
-      exception mustBe a[RuntimeException]
-      exception.getMessage mustBe "Missing CisIdPage in user answers"
-
-      verifyNoInteractions(connector)
     }
 
     "return error when AgentClientsPage is missing in the user answers" in {
       val (service, connector, sessionRepo) = newService()
 
-      val instanceId = "900063"
+      val uniqueId = "900063"
 
-      val userAnswers: UserAnswers = UserAnswers("userId").set(CisIdPage, instanceId).success.value
+      val userAnswers: UserAnswers = UserAnswers("userId")
 
-      val exception = service.removeClient(userAnswers).failed.futureValue
+      val exception = service.removeClient(uniqueId, userAnswers).failed.futureValue
       exception mustBe a[RuntimeException]
       exception.getMessage mustBe "Missing AgentClientsPage in user answers"
 
@@ -1122,13 +1107,10 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       val request = RemoveAgentClientRequest(taxOfficeNumber = "123", taxOfficeReference = "ABC123")
 
-      val instanceId      = "900063"
-      val existingClients = List(createClient(instanceId, "123", "ABC123"), createClient("CLIENT-002", "456", "XYZ456"))
+      val uniqueId        = "900063"
+      val existingClients = List(createClient(uniqueId, "123", "ABC123"), createClient("CLIENT-002", "456", "XYZ456"))
 
       val userAnswers: UserAnswers = UserAnswers("userId")
-        .set(CisIdPage, instanceId)
-        .success
-        .value
         .set(AgentClientsPage, existingClients)
         .success
         .value
@@ -1138,7 +1120,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       when(connector.removeClient(eqTo(request))(any[HeaderCarrier]))
         .thenReturn(Future.failed(boom))
 
-      val ex = service.removeClient(userAnswers).failed.futureValue
+      val ex = service.removeClient(uniqueId, userAnswers).failed.futureValue
       ex mustBe boom
 
       verify(connector).removeClient(eqTo(request))(any[HeaderCarrier])

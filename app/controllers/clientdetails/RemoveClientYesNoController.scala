@@ -52,21 +52,22 @@ class RemoveClientYesNoController @Inject() (
   val form       = formProvider()
   val clientName = "clientName"
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val preparedForm = request.userAnswers.get(RemoveClientYesNoPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
-    }
+  def onPageLoad(uniqueId: String, mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+      val preparedForm = request.userAnswers.get(RemoveClientYesNoPage) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
 
-    Ok(view(clientName, preparedForm, mode))
+      Ok(view(clientName, preparedForm, mode, uniqueId))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(uniqueId: String, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(clientName, formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(clientName, formWithErrors, mode, uniqueId))),
           value => {
             val result =
               for {
@@ -74,9 +75,9 @@ class RemoveClientYesNoController @Inject() (
                 updatedAnswersWithClients <-
                   if (value) {
                     for {
+                      _                    <- manageService.removeClient(uniqueId, updatedAnswers)
                       uaWithClients        <- Future.fromTry(updatedAnswers.remove(ClientListSearchPage))
                       (_, resolvedAnswers) <- manageService.resolveAndStoreAgentClients(uaWithClients)
-                      _                    <- manageService.removeClient(resolvedAnswers)
                     } yield resolvedAnswers
                   } else {
                     Future.successful(updatedAnswers)
@@ -95,5 +96,5 @@ class RemoveClientYesNoController @Inject() (
             }
           }
         )
-  }
+    }
 }
