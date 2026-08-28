@@ -20,10 +20,13 @@ import controllers.actions.*
 import forms.clientdetails.RemoveClientYesNoFormProvider
 import models.Mode
 import navigation.Navigator
+import pages.ClientListSearchPage
 import pages.clientdetails.RemoveClientYesNoPage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.ManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.clientdetails.RemoveClientYesNoView
 
@@ -33,6 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class RemoveClientYesNoController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
+  manageService: ManageService,
   navigator: Navigator,
   @Named("AgentIdentifier") identify: IdentifierAction,
   getData: DataRetrievalAction,
@@ -42,31 +46,55 @@ class RemoveClientYesNoController @Inject() (
   view: RemoveClientYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   val form       = formProvider()
   val clientName = "clientName"
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val preparedForm = request.userAnswers.get(RemoveClientYesNoPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
-    }
+  def onPageLoad(uniqueId: String, mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+      val preparedForm = request.userAnswers.get(RemoveClientYesNoPage) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
 
-    Ok(view(clientName, preparedForm, mode))
+      Ok(view(clientName, preparedForm, mode, uniqueId))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(uniqueId: String, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(clientName, formWithErrors, mode))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveClientYesNoPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(RemoveClientYesNoPage, mode, updatedAnswers))
+          formWithErrors => Future.successful(BadRequest(view(clientName, formWithErrors, mode, uniqueId))),
+          value => {
+            val result =
+              for {
+                updatedAnswers            <- Future.fromTry(request.userAnswers.set(RemoveClientYesNoPage, value))
+                updatedAnswersWithClients <-
+                  if (value) {
+                    for {
+                      _                    <- manageService.removeClient(uniqueId, updatedAnswers)
+                      uaWithClients        <- Future.fromTry(updatedAnswers.remove(ClientListSearchPage))
+                      (_, resolvedAnswers) <- manageService.resolveAndStoreAgentClients(uaWithClients)
+                    } yield resolvedAnswers
+                  } else {
+                    Future.successful(updatedAnswers)
+                  }
+                _                         <- sessionRepository.set(updatedAnswersWithClients)
+              } yield Redirect(
+                navigator.nextPage(RemoveClientYesNoPage, mode, updatedAnswersWithClients)
+              )
+
+            result.recover { case ex =>
+              logger.error(
+                s"[RemoveClientYesNoController][onSubmit] Failed to process remove client: ${ex.getMessage}",
+                ex
+              )
+              Redirect(controllers.routes.SystemErrorController.onPageLoad())
+            }
+          }
         )
-  }
+    }
 }
