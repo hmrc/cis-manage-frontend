@@ -53,28 +53,51 @@ class FormpRdsReconcileActionSpec extends SpecBase with MockitoSugar {
 
     "must pass through (None) when the FORMP-RDS comparison succeeds for a contractor" in {
       val prepopService = mock[PrepopService]
-      when(prepopService.prepopulateContractorKnownFacts(eqTo(cisId), eqTo(taxOfficeNumber), eqTo(taxOfficeReference))(any[HeaderCarrier]))
+      when(
+        prepopService.prepopulateContractorKnownFacts(eqTo(cisId), eqTo(taxOfficeNumber), eqTo(taxOfficeReference))(
+          any[HeaderCarrier]
+        )
+      )
         .thenReturn(Future.unit)
 
       val result = new Harness(prepopService).callFilter(contractorRequest)
 
       whenReady(result)(_ mustBe None)
-      verify(prepopService).prepopulateContractorKnownFacts(eqTo(cisId), eqTo(taxOfficeNumber), eqTo(taxOfficeReference))(any[HeaderCarrier])
+      verify(prepopService).prepopulateContractorKnownFacts(
+        eqTo(cisId),
+        eqTo(taxOfficeNumber),
+        eqTo(taxOfficeReference)
+      )(any[HeaderCarrier])
     }
 
     "must resolve the tax office from AgentClientsPage for an agent and pass through on success" in {
       val prepopService = mock[PrepopService]
       val client        =
-        CisTaxpayerSearchResult(cisId, taxOfficeNumber, taxOfficeReference, agentOwnRef = None, schemeName = None, utr = None)
+        CisTaxpayerSearchResult(
+          cisId,
+          taxOfficeNumber,
+          taxOfficeReference,
+          agentOwnRef = None,
+          schemeName = None,
+          utr = None
+        )
       val userAnswers   = emptyUserAnswers.set(AgentClientsPage, List(client)).success.value
 
-      when(prepopService.prepopulateContractorKnownFacts(eqTo(cisId), eqTo(taxOfficeNumber), eqTo(taxOfficeReference))(any[HeaderCarrier]))
+      when(
+        prepopService.prepopulateContractorKnownFacts(eqTo(cisId), eqTo(taxOfficeNumber), eqTo(taxOfficeReference))(
+          any[HeaderCarrier]
+        )
+      )
         .thenReturn(Future.unit)
 
       val result = new Harness(prepopService).callFilter(agentRequest(userAnswers))
 
       whenReady(result)(_ mustBe None)
-      verify(prepopService).prepopulateContractorKnownFacts(eqTo(cisId), eqTo(taxOfficeNumber), eqTo(taxOfficeReference))(any[HeaderCarrier])
+      verify(prepopService).prepopulateContractorKnownFacts(
+        eqTo(cisId),
+        eqTo(taxOfficeNumber),
+        eqTo(taxOfficeReference)
+      )(any[HeaderCarrier])
     }
 
     "must redirect to the unauthorised organisation page when the tax office details cannot be resolved" in {
