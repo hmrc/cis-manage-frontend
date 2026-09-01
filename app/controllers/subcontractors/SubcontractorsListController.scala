@@ -164,7 +164,7 @@ class SubcontractorsListController @Inject() (
         .map(_.format(DateTimeFormats.shortDateFormat()))
         .getOrElse(""),
       subbieResourceRef = subbieResourceRef,
-      amendUrl = s"${config.cisTypeOfSubcontractorUrl}/amend/start/$subbieResourceRef"
+      amendUrl = s"${config.cisTypeOfSubcontractorUrl}/amend/start/$subbieResourceRef/standard"
     )
   }
 
