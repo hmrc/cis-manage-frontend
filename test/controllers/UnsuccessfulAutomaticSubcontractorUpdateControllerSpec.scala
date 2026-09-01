@@ -157,7 +157,7 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to contractor details introduction on submit" in {
+    "must redirect to contractor details manage on submit" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
@@ -180,7 +180,7 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
         val appConfig = application.injector.instanceOf[config.FrontendAppConfig]
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual appConfig.contractorDetailsIntroductionUrl
+        redirectLocation(result).value mustEqual appConfig.contractorDetailsManagementUrl
       }
     }
   }
