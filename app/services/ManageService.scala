@@ -178,11 +178,6 @@ class ManageService @Inject() (
   ): Future[SubmittedReturnsData] =
     cisConnector.getSubmittedMonthlyReturns(instanceId)
 
-  def getVerificationRequestDetail(instanceId: String, verificationNumber: String)(implicit
-    hc: HeaderCarrier
-  ): Future[VerificationRequestDetailData] =
-    cisConnector.getVerificationRequestDetail(instanceId, verificationNumber)
-
   def buildReturnsLandingContext(
     instanceId: String,
     userAnswers: UserAnswers,
