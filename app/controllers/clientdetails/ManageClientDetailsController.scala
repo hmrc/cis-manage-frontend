@@ -17,12 +17,19 @@
 package controllers.clientdetails
 
 import controllers.actions.*
+import pages.clientdetails.ChangeClientReferencePage
+import pages.{AgentClientsPage, CisIdPage}
+import play.api.i18n.Lang.logger
 
 import javax.inject.{Inject, Named}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
+import services.ManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.clientdetails.ManageClientDetailsView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class ManageClientDetailsController @Inject() (
   override val messagesApi: MessagesApi,
@@ -30,15 +37,41 @@ class ManageClientDetailsController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
+  manageService: ManageService,
+  sessionRepository: SessionRepository,
   view: ManageClientDetailsView
-) extends FrontendBaseController
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val uniqueId: String          = "1"
-    val clientName: String        = "{Client}"
-    val employerReference: String = "{123/ab4}"
-    val clientReference: String   = "{AOR1}"
-    Ok(view(uniqueId, clientName, employerReference, clientReference))
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+    request.userAnswers.get(CisIdPage) match {
+      case Some(instanceId) =>
+        request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == instanceId)) match {
+          case Some(client) =>
+            manageService
+              .getClientByEmployerReference(client.taxOfficeNumber, client.taxOfficeRef)
+              .flatMap { response =>
+                val uniqueId: String          = response.uniqueId
+                val clientName: String        = response.schemeName.getOrElse("")
+                val employerReference: String = s"${response.taxOfficeNumber}/${response.taxOfficeRef}"
+                val clientReference           = response.agentOwnRef.getOrElse("")
+                for {
+                  updatedAnswers <-
+                    Future.fromTry(request.userAnswers.set(ChangeClientReferencePage, clientReference))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Ok(view(uniqueId, clientName, employerReference, clientReference))
+              }
+              .recover { case e =>
+                logger.error(s"[ManageClientDetailsController][onPageLoad] Failed for uniqueId=$instanceId", e)
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              }
+          case None         =>
+            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
+      case _                =>
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
+
   }
 }

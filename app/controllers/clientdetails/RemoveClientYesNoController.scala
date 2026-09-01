@@ -20,10 +20,13 @@ import controllers.actions.*
 import forms.clientdetails.RemoveClientYesNoFormProvider
 import models.Mode
 import navigation.Navigator
+import pages.AgentClientsPage
 import pages.clientdetails.RemoveClientYesNoPage
+import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.ManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.clientdetails.RemoveClientYesNoView
 
@@ -39,34 +42,62 @@ class RemoveClientYesNoController @Inject() (
   requireData: DataRequiredAction,
   formProvider: RemoveClientYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
+  manageService: ManageService,
   view: RemoveClientYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  val form       = formProvider()
-  val clientName = "clientName"
+  val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val preparedForm = request.userAnswers.get(RemoveClientYesNoPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+  def onPageLoad(uniqueId: String, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId)) match {
+        case Some(client) =>
+          manageService
+            .getClientByEmployerReference(client.taxOfficeNumber, client.taxOfficeRef)
+            .flatMap { response =>
+              val clientName   = response.schemeName.getOrElse("")
+              val preparedForm = request.userAnswers.get(RemoveClientYesNoPage) match {
+                case None        => form
+                case Some(value) => form.fill(value)
+              }
+              Future(Ok(view(clientName, preparedForm, mode, uniqueId)))
+            }
+            .recover { case e =>
+              logger.error(s"[RemoveClientYesNoController][onPageLoad] Failed for uniqueId=$uniqueId", e)
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
+        case _            =>
+          Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
     }
 
-    Ok(view(clientName, preparedForm, mode))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(clientName, formWithErrors, mode))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveClientYesNoPage, value))
-              _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(RemoveClientYesNoPage, mode, updatedAnswers))
-        )
-  }
+  def onSubmit(uniqueId: String, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId)) match {
+        case Some(client) =>
+          manageService
+            .getClientByEmployerReference(client.taxOfficeNumber, client.taxOfficeRef)
+            .flatMap { response =>
+              val clientName = response.schemeName.getOrElse("")
+              form
+                .bindFromRequest()
+                .fold(
+                  formWithErrors => Future.successful(BadRequest(view(clientName, formWithErrors, mode, uniqueId))),
+                  value =>
+                    for {
+                      updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveClientYesNoPage, value))
+                      _              <- sessionRepository.set(updatedAnswers)
+                    } yield Redirect(navigator.nextPage(RemoveClientYesNoPage, mode, updatedAnswers))
+                )
+            }
+            .recover { case e =>
+              logger.error(s"[RemoveClientYesNoController][onSubmit] Failed for uniqueId=$uniqueId", e)
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
+        case _            =>
+          Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
+    }
 }
