@@ -28,7 +28,11 @@ import views.html.verify.VerificationHistoryView
 
 class VerificationHistoryViewSpec extends SpecBase {
 
-  private val singleYearViewModel = VerificationHistoryPageViewModel(
+  private val verificationRequestUrl = controllers.verify.routes.VerificationRequestController.onPageLoad(1L).url
+  private val submissionReceiptUrl   =
+    controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(1L).url
+
+  private def singleYearViewModel(withReceiptLink: Boolean = true) = VerificationHistoryPageViewModel(
     taxYears = Seq(
       VerificationTaxYearViewModel(
         fromYear = 2026,
@@ -37,9 +41,12 @@ class VerificationHistoryViewSpec extends SpecBase {
           VerificationHistoryRowViewModel(
             verificationNumber = "V0004528765",
             dateSubmitted = "06 Apr 2026",
-            verificationRequestLink = controllers.verify.routes.VerificationRequestController.onPageLoad(1L).url,
-            submissionReceiptLink =
-              controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(1L).url
+            verificationRequestLink = verificationRequestUrl,
+            submissionReceiptLink = if (withReceiptLink) {
+              Some(submissionReceiptUrl)
+            } else {
+              None
+            }
           )
         )
       )
@@ -57,8 +64,8 @@ class VerificationHistoryViewSpec extends SpecBase {
           VerificationHistoryRowViewModel(
             verificationNumber = "V0004528765",
             dateSubmitted = "06 Apr 2026",
-            verificationRequestLink = controllers.verify.routes.VerificationRequestController.onPageLoad(1L).url,
-            submissionReceiptLink = "#"
+            verificationRequestLink = verificationRequestUrl,
+            submissionReceiptLink = Some("#")
           )
         )
       ),
@@ -70,8 +77,7 @@ class VerificationHistoryViewSpec extends SpecBase {
             verificationNumber = "V0004528759",
             dateSubmitted = "06 Apr 2025",
             verificationRequestLink = "#",
-            submissionReceiptLink =
-              controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(2L).url
+            submissionReceiptLink = Some(submissionReceiptUrl)
           )
         )
       )
@@ -89,7 +95,7 @@ class VerificationHistoryViewSpec extends SpecBase {
   "VerificationHistoryView" - {
 
     "render the page with expected title and heading for a single year" in {
-      val doc = render(singleYearViewModel)
+      val doc = render(singleYearViewModel())
 
       doc.title() shouldBe
         s"${messages(app)("verify.verificationHistory.singleYear.title")} - ${messages(app)("service.name")} - GOV.UK"
@@ -109,7 +115,7 @@ class VerificationHistoryViewSpec extends SpecBase {
     }
 
     "not render tax year headings for a single tax year" in {
-      val doc = render(singleYearViewModel)
+      val doc = render(singleYearViewModel())
 
       doc.select("h2.govuk-heading-m").eachText() shouldBe empty
     }
@@ -123,8 +129,7 @@ class VerificationHistoryViewSpec extends SpecBase {
     }
 
     "render the desktop table version" in {
-      val doc = render(singleYearViewModel)
-
+      val doc     = render(singleYearViewModel())
       val desktop = doc.selectFirst(".verification-history-desktop")
       desktop should not be null
 
@@ -136,40 +141,70 @@ class VerificationHistoryViewSpec extends SpecBase {
         messages(app)("verify.verificationHistory.table.submissionReceipt")
       )
 
-      desktop.text()                                                                       should include("V0004528765")
-      desktop.text()                                                                       should include("06 Apr 2026")
-      desktop.select(s"a[href=/verify/verification-request?verificationBatchId=1]").text() should include(
-        messages(app)("site.view")
-      )
-      desktop
-        .select(s"a[href=/verify/history/submission-receipt?verificationBatchId=1]")
-        .text()                                                                            should include(
-        messages(app)("site.view")
-      )
+      desktop.text() should include("V0004528765")
+      desktop.text() should include("06 Apr 2026")
+
+      desktop.select(s"""a[href="$verificationRequestUrl"]""").text() should include(messages(app)("site.view"))
+      desktop.select(s"""a[href="$submissionReceiptUrl"]""").text()   should include(messages(app)("site.view"))
+    }
+
+    "render an empty submission receipt cell when there is no receipt for desktop version" in {
+      val doc = render(singleYearViewModel(withReceiptLink = false))
+
+      val desktop = doc.selectFirst(".verification-history-desktop")
+      desktop should not be null
+
+      val row = desktop
+        .select("tbody tr")
+        .first()
+
+      row.select("td").size()                            shouldBe 3
+      row.select(s"""a[href="$submissionReceiptUrl"]""") shouldBe empty
     }
 
     "render the mobile stacked version" in {
-      val doc = render(singleYearViewModel)
+      val doc = render(singleYearViewModel())
 
       val mobile = doc.selectFirst(".verification-history-mobile")
       mobile should not be null
 
-      mobile.text()                                                                             should include("V0004528765")
-      mobile.text()                                                                             should include(messages(app)("verify.verificationHistory.table.dateSubmitted"))
-      mobile.text()                                                                             should include("06 Apr 2026")
-      mobile.text()                                                                             should include(messages(app)("verify.verificationHistory.table.verificationRequest"))
-      mobile.text()                                                                             should include(messages(app)("verify.verificationHistory.table.submissionReceipt"))
-      mobile.select(s"a[href=/verify/verification-request?verificationBatchId=1]").text()       should include(
+      mobile.text()                                                  should include("V0004528765")
+      mobile.text()                                                  should include(messages(app)("verify.verificationHistory.table.dateSubmitted"))
+      mobile.text()                                                  should include("06 Apr 2026")
+      mobile.text()                                                  should include(messages(app)("verify.verificationHistory.table.verificationRequest"))
+      mobile.text()                                                  should include(messages(app)("verify.verificationHistory.table.submissionReceipt"))
+      mobile.select(s"""a[href="$verificationRequestUrl"]""").text() should include(
         messages(app)("site.view")
       )
-      mobile.select(s"a[href=/verify/history/submission-receipt?verificationBatchId=1]").text() should include(
+      mobile.select(s"""a[href="$submissionReceiptUrl"]""").text()   should include(
         messages(app)("site.view")
       )
-      mobile.select(".govuk-summary-list").size()                                             shouldBe 1
+      mobile.select(".govuk-summary-list").size()                  shouldBe 1
+    }
+
+    "render an empty submission receipt value when there is no receipt for mobile version" in {
+      val doc = render(singleYearViewModel(withReceiptLink = false))
+
+      val mobile = doc.selectFirst(".verification-history-mobile")
+      mobile should not be null
+
+      mobile.select(".govuk-summary-list").size()      shouldBe 1
+      mobile.select(".govuk-summary-list__row").size() shouldBe 3
+
+      mobile.text() should include("V0004528765")
+      mobile.text() should include(
+        messages(app)("verify.verificationHistory.table.submissionReceipt")
+      )
+
+      mobile.select(".govuk-summary-list__row").get(2).select(".govuk-summary-list__key").text() shouldBe
+        messages(app)("verify.verificationHistory.table.submissionReceipt")
+
+      mobile.select(".govuk-summary-list__row").get(2).select(".govuk-summary-list__value").text() shouldBe ""
+      mobile.select(s"""a[href="$submissionReceiptUrl"]""")                                        shouldBe empty
     }
 
     "render the back to manage subcontractors link" in {
-      val doc = render(singleYearViewModel)
+      val doc = render(singleYearViewModel())
 
       val manageLink = doc.select("a:contains(Manage your subcontractors)")
       manageLink should not be empty

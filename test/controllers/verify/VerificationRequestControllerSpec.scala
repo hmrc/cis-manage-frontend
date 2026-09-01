@@ -53,6 +53,7 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
       verificationNumber = verificationNumber,
       dateSubmitted = dateSubmitted,
       taxYear = taxYear,
+      status = "SUBMITTED",
       acceptedDateTime = dateSubmitted.atStartOfDay(),
       contractorName = "Test Scheme",
       employerReference = "123PA000001",

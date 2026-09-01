@@ -29,6 +29,24 @@ class AuditEventModelSpec extends SpecBase {
     }
   }
 
+  "DeleteSubcontractorAuditEventModel" - {
+    val underTest = DeleteSubcontractorAuditEventModel(
+      cisId = "123/AB456",
+      subcontractorName = "Test Subcontractor",
+      subbieResourceRef = 42L
+    )
+    "must have the correct auditType" in {
+      underTest.auditType mustBe "deleteSubcontractor"
+    }
+    "must serialise correctly" in {
+      Json.toJson(underTest) mustBe Json.obj(
+        "cisId"             -> "123/AB456",
+        "subcontractorName" -> "Test Subcontractor",
+        "subbieResourceRef" -> 42L
+      )
+    }
+  }
+
   "extendedDataEvent" - {
     val testAuditType: String   = "test-audit-type"
     val testDetailJson: JsValue = Json.toJson(testAuditType)
