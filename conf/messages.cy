@@ -9,7 +9,8 @@ site.continue         =  Parhau
 site.saveAndContinue  =  Cadw a pharhau
 site.govuk            =  GOV.UK
 
-<<<<<<< HEAD
+error.title.prefix    =  Error:
+
 # Subcontractors
 retrievingSubcontractors.title                                =  Eich is-gontractwyr
 retrievingSubcontractors.heading                              =  Eich is-gontractwyr
@@ -43,26 +44,6 @@ successfulNoRecordsFound.p1                                   =  Doedd dim modd 
 successfulNoRecordsFound.p2                                   =  Gallwch
 
 successfulNoRecordsFound.p2.link                              =  ychwanegu is-gontractwr
-
-# Delete
-delete.deleteMonthlyReturn.title           =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ar gyfer {0}?
-delete.deleteMonthlyReturn.heading         =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ar gyfer {0}?
-delete.deleteMonthlyReturn.error.required  =  Dewiswch ‘Iawn’ i ddileu’r datganiad hwn
-
-delete.deleteNilMonthlyReturn.title        =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ‘dim’ ar gyfer {0}?
-delete.deleteNilMonthlyReturn.heading      =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ‘dim’ ar gyfer {0}?
-delete.deleteNilMonthlyReturn.error.required         =  Dewiswch ‘Iawn’ i ddileu’r datganiad misol ‘dim’ hwn
-
-delete.deleteAmendedMonthlyReturn.title    =  A ydych yn siŵr eich bod am ddileu’r datganiad misol diwygiedig ar gyfer {0}?
-delete.deleteAmendedMonthlyReturn.heading  =  A ydych yn siŵr eich bod am ddileu’r datganiad misol diwygiedig ar gyfer {0}?
-delete.deleteAmendedMonthlyReturn.error.required     =  Dewiswch ‘Iawn’ i ddileu’r datganiad misol diwygiedig hwn
-
-delete.deleteAmendedNilMonthlyReturn.title           =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ‘dim’ diwygiedig ar gyfer {0}?
-delete.deleteAmendedNilMonthlyReturn.heading         =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ‘dim’ diwygiedig ar gyfer {0}?
-delete.deleteAmendedNilMonthlyReturn.error.required  =  Dewiswch ‘Iawn’ i ddileu’r datganiad misol ‘dim’ diwygiedig hwn
-=======
-error.title.prefix    =  Error:
->>>>>>> origin/main
 
 # History
 history.submittedReturnsChooseTaxYear.title                                  =  Pa flwyddyn dreth ydych am fwrw golwg drosti?
@@ -103,9 +84,6 @@ history.returnHistory.returnType.nil                                         =  
 history.returnHistory.backLink                                               =  Dychwelyd i ‘Bwrw golwg dros flwyddyn dreth’
 history.returnHistory.status.awaitingConfirmation                            =  Yn aros am gadarnhad
 history.returnHistory.status.amend                                           =  Diwygio
-<<<<<<< HEAD
-history.returnHistory.status.notAvailable                                    =  Ddim ar gael
-=======
 history.returnHistory.status.notAvailable                                    =  Ddim ar gael
 
 # Delete
@@ -160,4 +138,3 @@ clientdetails.clientRemoved.p1                               =  Gall gymryd hyd 
 clientdetails.clientRemoved.return.link                      =  Dychwelyd i’ch rhestr o gleientiaid
 clientdetails.clientRemoved.survey.link                      =  Beth oedd eich barn am y gwasanaeth hwn?
 clientdetails.clientRemoved.survey.suffix                    =  (mae’n cymryd 30 eiliad)
->>>>>>> origin/main
