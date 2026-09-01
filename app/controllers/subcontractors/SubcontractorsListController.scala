@@ -63,6 +63,8 @@ class SubcontractorsListController @Inject() (
   private val SortOrderAsc  = "ascending"
   private val SortOrderDesc = "descending"
 
+  private val StandardJourneyType = "standard"
+
   private def isNoNameProvided(
     displayName: String
   )(implicit request: RequestHeader): Boolean = {
@@ -164,7 +166,7 @@ class SubcontractorsListController @Inject() (
         .map(_.format(DateTimeFormats.shortDateFormat()))
         .getOrElse(""),
       subbieResourceRef = subbieResourceRef,
-      amendUrl = s"${config.cisTypeOfSubcontractorUrl}/amend/start/$subbieResourceRef/standard"
+      amendUrl = s"${config.cisTypeOfSubcontractorUrl}/amend/start/$subbieResourceRef/$StandardJourneyType"
     )
   }
 
