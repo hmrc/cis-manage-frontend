@@ -36,10 +36,12 @@ import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.PlayBodyParsers
 import play.api.test.Helpers.stubControllerComponents
 import repositories.SessionRepository
-import views.html.PageNotFoundView
 
 import scala.concurrent.Future
 
+@Deprecated(
+  "To avoid spinning up and shutting down applications for unit tests, please consider using UnitSpec instead."
+)
 trait SpecBase
     extends AnyFreeSpec
     with Matchers
@@ -48,16 +50,13 @@ trait SpecBase
     with ScalaFutures
     with GuiceOneAppPerSuite
     with IntegrationPatience {
-  protected lazy val notFoundView: PageNotFoundView = app.injector.instanceOf[PageNotFoundView]
-
   override def fakeApplication(): Application = applicationBuilder().build()
 
   implicit lazy val applicationConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
 
   val userAnswersId: String    = "id"
   val parsers: PlayBodyParsers = stubControllerComponents().parsers
-  val givenCisId               = "1"
-  val cisIdData: JsObject      = Json.obj("cisId" -> givenCisId)
+  val cisIdData: JsObject      = Json.obj("cisId" -> "1")
 
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 

@@ -18,21 +18,18 @@ package controllers.verify
 
 import controllers.actions.*
 import forms.verify.TaxYearFormProvider
+import models.verify.VerificationTaxYearSelection
 import models.verify.VerificationTaxYearSelection.AllTaxYears
-import models.verify.{VerificationHistoryData, VerificationTaxYearSelection}
-import pages.verify.VerificationHistoryDataPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import services.{VerificationHistoryService, VerificationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.VerificationHistorySelectTaxYearView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class VerificationHistorySelectTaxYearController @Inject() (
-  sessionRepository: SessionRepository,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -48,22 +45,24 @@ class VerificationHistorySelectTaxYearController @Inject() (
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
-      for
-        history     <- verificationService.getSubmittedVerifications(request.cisId)
-        historyData  = verificationHistoryService.toVerificationHistoryData(history)
-        userAnswers <- Future.fromTry(request.userAnswers.set(VerificationHistoryDataPage, historyData))
-        _           <- sessionRepository.set(userAnswers)
-        taxYears     = verificationHistoryService.getSubmittedVerificationTaxYears(historyData)
-        response     = if taxYears.length > 1 then Ok(view(formProvider(taxYears), taxYears))
-                       else Redirect(routes.VerificationHistoryController.onPageLoad(AllTaxYears.toPath))
-      yield response
+      verificationService
+        .getSubmittedVerifications(request.cisId)
+        .map { history =>
+          val taxYears = verificationHistoryService.getSubmittedVerificationTaxYears(history)
+
+          if taxYears.length > 1
+          then Ok(view(formProvider(taxYears), taxYears))
+          else Redirect(routes.VerificationHistoryController.onPageLoad(AllTaxYears.toPath))
+        }
+        .recover(_ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
   def onSubmit(): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      request.userAnswers.get(VerificationHistoryDataPage) match {
-        case Some(data) =>
-          val years = verificationHistoryService.getSubmittedVerificationTaxYears(data)
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+      verificationService
+        .getSubmittedVerifications(request.cisId)
+        .map { history =>
+          val years = verificationHistoryService.getSubmittedVerificationTaxYears(history)
           val form  = formProvider(years)
 
           form
@@ -72,7 +71,7 @@ class VerificationHistorySelectTaxYearController @Inject() (
               formWithErrors => BadRequest(view(formWithErrors, years)),
               selection => Redirect(routes.VerificationHistoryController.onPageLoad(selection.toPath))
             )
-        case None       => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      }
+        }
+        .recover(_ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 }

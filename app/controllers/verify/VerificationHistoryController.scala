@@ -17,10 +17,8 @@
 package controllers.verify
 
 import controllers.actions.*
-import models.requests.CisIdDataRequest
+import models.verify.VerificationTaxYearSelection
 import models.verify.VerificationTaxYearSelection.{AllTaxYears, TaxYear}
-import models.verify.{VerificationHistoryData, VerificationTaxYearSelection}
-import pages.verify.VerificationHistoryDataPage
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -52,7 +50,8 @@ class VerificationHistoryController @Inject() (
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
       VerificationTaxYearSelection fromPath selectionStr match
         case Some(selection) =>
-          resolveVerificationHistoryData
+          verificationService
+            .getSubmittedVerifications(request.cisId)
             .map { data =>
               selection match
                 case AllTaxYears    =>
@@ -68,18 +67,5 @@ class VerificationHistoryController @Inject() (
               Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
             }
         case None            => Future.successful(NotFound(notFoundView()))
-    }
-
-  private def resolveVerificationHistoryData(implicit
-    request: CisIdDataRequest[AnyContent]
-  ): Future[VerificationHistoryData] =
-    request.userAnswers.get(VerificationHistoryDataPage) match {
-      case Some(data) =>
-        Future.successful(data)
-
-      case None =>
-        verificationService
-          .getSubmittedVerifications(request.cisId)
-          .map(verificationHistoryService.toVerificationHistoryData)
     }
 }

@@ -16,30 +16,23 @@
 
 package controllers.verify
 
-import base.SpecBase
-import models.UserAnswers
-import models.response.GetSubmittedVerificationsResponse
+import base.UnitSpec
+import controllers.actions.{CisIdRequiredActionImpl, DataRequiredActionImpl, DataRetrievalActionImpl, FakeIdentifierAction}
 import models.verify.{VerificationHistoryData, VerificationRequestData}
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify as mockVerify, verifyNoInteractions, when}
-import org.scalatestplus.mockito.MockitoSugar
-import pages.CisIdPage
-import pages.verify.VerificationHistoryDataPage
-import play.api.Application
-import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.{VerificationHistoryService, VerificationService}
-import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.*
 import views.html.verify.VerificationRequestView
 
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
+class VerificationRequestControllerSpec extends UnitSpec {
+  import play.twirl.api.Html
 
-  private val cisId               = "900063"
   private val verificationNumber  = "V0004528765"
   private val verificationBatchId = 1L
 
@@ -67,15 +60,6 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
     )
   )
 
-  private val submittedVerificationsResponse =
-    GetSubmittedVerificationsResponse(
-      scheme = Seq.empty,
-      subcontractors = Seq.empty,
-      verificationBatches = Seq.empty,
-      verifications = Seq.empty,
-      submissions = Seq.empty
-    )
-
   private val viewModel = VerificationRequestPageViewModel(
     submittedTime = "14:30",
     submittedDate = "06 February 2027",
@@ -92,126 +76,68 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
   )
 
   trait Setup {
+    protected val mockVerificationService: VerificationService               = mock[VerificationService]
+    protected val mockVerificationHistoryService: VerificationHistoryService = mock[VerificationHistoryService]
+    protected val mockView: VerificationRequestView                          = mock[VerificationRequestView]
 
-    val mockVerificationHistoryService: VerificationHistoryService = mock[VerificationHistoryService]
-    val mockVerificationService: VerificationService               = mock[VerificationService]
-
-    def application(userAnswers: UserAnswers): Application =
-      applicationBuilder(userAnswers = Some(userAnswers))
-        .overrides(
-          bind[VerificationHistoryService].toInstance(mockVerificationHistoryService),
-          bind[VerificationService].toInstance(mockVerificationService)
-        )
-        .build()
-
-    def userAnswersWithCisId: UserAnswers =
-      emptyUserAnswers
-        .set(CisIdPage, cisId)
-        .success
-        .value
-
-    def userAnswersWithVerificationHistoryData: UserAnswers =
-      userAnswersWithCisId
-        .set(VerificationHistoryDataPage, verificationHistoryData)
-        .success
-        .value
-
-    def journeyRecoveryUrl: String =
-      controllers.routes.JourneyRecoveryController.onPageLoad().url
-
-    def unauthorisedUrl: String =
-      controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad().url
+    val controllerUnderTest = new VerificationRequestController(
+      FakeIdentifierAction(isAgent = false)(parsers),
+      new DataRetrievalActionImpl(mockSessionRepository),
+      new DataRequiredActionImpl,
+      new CisIdRequiredActionImpl(),
+      stubMessagesControllerComponents(),
+      mockView,
+      mockVerificationHistoryService,
+      mockVerificationService
+    )
   }
 
-  "VerificationRequestController" - {
+  "onPageLoad must" - {
 
-    "onPageLoad must return OK using VerificationHistoryDataPage when data is available" in new Setup {
-      val userAnswers = userAnswersWithVerificationHistoryData
+    "return OK when Verification Service returns history data" in new Setup {
+      givenSessionWithData(Some(userAnswersWithCisId))
+      when(mockVerificationService.getSubmittedVerifications(any)(any)) thenReturn
+        Future.successful(verificationHistoryData)
+      when(mockVerificationHistoryService.buildVerificationRequestViewModel(any, any, any)) thenReturn Some(viewModel)
+      val givenViewContent = "Hello, world!"
+      when(mockView.apply(any)(any, any)) thenReturn Html(givenViewContent)
 
-      when(
-        mockVerificationHistoryService.buildVerificationRequestViewModel(
-          verificationHistoryData,
-          verificationBatchId,
-          cisId
-        )
-      ).thenReturn(Some(viewModel))
+      private val result = controllerUnderTest.onPageLoad(verificationBatchId)(FakeRequest())
 
-      val app = application(userAnswers)
+      status(result) mustEqual OK
+      contentAsString(result) mustEqual givenViewContent
 
-      running(app) {
-        val request = FakeRequest(GET, routes.VerificationRequestController.onPageLoad(verificationBatchId).url)
-        val result  = route(app, request).value
-        val view    = app.injector.instanceOf[VerificationRequestView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
-
-        mockVerify(mockVerificationHistoryService)
-          .buildVerificationRequestViewModel(verificationHistoryData, verificationBatchId, cisId)
-        verifyNoInteractions(mockVerificationService)
-      }
+      mockVerify(mockVerificationService).getSubmittedVerifications(eqTo(cisId))(any)
+      mockVerify(mockVerificationHistoryService)
+        .buildVerificationRequestViewModel(verificationHistoryData, verificationBatchId, cisId)
     }
 
-    "onPageLoad must retrieve submitted verifications when VerificationHistoryDataPage is missing" in new Setup {
-      val userAnswers = userAnswersWithCisId
+    "redirect to JourneyRecovery when the verification number is not found" in new Setup {
+      givenSessionWithData(Some(userAnswersWithCisId))
+      when(mockVerificationService.getSubmittedVerifications(any)(any)) thenReturn Future.successful(
+        verificationHistoryData
+      )
+      when(mockVerificationHistoryService.buildVerificationRequestViewModel(any, any, any)) thenReturn None
 
-      when(mockVerificationService.getSubmittedVerifications(any[String])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(submittedVerificationsResponse))
-      when(mockVerificationHistoryService.toVerificationHistoryData(submittedVerificationsResponse))
-        .thenReturn(verificationHistoryData)
-      when(
-        mockVerificationHistoryService.buildVerificationRequestViewModel(
-          verificationHistoryData,
-          verificationBatchId,
-          cisId
-        )
-      ).thenReturn(Some(viewModel))
+      private val result = controllerUnderTest.onPageLoad(verificationBatchId)(FakeRequest())
 
-      val app = application(userAnswers)
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual journeyRecoveryUrl
 
-      running(app) {
-        val request = FakeRequest(GET, routes.VerificationRequestController.onPageLoad(verificationBatchId).url)
-        val result  = route(app, request).value
-
-        status(result) mustEqual OK
-
-        mockVerify(mockVerificationService).getSubmittedVerifications(any[String])(any[HeaderCarrier])
-        mockVerify(mockVerificationHistoryService).toVerificationHistoryData(submittedVerificationsResponse)
-      }
+      mockVerify(mockVerificationService).getSubmittedVerifications(eqTo(cisId))(any)
+      mockVerify(mockVerificationHistoryService)
+        .buildVerificationRequestViewModel(verificationHistoryData, verificationBatchId, cisId)
     }
 
-    "onPageLoad must redirect to JourneyRecovery when the verification number is not found" in new Setup {
-      val userAnswers = userAnswersWithVerificationHistoryData
+    "redirect when CisIdPage is missing" in new Setup {
+      givenSessionWithData(Some(emptyUserAnswers))
 
-      when(
-        mockVerificationHistoryService.buildVerificationRequestViewModel(
-          verificationHistoryData,
-          verificationBatchId,
-          cisId
-        )
-      ).thenReturn(None)
+      private val result = controllerUnderTest.onPageLoad(verificationBatchId)(FakeRequest())
 
-      val app = application(userAnswers)
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual unauthorisedUrl
 
-      running(app) {
-        val request = FakeRequest(GET, routes.VerificationRequestController.onPageLoad(verificationBatchId).url)
-        val result  = route(app, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual journeyRecoveryUrl
-      }
-    }
-
-    "onPageLoad must redirect when CisIdPage is missing" in new Setup {
-      val app = application(emptyUserAnswers)
-
-      running(app) {
-        val request = FakeRequest(GET, routes.VerificationRequestController.onPageLoad(verificationBatchId).url)
-        val result  = route(app, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual unauthorisedUrl
-      }
+      verifyNoInteractions(mockVerificationService, mockVerificationHistoryService)
     }
   }
 }
