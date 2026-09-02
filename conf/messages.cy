@@ -140,7 +140,7 @@ clientdetails.clientRemoved.survey.link                      =  Beth oedd eich b
 clientdetails.clientRemoved.survey.suffix                    =  (mae’n cymryd 30 eiliad)
 
 
-# Landing Pages
+# Introduction & Landing
 introduction.title                                                =  Cynllun y Diwydiant Adeiladu (CIS)
 introduction.heading                                              =  Cynllun y Diwydiant Adeiladu (CIS)
 introduction.p1                                                   =  Defnyddiwch y gwasanaeth hwn i wneud y canlynol:
@@ -169,3 +169,25 @@ introduction.sidebar.link1                                        =  Beth yw Cyn
 introduction.sidebar.link2                                        =  Arweiniad datganiadau CIS misol
 introduction.sidebar.link3                                        =  CIS 340: Cosbau am ddatganiadau hwyr
 introduction.sidebar.link4                                        =  Arweiniad awdurdod cleientiaid
+
+contractorLanding.title                                           =  Rheoli cyfrif Cynllun y Diwydiant Adeiladu
+contractorLanding.heading                                         =  Rheoli cyfrif Cynllun y Diwydiant Adeiladu
+
+contractorLanding.label.schemeName                                =  Enw’r cynllun
+contractorLanding.label.employerReference                         =  Cyfeirnod y cyflogwr
+
+contractorLanding.landing.card.manageYourCisReturn.title          =  Rheoli’ch datganiad CIS
+contractorLanding.landing.card.manageYourCisReturn.p              =  Cyflwyno neu ddiwygio’ch datganiadau misol neu’ch datganiadau ‘dim’.
+contractorLanding.landing.card.manageYourSubcontractors.title     =  Rheoli’ch is-gontractwyr
+contractorLanding.landing.card.manageYourSubcontractors.p         =  Ychwanegu neu ddiwygio is-gontractwr, cyflwyno neu weld cais am ddilysiad.
+contractorLanding.landing.card.manageYourContractorDetails.title  =  Rheoli eich manylion contractwr
+contractorLanding.landing.card.manageYourContractorDetails.p      =  Ychwanegu neu newid Cyfeirnod Unigryw y Trethdalwr (UTR), enw’r cynllun neu gyfeiriad e-bost.
+contractorLanding.landing.card.appealPenalty.title                =  Apelio yn erbyn cosb
+contractorLanding.landing.card.appealPenalty.p                    =  Apelio yn erbyn cosb cyn pen 30 diwrnod o’i gael.
+contractorLanding.landing.card.noticesAndStatements.title         =  Hysbysiadau a datganiadau
+contractorLanding.landing.card.noticesAndStatements.p             =  Gweld hysbysiad gan CThEF, rhybuddion am gosb, a datganiadau cadarnhau.
+
+contractorLanding.sidebar.title                                   =  Help ac arweiniad
+contractorLanding.sidebar.nav.whatIs.text                         =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
+contractorLanding.sidebar.nav.guidance.text                       =  Talu TWE y cyflogwr
+contractorLanding.sidebar.nav.penalties.text                      =  Cosbau am ddatganiadau hwyr (CIS) CC/FS18b
