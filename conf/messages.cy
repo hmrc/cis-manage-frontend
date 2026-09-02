@@ -138,3 +138,34 @@ clientdetails.clientRemoved.p1                               =  Gall gymryd hyd 
 clientdetails.clientRemoved.return.link                      =  Dychwelyd i’ch rhestr o gleientiaid
 clientdetails.clientRemoved.survey.link                      =  Beth oedd eich barn am y gwasanaeth hwn?
 clientdetails.clientRemoved.survey.suffix                    =  (mae’n cymryd 30 eiliad)
+
+
+# Landing Pages
+introduction.title                                                =  Cynllun y Diwydiant Adeiladu (CIS)
+introduction.heading                                              =  Cynllun y Diwydiant Adeiladu (CIS)
+introduction.p1                                                   =  Defnyddiwch y gwasanaeth hwn i wneud y canlynol:
+introduction.listItem1                                            =  cyflwyno datganiadau CIS misol
+introduction.listItem2                                            =  cyflwyno datganiadau ‘dim’ (pan nad ydych wedi gwneud taliadau)
+introduction.listItem3                                            =  gweld a rheoli is-gontractwyr
+introduction.listItem4                                            =  diwygio datganiadau rydych wedi’u cyflwyno eisoes
+introduction.listItem5                                            =  gweld hysbysiadau a datganiadau
+introduction.listItem6                                            =  apelio yn erbyn cosbau am gyflwyno’n hwyr
+introduction.listItem7                                            =  cadw datganiadau sy’n anghyflawn
+introduction.inset                                                =  Mae’n rhaid i chi gyflwyno datganiad CIS ar gyfer pob mis, a gwneud hynny erbyn y 19fed o’r mis dilynol.
+introduction.h2                                                   =  Cyn i chi ddechrau
+introduction.p2                                                   =  Er mwyn defnyddio’r gwasanaeth hwn, bydd angen y canlynol arnoch:
+introduction.listItem8                                            =  awdurdod i weithredu ar ran eich cleient
+introduction.listItem9                                            =  cyfeirnod swyddfa dreth neu Gyfeirnod Unigryw y Trethdalwr (UTR)
+introduction.listItem10                                           =  manylion taliadau sydd wedi’u gwneud i is-gontractwyr yn ystod y mis treth
+
+introduction.details.summary                                      =  Dulliau eraill o gyflwyno datganiadau CIS
+introduction.details.h3                                           =  Gwasanaeth cyflwyno yn unig
+introduction.details.p1                                           =  Gallwch anfon datganiadau CIS misol heb gwblhau awdurdodiad ar-lein neu heb ffurflen FBI-2.
+introduction.details.p2                                           =  Mae’r gwasanaeth hwn ar gael wrth ddefnyddio meddalwedd fasnachol yn unig.
+introduction.details.link                                         =  Dewch o hyd i feddalwedd fasnachol ar gyfer datganiadau CIS
+
+introduction.sidebar.h2                                           =  Cynnwys cysylltiedig
+introduction.sidebar.link1                                        =  Beth yw Cynllun y Diwydiant Adeiladu
+introduction.sidebar.link2                                        =  Arweiniad datganiadau CIS misol
+introduction.sidebar.link3                                        =  CIS 340: Cosbau am ddatganiadau hwyr
+introduction.sidebar.link4                                        =  Arweiniad awdurdod cleientiaid
