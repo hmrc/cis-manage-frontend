@@ -54,7 +54,7 @@ class UnsuccessfulAutomaticSubcontractorUpdateController @Inject() (
 
   def onSubmit(instanceId: String): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireSchemeAccess(instanceId)) { implicit request =>
-      Redirect(appConfig.contractorDetailsIntroductionUrl)
+      Redirect(appConfig.contractorDetailsManagementUrl)
     }
 
 }
