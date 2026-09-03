@@ -109,6 +109,20 @@ subcontractorsLandingPage.aside.link1                         =  Cynllun y Diwyd
 subcontractorsLandingPage.aside.link2                         =  Diweddariadau dros e-bost, fideos a gweminarau ynghylch Cynllun y Diwydiant Adeiladu
 subcontractorsLandingPage.aside.link3                         =  Rhagor o wybodaeth ynghylch rheoli eiddo ac adeiladu
 
+returnsLanding.title                                              =  Rheoli’ch datganiad CIS
+returnsLanding.heading                                            =  Rheoli’ch datganiad CIS
+returnsLanding.fileMonthlyReturn.h3.link                          =  Cyflwyno datganiad misol
+returnsLanding.fileMonthlyReturn.p1                               =  Cyflwyno datganiad CIS ar gyfer unrhyw is-gontractwyr a dalwyd mewn mis treth.
+returnsLanding.fileNilReturn.h3.link                              =  Cyflwyno datganiad ’dim’
+returnsLanding.fileNilReturn.p1                                   =  Cyflwyno datganiad ’dim’ pan na chafodd unrhyw daliadau eu gwneud i is-gontractwyr mewn mis treth.
+returnsLanding.viewSubmittedReturns.h3.link                       =  Gweld datganiad a gyflwynwyd
+returnsLanding.viewSubmittedReturns.p1                            =  Gweld datganiadau misol neu ddatganiadau ‘dim’ a gyflwynwyd.
+returnsLanding.incompleteReturns.h3.link                          =  Datganiadau anghyflawn
+returnsLanding.incompleteReturns.p1                               =  Cyflwyno datganiad sydd ar y gweill ar hyn o bryd, neu ailgyflwyno datganiad na chafodd ei dderbyn i ddechrau.
+returnsLanding.aside.h2                                           =  Help ac arweiniad
+returnsLanding.aside.link1                                        =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
+returnsLanding.aside.link2                                        =  Dod o hyd i gyflenwyr meddalwedd ar gyfer Cynllun y Diwydiant Adeiladu (CIS) - GOV.UK
+
 # Agent
 agent.clientListSearch.title                       =  Dewiswch gleient er mwyn cyflwyno datganiad CIS
 agent.clientListSearch.heading                     =  Cyflwyno datganiad CIS misol
