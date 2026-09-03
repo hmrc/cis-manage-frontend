@@ -54,12 +54,31 @@ object VerificationHistorySelectTaxYear {
     yearItems ++ divider ++ viewAll
   }
 
-  private def labelFor(taxYear: TaxYearPeriod, currentTaxYearStart: Int)(implicit messages: Messages): String =
-    if (taxYear.startYear == currentTaxYearStart) {
-      s"${taxYear.toString} ${messages("verify.verificationHistorySelectTaxYear.currentTaxYear")}"
+  private def labelFor(
+    taxYearPeriod: TaxYearPeriod,
+    currentTaxYearStart: Int
+  )(implicit messages: Messages): String = {
+
+    val taxYear = s"${taxYearPeriod.startYear} to ${taxYearPeriod.endYear}"
+
+    val taxYearLabel =
+      taxYear.split(" to ") match {
+        case Array(start, end) =>
+          messages(
+            "verify.verificationHistorySelectTaxYear.taxYear",
+            start,
+            end
+          )
+        case _                 =>
+          taxYear
+      }
+
+    if (taxYearPeriod.startYear == currentTaxYearStart) {
+      s"$taxYearLabel ${messages("verify.verificationHistorySelectTaxYear.currentTaxYear")}"
     } else {
-      taxYear.toString
+      taxYearLabel
     }
+  }
 
   private def taxYearStart(date: LocalDate): Int = {
     val taxYearStartDate = LocalDate.of(date.getYear, 4, 6)

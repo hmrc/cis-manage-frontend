@@ -432,6 +432,7 @@ history.submittedReturnsChooseTaxYear.heading                                =  
 history.submittedReturnsChooseTaxYear.caption                                =  Submitted returns
 history.submittedReturnsChooseTaxYear.viewAll                                =  View all tax years
 history.submittedReturnsChooseTaxYear.error.required                         =  Select a tax year or all tax years
+history.submittedReturnsChooseTaxYear.taxYear                                = {0} to {1}
 
 history.printSubmissionDetails.title                                         =  Monthly return for period ending {0}
 history.printSubmissionDetails.heading                                       =  Monthly return for period ending {0}
@@ -581,7 +582,7 @@ verify.verificationHistorySelectTaxYear.heading              =  Which tax year d
 verify.verificationHistorySelectTaxYear.currentTaxYear       =  (current tax year)
 verify.verificationHistorySelectTaxYear.viewAll              =  View all tax years
 verify.verificationHistorySelectTaxYear.error.required       =  Select a tax year
-history.submittedReturnsChooseTaxYear.taxYear                = {0} to {1}
+verify.verificationHistorySelectTaxYear.taxYear              = {0} to {1}
 
 verify.verificationHistory.allYears.title                    =  Verification request history for all tax years
 verify.verificationHistory.allYears.heading                  =  Verification request history for all tax years

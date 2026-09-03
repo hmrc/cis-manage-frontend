@@ -15,6 +15,7 @@ history.submittedReturnsChooseTaxYear.title                                  =  
 history.submittedReturnsChooseTaxYear.heading                                =  Pa flwyddyn dreth ydych am fwrw golwg drosti?
 history.submittedReturnsChooseTaxYear.viewAll                                =  Bwrw golwg dros bob blwyddyn dreth
 history.submittedReturnsChooseTaxYear.error.required                         =  Dewiswch flwyddyn dreth neu bob blwyddyn dreth
+history.submittedReturnsChooseTaxYear.taxYear                                = {0} i {1}
 
 history.printSubmissionDetails.title                                         =  Datganiad misol ar gyfer cyfnod sy’n dod i ben {0}
 history.printSubmissionDetails.heading                                       =  Datganiad misol ar gyfer cyfnod sy’n dod i ben {0}
@@ -56,7 +57,7 @@ verify.verificationHistorySelectTaxYear.heading              =  O ba flwyddyn dr
 verify.verificationHistorySelectTaxYear.currentTaxYear       =  (blwyddyn dreth bresennol)
 verify.verificationHistorySelectTaxYear.viewAll              =  Bwrw golwg dros bob blwyddyn dreth
 verify.verificationHistorySelectTaxYear.error.required       =  Dewiswch flwyddyn dreth
-history.submittedReturnsChooseTaxYear.taxYear = {0} i {1}
+verify.verificationHistorySelectTaxYear.taxYear              = {0} i {1}
 
 verify.verificationHistory.allYears.title                    =  Hanes cais dilysu ar gyfer pob blwyddyn dreth
 verify.verificationHistory.allYears.heading                  =  Hanes cais dilysu ar gyfer pob blwyddyn dreth
