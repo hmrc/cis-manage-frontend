@@ -243,3 +243,12 @@ agent.failedToRetrieveClient.inset.h2                  =  Gwasanaeth cyflwyno yn
 agent.failedToRetrieveClient.inset.p3                  =  Gallwch anfon datganiadau CIS misol ar ran cleient heb gwblhau awdurdodiad ar-lein neu ffurflen FBI-2.
 agent.failedToRetrieveClient.inset.p4                  =  Mae’r gwasanaeth hwn ar gael wrth ddefnyddio meddalwedd fasnachol yn unig.
 agent.failedToRetrieveClient.inset.link                =  Dewch o hyd i feddalwedd fasnachol ar gyfer datganiadau CIS
+
+agent.retrievingClient.title                           =  Adalw eich rhestr o gleientiaid
+agent.retrievingClient.h1                              =  Adalw eich rhestr o gleientiaid
+agent.retrievingClient.p1                              =  Arhoswch tra byddwn yn adfer eich cleientiaid awdurdodedig. Dylai hyn ond cymryd ambell funud.
+agent.retrievingClient.p2                              =  Peidiwch ag adfywio’r dudalen hon na defnyddio’r botwm i fynd yn ôl.
+agent.retrievingClient.inset.h2                        =  Gwasanaeth cyflwyno yn unig
+agent.retrievingClient.inset.p3                        =  Gallwch anfon datganiadau CIS misol ar ran cleient heb gwblhau awdurdodiad ar-lein neu ffurflen FBI-2.
+agent.retrievingClient.inset.p4                        =  Mae’r gwasanaeth hwn ar gael wrth ddefnyddio meddalwedd fasnachol yn unig.
+agent.retrievingClient.inset.link                      =  Dewch o hyd i feddalwedd fasnachol ar gyfer datganiadau CIS
