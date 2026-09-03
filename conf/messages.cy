@@ -88,6 +88,27 @@ agent.landing.help.link1                               =  Cynllun y Diwydiant Ad
 agent.landing.help.link2                               =  Talu TWE y cyflogwr
 agent.landing.help.link3                               =  Cosbau am ddatganiadau hwyr (CIS) CC/FS18b
 
+subcontractorsLandingPage.title                               =  Rheoli’ch is-gontractwyr
+subcontractorsLandingPage.heading                             =  Rheoli’ch is-gontractwyr
+subcontractorsLandingPage.p1                                  =  Mae’n rhaid i is-gontractwyr fod wedi’u dilysu cyn y cewch eu cynnwys mewn datganiad misol. Bydd hyn yn sicrhau bod didyniadau yn cael eu gwneud ar y gyfradd gywir.
+subcontractorsLandingPage.hint.prefix                         =  Bydd angen i chi ddefnyddio meddalwedd
+subcontractorsLandingPage.hint.link                           =  fasnachol
+subcontractorsLandingPage.hint.suffix                         =  er mwyn cyflwyno unrhyw geisiadau am ddilysiad sy’n cynnwys mwy na 50 o is-gontractwyr.
+subcontractorsLandingPage.addSubcontractors                   =  Ychwanegu is-gontractwr newydd
+subcontractorsLandingPage.addSubcontractors.p1                =  Creu cofnodion ar gyfer unrhyw is-gontractwyr newydd yr ydych am eu talu.
+subcontractorsLandingPage.verifySubcontractors                =  Dilysu’ch is-gontractwyr
+subcontractorsLandingPage.verifySubcontractors.p1             =  Sicrhewch bod eich is-gontractwyr yn cael y triniaeth cywir o ran treth.
+subcontractorsLandingPage.viewSubcontractors                  =  Gweld eich is-gontractwyr
+subcontractorsLandingPage.viewSubcontractors.p1               =  Diwygio’r manylion ynghylch unrhyw is-gontractwr yn eich rhestr.
+subcontractorsLandingPage.viewVerificationHistory             =  Adolygu eich hanes dilysu
+subcontractorsLandingPage.viewVerificationHistory.p1          =  Lawrlwytho neu argraffu copïau o’r holl geisiadau am ddilysiad rydych wedi’u cyflwyno.
+subcontractorsLandingPage.checkResults                        =  Gwirio eich canlyniadau
+subcontractorsLandingPage.checkResults.p1                     =  Gweld canlyniad eich cais diweddaraf am ddilysiad.
+subcontractorsLandingPage.aside.h2                            =  Help ac arweiniad
+subcontractorsLandingPage.aside.link1                         =  Cynllun y Diwydiant Adeiladu: Canllaw ar gyfer contractwyr ac is-gontractwyr
+subcontractorsLandingPage.aside.link2                         =  Diweddariadau dros e-bost, fideos a gweminarau ynghylch Cynllun y Diwydiant Adeiladu
+subcontractorsLandingPage.aside.link3                         =  Rhagor o wybodaeth ynghylch rheoli eiddo ac adeiladu
+
 # Agent
 agent.clientListSearch.title                       =  Dewiswch gleient er mwyn cyflwyno datganiad CIS
 agent.clientListSearch.heading                     =  Cyflwyno datganiad CIS misol
