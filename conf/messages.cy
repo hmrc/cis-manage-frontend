@@ -230,3 +230,17 @@ agent.clientListSearch.details.2.p2                    =  Mae’r gwasanaeth hwn
 agent.clientListSearch.details.2.link                  =  Dewch o hyd i feddalwedd fasnachol ar gyfer datganiadau CIS
 agent.clientListSearch.td.actions.remove.hidden        =  Dewis {0}
 agent.clientListSearch.td.clientName.hidden            =  Dileu {0}
+
+agent.noAuthorisedClients.title                        =  Nid oes gennych unrhyw gleientiaid awdurdodedig
+agent.noAuthorisedClients.heading                      =  Nid oes gennych unrhyw gleientiaid awdurdodedig
+agent.noAuthorisedClients.p1                           =  Nid oes gennych unrhyw gleientiaid sydd ag awdurdod i ddefnyddio’r gwasanaeth ar gyfer Cynllun y Diwydiant Adeiladu (CIS).
+agent.noAuthorisedClients.p2                           =  I gyflwyno datganiadau ar ran cleient, mae’n rhaid iddynt eich awdurdodi i weithredu ar eu rhan.
+agent.noAuthorisedClients.h2                           =  Yr hyn y mae angen i chi ei wneud
+agent.noAuthorisedClients.p3                           =  Gofynnwch i’ch cleient eich awdurdodi. Gall eich cleient wneud hyn drwy naill ai:
+agent.noAuthorisedClients.listItem1                    =  eich awdurdodi drwy ei
+agent.noAuthorisedClients.listItem1.link               =  gyfrif ar-lein CThEF
+agent.noAuthorisedClients.listItem2                    =  lawrlwytho a chwblhau
+agent.noAuthorisedClients.listItem2.link               =  ffurflen 64-8
+agent.noAuthorisedClients.listItem2.afterLinkText      =  er mwyn eich awdurdodi drwy’r post
+agent.noAuthorisedClients.p4                           =  Gall gymryd hyd at 5 diwrnod gwaith i awdurdodiadau newydd ymddangos yn eich cyfrif.
+agent.noAuthorisedClients.returnToHome.link            =  Dychwelyd i’r hafan
