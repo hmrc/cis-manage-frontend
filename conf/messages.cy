@@ -1,15 +1,15 @@
 # Infrastructure
-service.name          =  Cynllun y Diwydiant Adeiladu
-
-site.change           =  Newid
-site.back             =  Yn ôl
-site.no               =  Na
-site.yes              =  Iawn
-site.continue         =  Parhau
-site.saveAndContinue  =  Cadw a pharhau
-site.govuk            =  GOV.UK
-
-error.title.prefix    =  Error:
+service.name                              =  Cynllun y Diwydiant Adeiladu
+site.change                               =  Newid
+site.back                                 =  Yn ôl
+site.no                                   =  Na
+site.yes                                  =  Iawn
+site.continue                             =  Parhau
+site.saveAndContinue                      =  Cadw a pharhau
+site.govuk                                =  GOV.UK
+site.or                                   =  neu
+site.view                                 =  Bwrw golwg dros
+error.title.prefix                        =  Error:
 
 # Subcontractors
 retrievingSubcontractors.title                                =  Eich is-gontractwyr
@@ -50,6 +50,7 @@ history.submittedReturnsChooseTaxYear.title                                  =  
 history.submittedReturnsChooseTaxYear.heading                                =  Pa flwyddyn dreth ydych am fwrw golwg drosti?
 history.submittedReturnsChooseTaxYear.viewAll                                =  Bwrw golwg dros bob blwyddyn dreth
 history.submittedReturnsChooseTaxYear.error.required                         =  Dewiswch flwyddyn dreth neu bob blwyddyn dreth
+history.submittedReturnsChooseTaxYear.taxYear                                = {0} i {1}
 
 history.printSubmissionDetails.title                                         =  Datganiad misol ar gyfer cyfnod sy’n dod i ben {0}
 history.printSubmissionDetails.heading                                       =  Datganiad misol ar gyfer cyfnod sy’n dod i ben {0}
@@ -85,6 +86,73 @@ history.returnHistory.backLink                                               =  
 history.returnHistory.status.awaitingConfirmation                            =  Yn aros am gadarnhad
 history.returnHistory.status.amend                                           =  Diwygio
 history.returnHistory.status.notAvailable                                    =  Ddim ar gael
+
+verify.verificationHistorySelectTaxYear.title                =  O ba flwyddyn dreth ymlaen ydych am weld ceisiadau dilysu?
+verify.verificationHistorySelectTaxYear.heading              =  O ba flwyddyn dreth ymlaen ydych am weld ceisiadau dilysu?
+verify.verificationHistorySelectTaxYear.currentTaxYear       =  (blwyddyn dreth bresennol)
+verify.verificationHistorySelectTaxYear.viewAll              =  Bwrw golwg dros bob blwyddyn dreth
+verify.verificationHistorySelectTaxYear.error.required       =  Dewiswch flwyddyn dreth
+verify.verificationHistorySelectTaxYear.taxYear              = {0} i {1}
+
+verify.verificationHistory.allYears.title                    =  Hanes cais dilysu ar gyfer pob blwyddyn dreth
+verify.verificationHistory.allYears.heading                  =  Hanes cais dilysu ar gyfer pob blwyddyn dreth
+verify.verificationHistory.singleYear.title                  =  Hanes cais dilysu ar gyfer blwyddyn dreth unigol
+verify.verificationHistory.singleYear.heading                =  Hanes cais dilysu ar gyfer blwyddyn dreth {0} i {1}
+verify.verificationHistory.table.verificationNumber          =  Rhif dilysu
+verify.verificationHistory.table.dateSubmitted               =  Dyddiad cyflwyno
+verify.verificationHistory.table.verificationRequest         =  Cais dilysu
+verify.verificationHistory.table.submissionReceipt           =  Derbynneb am gyflwyno
+verify.verificationHistory.backToManagePrefix                =  Yn ôl i
+verify.verificationHistory.backToManage                      =  Rheoli’ch is-gontractwyr
+verify.verificationHistory.hidden.verificationRequest        =  Cais dilysu gyfer {0}
+verify.verificationHistory.hidden.submissionReceipt          =  Derbynneb am gyflwyno gyfer {0}
+
+verify.noVerificationHistory.title                           =  Dim hanes dilysu
+verify.noVerificationHistory.heading                         =  Hanes dilysu
+verify.noVerificationHistory.p1                              =  Nid oes unrhyw geisiadau dilysu i’w dangos ar hyn o bryd.
+verify.noVerificationHistory.p2                              =  Unwaith y byddwch wedi creu a chyflwyno un, gallwch argraffu neu lawrlwytho copi ohono oddi yma.
+verify.noVerificationHistory.backTo                          =  Yn ôl i
+verify.noVerificationHistory.manageYourSubcontractors.link   =  Rheoli’ch is-gontractwyr
+
+verify.verificationRequest.title                             =  Cais dilysu
+verify.verificationRequest.heading                           =  Cais dilysu
+verify.verificationRequest.submissionDetails.heading         =  Manylion y cyflwyniad
+verify.verificationRequest.submittedAt                       =  Cyflwynwyd am {0} ar {1}
+verify.verificationRequest.verificationNumber                =  Rhif dilysu
+verify.verificationRequest.contractorName                    =  Enw’r contractwr
+verify.verificationRequest.employerReference                 =  Cyfeirnod y Cyflogwr
+verify.verificationRequest.receiptReferenceNumber            =  Cyfeirnod y dderbynneb
+verify.verificationRequest.subcontractorsInRequest           =  Is-gontractwyr yn y cais hwn
+verify.verificationRequest.subcontractorsToVerify.heading    =  Is-gontractwyr i’w dilysu
+verify.verificationRequest.subcontractorsToReverify.heading  =  Is-gontractwyr i’w dilysu eto
+verify.verificationRequest.table.name                        =  Enw
+verify.verificationRequest.table.verificationNumber          =  Rhif dilysu
+verify.verificationRequest.printThisRequest                  =  Argraffu’r cais hwn
+verify.verificationRequest.backTo                            =  Yn ôl i
+verify.verificationRequest.manageLink                        =  Rheoli’ch is-gontractwyr
+
+verify.subcontractorSubmissionReceipt.title                  =  Derbynneb am gyflwyno
+verify.subcontractorSubmissionReceipt.heading                =  Derbynneb am gyflwyno
+verify.subcontractorSubmissionReceipt.subheading             =  Manylion y cyflwyniad
+verify.subcontractorSubmissionReceipt.p1                     =  Cyflwynwyd am {0} ar {1}
+verify.subcontractorSubmissionReceipt.p2                     =  Mae’ch cais dilysu wedi’i gyflwyno i CThEF yn llwyddiannus.
+verify.subcontractorSubmissionReceipt.p3                     =  Cadwch y dderbynneb hon ar gyfer eich cofnodion.
+verify.subcontractorSubmissionReceipt.link1                  =  Argraffu’r dderbynneb hon
+verify.subcontractorSubmissionReceipt.link2.prefix           =  Yn ôl i
+verify.subcontractorSubmissionReceipt.link2.link             =  Rheoli’ch is-gontractwyr
+verify.subcontractorSubmissionReceipt.summaryList.key1       =  Enw’r contractwr
+verify.subcontractorSubmissionReceipt.summaryList.key2       =  Cyfeirnod y Cyflogwr
+verify.subcontractorSubmissionReceipt.summaryList.key3       =  Cyfeirnod y dderbynneb
+verify.subcontractorSubmissionReceipt.summaryList.key4       =  cyfeirnod dilysu rhif
+
+# Client Details
+clientdetails.manageClientDetails.title                                  =  Manylion y cleient
+clientdetails.manageClientDetails.heading                                =  Manylion ar gyfer {0}
+clientdetails.manageClientDetails.employerRef.key                        =  Cyfeirnod cyflogwr
+clientdetails.manageClientDetails.clientRef.key                          =  Cyfeirnod y cleient
+clientdetails.manageClientDetails.clientRef.key.hidden                   =  cyfeirnod y cleient
+clientdetails.manageClientDetails.clientRef.link                         =  Newid
+clientdetails.manageClientDetails.return.link                            =  Dychwelyd i ddangosfwrdd y cleient
 
 # Delete
 delete.deleteMonthlyReturn.title                     =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ar gyfer {0}?
