@@ -28,6 +28,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.ManageService
+import play.api.i18n.Lang
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel}
 import views.html.IncompleteReturnsView
@@ -57,7 +58,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         )
       )
 
-      when(mockService.getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier]))
+      when(mockService.getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier], any[Lang]()))
         .thenReturn(Future.successful(rows))
 
       val userAnswers = emptyUserAnswers.set(CisIdPage, "1234567890").success.value
@@ -76,14 +77,14 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(rows)(request, messages(application)).toString
 
-        verify(mockService).getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier])
+        verify(mockService).getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier], any[Lang]())
       }
     }
 
     "must redirect to NoIncompleteReturnsController when there are no incomplete returns" in {
       val mockService = mock[ManageService]
 
-      when(mockService.getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier]))
+      when(mockService.getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier], any[Lang]()))
         .thenReturn(Future.successful(Seq.empty))
 
       val userAnswers = emptyUserAnswers.set(CisIdPage, "123").success.value
@@ -101,7 +102,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual
           controllers.history.routes.NoIncompleteReturnsController.onPageLoad().url
 
-        verify(mockService).getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier])
+        verify(mockService).getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier], any[Lang]())
       }
     }
   }

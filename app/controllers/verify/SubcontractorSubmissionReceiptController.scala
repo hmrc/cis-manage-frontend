@@ -20,7 +20,7 @@ import controllers.actions.*
 import models.requests.CisIdDataRequest
 import models.verify.VerificationHistoryData
 import pages.verify.VerificationHistoryDataPage
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Lang, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{VerificationHistoryService, VerificationService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -46,6 +46,8 @@ class SubcontractorSubmissionReceiptController @Inject() (
 
   def onPageLoad(verificationBatchId: Long): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+      implicit val lang: Lang = messagesApi.preferred(request).lang
+
       resolveVerificationHistoryData
         .map { data =>
           verificationHistoryService.buildSubmissionReceiptViewModel(data, verificationBatchId, request.cisId) match {
