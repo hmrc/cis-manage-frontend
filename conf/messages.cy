@@ -123,6 +123,21 @@ returnsLanding.aside.h2                                           =  Help ac arw
 returnsLanding.aside.link1                                        =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
 returnsLanding.aside.link2                                        =  Dod o hyd i gyflenwyr meddalwedd ar gyfer Cynllun y Diwydiant Adeiladu (CIS) - GOV.UK
 
+incompleteReturns.title                      =  Datganiadau anghyflawn
+incompleteReturns.heading                    =  Datganiadau anghyflawn neu aflwyddiannus
+incompleteReturns.message                    =  Ni ellir newid mis treth os yw’n anghywir a bod y datganiad ar y gweill. Mae’n rhaid i chi ei ddileu, a chyflwyno datganiad newydd gyda’r mis treth cywir.
+incompleteReturns.table.returnPeriodEnd      =  Cyfnod y datganiad wedi dod i ben
+incompleteReturns.table.returnType           =  Math
+incompleteReturns.table.lastUpdate           =  Diweddarwyd ddiwethaf
+incompleteReturns.table.status               =  Statws
+incompleteReturns.table.action               =  Camau
+incompleteReturns.action.continue            =  Parhau
+incompleteReturns.action.delete              =  Dileu
+incompleteReturns.action.view                =  Gweld
+incompleteReturns.action.continue.hidden     =  Parhau gyda datganiad misol ar gyfer {0}
+incompleteReturns.action.delete.hidden       =  Dileu datganiad misol ar gyfer {0}
+incompleteReturns.action.view.hidden         =  Gweld datganiad misol ar gyfer {0}
+
 # Agent
 agent.clientListSearch.title                       =  Dewiswch gleient er mwyn cyflwyno datganiad CIS
 agent.clientListSearch.heading                     =  Cyflwyno datganiad CIS misol
