@@ -64,6 +64,32 @@ contractorLanding.sidebar.nav.whatIs.text                         =  Cynllun y D
 contractorLanding.sidebar.nav.guidance.text                       =  Talu TWE y cyflogwr
 contractorLanding.sidebar.nav.penalties.text                      =  Cosbau am ddatganiadau hwyr (CIS) CC/FS18b
 
+agent.landing.title                                    =  Rheoli cyfrif Cynllun y Diwydiant Adeiladu
+agent.landing.h1                                       =  Rheoli cyfrif Cynllun y Diwydiant Adeiladu
+agent.landing.agentName.key                            =  Enw’r asiant
+agent.landing.agentName.noName                         =  No name
+agent.landing.schemeName.key                           =  Enw’r cynllun
+agent.landing.schemeName.key.notProvided               =  Not provided
+agent.landing.employerRef.key                          =  Cyfeirnod y cyflogwr
+agent.landing.h2.help                                  =  Help ac arweiniad
+agent.landing.card.manageYourCisReturns.title          =  Rheoli’ch datganiad CIS
+agent.landing.card.manageYourCisReturns.p              =  Cyflwyno neu ddiwygio’ch datganiadau misol neu’ch datganiadau ‘dim’.
+agent.landing.card.manageYourSubcontractors.title      =  Rheoli’ch is-gontractwyr
+agent.landing.card.manageYourSubcontractors.p          =  Ychwanegu neu ddiwygio is-gontractwr, cyflwyno neu weld cais am ddilysiad.
+agent.landing.card.manageYourContractorDetails.title   =  Rheoli eich manylion contractwr
+agent.landing.card.manageYourContractorDetails.p       =  Ychwanegu neu newid Cyfeirnod Unigryw y Trethdalwr (UTR), enw’r cynllun neu gyfeiriad e-bost.
+agent.landing.card.appealPenalty.title                 =  Apelio yn erbyn cosb
+agent.landing.card.appealPenalty.p                     =  Apelio yn erbyn cosb cyn pen 30 diwrnod o’i gael.
+agent.landing.card.manageClientDetails.title           =  Rheoli manylion cleient
+agent.landing.card.manageClientDetails.p               =  Gweld manylion cleient, neu newid cyfeirnod y cyflogwr y cleient.
+agent.landing.card.removeClient.title                  =  Dileu cleient
+agent.landing.card.removeClient.p                      =  Dileu cleient nad ydych yn ei reoli mwyach.
+agent.landing.card.noticesAndStatements.title          =  Hysbysiadau a datganiadau
+agent.landing.card.noticesAndStatements.p              =  Gweld hysbysiad gan CThEF, rhybuddion am gosb, a datganiadau cadarnhau.
+agent.landing.help.link1                               =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
+agent.landing.help.link2                               =  Talu TWE y cyflogwr
+agent.landing.help.link3                               =  Cosbau am ddatganiadau hwyr (CIS) CC/FS18b
+
 # Agent
 agent.clientListSearch.title                       =  Dewiswch gleient er mwyn cyflwyno datganiad CIS
 agent.clientListSearch.heading                     =  Cyflwyno datganiad CIS misol
