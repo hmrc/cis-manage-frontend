@@ -191,8 +191,6 @@ returnsLanding.aside.h2                                           =  Help and gu
 returnsLanding.aside.link1                                        =  Construction Industry Scheme: A guide (CIS 340)
 returnsLanding.aside.link2                                        =  Find software suppliers for the Construction Industry Scheme (CIS) - GOV.UK
 
-returnsLanding.returnToHome.link                                  =  Return to home
-
 # Agent
 agent.retrievingClient.title                           =  Retrieving your client list
 agent.retrievingClient.h1                              =  Retrieving your client list
