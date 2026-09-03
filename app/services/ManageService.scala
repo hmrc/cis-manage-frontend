@@ -19,7 +19,7 @@ package services
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.*
-import models.agent.AgentClientData
+import models.agent.{AgentClientData, UpdateAgentClientRequest}
 import models.history.SubmittedReturnsData
 import models.verify.VerificationRequestDetailData
 import models.requests.*
@@ -344,4 +344,13 @@ class ManageService @Inject() (
         Seq.empty
     }
   }
+
+  def updateClient(uniqueId: String, ua: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] =
+    ua.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId)) match {
+      case Some(client) =>
+        cisConnector.updateClient(UpdateAgentClientRequest(client.taxOfficeNumber, client.taxOfficeRef))
+      case _            =>
+        logger.error(s"[updateClient] missing AgentClientsPage in user answers")
+        Future.failed(new RuntimeException("Missing AgentClientsPage in user answers"))
+    }
 }

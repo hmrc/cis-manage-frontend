@@ -24,14 +24,19 @@
     layout: templates.Layout,
     govukSummaryList: GovukSummaryList,
     govukButton: GovukButton,
+    govukErrorSummary: GovukErrorSummary,
     h1: H1,
     h2: components.H2,
     link: Link
 )
 
-@(uniqueId: String, clientName: String, employerRef: String, clientRef: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], uniqueId: String, clientName: String, employerRef: String, clientRef: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("clientdetails.manageClientDetails.title"))) {
+
+    @if(form.errors.nonEmpty) {
+    @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
+    }
 
     @h1(messages("clientdetails.manageClientDetails.heading", clientName))
 
