@@ -17,21 +17,16 @@
 package controllers.verify
 
 import controllers.actions.*
-import models.requests.CisIdDataRequest
-import models.verify.VerificationHistoryData
-import pages.verify.VerificationHistoryDataPage
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{VerificationHistoryService, VerificationService}
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.SubcontractorSubmissionReceiptView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class SubcontractorSubmissionReceiptController @Inject() (
-  override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -46,7 +41,8 @@ class SubcontractorSubmissionReceiptController @Inject() (
 
   def onPageLoad(verificationBatchId: Long): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
-      resolveVerificationHistoryData
+      verificationService
+        .getSubmittedVerifications(request.cisId)
         .map { data =>
           verificationHistoryService.buildSubmissionReceiptViewModel(data, verificationBatchId, request.cisId) match {
             case Some(vm) => Ok(view(vm))
@@ -56,19 +52,5 @@ class SubcontractorSubmissionReceiptController @Inject() (
         .recover { case _ =>
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
-    }
-
-  private def resolveVerificationHistoryData(implicit
-    request: CisIdDataRequest[AnyContent],
-    hc: HeaderCarrier
-  ): Future[VerificationHistoryData] =
-    request.userAnswers.get(VerificationHistoryDataPage) match {
-      case Some(data) =>
-        Future.successful(data)
-
-      case None =>
-        verificationService
-          .getSubmittedVerifications(request.cisId)
-          .map(verificationHistoryService.toVerificationHistoryData)
     }
 }

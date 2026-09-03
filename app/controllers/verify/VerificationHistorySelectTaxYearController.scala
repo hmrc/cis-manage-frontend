@@ -17,29 +17,25 @@
 package controllers.verify
 
 import controllers.actions.*
-import forms.verify.VerificationHistorySelectTaxYearFormProvider
-import models.Mode
-import models.verify.{VerificationHistoryData, VerificationTaxYearSelection}
-import models.verify.VerificationTaxYearSelection.{AllTaxYears, TaxYear, TaxYearPeriod}
-import pages.verify.{VerificationHistoryDataPage, VerificationHistorySelectTaxYearPage}
-import play.api.i18n.{I18nSupport, MessagesApi}
+import forms.verify.TaxYearFormProvider
+import models.verify.VerificationTaxYearSelection
+import models.verify.VerificationTaxYearSelection.AllTaxYears
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
-import models.verify.VerificationTaxYearSelection.given
-import services.VerificationHistoryService
+import services.{VerificationHistoryService, VerificationService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.verify.VerificationHistorySelectTaxYearView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class VerificationHistorySelectTaxYearController @Inject() (
-  override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: VerificationHistorySelectTaxYearFormProvider,
+  requireCisId: CisIdRequiredAction,
+  formProvider: TaxYearFormProvider,
+  verificationService: VerificationService,
   verificationHistoryService: VerificationHistoryService,
   val controllerComponents: MessagesControllerComponents,
   view: VerificationHistorySelectTaxYearView
@@ -47,70 +43,35 @@ class VerificationHistorySelectTaxYearController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  private def selectionFrom(value: String): VerificationTaxYearSelection =
-    VerificationTaxYearSelection.fromString(value)
+  def onPageLoad(): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+      verificationService
+        .getSubmittedVerifications(request.cisId)
+        .map { history =>
+          val taxYears = verificationHistoryService.getSubmittedVerificationTaxYears(history)
 
-  private def taxYears(data: VerificationHistoryData): Seq[TaxYearPeriod] =
-    verificationHistoryService
-      .getSubmittedVerificationTaxYears(data)
-
-  private def validValues(taxYears: Seq[TaxYearPeriod]): Seq[String] =
-    taxYears.map(_.startYear.toString)
-
-  def onPageLoad(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      request.userAnswers.get(VerificationHistoryDataPage) match {
-        case Some(data) =>
-          val years = taxYears(data)
-          val form  = formProvider(validValues(years))
-
-          val preparedForm =
-            request.userAnswers.get(VerificationHistorySelectTaxYearPage) match {
-              case Some(AllTaxYears) => form.fill("all")
-              case Some(TaxYear(v))  => form.fill(v.toString)
-              case None              => form
-            }
-
-          Ok(view(preparedForm, mode, years))
-
-        case None =>
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      }
+          if taxYears.length > 1
+          then Ok(view(formProvider(taxYears), taxYears))
+          else Redirect(routes.VerificationHistoryController.onPageLoad(AllTaxYears.toPath))
+        }
+        .recover(_ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      request.userAnswers.get(VerificationHistoryDataPage) match {
-        case Some(data) =>
-          val years = taxYears(data)
-          val form  = formProvider(validValues(years))
+  def onSubmit(): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+      verificationService
+        .getSubmittedVerifications(request.cisId)
+        .map { history =>
+          val years = verificationHistoryService.getSubmittedVerificationTaxYears(history)
+          val form  = formProvider(years)
 
           form
             .bindFromRequest()
             .fold(
-              formWithErrors =>
-                Future.successful(
-                  BadRequest(view(formWithErrors, mode, years))
-                ),
-              value => {
-                val selection = selectionFrom(value)
-
-                for {
-                  updatedAnswers <- Future.fromTry(
-                                      request.userAnswers.set(VerificationHistorySelectTaxYearPage, selection)
-                                    )
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield selection match {
-                  case AllTaxYears =>
-                    Redirect(controllers.verify.routes.VerificationHistoryController.onPageLoadAllYears())
-                  case TaxYear(_)  =>
-                    Redirect(controllers.verify.routes.VerificationHistoryController.onPageLoadSingleYear())
-                }
-              }
+              formWithErrors => BadRequest(view(formWithErrors, years)),
+              selection => Redirect(routes.VerificationHistoryController.onPageLoad(selection.toPath))
             )
-
-        case None =>
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      }
+        }
+        .recover(_ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 }

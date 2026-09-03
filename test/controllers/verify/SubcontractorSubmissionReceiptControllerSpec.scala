@@ -16,30 +16,24 @@
 
 package controllers.verify
 
-import base.SpecBase
-import models.UserAnswers
-import models.response.GetSubmittedVerificationsResponse
+import base.UnitSpec
+import controllers.actions.{CisIdRequiredActionImpl, DataRequiredActionImpl, DataRetrievalActionImpl}
 import models.verify.{VerificationHistoryData, VerificationRequestData}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify as mockVerify, verifyNoInteractions, when}
-import org.scalatestplus.mockito.MockitoSugar
-import pages.CisIdPage
-import pages.verify.VerificationHistoryDataPage
-import play.api.Application
-import play.api.inject.bind
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{verify as mockVerify, verifyNoMoreInteractions, when}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.{VerificationHistoryService, VerificationService}
-import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.SubcontractorSubmissionReceiptViewModel
 import views.html.verify.SubcontractorSubmissionReceiptView
 
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with MockitoSugar {
+class SubcontractorSubmissionReceiptControllerSpec extends UnitSpec {
+  import controllers.actions.FakeIdentifierAction
+  import play.twirl.api.Html
 
-  private val cisId               = "900063"
   private val verificationNumber  = "V0004528765"
   private val verificationBatchId = 1L
 
@@ -67,15 +61,6 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
     )
   )
 
-  private val submittedVerificationsResponse =
-    GetSubmittedVerificationsResponse(
-      scheme = Seq.empty,
-      subcontractors = Seq.empty,
-      verificationBatches = Seq.empty,
-      verifications = Seq.empty,
-      submissions = Seq.empty
-    )
-
   private val viewModel =
     SubcontractorSubmissionReceiptViewModel(
       submissionTime = "14:30",
@@ -91,135 +76,67 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
     val mockVerificationHistoryService: VerificationHistoryService = mock[VerificationHistoryService]
     val mockVerificationService: VerificationService               = mock[VerificationService]
 
-    def application(userAnswers: UserAnswers): Application =
-      applicationBuilder(userAnswers = Some(userAnswers))
-        .overrides(
-          bind[VerificationHistoryService].toInstance(mockVerificationHistoryService),
-          bind[VerificationService].toInstance(mockVerificationService)
-        )
-        .build()
+    val mockView: SubcontractorSubmissionReceiptView = mock[SubcontractorSubmissionReceiptView]
+    val givenViewContent                             = "Hello, World!"
+    when(mockView(any)(any, any)) thenReturn Html(givenViewContent)
 
-    def userAnswersWithCisId: UserAnswers =
-      emptyUserAnswers
-        .set(CisIdPage, cisId)
-        .success
-        .value
-
-    def userAnswersWithVerificationHistoryData: UserAnswers =
-      userAnswersWithCisId
-        .set(VerificationHistoryDataPage, verificationHistoryData)
-        .success
-        .value
-
-    def journeyRecoveryUrl: String =
-      controllers.routes.JourneyRecoveryController.onPageLoad().url
-
-    def unauthorisedUrl: String =
-      controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad().url
+    val controllerUnderTest = new SubcontractorSubmissionReceiptController(
+      new FakeIdentifierAction(isAgent = true)(parsers),
+      new DataRetrievalActionImpl(mockSessionRepository),
+      new DataRequiredActionImpl(),
+      new CisIdRequiredActionImpl(),
+      stubMessagesControllerComponents(),
+      mockView,
+      mockVerificationHistoryService,
+      mockVerificationService
+    )
   }
 
   "SubcontractorSubmissionReceipt Controller" - {
 
-    "must return OK using VerificationHistoryDataPage when data is available" in new Setup {
-      when(
-        mockVerificationHistoryService.buildSubmissionReceiptViewModel(
-          verificationHistoryData,
-          verificationBatchId,
-          cisId
-        )
-      ).thenReturn(Some(viewModel))
+    "must return OK when VerificationService retrieves history data and VerificationHistoryService builds view model" in new Setup {
+      givenSessionWithData(Some(userAnswersWithCisId))
+      when(mockVerificationService.getSubmittedVerifications(any)(any)) thenReturn
+        Future.successful(verificationHistoryData)
+      when(mockVerificationHistoryService.buildSubmissionReceiptViewModel(any, any, any)) thenReturn Some(viewModel)
 
-      val app = application(userAnswersWithVerificationHistoryData)
+      private val result = controllerUnderTest.onPageLoad(verificationBatchId)(FakeRequest())
 
-      running(app) {
-        val request =
-          FakeRequest(
-            GET,
-            controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(verificationBatchId).url
-          )
+      status(result) mustEqual OK
+      contentAsString(result) mustEqual givenViewContent
 
-        val result = route(app, request).value
-        val view   = app.injector.instanceOf[SubcontractorSubmissionReceiptView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
-
-        mockVerify(mockVerificationHistoryService)
-          .buildSubmissionReceiptViewModel(verificationHistoryData, verificationBatchId, cisId)
-        verifyNoInteractions(mockVerificationService)
-      }
-    }
-
-    "must retrieve submitted verifications when VerificationHistoryDataPage is missing" in new Setup {
-      when(mockVerificationService.getSubmittedVerifications(any[String])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(submittedVerificationsResponse))
-      when(mockVerificationHistoryService.toVerificationHistoryData(submittedVerificationsResponse))
-        .thenReturn(verificationHistoryData)
-      when(
-        mockVerificationHistoryService.buildSubmissionReceiptViewModel(
-          verificationHistoryData,
-          verificationBatchId,
-          cisId
-        )
-      ).thenReturn(Some(viewModel))
-
-      val app = application(userAnswersWithCisId)
-
-      running(app) {
-        val request =
-          FakeRequest(
-            GET,
-            controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(verificationBatchId).url
-          )
-
-        val result = route(app, request).value
-
-        status(result) mustEqual OK
-        mockVerify(mockVerificationService).getSubmittedVerifications(any[String])(any[HeaderCarrier])
-        mockVerify(mockVerificationHistoryService).toVerificationHistoryData(submittedVerificationsResponse)
-      }
+      mockVerify(mockVerificationService).getSubmittedVerifications(eqTo(cisId))(any)
+      mockVerify(mockVerificationHistoryService)
+        .buildSubmissionReceiptViewModel(verificationHistoryData, verificationBatchId, cisId)
+      verifyNoMoreInteractions(mockVerificationService, mockVerificationHistoryService)
     }
 
     "must redirect to JourneyRecovery when verification number is not found" in new Setup {
-      when(
-        mockVerificationHistoryService.buildSubmissionReceiptViewModel(
-          verificationHistoryData,
-          verificationBatchId,
-          cisId
-        )
-      ).thenReturn(None)
+      givenSessionWithData(Some(userAnswersWithCisId))
+      when(mockVerificationService.getSubmittedVerifications(any)(any)) thenReturn
+        Future.successful(verificationHistoryData)
+      when(mockVerificationHistoryService.buildSubmissionReceiptViewModel(any, any, any)) thenReturn None
 
-      val app = application(userAnswersWithVerificationHistoryData)
+      private val result = controllerUnderTest.onPageLoad(verificationBatchId)(FakeRequest())
 
-      running(app) {
-        val request =
-          FakeRequest(
-            GET,
-            controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(verificationBatchId).url
-          )
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual journeyRecoveryUrl
 
-        val result = route(app, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual journeyRecoveryUrl
-      }
+      mockVerify(mockVerificationService).getSubmittedVerifications(eqTo(cisId))(any)
+      mockVerify(mockVerificationHistoryService)
+        .buildSubmissionReceiptViewModel(verificationHistoryData, verificationBatchId, cisId)
+      verifyNoMoreInteractions(mockVerificationService, mockVerificationHistoryService)
     }
 
     "must redirect when CisIdPage is missing" in new Setup {
-      val app = application(emptyUserAnswers)
+      givenSessionWithData(Some(emptyUserAnswers))
 
-      running(app) {
-        val request =
-          FakeRequest(
-            GET,
-            controllers.verify.routes.SubcontractorSubmissionReceiptController.onPageLoad(verificationBatchId).url
-          )
+      private val result = controllerUnderTest.onPageLoad(verificationBatchId)(FakeRequest())
 
-        val result = route(app, request).value
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual unauthorisedUrl
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual unauthorisedUrl
-      }
+      verifyNoMoreInteractions(mockVerificationService, mockVerificationHistoryService)
     }
   }
 }

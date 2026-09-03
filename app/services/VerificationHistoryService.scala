@@ -60,21 +60,19 @@ class VerificationHistoryService @Inject() () {
 
   def buildSingleYearViewModel(
     data: VerificationHistoryData,
-    taxYear: String,
+    taxYearStart: Int,
     instanceId: String
   ): Option[VerificationHistoryPageViewModel] =
-    taxYear.toIntOption.flatMap { taxYearInt =>
-      val taxYearSections = buildTaxYearSections(data).filter(_.fromYear == taxYearInt)
-      if (taxYearSections.isEmpty) None
-      else {
-        Some(
-          VerificationHistoryPageViewModel(
-            taxYears = taxYearSections,
-            selectedTaxYear = Some(taxYear),
-            instanceId = instanceId
-          )
+    val taxYearSections = buildTaxYearSections(data).filter(_.fromYear == taxYearStart)
+    if (taxYearSections.isEmpty) None
+    else {
+      Some(
+        VerificationHistoryPageViewModel(
+          taxYears = taxYearSections,
+          selectedTaxYear = Some(taxYearStart.toString),
+          instanceId = instanceId
         )
-      }
+      )
     }
 
   def buildVerificationRequestViewModel(

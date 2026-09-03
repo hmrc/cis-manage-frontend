@@ -16,19 +16,30 @@
 
 package forms.verify
 
+import com.google.inject.Inject
 import forms.mappings.Mappings
+import models.verify.VerificationTaxYearSelection
 import play.api.data.Form
 
-import javax.inject.Inject
+class TaxYearFormProvider @Inject() extends Mappings {
+  import VerificationTaxYearSelection.*
 
-class VerificationHistorySelectTaxYearFormProvider @Inject() extends Mappings {
+  private val ALL = "all"
 
-  def apply(taxYears: Seq[String]): Form[String] =
+  def apply(taxYears: Seq[TaxYearPeriod]): Form[VerificationTaxYearSelection] =
+    val taxYearStrings = taxYears.map(_.startYear.toString).toList
+    val validOptions   = ALL :: taxYearStrings
     Form(
       "value" -> text("verify.verificationHistorySelectTaxYear.error.required")
-        .verifying(
-          "verificationHistorySelectTaxYear.error.invalid",
-          value => taxYears.contains(value) || value == "all"
+        .verifying("verificationHistorySelectTaxYear.error.invalid", validOptions.contains)
+        .transform[VerificationTaxYearSelection](
+          VerificationTaxYearSelection.fromString,
+          toInputValue
         )
     )
+
+  private def toInputValue(selection: VerificationTaxYearSelection) =
+    selection match
+      case TaxYear(startYear) => startYear.toString
+      case AllTaxYears        => ALL
 }

@@ -51,8 +51,6 @@ GET  /unauthorised/individual          controllers.UnauthorisedIndividualAffinit
 
 GET  /unauthorised/agent               controllers.UnauthorisedAgentAffinityController.onPageLoad()
 
-GET  /page-not-found                   controllers.PageNotFoundController.onPageLoad()
-
 GET  /access-denied                    controllers.AccessDeniedController.onPageLoad()
 
 GET  /system-error/there-is-a-problem  controllers.SystemErrorController.onPageLoad()
@@ -142,19 +140,14 @@ GET   /no-incomplete-returns  controllers.history.NoIncompleteReturnsController.
 GET  /manage-notices-statements/:instanceId  controllers.notices.ManageNoticesStatementsController.onPageLoad(instanceId: String)
 
 # Verify
-GET   /verify/select-tax-year-for-verification-requests     controllers.verify.VerificationHistorySelectTaxYearController.onPageLoad(mode: Mode = NormalMode)
-POST  /verify/select-tax-year-for-verification-requests     controllers.verify.VerificationHistorySelectTaxYearController.onSubmit(mode: Mode = NormalMode)
+GET   /verify/verification-request        controllers.verify.VerificationRequestController.onPageLoad(verificationBatchId: Long)
 
-GET   /verify/history/verification-history-all-tax-years    controllers.verify.VerificationHistoryController.onPageLoadAllYears()
-GET   /verify/history/verification-history-single-tax-year  controllers.verify.VerificationHistoryController.onPageLoadSingleYear()
+GET   /verify/history/submission-receipt  controllers.verify.SubcontractorSubmissionReceiptController.onPageLoad(verificationBatchId: Long)
 
-GET   /verify/history/submission-receipt                    controllers.verify.SubcontractorSubmissionReceiptController.onPageLoad(verificationBatchId: Long)
+GET   /verify/history/select-tax-year     controllers.verify.VerificationHistorySelectTaxYearController.onPageLoad()
+POST  /verify/history/select-tax-year     controllers.verify.VerificationHistorySelectTaxYearController.onSubmit()
 
-GET   /verify/verification-request                          controllers.verify.VerificationRequestController.onPageLoad(verificationBatchId: Long)
-
-GET   /verification-history/retrieve                        controllers.verify.GetSubmittedVerificationsController.onPageLoad()
-
-GET   /verify/no-verification-history                       controllers.verify.NoVerificationHistoryController.onPageLoad()
+GET   /verify/history/:selection          controllers.verify.VerificationHistoryController.onPageLoad(selection: String)
 
 # Client Details
 GET   /client-details/manage-client-details           controllers.clientdetails.ManageClientDetailsController.onPageLoad()

@@ -17,21 +17,21 @@
 package views.verify
 
 import base.SpecBase
-import forms.verify.VerificationHistorySelectTaxYearFormProvider
-import models.Mode
+import forms.verify.TaxYearFormProvider
+import models.verify.VerificationTaxYearSelection
+import models.verify.VerificationTaxYearSelection.TaxYearPeriod
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
 import play.api.data.Form
-import play.api.i18n.{Messages, MessagesApi, MessagesImpl}
+import play.api.i18n.Messages
 import play.api.mvc.Request
-import models.NormalMode
-import models.verify.VerificationTaxYearSelection.TaxYearPeriod
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import views.html.verify.VerificationHistorySelectTaxYearView
 
 class VerificationHistorySelectTaxYearViewSpec extends SpecBase {
+  import play.api.test.Helpers.*
 
   "VerificationHistorySelectTaxYearView" - {
 
@@ -64,14 +64,14 @@ class VerificationHistorySelectTaxYearViewSpec extends SpecBase {
       val labels =
         doc.select("label").eachText().toArray.toList
 
-      labels must contain("View all tax years")
+      labels must contain("verify.verificationHistorySelectTaxYear.viewAll")
     }
 
     "must show error summary when form has errors" in new Setup {
 
       val errorForm = form.bind(Map("value" -> ""))
 
-      val errorHtml = view(errorForm, mode, taxYears)
+      val errorHtml = view(errorForm, taxYears)
       val doc       = Jsoup.parse(errorHtml.toString)
 
       doc.select(".govuk-error-summary").size() mustBe 1
@@ -88,20 +88,13 @@ class VerificationHistorySelectTaxYearViewSpec extends SpecBase {
     val taxYears: Seq[TaxYearPeriod] =
       Seq(TaxYearPeriod(2021), TaxYearPeriod(2022), TaxYearPeriod(2023))
 
-    val formProvider       = new VerificationHistorySelectTaxYearFormProvider()
-    val form: Form[String] = formProvider(taxYears.map(_.startYear.toString))
-
-    val mode: Mode = NormalMode
+    val formProvider                             = new TaxYearFormProvider()
+    val form: Form[VerificationTaxYearSelection] = formProvider(taxYears)
 
     implicit val request: Request[_] = FakeRequest()
 
-    implicit val messages: Messages =
-      MessagesImpl(
-        play.api.i18n.Lang.defaultLang,
-        app.injector.instanceOf[MessagesApi]
-      )
+    implicit val messages: Messages = stubMessages()
 
-    val html: HtmlFormat.Appendable =
-      view(form, mode, taxYears)
+    val html: HtmlFormat.Appendable = view(form, taxYears)
   }
 }
