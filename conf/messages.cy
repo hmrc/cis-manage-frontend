@@ -244,3 +244,16 @@ agent.noAuthorisedClients.listItem2.link               =  ffurflen 64-8
 agent.noAuthorisedClients.listItem2.afterLinkText      =  er mwyn eich awdurdodi drwy’r post
 agent.noAuthorisedClients.p4                           =  Gall gymryd hyd at 5 diwrnod gwaith i awdurdodiadau newydd ymddangos yn eich cyfrif.
 agent.noAuthorisedClients.returnToHome.link            =  Dychwelyd i’r hafan
+
+agent.failedToRetrieveClient.title                     =  Ni allem adalw eich rhestr o gleientiaid
+agent.failedToRetrieveClient.heading                   =  Ni allem adalw eich rhestr o gleientiaid
+agent.failedToRetrieveClient.p1                        =  Gallai hyn fod oherwydd y rhesymau canlynol:
+agent.failedToRetrieveClient.listItem1                 =  mae problem dros dro gyda’r gwasanaeth
+agent.failedToRetrieveClient.listItem2                 =  mae’ch awdurdodiadau yn dal i gael eu prosesu
+agent.failedToRetrieveClient.listItem3                 =  nid oes gennych unrhyw gleientiaid sydd ag awdurdod i CIS
+agent.failedToRetrieveClient.p2                        =  Os yw’r broblem yn parhau cysylltwch â’r
+agent.failedToRetrieveClient.link                      =  Ddesg Gymorth gwasanaethau ar-lein CThEF.
+agent.failedToRetrieveClient.inset.h2                  =  Gwasanaeth cyflwyno yn unig
+agent.failedToRetrieveClient.inset.p3                  =  Gallwch anfon datganiadau CIS misol ar ran cleient heb gwblhau awdurdodiad ar-lein neu ffurflen FBI-2.
+agent.failedToRetrieveClient.inset.p4                  =  Mae’r gwasanaeth hwn ar gael wrth ddefnyddio meddalwedd fasnachol yn unig.
+agent.failedToRetrieveClient.inset.link                =  Dewch o hyd i feddalwedd fasnachol ar gyfer datganiadau CIS
