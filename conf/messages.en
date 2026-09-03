@@ -182,10 +182,10 @@ returnsLanding.fileNilReturn.h3.link                              =  File a nil 
 returnsLanding.fileNilReturn.p1                                   =  File a nil return when no payments were made to subcontractors in a tax month.
 
 returnsLanding.viewSubmittedReturns.h3.link                       =  View submitted returns
-returnsLanding.viewSubmittedReturns.p1                            =  View a return to make amendments, change payment details you entered, or check progress.
+returnsLanding.viewSubmittedReturns.p1                            =  View submitted monthly or nil returns.
 
 returnsLanding.incompleteReturns.h3.link                          =  Incomplete returns
-returnsLanding.incompleteReturns.p1                               =  Submit or delete a return in progress. You can also resubmit a return that was not initially accepted.
+returnsLanding.incompleteReturns.p1                               =  Submit a return currently in progress, or resubmit a return not initially accepted.
 
 returnsLanding.aside.h2                                           =  Help and guidance
 returnsLanding.aside.link1                                        =  Construction Industry Scheme: A guide (CIS 340)
