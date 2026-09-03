@@ -8,6 +8,7 @@ site.continue                             =  Parhau
 site.saveAndContinue                      =  Cadw a pharhau
 site.govuk                                =  GOV.UK
 site.or                                   =  neu
+site.view                                 =  Bwrw golwg dros
 error.title.prefix                        =  Error:
 
 # History
