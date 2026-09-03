@@ -17,10 +17,10 @@
 package models.agent
 
 import play.api.libs.json.{Json, OFormat}
-case class UpdateAgentClientRequest (
-                                     taxOfficeNumber: String,
-                                     taxOfficeReference: String
-                                   )
+case class UpdateAgentClientRequest(
+  taxOfficeNumber: String,
+  taxOfficeReference: String
+)
 
 object UpdateAgentClientRequest {
   given format: OFormat[UpdateAgentClientRequest] = Json.format[UpdateAgentClientRequest]
