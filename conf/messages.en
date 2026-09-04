@@ -474,6 +474,7 @@ history.returnHistory.status.awaitingConfirmation                            =  
 history.returnHistory.status.amend                                           =  Amend
 history.returnHistory.status.notAvailable                                    =  Not available
 history.returnHistory.status.inProgress                                      =  In progress
+history.returnHistory.status.unsuccessful                                    =  Unsuccessful
 history.returnHistory.hidden.status.amend                                    =  amend return for {0}
 history.returnHistory.hidden.status.inProgress                               =  submission return for {0}
 history.returnHistory.hidden.monthlyReturn                                   =  monthly return for {0}

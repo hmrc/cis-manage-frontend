@@ -46,6 +46,31 @@ case class LinkViewModel(
 
 import play.api.libs.json.{Format, JsError, JsString, JsSuccess, Reads, Writes}
 
+sealed trait StatusViewModel
+
+object StatusViewModel {
+  case class Text(messageKey: String) extends StatusViewModel
+  case class Link(link: LinkViewModel, textKey: String, hiddenTextKey: String) extends StatusViewModel
+
+  given reads: Reads[StatusViewModel] = Reads {
+    case JsString("In progress")           => JsSuccess(Text("history.returnHistory.status.inProgress"))
+    case JsString("Awaiting confirmation") => JsSuccess(Text("history.returnHistory.status.awaitingConfirmation"))
+    case JsString("Unsuccessful")          => JsSuccess(Text("history.returnHistory.status.unsuccessful"))
+    case JsString(other)                   => JsSuccess(Text(other))
+    case _                                 => JsError("Invalid StatusViewModel")
+  }
+
+  given writes: Writes[StatusViewModel] = Writes {
+    case Text("history.returnHistory.status.inProgress")           => JsString("In progress")
+    case Text("history.returnHistory.status.awaitingConfirmation") => JsString("Awaiting confirmation")
+    case Text("history.returnHistory.status.unsuccessful")         => JsString("Unsuccessful")
+    case Text(other)                                               => JsString(other)
+    case _: Link                                                   => JsString("")
+  }
+
+  given format: Format[StatusViewModel] = Format(reads, writes)
+}
+
 sealed trait ReturnTypeViewModel
 
 object ReturnTypeViewModel {
@@ -68,11 +93,4 @@ object ReturnTypeViewModel {
 
   given format: Format[ReturnTypeViewModel] =
     Format(reads, writes)
-}
-
-sealed trait StatusViewModel
-
-object StatusViewModel {
-  case class Text(messageKey: String) extends StatusViewModel
-  case class Link(link: LinkViewModel, textKey: String, hiddenTextKey: String) extends StatusViewModel
 }

@@ -19,7 +19,7 @@ package models
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
-import viewmodels.ReturnTypeViewModel
+import viewmodels.{ReturnTypeViewModel, StatusViewModel}
 
 import java.time.LocalDateTime
 
@@ -31,7 +31,7 @@ class UnsubmittedMonthlyReturnsResponseSpec extends AnyWordSpec with Matchers {
         taxYear = 2025,
         taxMonth = 1,
         returnType = ReturnTypeViewModel.Nil,
-        status = "PENDING",
+        status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
         monthlyReturnId = 12345L,
         lastUpdate = Some(LocalDateTime.parse("2025-01-01T00:00:00")),
         amendment = Some("N"),
@@ -50,7 +50,7 @@ class UnsubmittedMonthlyReturnsResponseSpec extends AnyWordSpec with Matchers {
             taxYear = 2025,
             taxMonth = 1,
             returnType = ReturnTypeViewModel.Nil,
-            status = "PENDING",
+            status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
             monthlyReturnId = 12345L,
             lastUpdate = Some(LocalDateTime.parse("2025-01-01T00:00:00")),
             amendment = Some("N"),

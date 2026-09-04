@@ -29,7 +29,7 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.ManageService
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel, ReturnTypeViewModel}
+import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel, ReturnTypeViewModel, StatusViewModel}
 import views.html.IncompleteReturnsView
 
 import scala.concurrent.Future
@@ -46,7 +46,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
           returnPeriodEnd = "5 April 2025",
           returnType = ReturnTypeViewModel.Standard,
           lastUpdate = "20 April 2026",
-          status = "In progress",
+          status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
           action = Seq(
             ActionLinkViewModel(
               textKey = "incompleteReturns.action.continue",
@@ -122,7 +122,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         taxYear = 2026,
         taxMonth = 4,
         returnType = ReturnTypeViewModel.Nil,
-        status = "In Progress",
+        status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -164,7 +164,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         taxYear = 2026,
         taxMonth = 4,
         returnType = ReturnTypeViewModel.Nil,
-        status = "In Progress",
+        status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
         lastUpdate = None,
         amendment = Some("N"),
         deletable = true
@@ -206,7 +206,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         taxYear = 2026,
         taxMonth = 4,
         returnType = ReturnTypeViewModel.Standard,
-        status = "In Progress",
+        status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -248,7 +248,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         taxYear = 2026,
         taxMonth = 4,
         returnType = ReturnTypeViewModel.Standard,
-        status = "In Progress",
+        status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
         lastUpdate = None,
         amendment = Some("N"),
         deletable = true
@@ -321,7 +321,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         taxYear = 2026,
         taxMonth = 4,
         returnType = ReturnTypeViewModel.Unknown,
-        status = "In Progress",
+        status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
         lastUpdate = None,
         amendment = Some("N"),
         deletable = true
@@ -372,7 +372,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         taxYear = 2026,
         taxMonth = 4,
         returnType = ReturnTypeViewModel.Nil,
-        status = "In Progress",
+        status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true

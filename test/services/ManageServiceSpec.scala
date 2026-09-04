@@ -35,7 +35,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import pages.*
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel, ReturnTypeViewModel}
+import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel, ReturnTypeViewModel, StatusViewModel}
 import viewmodels.agent.AgentLandingViewModel
 
 import java.time.{Instant, LocalDateTime}
@@ -419,7 +419,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             taxYear = 2025,
             taxMonth = 1,
             returnType = ReturnTypeViewModel.Nil,
-            status = "In progress",
+            status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
             monthlyReturnId = 123L,
             lastUpdate = Some(LocalDateTime.parse("2025-01-01T00:00:00")),
             amendment = Some("N"),
@@ -455,7 +455,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             taxYear = 2025,
             taxMonth = 1,
             returnType = ReturnTypeViewModel.Nil,
-            status = "In progress",
+            status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
             monthlyReturnId = 123L,
             lastUpdate = Some(LocalDateTime.parse("2025-01-01T00:00:00")),
             amendment = Some("N"),
@@ -483,7 +483,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
           returnPeriodEnd = "Jan 2025",
           returnType = ReturnTypeViewModel.Nil,
           lastUpdate = "01 Jan 2025",
-          status = "In progress",
+          status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
           action = Seq(
             ActionLinkViewModel(
               textKey = "incompleteReturns.action.continue",
@@ -603,7 +603,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             2025,
             1,
             ReturnTypeViewModel.Nil,
-            "In Progress",
+            StatusViewModel.Text("history.returnHistory.status.inProgress"),
             3000L,
             None,
             Some("Y"),
@@ -613,7 +613,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
             2025,
             2,
             ReturnTypeViewModel.Nil,
-            "In Progress",
+            StatusViewModel.Text("history.returnHistory.status.inProgress"),
             3001L,
             Some(LocalDateTime.now()),
             Some("Y"),
@@ -694,7 +694,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         taxYear = 2025,
         taxMonth = 1,
         returnType = ReturnTypeViewModel.Nil,
-        status = "PENDING",
+        status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -724,7 +724,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         taxYear = 2025,
         taxMonth = 1,
         returnType = ReturnTypeViewModel.Nil,
-        status = "PENDING",
+        status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = false
@@ -789,7 +789,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         taxYear = 2026,
         taxMonth = 4,
         returnType = ReturnTypeViewModel.Nil,
-        status = "In Progress",
+        status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -821,7 +821,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         taxYear = 2026,
         taxMonth = 4,
         returnType = ReturnTypeViewModel.Nil,
-        status = "In Progress",
+        status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -848,7 +848,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         taxYear = 2026,
         taxMonth = 4,
         returnType = ReturnTypeViewModel.Nil,
-        status = "In Progress",
+        status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true

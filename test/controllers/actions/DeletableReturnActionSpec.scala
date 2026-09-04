@@ -24,7 +24,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import queries.delete.UnsubmittedMonthlyReturnToDeleteQuery
-import viewmodels.ReturnTypeViewModel
+import viewmodels.{ReturnTypeViewModel, StatusViewModel}
 
 import scala.concurrent.Future
 
@@ -45,7 +45,7 @@ class DeletableReturnActionSpec extends SpecBase with MockitoSugar {
           taxYear = 2025,
           taxMonth = 1,
           returnType = ReturnTypeViewModel.Nil,
-          status = "In Progress",
+          status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
           lastUpdate = None,
           amendment = Some("Y"),
           deletable = true
@@ -75,7 +75,7 @@ class DeletableReturnActionSpec extends SpecBase with MockitoSugar {
           taxYear = 2025,
           taxMonth = 1,
           returnType = ReturnTypeViewModel.Nil,
-          status = "In Progress",
+          status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
           lastUpdate = None,
           amendment = Some("Y"),
           deletable = false

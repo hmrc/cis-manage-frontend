@@ -293,6 +293,8 @@ history.returnHistory.backLink                                               =  
 history.returnHistory.status.awaitingConfirmation                            =  Yn aros am gadarnhad
 history.returnHistory.status.amend                                           =  Diwygio
 history.returnHistory.status.notAvailable                                    =  Ddim ar gael
+history.returnHistory.status.inProgress                                      =  Ar y gweill
+history.returnHistory.status.unsuccessful                                    =  Aflwyddiannus
 
 # Delete
 delete.deleteMonthlyReturn.title                     =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ar gyfer {0}?

@@ -29,7 +29,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpException, UpstreamErrorResponse}
-import viewmodels.ReturnTypeViewModel
+import viewmodels.{ReturnTypeViewModel, StatusViewModel}
 
 import java.time.Instant
 
@@ -629,7 +629,7 @@ class ConstructionIndustrySchemeConnectorSpec
       result.unsubmittedCisReturns.head.taxYear mustBe 2025
       result.unsubmittedCisReturns.head.taxMonth mustBe 1
       result.unsubmittedCisReturns.head.returnType mustBe ReturnTypeViewModel.Nil
-      result.unsubmittedCisReturns.head.status mustBe "PENDING"
+      result.unsubmittedCisReturns.head.status mustBe StatusViewModel.Text("PENDING")
       result.unsubmittedCisReturns.head.monthlyReturnId mustBe 12345
       result.unsubmittedCisReturns.head.lastUpdate mustBe None
       result.unsubmittedCisReturns.head.amendment mustBe Some("N")

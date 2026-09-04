@@ -19,7 +19,7 @@ package queries.delete
 import base.SpecBase
 import models.UnsubmittedMonthlyReturnsRow
 import play.api.libs.json.JsPath
-import viewmodels.ReturnTypeViewModel
+import viewmodels.{ReturnTypeViewModel, StatusViewModel}
 
 class UnsubmittedMonthlyReturnToDeleteQuerySpec extends SpecBase {
   "UnsubmittedMonthlyReturnToDeleteQuery" - {
@@ -39,7 +39,7 @@ class UnsubmittedMonthlyReturnToDeleteQuerySpec extends SpecBase {
         taxYear = 2025,
         taxMonth = 1,
         returnType = ReturnTypeViewModel.Nil,
-        status = "STARTED",
+        status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true

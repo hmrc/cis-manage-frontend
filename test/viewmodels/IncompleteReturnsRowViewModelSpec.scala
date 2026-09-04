@@ -33,7 +33,7 @@ class IncompleteReturnsRowViewModelSpec extends AnyWordSpec with Matchers {
         returnPeriodEnd = "Jan 2025",
         returnType = ReturnTypeViewModel.Nil,
         lastUpdate = "01 Jan 2025",
-        status = "In progress",
+        status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
         action = Seq(action),
         amendment = Some("N")
       )
@@ -41,7 +41,7 @@ class IncompleteReturnsRowViewModelSpec extends AnyWordSpec with Matchers {
       model.returnPeriodEnd mustBe "Jan 2025"
       model.returnType mustBe ReturnTypeViewModel.Nil
       model.lastUpdate mustBe "01 Jan 2025"
-      model.status mustBe "In progress"
+      model.status mustBe StatusViewModel.Text("history.returnHistory.status.inProgress")
       model.action mustBe Seq(action)
       model.amendment mustBe Some("N")
     }
