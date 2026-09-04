@@ -356,3 +356,11 @@ amend.noIncompleteReturns.p2       =  Gallwch wneud hyn drwy fynd i
 amend.noIncompleteReturns.p2.link  =  Rheoli’ch datganiad CIS
 amend.noIncompleteReturns.p3       =  Dysgwch ragor ynghylch
 amend.noIncompleteReturns.p3.link  =  yr hyn sydd angen i chi ei wneud fel contractwr CIS
+
+amend.noReturnsSubmitted.title     =  Nid ydych wedi cyflwyno unrhyw ddatganiadau
+amend.noReturnsSubmitted.heading   =  Nid ydych wedi cyflwyno unrhyw ddatganiadau
+amend.noReturnsSubmitted.p1        =  Er mwyn gweld datganiad misol, neu wneud unrhyw ddiwygiadau, mae’n rhaid i chi gyflwyno un yn gyntaf.
+amend.noReturnsSubmitted.p2        =  Gallwch wneud hyn drwy fynd i
+amend.noReturnsSubmitted.p2.link   =  Rheoli’ch datganiad CIS
+amend.noReturnsSubmitted.p3        =  Dysgwch ragor ynghylch
+amend.noReturnsSubmitted.p3.link   =  yr hyn sydd angen i chi ei wneud fel contractwr CIS
