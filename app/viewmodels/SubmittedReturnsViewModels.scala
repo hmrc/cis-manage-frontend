@@ -44,12 +44,30 @@ case class LinkViewModel(
   hiddenText: String
 )
 
+import play.api.libs.json.{Format, JsError, JsString, JsSuccess, Reads, Writes}
+
 sealed trait ReturnTypeViewModel
 
 object ReturnTypeViewModel {
   case object Nil extends WithName("Nil") with ReturnTypeViewModel
   case object Standard extends WithName("Standard") with ReturnTypeViewModel
   case object Unknown extends WithName("Unknown") with ReturnTypeViewModel
+
+  given reads: Reads[ReturnTypeViewModel] = Reads {
+    case JsString("Nil")      => JsSuccess(Nil)
+    case JsString("Standard") => JsSuccess(Standard)
+    case JsString("Unknown")  => JsSuccess(Unknown)
+    case _                    => JsError("Invalid ReturnTypeViewModel")
+  }
+
+  given writes: Writes[ReturnTypeViewModel] = Writes {
+    case Nil      => JsString("Nil")
+    case Standard => JsString("Standard")
+    case Unknown  => JsString("Unknown")
+  }
+
+  given format: Format[ReturnTypeViewModel] =
+    Format(reads, writes)
 }
 
 sealed trait StatusViewModel

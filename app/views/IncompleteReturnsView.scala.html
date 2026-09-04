@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import viewmodels.{IncompleteReturnsRowViewModel, ActionLinkViewModel}
+@import viewmodels.{IncompleteReturnsRowViewModel, ActionLinkViewModel, ReturnTypeViewModel, SubmittedReturnsRowViewModel}
 @import views.html.components.*
 
 @this(
@@ -40,6 +40,14 @@
         @if(index < row.action.size - 1) {
             <span aria-hidden="true"> | </span>
         }
+    }
+}
+
+@renderReturnType(returnType: ReturnTypeViewModel) = @{
+    returnType match {
+        case ReturnTypeViewModel.Standard => messages("history.returnHistory.returnType.standard")
+        case ReturnTypeViewModel.Nil      => messages("history.returnHistory.returnType.nil")
+        case ReturnTypeViewModel.Unknown  => ""
     }
 }
 
@@ -74,7 +82,7 @@
                         rows = viewModel.map { row =>
                             Seq(
                                 TableRow(content = Text(row.returnPeriodEnd), classes = "ir-col-period"),
-                                TableRow(content = Text(row.returnType), classes = "ir-col-type"),
+                                TableRow(content = Text(renderReturnType(row.returnType)), classes = "ir-col-type"),
                                 TableRow(content = Text(row.lastUpdate), classes = "ir-col-date"),
                                 TableRow(content = Text(row.status), classes = "ir-col-status"),
                                 TableRow(content = HtmlContent(renderActions(row)), classes = "ir-col-action")
@@ -94,7 +102,7 @@
                             rows = Seq(
                                 SummaryListRow(
                                     key = Key(content = Text(messages("incompleteReturns.table.returnType"))),
-                                    value = Value(content = Text(row.returnType)),
+                                    value = Value(content = Text(renderReturnType(row.returnType))),
                                 ),
                                 SummaryListRow(
                                     key = Key(content = Text(messages("incompleteReturns.table.lastUpdate"))),

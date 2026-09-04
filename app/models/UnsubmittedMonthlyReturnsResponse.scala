@@ -22,11 +22,12 @@ import play.api.libs.json.{Json, OFormat}
 import java.time.LocalDateTime
 import java.util.Locale
 import utils.Utils.monthName
+import viewmodels.ReturnTypeViewModel
 
 case class UnsubmittedMonthlyReturnsRow(
   taxYear: Int,
   taxMonth: Int,
-  returnType: String,
+  returnType: ReturnTypeViewModel,
   status: String,
   monthlyReturnId: Long,
   lastUpdate: Option[LocalDateTime],

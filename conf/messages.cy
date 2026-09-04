@@ -64,142 +64,144 @@ contractorLanding.sidebar.nav.whatIs.text                         =  Cynllun y D
 contractorLanding.sidebar.nav.guidance.text                       =  Talu TWE y cyflogwr
 contractorLanding.sidebar.nav.penalties.text                      =  Cosbau am ddatganiadau hwyr (CIS) CC/FS18b
 
-agent.landing.title                                    =  Rheoli cyfrif Cynllun y Diwydiant Adeiladu
-agent.landing.h1                                       =  Rheoli cyfrif Cynllun y Diwydiant Adeiladu
-agent.landing.agentName.key                            =  Enw’r asiant
-agent.landing.schemeName.key                           =  Enw’r cynllun
-agent.landing.employerRef.key                          =  Cyfeirnod y cyflogwr
-agent.landing.h2.help                                  =  Help ac arweiniad
-agent.landing.card.manageYourCisReturns.title          =  Rheoli’ch datganiad CIS
-agent.landing.card.manageYourCisReturns.p              =  Cyflwyno neu ddiwygio’ch datganiadau misol neu’ch datganiadau ‘dim’.
-agent.landing.card.manageYourSubcontractors.title      =  Rheoli’ch is-gontractwyr
-agent.landing.card.manageYourSubcontractors.p          =  Ychwanegu neu ddiwygio is-gontractwr, cyflwyno neu weld cais am ddilysiad.
-agent.landing.card.manageYourContractorDetails.title   =  Rheoli eich manylion contractwr
-agent.landing.card.manageYourContractorDetails.p       =  Ychwanegu neu newid Cyfeirnod Unigryw y Trethdalwr (UTR), enw’r cynllun neu gyfeiriad e-bost.
-agent.landing.card.appealPenalty.title                 =  Apelio yn erbyn cosb
-agent.landing.card.appealPenalty.p                     =  Apelio yn erbyn cosb cyn pen 30 diwrnod o’i gael.
-agent.landing.card.manageClientDetails.title           =  Rheoli manylion cleient
-agent.landing.card.manageClientDetails.p               =  Gweld manylion cleient, neu newid cyfeirnod y cyflogwr y cleient.
-agent.landing.card.removeClient.title                  =  Dileu cleient
-agent.landing.card.removeClient.p                      =  Dileu cleient nad ydych yn ei reoli mwyach.
-agent.landing.card.noticesAndStatements.title          =  Hysbysiadau a datganiadau
-agent.landing.card.noticesAndStatements.p              =  Gweld hysbysiad gan CThEF, rhybuddion am gosb, a datganiadau cadarnhau.
-agent.landing.help.link1                               =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
-agent.landing.help.link2                               =  Talu TWE y cyflogwr
-agent.landing.help.link3                               =  Cosbau am ddatganiadau hwyr (CIS) CC/FS18b
+returnsLanding.title                                              =  Rheoli’ch datganiad CIS
+returnsLanding.heading                                            =  Rheoli’ch datganiad CIS
 
+returnsLanding.fileMonthlyReturn.h3.link                          =  Cyflwyno datganiad misol
+returnsLanding.fileMonthlyReturn.p1                               =  Cyflwyno datganiad CIS ar gyfer unrhyw is-gontractwyr a dalwyd mewn mis treth.
+
+returnsLanding.fileNilReturn.h3.link                              =  Cyflwyno datganiad ’dim’
+returnsLanding.fileNilReturn.p1                                   =  Cyflwyno datganiad ’dim’ pan na chafodd unrhyw daliadau eu gwneud i is-gontractwyr mewn mis treth.
+
+returnsLanding.viewSubmittedReturns.h3.link                       =  Gweld datganiad a gyflwynwyd
+returnsLanding.viewSubmittedReturns.p1                            =  Gweld datganiadau misol neu ddatganiadau ‘dim’ a gyflwynwyd.
+
+returnsLanding.incompleteReturns.h3.link                          =  Datganiadau anghyflawn
+returnsLanding.incompleteReturns.p1                               =  Cyflwyno datganiad sydd ar y gweill ar hyn o bryd, neu ailgyflwyno datganiad na chafodd ei dderbyn i ddechrau.
+
+returnsLanding.aside.h2                                           =  Help ac arweiniad
+returnsLanding.aside.link1                                        =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
+returnsLanding.aside.link2                                        =  Dod o hyd i gyflenwyr meddalwedd ar gyfer Cynllun y Diwydiant Adeiladu (CIS) - GOV.UK
+
+# Agent
+agent.landing.title                                   =  Rheoli cyfrif Cynllun y Diwydiant Adeiladu
+agent.landing.h1                                      =  Rheoli cyfrif Cynllun y Diwydiant Adeiladu
+agent.landing.agentName.key                           =  Enw’r asiant
+agent.landing.schemeName.key                          =  Enw’r cynllun
+agent.landing.employerRef.key                         =  Cyfeirnod y cyflogwr
+agent.landing.h2.help                                 =  Help ac arweiniad
+agent.landing.card.manageYourCisReturns.title         =  Rheoli’ch datganiad CIS
+agent.landing.card.manageYourCisReturns.p             =  Cyflwyno neu ddiwygio’ch datganiadau misol neu’ch datganiadau ‘dim’.
+agent.landing.card.manageYourSubcontractors.title     =  Rheoli’ch is-gontractwyr
+agent.landing.card.manageYourSubcontractors.p         =  Ychwanegu neu ddiwygio is-gontractwr, cyflwyno neu weld cais am ddilysiad.
+agent.landing.card.manageYourContractorDetails.title  =  Rheoli eich manylion contractwr
+agent.landing.card.manageYourContractorDetails.p      =  Ychwanegu neu newid Cyfeirnod Unigryw y Trethdalwr (UTR), enw’r cynllun neu gyfeiriad e-bost.
+agent.landing.card.appealPenalty.title                =  Apelio yn erbyn cosb
+agent.landing.card.appealPenalty.p                    =  Apelio yn erbyn cosb cyn pen 30 diwrnod o’i gael.
+agent.landing.card.manageClientDetails.title          =  Rheoli manylion cleient
+agent.landing.card.manageClientDetails.p              =  Gweld manylion cleient, neu newid cyfeirnod y cyflogwr y cleient.
+agent.landing.card.removeClient.title                 =  Dileu cleient
+agent.landing.card.removeClient.p                     =  Dileu cleient nad ydych yn ei reoli mwyach.
+agent.landing.card.noticesAndStatements.title         =  Hysbysiadau a datganiadau
+agent.landing.card.noticesAndStatements.p             =  Gweld hysbysiad gan CThEF, rhybuddion am gosb, a datganiadau cadarnhau.
+agent.landing.help.link1                              =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
+agent.landing.help.link2                              =  Talu TWE y cyflogwr
+agent.landing.help.link3                              =  Cosbau am ddatganiadau hwyr (CIS) CC/FS18b
+
+agent.clientListSearch.title                          =  Dewiswch gleient er mwyn cyflwyno datganiad CIS
+agent.clientListSearch.heading                        =  Cyflwyno datganiad CIS misol
+agent.clientListSearch.p1                             =  Mae tri dull posibl o chwilio am ddatganiad CIS misol, a’i gyflwyno.
+agent.clientListSearch.searchBy.label                 =  Drwy ba ddull yr hoffech chwilio?
+agent.clientListSearch.searchBy.placeholder           =  Dewiswch opsiwn
+agent.clientListSearch.searchFilter.label             =  Nodwch eich chwiliad
+agent.clientListSearch.searchFilter.label.hint        =  Dyma enw’r cleient (ABC Construction), Cyfeirnod y cyflogwr (123/AB45678), neu Gyfeirnod y cleient (ABC-001)
+agent.clientListSearch.table.caption                  =  Eich cleientiaid
+agent.clientListSearch.th.clientName                  =  Enw’r cleient
+agent.clientListSearch.th.employersReference          =  Cyfeirnod y cyflogwr
+agent.clientListSearch.th.clientReference             =  Cyfeirnod y cleient
+agent.clientListSearch.th.actions                     =  Camau
+agent.clientListSearch.td.actions.remove              =  Dileu
+agent.clientListSearch.clearSearch                    =  Cliriwch y chwiliad
+agent.clientListSearch.details.1.summary              =  Lawrlwytho rhestr eich cleientiaid
+agent.clientListSearch.details.1.p1                   =  Gallwch lawrlwytho rhestr o’ch holl gleientiaid fel ffeil CSV. Gall hyn gymryd cryn amser os oes gennych lawer o gleientiaid.
+agent.clientListSearch.details.1.link                 =  Lawrlwytho rhestr gleientiaid (CSV)
+agent.clientListSearch.details.2.summary              =  Gwasanaeth cyflwyno yn unig
+agent.clientListSearch.details.2.p1                   =  Gallwch anfon datganiadau CIS misol ar ran cleient heb gwblhau awdurdodiad ar-lein neu ffurflen FBI-2.
+agent.clientListSearch.details.2.p2                   =  Mae’r gwasanaeth hwn ar gael wrth ddefnyddio meddalwedd fasnachol yn unig.
+agent.clientListSearch.details.2.link                 =  Dewch o hyd i feddalwedd fasnachol ar gyfer datganiadau CIS
+agent.clientListSearch.td.actions.remove.hidden       =  Dewis {0}
+agent.clientListSearch.td.clientName.hidden           =  Dileu {0}
+
+agent.noAuthorisedClients.title                       =  Nid oes gennych unrhyw gleientiaid awdurdodedig
+agent.noAuthorisedClients.heading                     =  Nid oes gennych unrhyw gleientiaid awdurdodedig
+agent.noAuthorisedClients.p1                          =  Nid oes gennych unrhyw gleientiaid sydd ag awdurdod i ddefnyddio’r gwasanaeth ar gyfer Cynllun y Diwydiant Adeiladu (CIS).
+agent.noAuthorisedClients.p2                          =  I gyflwyno datganiadau ar ran cleient, mae’n rhaid iddynt eich awdurdodi i weithredu ar eu rhan.
+agent.noAuthorisedClients.h2                          =  Yr hyn y mae angen i chi ei wneud
+agent.noAuthorisedClients.p3                          =  Gofynnwch i’ch cleient eich awdurdodi. Gall eich cleient wneud hyn drwy naill ai:
+agent.noAuthorisedClients.listItem1                   =  eich awdurdodi drwy ei
+agent.noAuthorisedClients.listItem1.link              =  gyfrif ar-lein CThEF
+agent.noAuthorisedClients.listItem2                   =  lawrlwytho a chwblhau
+agent.noAuthorisedClients.listItem2.link              =  ffurflen 64-8
+agent.noAuthorisedClients.listItem2.afterLinkText     =  er mwyn eich awdurdodi drwy’r post
+agent.noAuthorisedClients.p4                          =  Gall gymryd hyd at 5 diwrnod gwaith i awdurdodiadau newydd ymddangos yn eich cyfrif.
+agent.noAuthorisedClients.returnToHome.link           =  Dychwelyd i’r hafan
+
+agent.failedToRetrieveClient.title                    =  Ni allem adalw eich rhestr o gleientiaid
+agent.failedToRetrieveClient.heading                  =  Ni allem adalw eich rhestr o gleientiaid
+agent.failedToRetrieveClient.p1                       =  Gallai hyn fod oherwydd y rhesymau canlynol:
+agent.failedToRetrieveClient.listItem1                =  mae problem dros dro gyda’r gwasanaeth
+agent.failedToRetrieveClient.listItem2                =  mae’ch awdurdodiadau yn dal i gael eu prosesu
+agent.failedToRetrieveClient.listItem3                =  nid oes gennych unrhyw gleientiaid sydd ag awdurdod i CIS
+agent.failedToRetrieveClient.p2                       =  Os yw’r broblem yn parhau cysylltwch â’r
+agent.failedToRetrieveClient.link                     =  Ddesg Gymorth gwasanaethau ar-lein CThEF.
+agent.failedToRetrieveClient.inset.h2                 =  Gwasanaeth cyflwyno yn unig
+agent.failedToRetrieveClient.inset.p3                 =  Gallwch anfon datganiadau CIS misol ar ran cleient heb gwblhau awdurdodiad ar-lein neu ffurflen FBI-2.
+agent.failedToRetrieveClient.inset.p4                 =  Mae’r gwasanaeth hwn ar gael wrth ddefnyddio meddalwedd fasnachol yn unig.
+agent.failedToRetrieveClient.inset.link               =  Dewch o hyd i feddalwedd fasnachol ar gyfer datganiadau CIS
+
+agent.retrievingClient.title                          =  Adalw eich rhestr o gleientiaid
+agent.retrievingClient.h1                             =  Adalw eich rhestr o gleientiaid
+agent.retrievingClient.p1                             =  Arhoswch tra byddwn yn adfer eich cleientiaid awdurdodedig. Dylai hyn ond cymryd ambell funud.
+agent.retrievingClient.p2                             =  Peidiwch ag adfywio’r dudalen hon na defnyddio’r botwm i fynd yn ôl.
+agent.retrievingClient.inset.h2                       =  Gwasanaeth cyflwyno yn unig
+agent.retrievingClient.inset.p3                       =  Gallwch anfon datganiadau CIS misol ar ran cleient heb gwblhau awdurdodiad ar-lein neu ffurflen FBI-2.
+agent.retrievingClient.inset.p4                       =  Mae’r gwasanaeth hwn ar gael wrth ddefnyddio meddalwedd fasnachol yn unig.
+agent.retrievingClient.inset.link                     =  Dewch o hyd i feddalwedd fasnachol ar gyfer datganiadau CIS
+
+# Subcontractors
 subcontractorsLandingPage.title                               =  Rheoli’ch is-gontractwyr
 subcontractorsLandingPage.heading                             =  Rheoli’ch is-gontractwyr
 subcontractorsLandingPage.p1                                  =  Mae’n rhaid i is-gontractwyr fod wedi’u dilysu cyn y cewch eu cynnwys mewn datganiad misol. Bydd hyn yn sicrhau bod didyniadau yn cael eu gwneud ar y gyfradd gywir.
+
 subcontractorsLandingPage.hint.prefix                         =  Bydd angen i chi ddefnyddio meddalwedd
 subcontractorsLandingPage.hint.link                           =  fasnachol
 subcontractorsLandingPage.hint.suffix                         =  er mwyn cyflwyno unrhyw geisiadau am ddilysiad sy’n cynnwys mwy na 50 o is-gontractwyr.
+
 subcontractorsLandingPage.addSubcontractors                   =  Ychwanegu is-gontractwr newydd
+
 subcontractorsLandingPage.addSubcontractors.p1                =  Creu cofnodion ar gyfer unrhyw is-gontractwyr newydd yr ydych am eu talu.
+
 subcontractorsLandingPage.verifySubcontractors                =  Dilysu’ch is-gontractwyr
+
 subcontractorsLandingPage.verifySubcontractors.p1             =  Sicrhewch bod eich is-gontractwyr yn cael y triniaeth cywir o ran treth.
+
 subcontractorsLandingPage.viewSubcontractors                  =  Gweld eich is-gontractwyr
+
 subcontractorsLandingPage.viewSubcontractors.p1               =  Diwygio’r manylion ynghylch unrhyw is-gontractwr yn eich rhestr.
+
 subcontractorsLandingPage.viewVerificationHistory             =  Adolygu eich hanes dilysu
+
 subcontractorsLandingPage.viewVerificationHistory.p1          =  Lawrlwytho neu argraffu copïau o’r holl geisiadau am ddilysiad rydych wedi’u cyflwyno.
+
 subcontractorsLandingPage.checkResults                        =  Gwirio eich canlyniadau
+
 subcontractorsLandingPage.checkResults.p1                     =  Gweld canlyniad eich cais diweddaraf am ddilysiad.
+
 subcontractorsLandingPage.aside.h2                            =  Help ac arweiniad
 subcontractorsLandingPage.aside.link1                         =  Cynllun y Diwydiant Adeiladu: Canllaw ar gyfer contractwyr ac is-gontractwyr
 subcontractorsLandingPage.aside.link2                         =  Diweddariadau dros e-bost, fideos a gweminarau ynghylch Cynllun y Diwydiant Adeiladu
 subcontractorsLandingPage.aside.link3                         =  Rhagor o wybodaeth ynghylch rheoli eiddo ac adeiladu
 
-returnsLanding.title                                              =  Rheoli’ch datganiad CIS
-returnsLanding.heading                                            =  Rheoli’ch datganiad CIS
-returnsLanding.fileMonthlyReturn.h3.link                          =  Cyflwyno datganiad misol
-returnsLanding.fileMonthlyReturn.p1                               =  Cyflwyno datganiad CIS ar gyfer unrhyw is-gontractwyr a dalwyd mewn mis treth.
-returnsLanding.fileNilReturn.h3.link                              =  Cyflwyno datganiad ’dim’
-returnsLanding.fileNilReturn.p1                                   =  Cyflwyno datganiad ’dim’ pan na chafodd unrhyw daliadau eu gwneud i is-gontractwyr mewn mis treth.
-returnsLanding.viewSubmittedReturns.h3.link                       =  Gweld datganiad a gyflwynwyd
-returnsLanding.viewSubmittedReturns.p1                            =  Gweld datganiadau misol neu ddatganiadau ‘dim’ a gyflwynwyd.
-returnsLanding.incompleteReturns.h3.link                          =  Datganiadau anghyflawn
-returnsLanding.incompleteReturns.p1                               =  Cyflwyno datganiad sydd ar y gweill ar hyn o bryd, neu ailgyflwyno datganiad na chafodd ei dderbyn i ddechrau.
-returnsLanding.aside.h2                                           =  Help ac arweiniad
-returnsLanding.aside.link1                                        =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
-returnsLanding.aside.link2                                        =  Dod o hyd i gyflenwyr meddalwedd ar gyfer Cynllun y Diwydiant Adeiladu (CIS) - GOV.UK
-
-incompleteReturns.title                      =  Datganiadau anghyflawn
-incompleteReturns.heading                    =  Datganiadau anghyflawn neu aflwyddiannus
-incompleteReturns.message                    =  Ni ellir newid mis treth os yw’n anghywir a bod y datganiad ar y gweill. Mae’n rhaid i chi ei ddileu, a chyflwyno datganiad newydd gyda’r mis treth cywir.
-incompleteReturns.table.returnPeriodEnd      =  Cyfnod y datganiad wedi dod i ben
-incompleteReturns.table.returnType           =  Math
-incompleteReturns.table.lastUpdate           =  Diweddarwyd ddiwethaf
-incompleteReturns.table.status               =  Statws
-incompleteReturns.table.action               =  Camau
-incompleteReturns.action.continue            =  Parhau
-incompleteReturns.action.delete              =  Dileu
-incompleteReturns.action.view                =  Gweld
-incompleteReturns.action.continue.hidden     =  Parhau gyda datganiad misol ar gyfer {0}
-incompleteReturns.action.delete.hidden       =  Dileu datganiad misol ar gyfer {0}
-incompleteReturns.action.view.hidden         =  Gweld datganiad misol ar gyfer {0}
-
-# Agent
-agent.clientListSearch.title                       =  Dewiswch gleient er mwyn cyflwyno datganiad CIS
-agent.clientListSearch.heading                     =  Cyflwyno datganiad CIS misol
-agent.clientListSearch.p1                          =  Mae tri dull posibl o chwilio am ddatganiad CIS misol, a’i gyflwyno.
-agent.clientListSearch.searchBy.label              =  Drwy ba ddull yr hoffech chwilio?
-agent.clientListSearch.searchBy.placeholder        =  Dewiswch opsiwn
-agent.clientListSearch.searchFilter.label          =  Nodwch eich chwiliad
-agent.clientListSearch.searchFilter.label.hint     =  Dyma enw’r cleient (ABC Construction), Cyfeirnod y cyflogwr (123/AB45678), neu Gyfeirnod y cleient (ABC-001)
-agent.clientListSearch.table.caption               =  Eich cleientiaid
-agent.clientListSearch.th.clientName               =  Enw’r cleient
-agent.clientListSearch.th.employersReference       =  Cyfeirnod y cyflogwr
-agent.clientListSearch.th.clientReference          =  Cyfeirnod y cleient
-agent.clientListSearch.th.actions                  =  Camau
-agent.clientListSearch.td.actions.remove           =  Dileu
-agent.clientListSearch.clearSearch                 =  Cliriwch y chwiliad
-agent.clientListSearch.details.1.summary           =  Lawrlwytho rhestr eich cleientiaid
-agent.clientListSearch.details.1.p1                =  Gallwch lawrlwytho rhestr o’ch holl gleientiaid fel ffeil CSV. Gall hyn gymryd cryn amser os oes gennych lawer o gleientiaid.
-agent.clientListSearch.details.1.link              =  Lawrlwytho rhestr gleientiaid (CSV)
-agent.clientListSearch.details.2.summary           =  Gwasanaeth cyflwyno yn unig
-agent.clientListSearch.details.2.p1                =  Gallwch anfon datganiadau CIS misol ar ran cleient heb gwblhau awdurdodiad ar-lein neu ffurflen FBI-2.
-agent.clientListSearch.details.2.p2                =  Mae’r gwasanaeth hwn ar gael wrth ddefnyddio meddalwedd fasnachol yn unig.
-agent.clientListSearch.details.2.link              =  Dewch o hyd i feddalwedd fasnachol ar gyfer datganiadau CIS
-agent.clientListSearch.td.actions.remove.hidden    =  Dewis {0}
-agent.clientListSearch.td.clientName.hidden        =  Dileu {0}
-
-agent.noAuthorisedClients.title                    =  Nid oes gennych unrhyw gleientiaid awdurdodedig
-agent.noAuthorisedClients.heading                  =  Nid oes gennych unrhyw gleientiaid awdurdodedig
-agent.noAuthorisedClients.p1                       =  Nid oes gennych unrhyw gleientiaid sydd ag awdurdod i ddefnyddio’r gwasanaeth ar gyfer Cynllun y Diwydiant Adeiladu (CIS).
-agent.noAuthorisedClients.p2                       =  I gyflwyno datganiadau ar ran cleient, mae’n rhaid iddynt eich awdurdodi i weithredu ar eu rhan.
-agent.noAuthorisedClients.h2                       =  Yr hyn y mae angen i chi ei wneud
-agent.noAuthorisedClients.p3                       =  Gofynnwch i’ch cleient eich awdurdodi. Gall eich cleient wneud hyn drwy naill ai:
-agent.noAuthorisedClients.listItem1                =  eich awdurdodi drwy ei
-agent.noAuthorisedClients.listItem1.link           =  gyfrif ar-lein CThEF
-agent.noAuthorisedClients.listItem2                =  lawrlwytho a chwblhau
-agent.noAuthorisedClients.listItem2.link           =  ffurflen 64-8
-agent.noAuthorisedClients.listItem2.afterLinkText  =  er mwyn eich awdurdodi drwy’r post
-agent.noAuthorisedClients.p4                       =  Gall gymryd hyd at 5 diwrnod gwaith i awdurdodiadau newydd ymddangos yn eich cyfrif.
-agent.noAuthorisedClients.returnToHome.link        =  Dychwelyd i’r hafan
-
-agent.failedToRetrieveClient.title                 =  Ni allem adalw eich rhestr o gleientiaid
-agent.failedToRetrieveClient.heading               =  Ni allem adalw eich rhestr o gleientiaid
-agent.failedToRetrieveClient.p1                    =  Gallai hyn fod oherwydd y rhesymau canlynol:
-agent.failedToRetrieveClient.listItem1             =  mae problem dros dro gyda’r gwasanaeth
-agent.failedToRetrieveClient.listItem2             =  mae’ch awdurdodiadau yn dal i gael eu prosesu
-agent.failedToRetrieveClient.listItem3             =  nid oes gennych unrhyw gleientiaid sydd ag awdurdod i CIS
-agent.failedToRetrieveClient.p2                    =  Os yw’r broblem yn parhau cysylltwch â’r
-agent.failedToRetrieveClient.link                  =  Ddesg Gymorth gwasanaethau ar-lein CThEF.
-agent.failedToRetrieveClient.inset.h2              =  Gwasanaeth cyflwyno yn unig
-agent.failedToRetrieveClient.inset.p3              =  Gallwch anfon datganiadau CIS misol ar ran cleient heb gwblhau awdurdodiad ar-lein neu ffurflen FBI-2.
-agent.failedToRetrieveClient.inset.p4              =  Mae’r gwasanaeth hwn ar gael wrth ddefnyddio meddalwedd fasnachol yn unig.
-agent.failedToRetrieveClient.inset.link            =  Dewch o hyd i feddalwedd fasnachol ar gyfer datganiadau CIS
-
-agent.retrievingClient.title                       =  Adalw eich rhestr o gleientiaid
-agent.retrievingClient.h1                          =  Adalw eich rhestr o gleientiaid
-agent.retrievingClient.p1                          =  Arhoswch tra byddwn yn adfer eich cleientiaid awdurdodedig. Dylai hyn ond cymryd ambell funud.
-agent.retrievingClient.p2                          =  Peidiwch ag adfywio’r dudalen hon na defnyddio’r botwm i fynd yn ôl.
-agent.retrievingClient.inset.h2                    =  Gwasanaeth cyflwyno yn unig
-agent.retrievingClient.inset.p3                    =  Gallwch anfon datganiadau CIS misol ar ran cleient heb gwblhau awdurdodiad ar-lein neu ffurflen FBI-2.
-agent.retrievingClient.inset.p4                    =  Mae’r gwasanaeth hwn ar gael wrth ddefnyddio meddalwedd fasnachol yn unig.
-agent.retrievingClient.inset.link                  =  Dewch o hyd i feddalwedd fasnachol ar gyfer datganiadau CIS
-
-# Subcontractors
 retrievingSubcontractors.title                                =  Eich is-gontractwyr
 retrievingSubcontractors.heading                              =  Eich is-gontractwyr
 retrievingSubcontractors.p1                                   =  Rydym yn chwilio am gofnodion o’ch is-gontractwyr.
@@ -232,6 +234,24 @@ successfulNoRecordsFound.p1                                   =  Doedd dim modd 
 successfulNoRecordsFound.p2                                   =  Gallwch
 
 successfulNoRecordsFound.p2.link                              =  ychwanegu is-gontractwr
+
+# Returns & Submissions
+incompleteReturns.title                   =  Datganiadau anghyflawn
+incompleteReturns.heading                 =  Datganiadau anghyflawn neu aflwyddiannus
+incompleteReturns.message                 =  Ni ellir newid mis treth os yw’n anghywir a bod y datganiad ar y gweill. Mae’n rhaid i chi ei ddileu, a chyflwyno datganiad newydd gyda’r mis treth cywir.
+
+incompleteReturns.table.returnPeriodEnd   =  Cyfnod y datganiad wedi dod i ben
+incompleteReturns.table.returnType        =  Math
+incompleteReturns.table.lastUpdate        =  Diweddarwyd ddiwethaf
+incompleteReturns.table.status            =  Statws
+incompleteReturns.table.action            =  Camau
+
+incompleteReturns.action.continue         =  Parhau
+incompleteReturns.action.delete           =  Dileu
+incompleteReturns.action.view             =  Gweld
+incompleteReturns.action.continue.hidden  =  Parhau gyda datganiad misol ar gyfer {0}
+incompleteReturns.action.delete.hidden    =  Dileu datganiad misol ar gyfer {0}
+incompleteReturns.action.view.hidden      =  Gweld datganiad misol ar gyfer {0}
 
 # History
 history.submittedReturnsChooseTaxYear.title                                  =  Pa flwyddyn dreth ydych am fwrw golwg drosti?
