@@ -29,7 +29,7 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.ManageService
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel}
+import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel, ReturnTypeViewModel}
 import views.html.IncompleteReturnsView
 
 import scala.concurrent.Future
@@ -44,7 +44,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
       val rows = Seq(
         IncompleteReturnsRowViewModel(
           returnPeriodEnd = "5 April 2025",
-          returnType = "Standard",
+          returnType = ReturnTypeViewModel.Standard,
           lastUpdate = "20 April 2026",
           status = "In progress",
           action = Seq(
@@ -121,7 +121,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         monthlyReturnId = monthlyReturnId,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Nil",
+        returnType = ReturnTypeViewModel.Nil,
         status = "In Progress",
         lastUpdate = None,
         amendment = Some("Y"),
@@ -163,7 +163,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         monthlyReturnId = monthlyReturnId,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Nil",
+        returnType = ReturnTypeViewModel.Nil,
         status = "In Progress",
         lastUpdate = None,
         amendment = Some("N"),
@@ -205,7 +205,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         monthlyReturnId = monthlyReturnId,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Standard",
+        returnType = ReturnTypeViewModel.Standard,
         status = "In Progress",
         lastUpdate = None,
         amendment = Some("Y"),
@@ -247,7 +247,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         monthlyReturnId = monthlyReturnId,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Standard",
+        returnType = ReturnTypeViewModel.Standard,
         status = "In Progress",
         lastUpdate = None,
         amendment = Some("N"),
@@ -320,7 +320,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         monthlyReturnId = monthlyReturnId,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Invalid Type",
+        returnType = ReturnTypeViewModel.Unknown,
         status = "In Progress",
         lastUpdate = None,
         amendment = Some("N"),
@@ -371,7 +371,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         monthlyReturnId = monthlyReturnId,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Nil",
+        returnType = ReturnTypeViewModel.Nil,
         status = "In Progress",
         lastUpdate = None,
         amendment = Some("Y"),

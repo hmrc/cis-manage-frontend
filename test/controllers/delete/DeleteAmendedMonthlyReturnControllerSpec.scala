@@ -31,6 +31,7 @@ import queries.delete.UnsubmittedMonthlyReturnToDeleteQuery
 import repositories.SessionRepository
 import services.ManageService
 import uk.gov.hmrc.http.HeaderCarrier
+import viewmodels.ReturnTypeViewModel.Standard
 import views.html.delete.DeleteAmendedMonthlyReturnView
 
 import scala.concurrent.Future
@@ -43,7 +44,7 @@ class DeleteAmendedMonthlyReturnControllerSpec extends SpecBase with MockitoSuga
   val deletableRow        = UnsubmittedMonthlyReturnsRow(
     2026,
     4,
-    "Standard",
+    Standard,
     "In Progress",
     3000L,
     None,
