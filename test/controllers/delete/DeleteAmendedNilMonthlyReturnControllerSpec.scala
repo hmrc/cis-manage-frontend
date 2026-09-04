@@ -32,6 +32,7 @@ import queries.delete.UnsubmittedMonthlyReturnToDeleteQuery
 import repositories.SessionRepository
 import services.ManageService
 import uk.gov.hmrc.http.HeaderCarrier
+import viewmodels.{ReturnTypeViewModel, StatusViewModel}
 import views.html.delete.DeleteAmendedNilMonthlyReturnView
 
 import scala.concurrent.Future
@@ -44,7 +45,16 @@ class DeleteAmendedNilMonthlyReturnControllerSpec extends SpecBase with MockitoS
   private val monthYear: String = "April 2026"
 
   val deletableRow        =
-    UnsubmittedMonthlyReturnsRow(2026, 4, "Nil", "In Progress", 3000L, None, Some("Y"), true)
+    UnsubmittedMonthlyReturnsRow(
+      2026,
+      4,
+      ReturnTypeViewModel.Nil,
+      StatusViewModel.Text("history.returnHistory.status.inProgress"),
+      3000L,
+      None,
+      Some("Y"),
+      true
+    )
   val baseUa: UserAnswers = userAnswersWithCisId
     .set(UnsubmittedMonthlyReturnToDeleteQuery, deletableRow)
     .success

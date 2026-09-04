@@ -27,6 +27,7 @@ import queries.delete.UnsubmittedMonthlyReturnToDeleteQuery
 import repositories.SessionRepository
 import services.ManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.ReturnTypeViewModel
 import views.html.IncompleteReturnsView
 
 import javax.inject.Inject
@@ -92,11 +93,15 @@ class IncompleteReturnsController @Inject() (
 
   private def resolveDeleteRoute(record: UnsubmittedMonthlyReturnsRow): Call =
     (record.returnType, record.amendment) match {
-      case ("Nil", Some("Y"))      => controllers.delete.routes.DeleteAmendedNilMonthlyReturnController.onPageLoad()
-      case ("Nil", Some("N"))      => controllers.delete.routes.DeleteNilMonthlyReturnController.onPageLoad()
-      case ("Standard", Some("Y")) => controllers.delete.routes.DeleteAmendedMonthlyReturnController.onPageLoad()
-      case ("Standard", Some("N")) => controllers.delete.routes.DeleteMonthlyReturnController.onPageLoad()
-      case _                       =>
+      case (ReturnTypeViewModel.Nil, Some("Y"))      =>
+        controllers.delete.routes.DeleteAmendedNilMonthlyReturnController.onPageLoad()
+      case (ReturnTypeViewModel.Nil, Some("N"))      =>
+        controllers.delete.routes.DeleteNilMonthlyReturnController.onPageLoad()
+      case (ReturnTypeViewModel.Standard, Some("Y")) =>
+        controllers.delete.routes.DeleteAmendedMonthlyReturnController.onPageLoad()
+      case (ReturnTypeViewModel.Standard, Some("N")) =>
+        controllers.delete.routes.DeleteMonthlyReturnController.onPageLoad()
+      case _                                         =>
         logger.warn(
           s"[IncompleteReturnsController] No delete route mapping for monthlyReturnId=${record.monthlyReturnId}"
         )

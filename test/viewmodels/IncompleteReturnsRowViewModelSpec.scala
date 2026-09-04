@@ -31,17 +31,17 @@ class IncompleteReturnsRowViewModelSpec extends AnyWordSpec with Matchers {
 
       val model = IncompleteReturnsRowViewModel(
         returnPeriodEnd = "Jan 2025",
-        returnType = "Nil",
+        returnType = ReturnTypeViewModel.Nil,
         lastUpdate = "01 Jan 2025",
-        status = "In progress",
+        status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
         action = Seq(action),
         amendment = Some("N")
       )
 
       model.returnPeriodEnd mustBe "Jan 2025"
-      model.returnType mustBe "Nil"
+      model.returnType mustBe ReturnTypeViewModel.Nil
       model.lastUpdate mustBe "01 Jan 2025"
-      model.status mustBe "In progress"
+      model.status mustBe StatusViewModel.Text("history.returnHistory.status.inProgress")
       model.action mustBe Seq(action)
       model.amendment mustBe Some("N")
     }

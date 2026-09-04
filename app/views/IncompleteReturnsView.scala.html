@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import viewmodels.{IncompleteReturnsRowViewModel, ActionLinkViewModel}
+@import viewmodels.{IncompleteReturnsRowViewModel, ActionLinkViewModel, ReturnTypeViewModel, SubmittedReturnsRowViewModel, StatusViewModel}
 @import views.html.components.*
 
 @this(
@@ -40,6 +40,31 @@
         @if(index < row.action.size - 1) {
             <span aria-hidden="true"> | </span>
         }
+    }
+}
+
+@renderReturnType(returnType: ReturnTypeViewModel) = @{
+    returnType match {
+        case ReturnTypeViewModel.Standard => messages("history.returnHistory.returnType.standard")
+        case ReturnTypeViewModel.Nil      => messages("history.returnHistory.returnType.nil")
+        case ReturnTypeViewModel.Unknown  => ""
+    }
+}
+
+@renderStatus(status: StatusViewModel) = @{
+    status match {
+        case StatusViewModel.Text(messageKey) =>
+            Html(messages(messageKey))
+
+        case StatusViewModel.Link(linkValue, textKey, hiddenTextKey) =>
+            Html(
+                link(
+                    linkTextKey = textKey,
+                    linkUrl = linkValue.url,
+                    paragraphWrapped = false,
+                    visuallyHiddenText = Some(messages(hiddenTextKey, linkValue.hiddenText))
+                ).body
+            )
     }
 }
 
@@ -74,9 +99,9 @@
                         rows = viewModel.map { row =>
                             Seq(
                                 TableRow(content = Text(row.returnPeriodEnd), classes = "ir-col-period"),
-                                TableRow(content = Text(row.returnType), classes = "ir-col-type"),
+                                TableRow(content = Text(renderReturnType(row.returnType)), classes = "ir-col-type"),
                                 TableRow(content = Text(row.lastUpdate), classes = "ir-col-date"),
-                                TableRow(content = Text(row.status), classes = "ir-col-status"),
+                                TableRow(content = HtmlContent(renderStatus(row.status)), classes = "ir-col-status"),
                                 TableRow(content = HtmlContent(renderActions(row)), classes = "ir-col-action")
                             )
                         }
@@ -94,7 +119,7 @@
                             rows = Seq(
                                 SummaryListRow(
                                     key = Key(content = Text(messages("incompleteReturns.table.returnType"))),
-                                    value = Value(content = Text(row.returnType)),
+                                    value = Value(content = Text(renderReturnType(row.returnType))),
                                 ),
                                 SummaryListRow(
                                     key = Key(content = Text(messages("incompleteReturns.table.lastUpdate"))),
@@ -102,7 +127,7 @@
                                 ),
                                 SummaryListRow(
                                     key = Key(content = Text(messages("incompleteReturns.table.status"))),
-                                    value = Value(content = Text(row.status)),
+                                    value = Value(content = HtmlContent(renderStatus(row.status))),
                                 ),
                                 SummaryListRow(
                                     key = Key(content = Text(messages("incompleteReturns.table.action"))),

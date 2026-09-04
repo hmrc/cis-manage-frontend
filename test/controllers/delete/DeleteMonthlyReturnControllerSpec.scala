@@ -31,6 +31,8 @@ import queries.delete.UnsubmittedMonthlyReturnToDeleteQuery
 import repositories.SessionRepository
 import services.ManageService
 import uk.gov.hmrc.http.HeaderCarrier
+import viewmodels.{ReturnTypeViewModel, StatusViewModel}
+import viewmodels.ReturnTypeViewModel.Standard
 import views.html.delete.DeleteMonthlyReturnView
 
 import scala.concurrent.Future
@@ -45,8 +47,8 @@ class DeleteMonthlyReturnControllerSpec extends SpecBase with MockitoSugar {
   val deletableRow        = UnsubmittedMonthlyReturnsRow(
     2026,
     4,
-    "Standard",
-    "In Progress",
+    Standard,
+    StatusViewModel.Text("history.returnHistory.status.inProgress"),
     3000L,
     None,
     Some("N"),

@@ -129,10 +129,10 @@ case class SearchByList(value: String, label: String)
 
 object SearchByList {
 
-  val searchByOptions: Seq[SearchByList] = Seq(
-    SearchByList(CN.toString, "Client name"),
-    SearchByList(ER.toString, "Employer reference"),
-    SearchByList(CR.toString, "Client reference")
+  def searchByOptions(implicit messages: Messages): Seq[SearchByList] = Seq(
+    SearchByList(CN.toString, messages("agent.clientListSearch.th.clientName")),
+    SearchByList(ER.toString, messages("agent.clientListSearch.th.employersReference")),
+    SearchByList(CR.toString, messages("agent.clientListSearch.th.clientReference"))
   )
 
 }
