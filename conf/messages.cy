@@ -7,7 +7,7 @@ site.change                                             =  Newid
 site.no                                                 =  Na
 site.yes                                                =  Iawn
 site.continue                                           =  Parhau
-site.search                                             =  xxxxxxxxxxxxxxxxxxxx
+site.search                                             =  Chwilio
 site.start                                              =  xxxxxxxxxxxxxxxxxxxx
 site.startAgain                                         =  xxxxxxxxxxxxxxxxxxxx
 site.signIn                                             =  xxxxxxxxxxxxxxxxxxxx
@@ -119,180 +119,6 @@ unauthorised.agent.p1                    =  xxxxxxxxxxxxxxxxxxxx
 unauthorised.agent.p2.prefix             =  xxxxxxxxxxxxxxxxxxxx
 unauthorised.agent.p2.link               =  xxxxxxxxxxxxxxxxxxxx
 unauthorised.agent.p2.suffix             =  xxxxxxxxxxxxxxxxxxxx
-
-# Introduction & Landing
-contractorLanding.title                                           =  xxxxxxxxxxxxxxxxxxxx
-contractorLanding.heading                                         =  xxxxxxxxxxxxxxxxxxxx
-
-contractorLanding.label.schemeName                                =  xxxxxxxxxxxxxxxxxxxx
-contractorLanding.label.employerReference                         =  xxxxxxxxxxxxxxxxxxxx
-
-contractorLanding.landing.card.manageYourCisReturn.title          =  xxxxxxxxxxxxxxxxxxxx
-contractorLanding.landing.card.manageYourCisReturn.p              =  xxxxxxxxxxxxxxxxxxxx
-contractorLanding.landing.card.manageYourSubcontractors.title     =  xxxxxxxxxxxxxxxxxxxx
-contractorLanding.landing.card.manageYourSubcontractors.p         =  xxxxxxxxxxxxxxxxxxxx
-contractorLanding.landing.card.manageYourContractorDetails.title  =  xxxxxxxxxxxxxxxxxxxx
-contractorLanding.landing.card.manageYourContractorDetails.p      =  xxxxxxxxxxxxxxxxxxxx
-contractorLanding.landing.card.appealPenalty.title                =  xxxxxxxxxxxxxxxxxxxx
-contractorLanding.landing.card.appealPenalty.p                    =  xxxxxxxxxxxxxxxxxxxx
-contractorLanding.landing.card.noticesAndStatements.title         =  xxxxxxxxxxxxxxxxxxxx
-contractorLanding.landing.card.noticesAndStatements.p             =  xxxxxxxxxxxxxxxxxxxx
-
-contractorLanding.sidebar.title                                   =  xxxxxxxxxxxxxxxxxxxx
-contractorLanding.sidebar.nav.whatIs.text                         =  xxxxxxxxxxxxxxxxxxxx
-contractorLanding.sidebar.nav.guidance.text                       =  xxxxxxxxxxxxxxxxxxxx
-contractorLanding.sidebar.nav.penalties.text                      =  xxxxxxxxxxxxxxxxxxxx
-
-introduction.title                                                =  xxxxxxxxxxxxxxxxxxxx
-introduction.heading                                              =  xxxxxxxxxxxxxxxxxxxx
-introduction.p1                                                   =  xxxxxxxxxxxxxxxxxxxx
-introduction.listItem1                                            =  xxxxxxxxxxxxxxxxxxxx
-introduction.listItem2                                            =  xxxxxxxxxxxxxxxxxxxx
-introduction.listItem3                                            =  xxxxxxxxxxxxxxxxxxxx
-introduction.listItem4                                            =  xxxxxxxxxxxxxxxxxxxx
-introduction.listItem5                                            =  xxxxxxxxxxxxxxxxxxxx
-introduction.listItem6                                            =  xxxxxxxxxxxxxxxxxxxx
-introduction.listItem7                                            =  xxxxxxxxxxxxxxxxxxxx
-introduction.inset                                                =  xxxxxxxxxxxxxxxxxxxx
-introduction.h2                                                   =  xxxxxxxxxxxxxxxxxxxx
-introduction.p2                                                   =  xxxxxxxxxxxxxxxxxxxx
-introduction.listItem8                                            =  xxxxxxxxxxxxxxxxxxxx
-introduction.listItem9                                            =  xxxxxxxxxxxxxxxxxxxx
-introduction.listItem10                                           =  xxxxxxxxxxxxxxxxxxxx
-
-introduction.details.summary                                      =  xxxxxxxxxxxxxxxxxxxx
-introduction.details.h3                                           =  xxxxxxxxxxxxxxxxxxxx
-introduction.details.p1                                           =  xxxxxxxxxxxxxxxxxxxx
-introduction.details.p2                                           =  xxxxxxxxxxxxxxxxxxxx
-introduction.details.link                                         =  xxxxxxxxxxxxxxxxxxxx
-
-introduction.sidebar.h2                                           =  xxxxxxxxxxxxxxxxxxxx
-introduction.sidebar.link1                                        =  xxxxxxxxxxxxxxxxxxxx
-introduction.sidebar.link2                                        =  xxxxxxxxxxxxxxxxxxxx
-introduction.sidebar.link3                                        =  xxxxxxxxxxxxxxxxxxxx
-introduction.sidebar.link4                                        =  xxxxxxxxxxxxxxxxxxxx
-
-returnsLanding.title                                              =  xxxxxxxxxxxxxxxxxxxx
-returnsLanding.heading                                            =  xxxxxxxxxxxxxxxxxxxx
-
-returnsLanding.fileMonthlyReturn.h3.link                          =  xxxxxxxxxxxxxxxxxxxx
-returnsLanding.fileMonthlyReturn.p1                               =  xxxxxxxxxxxxxxxxxxxx
-
-returnsLanding.fileNilReturn.h3.link                              =  xxxxxxxxxxxxxxxxxxxx
-returnsLanding.fileNilReturn.p1                                   =  xxxxxxxxxxxxxxxxxxxx
-
-returnsLanding.viewSubmittedReturns.h3.link                       =  xxxxxxxxxxxxxxxxxxxx
-returnsLanding.viewSubmittedReturns.p1                            =  xxxxxxxxxxxxxxxxxxxx
-
-returnsLanding.incompleteReturns.h3.link                          =  xxxxxxxxxxxxxxxxxxxx
-returnsLanding.incompleteReturns.p1                               =  xxxxxxxxxxxxxxxxxxxx
-
-returnsLanding.aside.h2                                           =  xxxxxxxxxxxxxxxxxxxx
-returnsLanding.aside.link1                                        =  xxxxxxxxxxxxxxxxxxxx
-returnsLanding.aside.link2                                        =  xxxxxxxxxxxxxxxxxxxx
-
-returnsLanding.returnToHome.link                                  =  xxxxxxxxxxxxxxxxxxxx
-
-# Agent
-agent.retrievingClient.title                           =  xxxxxxxxxxxxxxxxxxxx
-agent.retrievingClient.h1                              =  xxxxxxxxxxxxxxxxxxxx
-agent.retrievingClient.p1                              =  xxxxxxxxxxxxxxxxxxxx
-agent.retrievingClient.p2                              =  xxxxxxxxxxxxxxxxxxxx
-agent.retrievingClient.inset.h2                        =  xxxxxxxxxxxxxxxxxxxx
-agent.retrievingClient.inset.p3                        =  xxxxxxxxxxxxxxxxxxxx
-agent.retrievingClient.inset.p4                        =  xxxxxxxxxxxxxxxxxxxx
-agent.retrievingClient.inset.link                      =  xxxxxxxxxxxxxxxxxxxx
-
-agent.failedToRetrieveClient.title                     =  xxxxxxxxxxxxxxxxxxxx
-agent.failedToRetrieveClient.heading                   =  xxxxxxxxxxxxxxxxxxxx
-agent.failedToRetrieveClient.p1                        =  xxxxxxxxxxxxxxxxxxxx
-agent.failedToRetrieveClient.listItem1                 =  xxxxxxxxxxxxxxxxxxxx
-agent.failedToRetrieveClient.listItem2                 =  xxxxxxxxxxxxxxxxxxxx
-agent.failedToRetrieveClient.listItem3                 =  xxxxxxxxxxxxxxxxxxxx
-agent.failedToRetrieveClient.p2                        =  xxxxxxxxxxxxxxxxxxxx
-agent.failedToRetrieveClient.link                      =  xxxxxxxxxxxxxxxxxxxx
-agent.failedToRetrieveClient.inset.h2                  =  xxxxxxxxxxxxxxxxxxxx
-agent.failedToRetrieveClient.inset.p3                  =  xxxxxxxxxxxxxxxxxxxx
-agent.failedToRetrieveClient.inset.p4                  =  xxxxxxxxxxxxxxxxxxxx
-agent.failedToRetrieveClient.inset.link                =  xxxxxxxxxxxxxxxxxxxx
-
-agent.noAuthorisedClients.title                        =  xxxxxxxxxxxxxxxxxxxx
-agent.noAuthorisedClients.heading                      =  xxxxxxxxxxxxxxxxxxxx
-agent.noAuthorisedClients.p1                           =  xxxxxxxxxxxxxxxxxxxx
-agent.noAuthorisedClients.p2                           =  xxxxxxxxxxxxxxxxxxxx
-agent.noAuthorisedClients.h2                           =  xxxxxxxxxxxxxxxxxxxx
-agent.noAuthorisedClients.p3                           =  xxxxxxxxxxxxxxxxxxxx
-agent.noAuthorisedClients.listItem1                    =  xxxxxxxxxxxxxxxxxxxx
-agent.noAuthorisedClients.listItem1.link               =  xxxxxxxxxxxxxxxxxxxx
-agent.noAuthorisedClients.listItem2                    =  xxxxxxxxxxxxxxxxxxxx
-agent.noAuthorisedClients.listItem2.link               =  xxxxxxxxxxxxxxxxxxxx
-agent.noAuthorisedClients.listItem2.afterLinkText      =  xxxxxxxxxxxxxxxxxxxx
-agent.noAuthorisedClients.p4                           =  xxxxxxxxxxxxxxxxxxxx
-agent.noAuthorisedClients.returnToHome.link            =  xxxxxxxxxxxxxxxxxxxx
-
-agent.clientListSearch.title                           =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.heading                         =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.p1                              =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchBy.label                  =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchBy.error.required         =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchBy.placeholder            =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.label              =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.label.hint         =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.error.required     =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.error.length       =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.error.format       =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.cn.error.required  =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.er.error.required  =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.cr.error.required  =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.cn.error.format    =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.er.error.format    =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.cr.error.format    =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.cn.error.length    =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.er.error.length    =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.cr.error.length    =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.table.caption                   =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.th.clientName                   =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.th.employersReference           =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.th.clientReference              =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.th.actions                      =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.td.actions.remove               =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.clearSearch                     =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.noResults                       =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.details.1.summary               =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.details.1.p1                    =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.details.1.link                  =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.details.2.summary               =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.details.2.p1                    =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.details.2.p2                    =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.details.2.link                  =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.td.actions.remove.hidden        =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.td.clientName.hidden            =  xxxxxxxxxxxxxxxxxxxx
-
-agent.landing.title                                    =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.h1                                       =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.agentName.key                            =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.agentName.noName                         =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.schemeName.key                           =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.schemeName.key.notProvided               =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.employerRef.key                          =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.h2.help                                  =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.card.manageYourCisReturns.title          =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.card.manageYourCisReturns.p              =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.card.manageYourSubcontractors.title      =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.card.manageYourSubcontractors.p          =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.card.manageYourContractorDetails.title   =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.card.manageYourContractorDetails.p       =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.card.appealPenalty.title                 =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.card.appealPenalty.p                     =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.card.manageClientDetails.title           =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.card.manageClientDetails.p               =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.card.removeClient.title                  =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.card.removeClient.p                      =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.card.noticesAndStatements.title          =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.card.noticesAndStatements.p              =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.help.link1                               =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.help.link2                               =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.help.link3                               =  xxxxxxxxxxxxxxxxxxxx
 
 agent.agentLostAccess.title                            =  xxxxxxxxxxxxxxxxxxxx
 agent.agentLostAccess.heading                          =  xxxxxxxxxxxxxxxxxxxx
@@ -429,6 +255,21 @@ agent.clientListSearch.details.2.p2                   =  Mae’r gwasanaeth hwn 
 agent.clientListSearch.details.2.link                 =  Dewch o hyd i feddalwedd fasnachol ar gyfer datganiadau CIS
 agent.clientListSearch.td.actions.remove.hidden       =  Dewis {0}
 agent.clientListSearch.td.clientName.hidden           =  Dileu {0}
+agent.clientListSearch.searchBy.error.required         =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.searchFilter.label              =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.searchFilter.label.hint         =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.searchFilter.error.required     =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.searchFilter.error.length       =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.searchFilter.error.format       =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.searchFilter.cn.error.required  =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.searchFilter.er.error.required  =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.searchFilter.cr.error.required  =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.searchFilter.cn.error.format    =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.searchFilter.er.error.format    =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.searchFilter.cr.error.format    =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.searchFilter.cn.error.length    =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.searchFilter.er.error.length    =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.searchFilter.cr.error.length    =  xxxxxxxxxxxxxxxxxxxx
 
 agent.noAuthorisedClients.title                       =  Nid oes gennych unrhyw gleientiaid awdurdodedig
 agent.noAuthorisedClients.heading                     =  Nid oes gennych unrhyw gleientiaid awdurdodedig
@@ -582,23 +423,6 @@ submissionConfirmation.needHelp.link         =  xxxxxxxxxxxxxxxxxxxx
 
 submissionConfirmation.returnType.monthly    =  xxxxxxxxxxxxxxxxxxxx
 submissionConfirmation.returnType.nil        =  xxxxxxxxxxxxxxxxxxxx
-
-incompleteReturns.title                      =  xxxxxxxxxxxxxxxxxxxx
-incompleteReturns.heading                    =  xxxxxxxxxxxxxxxxxxxx
-incompleteReturns.message                    =  xxxxxxxxxxxxxxxxxxxx
-
-incompleteReturns.table.returnPeriodEnd      =  xxxxxxxxxxxxxxxxxxxx
-incompleteReturns.table.returnType           =  xxxxxxxxxxxxxxxxxxxx
-incompleteReturns.table.lastUpdate           =  xxxxxxxxxxxxxxxxxxxx
-incompleteReturns.table.status               =  xxxxxxxxxxxxxxxxxxxx
-incompleteReturns.table.action               =  xxxxxxxxxxxxxxxxxxxx
-
-incompleteReturns.action.continue            =  xxxxxxxxxxxxxxxxxxxx
-incompleteReturns.action.delete              =  xxxxxxxxxxxxxxxxxxxx
-incompleteReturns.action.view                =  xxxxxxxxxxxxxxxxxxxx
-incompleteReturns.action.continue.hidden     =  xxxxxxxxxxxxxxxxxxxx
-incompleteReturns.action.delete.hidden       =  xxxxxxxxxxxxxxxxxxxx
-incompleteReturns.action.view.hidden         =  xxxxxxxxxxxxxxxxxxxx
 
 # History
 history.submittedReturnsChooseTaxYear.title                                  =  Pa flwyddyn dreth ydych am fwrw golwg drosti?
