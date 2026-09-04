@@ -348,3 +348,11 @@ clientdetails.clientRemoved.p1                               =  Gall gymryd hyd 
 clientdetails.clientRemoved.return.link                      =  Dychwelyd i’ch rhestr o gleientiaid
 clientdetails.clientRemoved.survey.link                      =  Beth oedd eich barn am y gwasanaeth hwn?
 clientdetails.clientRemoved.survey.suffix                    =  (mae’n cymryd 30 eiliad)
+
+amend.noIncompleteReturns.title    =  Nid oes gennych unrhyw ddatganiadau anghyflawn
+amend.noIncompleteReturns.heading  =  Nid oes gennych unrhyw ddatganiadau anghyflawn
+amend.noIncompleteReturns.p1       =  Er mwyn gweld datganiad misol, neu wneud unrhyw ddiwygiadau, mae’n rhaid i chi gyflwyno un yn gyntaf.
+amend.noIncompleteReturns.p2       =  Gallwch wneud hyn drwy fynd i
+amend.noIncompleteReturns.p2.link  =  Rheoli’ch datganiad CIS
+amend.noIncompleteReturns.p3       =  Dysgwch ragor ynghylch
+amend.noIncompleteReturns.p3.link  =  yr hyn sydd angen i chi ei wneud fel contractwr CIS
