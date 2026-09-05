@@ -23,7 +23,7 @@ import models.history.SubmittedReturnsData
 import models.requests.CisIdDataRequest
 import pages.history.SubmittedReturnsDataPage
 import play.api.Logging
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Lang, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{ManageService, SubmittedReturnsService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -56,6 +56,7 @@ class SubmittedReturnsController @Inject() (
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
 
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+      implicit val lang: Lang        = messagesApi.preferred(request).lang
 
       resolveSubmittedReturnsData
         .map { data =>
@@ -73,6 +74,7 @@ class SubmittedReturnsController @Inject() (
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
 
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+      implicit val lang: Lang        = messagesApi.preferred(request).lang
 
       resolveSubmittedReturnsData
         .map { data =>
@@ -100,6 +102,7 @@ class SubmittedReturnsController @Inject() (
   def viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+      implicit val lang: Lang        = messagesApi.preferred(request).lang
 
       submittedReturnsService
         .getMonthlyReturnComplete(request.cisId, taxYear, taxMonth, amendment)

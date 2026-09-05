@@ -34,6 +34,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import pages.*
 import repositories.SessionRepository
+import play.api.i18n.Lang
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel}
 import viewmodels.agent.AgentLandingViewModel
@@ -46,6 +47,7 @@ import scala.util.Failure
 class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
   implicit val hc: HeaderCarrier            = HeaderCarrier()
+  implicit val lang: Lang                   = Lang("en")
   implicit val ec: ExecutionContext         = global
   implicit val appConfig: FrontendAppConfig = mock(classOf[FrontendAppConfig])
 
@@ -482,7 +484,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         IncompleteReturnsRowViewModel(
           returnPeriodEnd = "Jan 2025",
           returnType = "Nil",
-          lastUpdate = "01 Jan 2025",
+          lastUpdate = "1 Jan 2025",
           status = "In progress",
           action = Seq(
             ActionLinkViewModel(

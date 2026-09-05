@@ -21,6 +21,7 @@ import models.UserAnswers
 import models.response.GetSubmittedVerificationsResponse
 import models.verify.{VerificationHistoryData, VerificationRequestData}
 import org.mockito.ArgumentMatchers.any
+import play.api.i18n.Lang
 import org.mockito.Mockito.{verify as mockVerify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CisIdPage
@@ -126,10 +127,10 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
           verificationHistoryData,
           verificationBatchId,
           cisId
-        )
+        )(Lang("en"))
       ).thenReturn(Some(viewModel))
 
-      val app = application(userAnswersWithVerificationHistoryData)
+      val app: Application = application(userAnswersWithVerificationHistoryData)
 
       running(app) {
         val request =
@@ -145,7 +146,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
         contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
 
         mockVerify(mockVerificationHistoryService)
-          .buildSubmissionReceiptViewModel(verificationHistoryData, verificationBatchId, cisId)
+          .buildSubmissionReceiptViewModel(verificationHistoryData, verificationBatchId, cisId)(Lang("en"))
         verifyNoInteractions(mockVerificationService)
       }
     }
@@ -160,10 +161,10 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
           verificationHistoryData,
           verificationBatchId,
           cisId
-        )
+        )(Lang("en"))
       ).thenReturn(Some(viewModel))
 
-      val app = application(userAnswersWithCisId)
+      val app: Application = application(userAnswersWithCisId)
 
       running(app) {
         val request =
@@ -186,10 +187,10 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
           verificationHistoryData,
           verificationBatchId,
           cisId
-        )
+        )(Lang("en"))
       ).thenReturn(None)
 
-      val app = application(userAnswersWithVerificationHistoryData)
+      val app: Application = application(userAnswersWithVerificationHistoryData)
 
       running(app) {
         val request =
@@ -206,7 +207,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends SpecBase with Mockito
     }
 
     "must redirect when CisIdPage is missing" in new Setup {
-      val app = application(emptyUserAnswers)
+      val app: Application = application(emptyUserAnswers)
 
       running(app) {
         val request =

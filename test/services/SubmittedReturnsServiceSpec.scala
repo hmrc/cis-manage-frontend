@@ -109,7 +109,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
     val service: SubmittedReturnsService = new SubmittedReturnsService(mockConnector)
 
     def singleRow(testData: SubmittedReturnsData): SubmittedReturnsRowViewModel =
-      service.buildAllYearsViewModel(testData, instanceId).value.taxYears.head.rows.head
+      service.buildAllYearsViewModel(testData, instanceId)(Lang("en")).value.taxYears.head.rows.head
   }
 
   "SubmittedReturnsService" - {
@@ -149,7 +149,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         submissions = Seq(submission())
       )
 
-      val result = service.buildSingleYearViewModel(testData, "2022", instanceId)
+      val result = service.buildSingleYearViewModel(testData, "2022", instanceId)(Lang("en"))
 
       result.value.selectedTaxYear                           shouldBe Some("2022")
       result.value.taxYears.map(t => (t.fromYear, t.toYear)) shouldBe Seq(2022 -> 2023)
@@ -171,7 +171,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         submissions = Seq(submission())
       )
 
-      service.buildSingleYearViewModel(testData, "abc", instanceId) shouldBe None
+      service.buildSingleYearViewModel(testData, "abc", instanceId)(Lang("en")) shouldBe None
     }
 
     "uses Unknown return type for unhandled nilReturnIndicator" in new Setup {
@@ -438,6 +438,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
     "createAmendmentHandoff must create journey handoff and return handoff id" in new Setup {
       implicit val hc: HeaderCarrier = HeaderCarrier()
+      implicit val lang: Lang        = Lang("en")
 
       val handoffId = "handoff-123"
 
@@ -492,6 +493,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
     "createAmendmentHandoff must create payload without acceptedTime when matching submission has no acceptedTime" in new Setup {
       implicit val hc: HeaderCarrier = HeaderCarrier()
+      implicit val lang: Lang        = Lang("en")
 
       val handoffId = "handoff-123"
 
@@ -545,6 +547,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
     "createAmendmentHandoff must return Left when no matching monthly return exists" in new Setup {
       implicit val hc: HeaderCarrier = HeaderCarrier()
+      implicit val lang: Lang        = Lang("en")
 
       val testData = data(
         monthlyReturns = Seq(
@@ -571,6 +574,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
     "createAmendmentHandoff must propagate connector failure" in new Setup {
       implicit val hc: HeaderCarrier = HeaderCarrier()
+      implicit val lang: Lang        = Lang("en")
 
       val testData = data(
         monthlyReturns = Seq(
@@ -602,6 +606,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
     "getMonthlyReturnComplete must build a SubmissionReceiptViewModel from connector response" in new Setup {
       implicit val hc: HeaderCarrier = HeaderCarrier()
+      implicit val lang: Lang        = Lang("en")
 
       val response = MonthlyReturnCompleteResponse(
         scheme = Seq(CompleteSchemeData(1, "INST001", "123P", "123", "ABC456", None, Some("Test Contractor"), None)),
@@ -662,6 +667,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
     "getMonthlyReturnComplete must identify nil returns correctly" in new Setup {
       implicit val hc: HeaderCarrier = HeaderCarrier()
+      implicit val lang: Lang        = Lang("en")
 
       val response = MonthlyReturnCompleteResponse(
         scheme = Seq(CompleteSchemeData(1, "INST001", "123P", "123", "ABC456", None, Some("Nil Co"), None)),
@@ -698,6 +704,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
     "getMonthlyReturnComplete must fail guard when status is not SUBMITTED and amendment is not Y" in new Setup {
       implicit val hc: HeaderCarrier = HeaderCarrier()
+      implicit val lang: Lang        = Lang("en")
 
       val response = MonthlyReturnCompleteResponse(
         scheme = Seq(CompleteSchemeData(1, "INST001", "123P", "123", "ABC456", None, Some("Test Co"), None)),
@@ -730,6 +737,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
     "getMonthlyReturnComplete must pass guard when amendment is Y even if status is not SUBMITTED" in new Setup {
       implicit val hc: HeaderCarrier = HeaderCarrier()
+      implicit val lang: Lang        = Lang("en")
 
       val response = MonthlyReturnCompleteResponse(
         scheme = Seq(CompleteSchemeData(1, "INST001", "123P", "123", "ABC456", None, Some("Test Co"), None)),
@@ -761,6 +769,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
     "getMonthlyReturnComplete must fail guard when IRMarks do not match" in new Setup {
       implicit val hc: HeaderCarrier = HeaderCarrier()
+      implicit val lang: Lang        = Lang("en")
 
       val response = MonthlyReturnCompleteResponse(
         scheme = Seq(CompleteSchemeData(1, "INST001", "123P", "123", "ABC456", None, Some("Test Co"), None)),
@@ -793,6 +802,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
     "getMonthlyReturnComplete must fail guard when IRMark is null" in new Setup {
       implicit val hc: HeaderCarrier = HeaderCarrier()
+      implicit val lang: Lang        = Lang("en")
 
       val response = MonthlyReturnCompleteResponse(
         scheme = Seq(CompleteSchemeData(1, "INST001", "123P", "123", "ABC456", None, Some("Test Co"), None)),

@@ -21,7 +21,7 @@ import controllers.actions.*
 import controllers.routes
 import models.*
 import play.api.Logging
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Lang, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import queries.delete.UnsubmittedMonthlyReturnToDeleteQuery
 import repositories.SessionRepository
@@ -49,6 +49,7 @@ class IncompleteReturnsController @Inject() (
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData andThen requireCisId).async {
     implicit request =>
+      implicit val lang: Lang = messagesApi.preferred(request).lang
       service.getUnsubmittedMonthlyReturnRows(request.cisId).map { rows =>
         if (rows.isEmpty) {
           Redirect(controllers.history.routes.NoIncompleteReturnsController.onPageLoad())

@@ -26,15 +26,15 @@ import models.requests.*
 import models.response.*
 import pages.*
 import play.api.Logging
+import play.api.i18n.Lang
 import play.api.libs.json.Json
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.DateTimeFormats
 import viewmodels.*
 import viewmodels.agent.AgentLandingViewModel
 
 import java.time.*
-import java.time.format.*
-import java.util.Locale
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,9 +44,6 @@ class ManageService @Inject() (
   sessionRepository: SessionRepository
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends Logging {
-
-  private val shortMonthYearFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM yyyy", Locale.UK)
-  private val lastUpdateFormatter: DateTimeFormatter     = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.UK)
 
   def resolveAndStoreCisId(ua: UserAnswers)(implicit hc: HeaderCarrier): Future[(String, UserAnswers)] =
     ua.get(CisIdPage) match {
@@ -135,7 +132,8 @@ class ManageService @Inject() (
     cisConnector.getUnsubmittedMonthlyReturns(instanceId)
 
   def getUnsubmittedMonthlyReturnRows(instanceId: String)(implicit
-    hc: HeaderCarrier
+    hc: HeaderCarrier,
+    lang: Lang
   ): Future[Seq[IncompleteReturnsRowViewModel]] =
     for {
       unsubmitted <- getUnsubmittedMonthlyReturns(instanceId)
@@ -269,12 +267,12 @@ class ManageService @Inject() (
       GetSubmittedMonthlyReturnsDataRequest(instanceId, taxYear, taxMonth, amendment)
     )
 
-  private def buildReturnPeriodEnd(taxMonth: Int, taxYear: Int): String =
-    YearMonth.of(taxYear, taxMonth).format(shortMonthYearFormatter)
+  private def buildReturnPeriodEnd(taxMonth: Int, taxYear: Int)(implicit lang: Lang): String =
+    YearMonth.of(taxYear, taxMonth).format(DateTimeFormats.monthYearFormat())
 
-  private def formatLastUpdate(lastUpdate: Option[LocalDateTime]): String =
+  private def formatLastUpdate(lastUpdate: Option[LocalDateTime])(implicit lang: Lang): String =
     lastUpdate match {
-      case Some(dateTime) => dateTime.toLocalDate.format(lastUpdateFormatter)
+      case Some(dateTime) => dateTime.toLocalDate.format(DateTimeFormats.shortDateFormat())
       case None           => ""
     }
 

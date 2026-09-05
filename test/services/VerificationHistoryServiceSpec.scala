@@ -21,6 +21,7 @@ import models.verify.VerificationTaxYearSelection.TaxYearPeriod
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.OptionValues
+import play.api.i18n.Lang
 
 import java.time.LocalDate
 import models.response.*
@@ -168,7 +169,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
     "buildAllYearsViewModel" - {
 
       "must return a view model with all tax years grouped and sorted descending" in {
-        val result = service.buildAllYearsViewModel(data, instanceId)
+        val result = service.buildAllYearsViewModel(data, instanceId)(Lang("en"))
 
         result mustBe defined
 
@@ -183,7 +184,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
       }
 
       "must group rows correctly per tax year" in {
-        val result = service.buildAllYearsViewModel(data, instanceId)
+        val result = service.buildAllYearsViewModel(data, instanceId)(Lang("en"))
 
         val vm = result.get
         vm.taxYears.head.rows.size mustBe 2
@@ -191,16 +192,16 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
       }
 
       "must format date submitted correctly" in {
-        val result = service.buildAllYearsViewModel(data, instanceId)
+        val result = service.buildAllYearsViewModel(data, instanceId)(Lang("en"))
 
         val vm   = result.get
         val rows = vm.taxYears.head.rows
-        rows.head.dateSubmitted mustBe "06 Jun 2026"
-        rows(1).dateSubmitted mustBe "06 Apr 2026"
+        rows.head.dateSubmitted mustBe "6 Jun 2026"
+        rows(1).dateSubmitted mustBe "6 Apr 2026"
       }
 
       "must set verification request link to the verification request page" in {
-        val result = service.buildAllYearsViewModel(data, instanceId)
+        val result = service.buildAllYearsViewModel(data, instanceId)(Lang("en"))
 
         val vm  = result.get
         val row = vm.taxYears.head.rows.head
@@ -209,7 +210,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
       }
 
       "must set submission receipt link to the submission receipt page" in {
-        val result = service.buildAllYearsViewModel(data, instanceId)
+        val result = service.buildAllYearsViewModel(data, instanceId)(Lang("en"))
 
         val vm  = result.get
         val row = vm.taxYears.head.rows(1)
@@ -218,7 +219,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
       }
 
       "must set submission receipt link to None when the status is 'SUBMITTED_NO_RECEIPT'" in {
-        val result = service.buildAllYearsViewModel(data, instanceId)
+        val result = service.buildAllYearsViewModel(data, instanceId)(Lang("en"))
 
         val vm  = result.get
         val row = vm.taxYears.head.rows.head
@@ -227,7 +228,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
 
       "must return None when there are no verification requests" in {
         val emptyData = VerificationHistoryData(verificationRequests = Seq.empty)
-        val result    = service.buildAllYearsViewModel(emptyData, instanceId)
+        val result    = service.buildAllYearsViewModel(emptyData, instanceId)(Lang("en"))
 
         result mustBe None
       }
@@ -236,7 +237,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
     "buildSingleYearViewModel" - {
 
       "must return a view model filtered to the selected tax year" in {
-        val result = service.buildSingleYearViewModel(data, "2026", instanceId)
+        val result = service.buildSingleYearViewModel(data, "2026", instanceId)(Lang("en"))
 
         result mustBe defined
 
@@ -249,13 +250,13 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
       }
 
       "must return None for an invalid (non-numeric) tax year" in {
-        val result = service.buildSingleYearViewModel(data, "invalid", instanceId)
+        val result = service.buildSingleYearViewModel(data, "invalid", instanceId)(Lang("en"))
 
         result mustBe None
       }
 
       "must return None for a year with no data" in {
-        val result = service.buildSingleYearViewModel(data, "2020", instanceId)
+        val result = service.buildSingleYearViewModel(data, "2020", instanceId)(Lang("en"))
 
         result mustBe None
       }
@@ -512,10 +513,10 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
           VerificationHistoryData(Seq(requestData)),
           1L,
           instanceId
-        )
+        )(Lang("en"))
 
         result.value.submittedTime mustBe "14:30"
-        result.value.submittedDate mustBe "06 April 2026"
+        result.value.submittedDate mustBe "6 April 2026"
         result.value.verificationNumber mustBe "V001"
         result.value.contractorName mustBe "Test Scheme"
         result.value.employerReference mustBe "123/AB456"
@@ -546,7 +547,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
           VerificationHistoryData(Seq(firstRequest, secondRequest)),
           2L,
           instanceId
-        )
+        )(Lang("en"))
 
         result.value.subcontractorsToVerify mustBe Seq(SubcontractorRowViewModel("Second Subcontractor", "V001"))
       }
@@ -566,10 +567,10 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
           VerificationHistoryData(Seq(requestData)),
           1L,
           instanceId
-        )
+        )(Lang("en"))
 
         result.value.submissionTime mustBe "14:30"
-        result.value.submissionDate mustBe "06 April 2026"
+        result.value.submissionDate mustBe "6 April 2026"
         result.value.contractorName mustBe "Test Scheme"
         result.value.employerReference mustBe "123/AB456"
         result.value.receiptReferenceNumber mustBe receiptReferenceNumber
