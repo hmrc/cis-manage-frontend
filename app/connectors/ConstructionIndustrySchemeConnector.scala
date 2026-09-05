@@ -206,29 +206,6 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .execute[JourneyHandoffResponse]
       .map(_.id)
 
-  // TODO: Replace stub with real API call when available
-  def getVerificationRequestDetail(
-    instanceId: String,
-    verificationNumber: String
-  )(implicit hc: HeaderCarrier): Future[VerificationRequestDetailData] =
-    Future.successful(
-      VerificationRequestDetailData(
-        verificationNumber = verificationNumber,
-        dateTimeSubmitted = LocalDateTime.of(2027, 2, 6, 14, 30),
-        subcontractorsToVerify = Seq(
-          SubcontractorVerificationData("Amity Marine Contractors", "V0004528765"),
-          SubcontractorVerificationData("Brody, Martin", "V0004528765"),
-          SubcontractorVerificationData("Brody, Michael", "V0004528765"),
-          SubcontractorVerificationData("Brody, Sean", "V0004528765"),
-          SubcontractorVerificationData("Hooper and Associates", "V0004528765")
-        ),
-        subcontractorsToReverify = Seq(
-          SubcontractorVerificationData("Orca Industrial", "V0004528765/L"),
-          SubcontractorVerificationData("Quint Transportation", "V0004528765")
-        )
-      )
-    )
-
   def getSubcontractorDeleteStatus(
     cisId: String,
     subbieResourceRef: Long
