@@ -48,7 +48,7 @@ class DeleteMonthlyReturnControllerSpec extends SpecBase with MockitoSugar {
     2026,
     4,
     Standard,
-    StatusViewModel.Text("history.returnHistory.status.inProgress"),
+    StatusViewModel.InProgress,
     3000L,
     None,
     Some("N"),

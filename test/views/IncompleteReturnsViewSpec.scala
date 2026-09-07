@@ -67,7 +67,7 @@ class IncompleteReturnsViewSpec extends SpecBase {
         returnPeriodEnd = "Jan 2025",
         returnType = ReturnTypeViewModel.Nil,
         lastUpdate = "01 Jan 2025",
-        status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
+        status = StatusViewModel.InProgress,
         action = Seq(
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.continue",

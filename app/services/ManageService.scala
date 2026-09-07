@@ -285,7 +285,7 @@ class ManageService @Inject() (
     val isAmendment = row.amendment.exists(_.equals("Y"))
 
     row.status match {
-      case StatusViewModel.Text("history.returnHistory.status.inProgress") =>
+      case StatusViewModel.InProgress =>
         Seq(
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.continue",
@@ -313,7 +313,7 @@ class ManageService @Inject() (
           )
         )
 
-      case StatusViewModel.Text("history.returnHistory.status.awaitingConfirmation") =>
+      case StatusViewModel.AwaitingConfirmation =>
         Seq(
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.view",
@@ -322,7 +322,7 @@ class ManageService @Inject() (
           )
         )
 
-      case StatusViewModel.Text("history.returnHistory.status.unsuccessful") =>
+      case StatusViewModel.Unsuccessful =>
         Seq(
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.view",

@@ -39,7 +39,7 @@ class UnsubmittedMonthlyReturnToDeleteQuerySpec extends SpecBase {
         taxYear = 2025,
         taxMonth = 1,
         returnType = ReturnTypeViewModel.Nil,
-        status = StatusViewModel.Text("history.returnHistory.status.inProgress"),
+        status = StatusViewModel.InProgress,
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true

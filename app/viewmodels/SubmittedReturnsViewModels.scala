@@ -49,23 +49,26 @@ import play.api.libs.json.{Format, JsError, JsString, JsSuccess, Reads, Writes}
 sealed trait StatusViewModel
 
 object StatusViewModel {
+  case object InProgress extends StatusViewModel
+  case object AwaitingConfirmation extends StatusViewModel
+  case object Unsuccessful extends StatusViewModel
   case class Text(messageKey: String) extends StatusViewModel
   case class Link(link: LinkViewModel, textKey: String, hiddenTextKey: String) extends StatusViewModel
 
   given reads: Reads[StatusViewModel] = Reads {
-    case JsString("In progress")           => JsSuccess(Text("history.returnHistory.status.inProgress"))
-    case JsString("Awaiting confirmation") => JsSuccess(Text("history.returnHistory.status.awaitingConfirmation"))
-    case JsString("Unsuccessful")          => JsSuccess(Text("history.returnHistory.status.unsuccessful"))
+    case JsString("In progress")           => JsSuccess(InProgress)
+    case JsString("Awaiting confirmation") => JsSuccess(AwaitingConfirmation)
+    case JsString("Unsuccessful")          => JsSuccess(Unsuccessful)
     case JsString(other)                   => JsSuccess(Text(other))
     case _                                 => JsError("Invalid StatusViewModel")
   }
 
   given writes: Writes[StatusViewModel] = Writes {
-    case Text("history.returnHistory.status.inProgress")           => JsString("In progress")
-    case Text("history.returnHistory.status.awaitingConfirmation") => JsString("Awaiting confirmation")
-    case Text("history.returnHistory.status.unsuccessful")         => JsString("Unsuccessful")
-    case Text(other)                                               => JsString(other)
-    case _: Link                                                   => JsString("")
+    case InProgress           => JsString("In progress")
+    case AwaitingConfirmation => JsString("Awaiting confirmation")
+    case Unsuccessful         => JsString("Unsuccessful")
+    case Text(other)          => JsString(other)
+    case _: Link              => JsString("")
   }
 
   given format: Format[StatusViewModel] = Format(reads, writes)

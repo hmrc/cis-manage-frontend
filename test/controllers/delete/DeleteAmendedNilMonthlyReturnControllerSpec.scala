@@ -49,7 +49,7 @@ class DeleteAmendedNilMonthlyReturnControllerSpec extends SpecBase with MockitoS
       2026,
       4,
       ReturnTypeViewModel.Nil,
-      StatusViewModel.Text("history.returnHistory.status.inProgress"),
+      StatusViewModel.InProgress,
       3000L,
       None,
       Some("Y"),
