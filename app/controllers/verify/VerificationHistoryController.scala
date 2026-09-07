@@ -16,92 +16,49 @@
 
 package controllers.verify
 
-import controllers.actions.*
-import models.requests.CisIdDataRequest
-import models.verify.VerificationHistoryData
-import models.verify.VerificationTaxYearSelection.TaxYear
-import pages.verify.{VerificationHistoryDataPage, VerificationHistorySelectTaxYearPage}
+import controllers.{CisController, CisControllerComponents}
+import models.verify.VerificationTaxYearSelection
+import models.verify.VerificationTaxYearSelection.{AllTaxYears, TaxYear}
 import play.api.Logging
-import play.api.i18n.{I18nSupport, Lang, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent}
 import services.{VerificationHistoryService, VerificationService}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import views.html.verify.VerificationHistoryView
+import views.html.PageNotFoundView
+import views.html.verify.{NoVerificationHistoryView, VerificationHistoryView}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class VerificationHistoryController @Inject() (
-  override val messagesApi: MessagesApi,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  requireCisId: CisIdRequiredAction,
-  val controllerComponents: MessagesControllerComponents,
+  val controllerComponents: CisControllerComponents,
   view: VerificationHistoryView,
+  noHistoryView: NoVerificationHistoryView,
+  notFoundView: PageNotFoundView,
   verificationHistoryService: VerificationHistoryService,
   verificationService: VerificationService
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport
+    extends CisController
     with Logging {
 
-  def onPageLoadSingleYear(): Action[AnyContent] =
+  def onPageLoad(selectionStr: String): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
-
-      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
-      implicit val lang: Lang = messagesApi.preferred(request).lang
-
-      request.userAnswers.get(VerificationHistorySelectTaxYearPage) match {
-        case Some(TaxYear(startYear)) =>
-          resolveVerificationHistoryData
+      VerificationTaxYearSelection fromPath selectionStr match
+        case Some(selection) =>
+          verificationService
+            .getSubmittedVerifications(request.cisId)
             .map { data =>
-              verificationHistoryService.buildSingleYearViewModel(data, startYear.toString, request.cisId) match {
-                case Some(vm) => Ok(view(vm))
-                case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-              }
+              selection match
+                case AllTaxYears    =>
+                  verificationHistoryService.buildAllYearsViewModel(data, request.cisId) match
+                    case Some(vm) if vm.taxYears.nonEmpty => Ok(view(vm))
+                    case _                                => Ok(noHistoryView(request.cisId))
+                case TaxYear(start) =>
+                  verificationHistoryService.buildSingleYearViewModel(data, start, request.cisId) match
+                    case Some(vm) if vm.taxYears.nonEmpty => Ok(view(vm))
+                    case _                                => NotFound(notFoundView())
             }
-            .recover { case _ =>
+            .recover { _ =>
               Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
             }
-        case _                        =>
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      }
-    }
-
-  def onPageLoadAllYears: Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
-
-      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
-      implicit val lang: Lang = messagesApi.preferred(request).lang
-
-      resolveVerificationHistoryData
-        .map { data =>
-          verificationHistoryService.buildAllYearsViewModel(data, request.cisId) match {
-            case Some(vm) => Ok(view(vm))
-            case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          }
-        }
-        .recover { case _ =>
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
-    }
-
-  private def resolveVerificationHistoryData(implicit
-    request: CisIdDataRequest[AnyContent],
-    hc: HeaderCarrier
-  ): Future[VerificationHistoryData] =
-    request.userAnswers.get(VerificationHistoryDataPage) match {
-      case Some(data) =>
-        Future.successful(data)
-
-      case None =>
-        verificationService
-          .getSubmittedVerifications(request.cisId)
-          .map(verificationHistoryService.toVerificationHistoryData)
+        case None            => Future.successful(NotFound(notFoundView()))
     }
 }
