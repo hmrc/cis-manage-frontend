@@ -231,6 +231,8 @@ agent.landing.card.noticesAndStatements.p             =  Gweld hysbysiad gan CTh
 agent.landing.help.link1                              =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
 agent.landing.help.link2                              =  Talu TWE y cyflogwr
 agent.landing.help.link3                              =  Cosbau am ddatganiadau hwyr (CIS) CC/FS18b
+agent.landing.agentName.noName                        =  xxxxxxxxxxxxxxxxxxxx
+agent.landing.schemeName.key.notProvided              =  xxxxxxxxxxxxxxxxxxxx
 
 agent.clientListSearch.title                          =  Dewiswch gleient er mwyn cyflwyno datganiad CIS
 agent.clientListSearch.heading                        =  Cyflwyno datganiad CIS misol
@@ -256,8 +258,6 @@ agent.clientListSearch.details.2.link                 =  Dewch o hyd i feddalwed
 agent.clientListSearch.td.actions.remove.hidden       =  Dewis {0}
 agent.clientListSearch.td.clientName.hidden           =  Dileu {0}
 agent.clientListSearch.searchBy.error.required         =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.label              =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.label.hint         =  xxxxxxxxxxxxxxxxxxxx
 agent.clientListSearch.searchFilter.error.required     =  xxxxxxxxxxxxxxxxxxxx
 agent.clientListSearch.searchFilter.error.length       =  xxxxxxxxxxxxxxxxxxxx
 agent.clientListSearch.searchFilter.error.format       =  xxxxxxxxxxxxxxxxxxxx
@@ -270,6 +270,7 @@ agent.clientListSearch.searchFilter.cr.error.format    =  xxxxxxxxxxxxxxxxxxxx
 agent.clientListSearch.searchFilter.cn.error.length    =  xxxxxxxxxxxxxxxxxxxx
 agent.clientListSearch.searchFilter.er.error.length    =  xxxxxxxxxxxxxxxxxxxx
 agent.clientListSearch.searchFilter.cr.error.length    =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.noResults                       =  xxxxxxxxxxxxxxxxxxxx
 
 agent.noAuthorisedClients.title                       =  Nid oes gennych unrhyw gleientiaid awdurdodedig
 agent.noAuthorisedClients.heading                     =  Nid oes gennych unrhyw gleientiaid awdurdodedig
