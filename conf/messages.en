@@ -26,6 +26,7 @@ site.saveAndContinue                                    =  Save and continue
 date.day                                                =  Day
 date.month                                              =  Month
 date.year                                               =  Year
+date.period                                             =  {0} to {1}
 
 date.error.day                                          =  day
 date.error.month                                        =  month

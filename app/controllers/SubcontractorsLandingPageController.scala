@@ -16,26 +16,15 @@
 
 package controllers
 
-import config.FrontendAppConfig
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, HasClientGuard, IdentifierAction}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import play.api.mvc.{Action, AnyContent}
 import views.html.SubcontractorsLandingPageView
 
 import javax.inject.Inject
 
 class SubcontractorsLandingPageController @Inject() (
-  override val messagesApi: MessagesApi,
-  val controllerComponents: MessagesControllerComponents,
-  view: SubcontractorsLandingPageView,
-  getData: DataRetrievalAction,
-  identify: IdentifierAction,
-  requireData: DataRequiredAction,
-  hasClientGuard: HasClientGuard
-)(implicit appConfig: FrontendAppConfig)
-    extends FrontendBaseController
-    with I18nSupport {
+  val controllerComponents: CisControllerComponents,
+  view: SubcontractorsLandingPageView
+) extends CisController {
 
   def onPageLoad(instanceId: String): Action[AnyContent] =
     (identify
