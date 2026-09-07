@@ -21,6 +21,9 @@ import models.verify.VerificationTaxYearSelection.TaxYearPeriod
 import models.response.GetSubmittedVerification
 import viewmodels.*
 
+import play.api.i18n.Lang
+import utils.DateTimeFormats
+
 import java.time.format.DateTimeFormatter
 import javax.inject.{Inject, Singleton}
 import models.response.{GetSubmittedSubmission, GetSubmittedVerificationsResponse}
@@ -31,9 +34,7 @@ import scala.util.Try
 @Singleton
 class VerificationHistoryService @Inject() () {
 
-  private val displayDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
-  private val timeFormatter: DateTimeFormatter        = DateTimeFormatter.ofPattern("HH:mm")
-  private val fullDateFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("dd MMMM yyyy")
+  private val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
   def getSubmittedVerificationTaxYears(data: VerificationHistoryData): Seq[TaxYearPeriod] =
     data.verificationRequests
@@ -44,7 +45,7 @@ class VerificationHistoryService @Inject() () {
   def buildAllYearsViewModel(
     data: VerificationHistoryData,
     instanceId: String
-  ): Option[VerificationHistoryPageViewModel] = {
+  )(implicit lang: Lang): Option[VerificationHistoryPageViewModel] = {
     val taxYearSections = buildTaxYearSections(data)
     if (taxYearSections.isEmpty) None
     else {
@@ -62,7 +63,7 @@ class VerificationHistoryService @Inject() () {
     data: VerificationHistoryData,
     taxYear: String,
     instanceId: String
-  ): Option[VerificationHistoryPageViewModel] =
+  )(implicit lang: Lang): Option[VerificationHistoryPageViewModel] =
     taxYear.toIntOption.flatMap { taxYearInt =>
       val taxYearSections = buildTaxYearSections(data).filter(_.fromYear == taxYearInt)
       if (taxYearSections.isEmpty) None
@@ -81,13 +82,13 @@ class VerificationHistoryService @Inject() () {
     data: VerificationHistoryData,
     verificationBatchId: Long,
     instanceId: String
-  ): Option[VerificationRequestPageViewModel] =
+  )(implicit lang: Lang): Option[VerificationRequestPageViewModel] =
     data.verificationRequests
       .find(_.verificationBatchId == verificationBatchId)
       .map { request =>
         VerificationRequestPageViewModel(
           submittedTime = request.acceptedDateTime.format(timeFormatter),
-          submittedDate = request.acceptedDateTime.format(fullDateFormatter),
+          submittedDate = request.acceptedDateTime.format(DateTimeFormats.dateTimeFormat()),
           verificationNumber = request.verificationNumber,
           contractorName = request.contractorName,
           employerReference = request.employerReference,
@@ -102,13 +103,13 @@ class VerificationHistoryService @Inject() () {
     data: VerificationHistoryData,
     verificationBatchId: Long,
     instanceId: String
-  ): Option[SubcontractorSubmissionReceiptViewModel] =
+  )(implicit lang: Lang): Option[SubcontractorSubmissionReceiptViewModel] =
     data.verificationRequests
       .find(_.verificationBatchId == verificationBatchId)
       .map { request =>
         SubcontractorSubmissionReceiptViewModel(
           submissionTime = request.acceptedDateTime.format(timeFormatter),
-          submissionDate = request.acceptedDateTime.format(fullDateFormatter),
+          submissionDate = request.acceptedDateTime.format(DateTimeFormats.dateTimeFormat()),
           contractorName = request.contractorName,
           employerReference = request.employerReference,
           receiptReferenceNumber = request.receiptReferenceNumber,
@@ -119,7 +120,7 @@ class VerificationHistoryService @Inject() () {
 
   private def buildTaxYearSections(
     data: VerificationHistoryData
-  ): Seq[VerificationTaxYearViewModel] = {
+  )(implicit lang: Lang): Seq[VerificationTaxYearViewModel] = {
     val rowsWithTaxYear = data.verificationRequests
       .sortBy(_.dateSubmitted)(Ordering[java.time.LocalDate].reverse)
       .map { request =>
@@ -142,10 +143,10 @@ class VerificationHistoryService @Inject() () {
 
   private def toRowViewModel(
     request: VerificationRequestData
-  ): VerificationHistoryRowViewModel =
+  )(implicit lang: Lang): VerificationHistoryRowViewModel =
     VerificationHistoryRowViewModel(
       verificationNumber = request.verificationNumber,
-      dateSubmitted = request.dateSubmitted.format(displayDateFormatter),
+      dateSubmitted = request.dateSubmitted.format(DateTimeFormats.shortDateFormat()),
       verificationRequestLink =
         controllers.verify.routes.VerificationRequestController.onPageLoad(request.verificationBatchId).url,
       submissionReceiptLink = Option.when(request.status != "SUBMITTED_NO_RECEIPT") {

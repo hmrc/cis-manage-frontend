@@ -36,3 +36,16 @@ case class AuthFailureAuditEventModel() extends AuditEventModel {
 object AuthFailureAuditEventModel {
   implicit val formats: Format[AuthFailureAuditEventModel] = Json.format[AuthFailureAuditEventModel]
 }
+
+case class DeleteSubcontractorAuditEventModel(
+  cisId: String,
+  subcontractorName: String,
+  subbieResourceRef: Long
+) extends AuditEventModel {
+  override val auditType: String   = "deleteSubcontractor"
+  override val detailJson: JsValue = Json.toJson(this)
+}
+
+object DeleteSubcontractorAuditEventModel {
+  implicit val formats: Format[DeleteSubcontractorAuditEventModel] = Json.format[DeleteSubcontractorAuditEventModel]
+}

@@ -34,6 +34,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import pages.*
 import repositories.SessionRepository
+import play.api.i18n.Lang
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel}
 import viewmodels.agent.AgentLandingViewModel
@@ -46,6 +47,7 @@ import scala.util.Failure
 class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
   implicit val hc: HeaderCarrier            = HeaderCarrier()
+  implicit val lang: Lang                   = Lang("en")
   implicit val ec: ExecutionContext         = global
   implicit val appConfig: FrontendAppConfig = mock(classOf[FrontendAppConfig])
 
@@ -372,6 +374,41 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
     }
   }
 
+  "getClientByEmployerReference" should {
+
+    "must return tax payer search result by empRef key" in {
+
+      val okResponse = CisTaxpayer(
+        uniqueId = "CIS-123",
+        taxOfficeNumber = "111",
+        taxOfficeRef = "test111",
+        aoDistrict = None,
+        aoPayType = None,
+        aoCheckCode = None,
+        aoReference = None,
+        validBusinessAddr = None,
+        correlation = None,
+        ggAgentId = None,
+        employerName1 = Some("TEST LTD"),
+        employerName2 = None,
+        agentOwnRef = None,
+        schemeName = Option("ABCD"),
+        utr = Some("1234567890"),
+        enrolledSig = None
+      )
+
+      val (service, connector, sessionRepo) = newService()
+
+      when(connector.getAgentClientTaxpayer(any[String], any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(okResponse))
+
+      service.getClientByEmployerReference(any[String], any[String])(any[HeaderCarrier]).futureValue mustBe okResponse
+
+      verify(connector).getAgentClientTaxpayer(any[String], any[String])(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+  }
+
   "getUnsubmittedMonthlyReturns" should {
 
     "delegate to connector and return raw response" in {
@@ -447,7 +484,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         IncompleteReturnsRowViewModel(
           returnPeriodEnd = "Jan 2025",
           returnType = "Nil",
-          lastUpdate = "01 Jan 2025",
+          lastUpdate = "1 Jan 2025",
           status = "In progress",
           action = Seq(
             ActionLinkViewModel(
