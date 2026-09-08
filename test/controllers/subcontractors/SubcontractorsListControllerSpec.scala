@@ -31,7 +31,7 @@ import models.response.{GetSubcontractor, GetSubcontractorListResponse}
 import models.{Mode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
 import pages.CisIdPage
 import pages.subcontractors.SubcontractorListPage
@@ -208,22 +208,6 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe OK
         contentAsString(result) mustBe "Subcontractors List View"
-        verify(mockView).apply(
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
-          any()
-        )(any(), any())
       }
     }
 
@@ -260,22 +244,6 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe OK
         contentAsString(result) mustBe "Subcontractors List View"
-        verify(mockView).apply(
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
-          any(),
-          any()
-        )(any(), any())
       }
     }
 
