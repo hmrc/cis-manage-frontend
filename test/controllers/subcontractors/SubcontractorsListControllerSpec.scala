@@ -167,7 +167,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
         taxTreatment = TaxTreatment.Unknown,
         dateAdded = "6 Apr 2026",
         subbieResourceRef = 10L,
-        amendUrl = s"$amendBaseUrl/amend/start/10"
+        amendUrl = s"$amendBaseUrl/amend/start/10/standard"
       ),
       SubcontractorsListRow(
         id = "2",
@@ -178,7 +178,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
         taxTreatment = TaxTreatment.Gross,
         dateAdded = "6 May 2026",
         subbieResourceRef = 20L,
-        amendUrl = s"$amendBaseUrl/amend/start/20"
+        amendUrl = s"$amendBaseUrl/amend/start/20/standard"
       )
     )
 
