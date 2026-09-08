@@ -48,7 +48,7 @@ class RemoveClientYesNoController @Inject() (
   manageService: ManageService,
   view: RemoveClientYesNoView
 )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 

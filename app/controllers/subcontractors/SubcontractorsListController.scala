@@ -516,8 +516,7 @@ class SubcontractorsListController @Inject() (
     (identify
       andThen getData
       andThen requireData
-      andThen hasClientGuard.forInstanceId(instanceId)
-    ) { implicit request =>
+      andThen hasClientGuard.forInstanceId(instanceId)) { implicit request =>
       implicit val lang: Lang = messagesApi.preferred(request).lang
 
       rowsFromUserAnswers(request.userAnswers) match {

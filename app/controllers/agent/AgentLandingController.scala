@@ -54,7 +54,7 @@ class AgentLandingController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: AgentLandingView
 )(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
-  extends FrontendBaseController
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 

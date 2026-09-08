@@ -45,7 +45,7 @@ class ManageClientDetailsController @Inject() (
   sessionRepository: SessionRepository,
   view: ManageClientDetailsView
 )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] =

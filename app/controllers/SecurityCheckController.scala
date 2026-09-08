@@ -158,12 +158,12 @@ class SecurityCheckController @Inject() (
           }
 
       case ClientListCheckReturnTarget.RemoveClient.key =>
-        mode
-          .flatMap(Mode.fromString)
-          .map { parsedMode =>
-            controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(parsedMode)
-          }
-      case _                                            =>
+        for {
+          id         <- instanceId
+          parsedMode <- mode.flatMap(Mode.fromString)
+        } yield controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(id, parsedMode)
+
+      case _ =>
         None
     }
 

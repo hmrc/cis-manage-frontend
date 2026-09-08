@@ -323,7 +323,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
       }
     }
 
-    "must redirect to SystemErrorController when client is missing on page load" in {
+    "must redirect to JourneyRecoveryController when client is missing on page load" in {
 
       val application =
         applicationBuilder(
@@ -343,7 +343,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          controllers.routes.SystemErrorController.onPageLoad().url
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
 
         verifyNoInteractions(mockAuditService)
         verifyNoInteractions(mockManageService)

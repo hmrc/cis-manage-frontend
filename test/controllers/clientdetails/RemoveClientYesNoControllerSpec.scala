@@ -43,7 +43,8 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   implicit val ec: ExecutionContext = ExecutionContext.global
 
-  val clientName  = "clientName"
+  val clientName = "clientName"
+
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new RemoveClientYesNoFormProvider()
