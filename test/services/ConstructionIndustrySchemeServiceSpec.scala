@@ -19,95 +19,70 @@ package services
 import base.SpecBase
 import connectors.ConstructionIndustrySchemeConnector
 import models.GetClientListStatusResponse
+import models.agent.{ClientListStatus, HasClientResponse}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
-import org.scalatest.TryValues
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ConstructionIndustrySchemeServiceSpec extends SpecBase with TryValues {
+class ConstructionIndustrySchemeServiceSpec extends SpecBase {
 
-  given hc: HeaderCarrier                            = HeaderCarrier()
-  given ec: ExecutionContext                         = scala.concurrent.ExecutionContext.global
-  val connector: ConstructionIndustrySchemeConnector = mock(classOf[ConstructionIndustrySchemeConnector])
+  given hc: HeaderCarrier = HeaderCarrier()
 
-  val service = new ConstructionIndustrySchemeService(connector)
+  given ec: ExecutionContext = ExecutionContext.global
+
+  val connector: ConstructionIndustrySchemeConnector =
+    mock(classOf[ConstructionIndustrySchemeConnector])
+
+  val service =
+    new ConstructionIndustrySchemeService(connector)
 
   "startClientListRetrieval" - {
 
-    "should get the success status from the connector response" in {
+    "should return the status from the connector response" in {
       when(connector.startClientList(using any[HeaderCarrier]))
-        .thenReturn(Future.successful(GetClientListStatusResponse("succeeded")))
+        .thenReturn(
+          Future.successful(
+            GetClientListStatusResponse(ClientListStatus.Succeeded)
+          )
+        )
 
-      val status = service.startClientListRetrieval.futureValue
-
-      status mustBe "succeeded"
-    }
-
-    "should get the failed status from the connector response" in {
-      when(connector.startClientList(using any[HeaderCarrier]))
-        .thenReturn(Future.successful(GetClientListStatusResponse("failed")))
-
-      val status = service.startClientListRetrieval.futureValue
-
-      status mustBe "failed"
-    }
-
-    "should get the initiate-download status from the connector response" in {
-      when(connector.startClientList(using any[HeaderCarrier]))
-        .thenReturn(Future.successful(GetClientListStatusResponse("initiate-download")))
-
-      val status = service.startClientListRetrieval.futureValue
-
-      status mustBe "initiate-download"
-    }
-
-    "should get the in-progress status from the connector response" in {
-      when(connector.startClientList(using any[HeaderCarrier]))
-        .thenReturn(Future.successful(GetClientListStatusResponse("in-progress")))
-
-      val status = service.startClientListRetrieval.futureValue
-
-      status mustBe "in-progress"
+      service.startClientListRetrieval.futureValue mustBe
+        ClientListStatus.Succeeded
     }
   }
 
   "getClientListStatus" - {
-    "should get the success status from the connector response" in {
+
+    "should return the status from the connector response" in {
       when(connector.getClientListStatus(using any[HeaderCarrier]))
-        .thenReturn(Future.successful(GetClientListStatusResponse("Success")))
+        .thenReturn(
+          Future.successful(
+            GetClientListStatusResponse(ClientListStatus.InProgress)
+          )
+        )
 
-      val status = service.getClientListStatus.futureValue
-
-      status mustBe "Success"
+      service.getClientListStatus.futureValue mustBe
+        ClientListStatus.InProgress
     }
+  }
 
-    "should get the failed status from the connector response" in {
-      when(connector.getClientListStatus(using any[HeaderCarrier]))
-        .thenReturn(Future.successful(GetClientListStatusResponse("Failed")))
+  "hasClient" - {
 
-      val status = service.getClientListStatus.futureValue
+    "should return the hasClient value from the connector response" in {
+      when(
+        connector.hasClient(
+          "163",
+          "AB0063"
+        )(using hc)
+      ).thenReturn(
+        Future.successful(
+          HasClientResponse(hasClient = true)
+        )
+      )
 
-      status mustBe "Failed"
-    }
-
-    "should get the initiate download status from the connector response" in {
-      when(connector.getClientListStatus(using any[HeaderCarrier]))
-        .thenReturn(Future.successful(GetClientListStatusResponse("InitiateDownload")))
-
-      val status = service.getClientListStatus.futureValue
-
-      status mustBe "InitiateDownload"
-    }
-
-    "should get the in progress status from the connector response" in {
-      when(connector.getClientListStatus(using any[HeaderCarrier]))
-        .thenReturn(Future.successful(GetClientListStatusResponse("InProgress")))
-
-      val status = service.getClientListStatus.futureValue
-
-      status mustBe "InProgress"
+      service.hasClient("163", "AB0063").futureValue mustBe true
     }
   }
 }

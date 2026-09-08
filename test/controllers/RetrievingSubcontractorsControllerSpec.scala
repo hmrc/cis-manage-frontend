@@ -17,22 +17,40 @@
 package controllers
 
 import base.SpecBase
+import controllers.actions.HasClientGuard
 import models.Scheme
+import models.requests.DataRequest
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject.bind
+import play.api.mvc.{ActionFilter, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.PrepopService
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.RetrievingSubcontractorsView
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
-  val mockPrepopService: PrepopService = mock[PrepopService]
+  val mockPrepopService: PrepopService   = mock[PrepopService]
+  val mockHasClientGuard: HasClientGuard = mock[HasClientGuard]
+
+  val passThroughHasClientGuard: ActionFilter[DataRequest] = new ActionFilter[DataRequest] {
+    override protected def executionContext: ExecutionContext                         = ExecutionContext.global
+    override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
+      Future.successful(None)
+  }
+
+  when(mockHasClientGuard.forInstanceId(any[String])).thenReturn(passThroughHasClientGuard)
+
+  private def applicationBuilderWithClientGuard =
+    applicationBuilder(
+      userAnswers = Some(emptyUserAnswers),
+      additionalBindings = Seq(bind[HasClientGuard].toInstance(mockHasClientGuard))
+    )
 
   val taxOfficeNumber: String    = "101"
   val taxOfficeReference: String = "AB0001"
@@ -43,7 +61,7 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilderWithClientGuard.build()
 
       running(application) {
         val request = FakeRequest(
@@ -67,7 +85,7 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
     "start must redirect to SuccessfulAutomaticSubcontractorUpdateController when scheme has prePopSuccessful 'Y' and subcontractors" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilderWithClientGuard
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService)
         )
@@ -114,7 +132,7 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
     "start must redirect to SuccessfulNoRecordsFoundController when scheme has prePopSuccessful 'Y' and no subcontractors" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilderWithClientGuard
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService)
         )
@@ -161,7 +179,7 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
     "start must redirect to UnsuccessfulAutomaticSubcontractorUpdateController when scheme has prePopSuccessful 'N'" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilderWithClientGuard
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService)
         )
@@ -208,7 +226,7 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
     "start must redirect to UnsuccessfulAutomaticSubcontractorUpdateController when scheme has no prePopSuccessful value" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilderWithClientGuard
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService)
         )
@@ -255,7 +273,7 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
     "start must redirect to UnsuccessfulAutomaticSubcontractorUpdateController when there is no scheme" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilderWithClientGuard
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService)
         )
@@ -291,7 +309,7 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
     "start must redirect to UnsuccessfulAutomaticSubcontractorUpdateController when prepopulate fails" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilderWithClientGuard
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService)
         )

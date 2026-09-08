@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package models
+package controllers.actions
 
-import models.agent.ClientListStatus
-import play.api.libs.json.{Json, Reads}
+import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 
-case class GetClientListStatusResponse(result: ClientListStatus)
+private[actions] object ClientListCheckRedirects {
+  def systemError: Result =
+    Redirect(controllers.routes.SystemErrorController.onPageLoad())
 
-object GetClientListStatusResponse {
-  implicit val reads: Reads[GetClientListStatusResponse] = Json.reads[GetClientListStatusResponse]
+  def agentLostAccess: Result =
+    Redirect(controllers.agent.routes.AgentLostAccessController.onPageLoad())
 }

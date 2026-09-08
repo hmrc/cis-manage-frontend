@@ -45,6 +45,7 @@ class SubcontractorsListController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  hasClientGuard: HasClientGuard,
   formProvider: SubcontractorsListFormProvider,
   paginationService: PaginationSubcontractorsListService,
   clock: Clock,
@@ -512,8 +513,12 @@ class SubcontractorsListController @Inject() (
     mode: Mode,
     page: Int = 1
   ): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify
+      andThen getData
+      andThen requireData
+      andThen hasClientGuard.forInstanceId(instanceId)) { implicit request =>
       implicit val lang: Lang = messagesApi.preferred(request).lang
+
       rowsFromUserAnswers(request.userAnswers) match {
         case Some(allRows) if allRows.nonEmpty =>
           renderPage(

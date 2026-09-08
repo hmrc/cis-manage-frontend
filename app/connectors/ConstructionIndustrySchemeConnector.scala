@@ -17,7 +17,7 @@
 package connectors
 
 import models.*
-import models.agent.AgentClientData
+import models.agent.{AgentClientData, HasClientResponse}
 import models.history.*
 import models.requests.*
 import models.response.*
@@ -56,6 +56,14 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
     http
       .post(url"$cisBaseUrl/agent/client-list/retrieval/status")
       .execute[GetClientListStatusResponse]
+
+  def hasClient(
+    taxOfficeNumber: String,
+    taxOfficeReference: String
+  )(implicit hc: HeaderCarrier): Future[HasClientResponse] =
+    http
+      .get(url"$cisBaseUrl/agent/has-client/$taxOfficeNumber/$taxOfficeReference")
+      .execute[HasClientResponse]
 
   def getAllClients(implicit hc: HeaderCarrier): Future[List[CisTaxpayerSearchResult]] =
     http

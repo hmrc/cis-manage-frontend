@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.RetrievingSubcontractorsView
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, HasClientGuard, IdentifierAction}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -32,6 +32,7 @@ class RetrievingSubcontractorsController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  hasClientGuard: HasClientGuard,
   val controllerComponents: MessagesControllerComponents,
   view: RetrievingSubcontractorsView,
   prepopService: PrepopService
@@ -45,11 +46,12 @@ class RetrievingSubcontractorsController @Inject() (
     instanceId: String,
     targetKey: String
   ): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      Ok(view())
-        .withHeaders(
-          "Refresh" -> s"0; url=${controllers.routes.RetrievingSubcontractorsController.start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey).url}"
-        )
+    (identify andThen getData andThen requireData andThen hasClientGuard.forInstanceId(instanceId)) {
+      implicit request =>
+        Ok(view())
+          .withHeaders(
+            "Refresh" -> s"0; url=${controllers.routes.RetrievingSubcontractorsController.start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey).url}"
+          )
     }
 
   def start(
@@ -58,42 +60,44 @@ class RetrievingSubcontractorsController @Inject() (
     instanceId: String,
     targetKey: String
   ): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-      for {
-        prepopOk  <- prepopService.prepopulate(taxOfficeNumber, taxOfficeReference, instanceId)
-        schemeOpt <- if (prepopOk) prepopService.getScheme(instanceId) else Future.successful(None)
-        result    <- schemeOpt match {
-                       case None =>
-                         Future.successful(
-                           Redirect(routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId))
-                         )
+    (identify andThen getData andThen requireData andThen hasClientGuard.forInstanceId(instanceId)).async {
+      implicit request =>
+        implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+        for {
+          prepopOk  <- prepopService.prepopulate(taxOfficeNumber, taxOfficeReference, instanceId)
+          schemeOpt <- if (prepopOk) prepopService.getScheme(instanceId) else Future.successful(None)
+          result    <- schemeOpt match {
+                         case None =>
+                           Future.successful(
+                             Redirect(routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId))
+                           )
 
-                       case Some(scheme) =>
-                         scheme.prePopSuccessful match {
-                           case Some("Y") if scheme.subcontractorCounter.exists(_ > 0) =>
-                             Future.successful(
-                               Redirect(
-                                 routes.SuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId, targetKey)
+                         case Some(scheme) =>
+                           scheme.prePopSuccessful match {
+                             case Some("Y") if scheme.subcontractorCounter.exists(_ > 0) =>
+                               Future.successful(
+                                 Redirect(
+                                   routes.SuccessfulAutomaticSubcontractorUpdateController
+                                     .onPageLoad(instanceId, targetKey)
+                                 )
                                )
-                             )
 
-                           case Some("Y") =>
-                             Future.successful(
-                               Redirect(routes.SuccessfulNoRecordsFoundController.onPageLoad(instanceId, targetKey))
-                             )
+                             case Some("Y") =>
+                               Future.successful(
+                                 Redirect(routes.SuccessfulNoRecordsFoundController.onPageLoad(instanceId, targetKey))
+                               )
 
-                           case Some("N") =>
-                             Future.successful(
-                               Redirect(routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId))
-                             )
+                             case Some("N") =>
+                               Future.successful(
+                                 Redirect(routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId))
+                               )
 
-                           case _ =>
-                             Future.successful(
-                               Redirect(routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId))
-                             )
-                         }
-                     }
-      } yield result
+                             case _ =>
+                               Future.successful(
+                                 Redirect(routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId))
+                               )
+                           }
+                       }
+        } yield result
     }
 }

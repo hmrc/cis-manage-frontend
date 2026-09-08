@@ -17,6 +17,7 @@
 package controllers.clientdetails
 
 import controllers.actions.*
+import navigation.ClientListCheckNavigator
 import pages.clientdetails.ChangeClientReferencePage
 import pages.{AgentClientsPage, CisIdPage}
 import play.api.i18n.Lang.logger
@@ -36,6 +37,9 @@ class ManageClientDetailsController @Inject() (
   @Named("AgentIdentifier") identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  clientListStatusGuard: ClientListStatusGuard,
+  clientListCheckNavigator: ClientListCheckNavigator,
+  hasClientGuard: HasClientGuard,
   val controllerComponents: MessagesControllerComponents,
   manageService: ManageService,
   sessionRepository: SessionRepository,
@@ -44,34 +48,55 @@ class ManageClientDetailsController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    request.userAnswers.get(CisIdPage) match {
-      case Some(instanceId) =>
-        request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == instanceId)) match {
-          case Some(client) =>
-            manageService
-              .getClientByEmployerReference(client.taxOfficeNumber, client.taxOfficeRef)
-              .flatMap { response =>
-                val uniqueId: String          = response.uniqueId
-                val clientName: String        = response.schemeName.getOrElse("")
-                val employerReference: String = s"${response.taxOfficeNumber}/${response.taxOfficeRef}"
-                val clientReference           = response.agentOwnRef.getOrElse("")
-                for {
-                  updatedAnswers <-
-                    Future.fromTry(request.userAnswers.set(ChangeClientReferencePage, clientReference))
-                  _              <- sessionRepository.set(updatedAnswers)
-                } yield Ok(view(uniqueId, clientName, employerReference, clientReference))
-              }
-              .recover { case e =>
-                logger.error(s"[ManageClientDetailsController][onPageLoad] Failed for uniqueId=$instanceId", e)
-                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-              }
-          case None         =>
-            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-        }
-      case _                =>
-        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-    }
+  def onPageLoad: Action[AnyContent] =
+    (identify
+      andThen clientListStatusGuard.groupB(clientListCheckNavigator.manageClientDetails)
+      andThen getData
+      andThen requireData
+      andThen hasClientGuard.currentClient).async { implicit request =>
+      request.userAnswers.get(CisIdPage) match {
+        case Some(instanceId) =>
+          request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == instanceId)) match {
+            case Some(client) =>
+              manageService
+                .getClientByEmployerReference(client.taxOfficeNumber, client.taxOfficeRef)
+                .flatMap { response =>
+                  val uniqueId: String          = response.uniqueId
+                  val clientName: String        = response.schemeName.getOrElse("")
+                  val employerReference: String = s"${response.taxOfficeNumber}/${response.taxOfficeRef}"
+                  val clientReference           = response.agentOwnRef.getOrElse("")
 
-  }
+                  for {
+                    updatedAnswers <-
+                      Future.fromTry(request.userAnswers.set(ChangeClientReferencePage, clientReference))
+                    _              <- sessionRepository.set(updatedAnswers)
+                  } yield Ok(
+                    view(
+                      uniqueId,
+                      clientName,
+                      employerReference,
+                      clientReference
+                    )
+                  )
+                }
+                .recover { case e =>
+                  logger.error(
+                    s"[ManageClientDetailsController][onPageLoad] Failed for uniqueId=$instanceId",
+                    e
+                  )
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                }
+
+            case None =>
+              Future.successful(
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              )
+          }
+
+        case None =>
+          Future.successful(
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          )
+      }
+    }
 }

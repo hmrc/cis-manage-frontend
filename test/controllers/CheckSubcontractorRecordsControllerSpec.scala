@@ -17,11 +17,13 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.{AuthorizedForSchemeActionProvider, FakeAuthorizedForSchemeAction}
+import controllers.actions.{AuthorizedForSchemeActionProvider, FakeAuthorizedForSchemeAction, HasClientGuard}
 import models.Scheme
+import models.requests.DataRequest
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
+import play.api.mvc.{ActionFilter, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.PrepopService
@@ -35,6 +37,16 @@ class CheckSubcontractorRecordsControllerSpec extends SpecBase {
 
   val mockPrepopService: PrepopService                            = mock[PrepopService]
   val mockSchemeAccessProvider: AuthorizedForSchemeActionProvider = mock[AuthorizedForSchemeActionProvider]
+  val mockHasClientGuard: HasClientGuard                          = mock[HasClientGuard]
+
+  private val passThroughHasClientGuard =
+    new ActionFilter[DataRequest] {
+      override protected def executionContext: ExecutionContext                         = ExecutionContext.global
+      override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
+        Future.successful(None)
+    }
+
+  when(mockHasClientGuard.forInstanceId(any[String])).thenReturn(passThroughHasClientGuard)
 
   "CheckSubcontractorRecords Controller" - {
 
@@ -43,7 +55,8 @@ class CheckSubcontractorRecordsControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService),
-          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider)
+          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider),
+          bind[HasClientGuard].toInstance(mockHasClientGuard)
         )
         .build()
 
@@ -97,7 +110,8 @@ class CheckSubcontractorRecordsControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService),
-          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider)
+          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider),
+          bind[HasClientGuard].toInstance(mockHasClientGuard)
         )
         .build()
 
@@ -147,7 +161,8 @@ class CheckSubcontractorRecordsControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService),
-          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider)
+          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider),
+          bind[HasClientGuard].toInstance(mockHasClientGuard)
         )
         .build()
 
