@@ -244,7 +244,7 @@ class ConstructionIndustrySchemeConnectorSpec
       ex.getMessage must include("returned 500")
     }
   }
-
+  
   "startClientList" should {
 
     "return GetClientListStatusResponse with 'succeeded' when BE returns succeeded" in {

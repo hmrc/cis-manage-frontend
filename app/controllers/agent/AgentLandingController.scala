@@ -54,7 +54,7 @@ class AgentLandingController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: AgentLandingView
 )(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
-    extends FrontendBaseController
+  extends FrontendBaseController
     with I18nSupport
     with Logging {
 
@@ -72,8 +72,8 @@ class AgentLandingController @Inject() (
           loadLandingPage(uniqueId, client)
 
         case None =>
-          logger.error(s"[AgentLandingController] Client not found in userAnswers for uniqueId=$uniqueId")
-          Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
+          logger.warn(s"[AgentLandingController][onPageLoad] Missing client in userAnswers for uniqueId=$uniqueId")
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
     }
 
@@ -96,7 +96,17 @@ class AgentLandingController @Inject() (
   private def loadLandingPage(
     uniqueId: String,
     client: CisTaxpayerSearchResult
-  )(using request: DataRequest[?], hc: HeaderCarrier): Future[Result] =
+  )(using request: DataRequest[?], hc: HeaderCarrier): Future[Result] = {
+    val cisOrgAppealUrl = appConfig.cisOrgAppealUrl(
+      taxOfficeNumber = client.taxOfficeNumber,
+      taxOfficeReference = client.taxOfficeRef
+    )
+
+    val cisOrgGenericNoticesUrl = appConfig.cisOrgGenericNoticesUrl(
+      taxOfficeNumber = client.taxOfficeNumber,
+      taxOfficeReference = client.taxOfficeRef
+    )
+
     (for {
       _                  <- auditClientDetailsRetrieved(client, uniqueId)
       updatedUserAnswers <- Future.fromTry(request.userAnswers.set(CisIdPage, uniqueId))
@@ -107,12 +117,15 @@ class AgentLandingController @Inject() (
         uniqueId = uniqueId,
         agentName = request.itmpName,
         schemeName = viewModel.schemeName,
-        employerRef = viewModel.employerRef
+        employerRef = viewModel.employerRef,
+        cisOrgAppealUrl = cisOrgAppealUrl,
+        cisOrgGenericNoticesUrl = cisOrgGenericNoticesUrl
       )
     )).recover { case NonFatal(ex) =>
-      logger.error(s"[AgentLandingController] unexpected error for uniqueId=$uniqueId", ex)
+      logger.error(s"[AgentLandingController][onPageLoad] Failed for uniqueId=$uniqueId", ex)
       Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
+  }
 
   private def auditClientDetailsRetrieved(
     client: CisTaxpayerSearchResult,
@@ -126,6 +139,7 @@ class AgentLandingController @Inject() (
           taxOfficeNumber = client.taxOfficeNumber,
           taxOfficeReference = client.taxOfficeRef
         )
+
         auditService
           .sendEvent(auditEvent)
           .map(_ => ())

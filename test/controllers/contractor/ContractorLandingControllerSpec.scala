@@ -64,7 +64,7 @@ class ContractorLandingControllerSpec extends SpecBase {
         val request  = FakeRequest(GET, routes.ContractorLandingController.onPageLoad().url)
         val result   = route(application, request).value
         val view     = application.injector.instanceOf[ContractorLandingView]
-        val vm       = fromUserAnswers(emptyUserAnswers, appConfig)
+        val vm       = fromUserAnswers(emptyUserAnswers, appConfig, "taxOfficeNumber", "taxOfficeReference")
         val expected = view(vm)(request, messages(application))
 
         status(result)          shouldBe OK

@@ -23,7 +23,8 @@ import models.response.GetSubcontractor
 import models.{Mode, UserAnswers}
 import pages.subcontractors.SubcontractorListPage
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{I18nSupport, Lang, MessagesApi}
+import utils.DateTimeFormats
 import play.api.mvc.*
 import services.PaginationSubcontractorsListService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -55,9 +56,6 @@ class SubcontractorsListController @Inject() (
     with I18nSupport {
 
   val form: Form[String] = formProvider()
-
-  private val dateAddedFormatter: DateTimeFormatter =
-    DateTimeFormatter.ofPattern("d MMM yyyy")
 
   private val SortByName      = "name"
   private val SortByDateAdded = "dateAdded"
@@ -104,6 +102,8 @@ class SubcontractorsListController @Inject() (
       DateTimeFormatter.ISO_LOCAL_DATE,
       DateTimeFormatter.ofPattern("d MMM yyyy", Locale.UK),
       DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK),
+      DateTimeFormatter.ofPattern("d MMM yyyy", Locale.forLanguageTag("cy")),
+      DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("cy")),
       DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.UK),
       DateTimeFormatter.ofPattern("d/M/yyyy", Locale.UK)
     )
@@ -116,7 +116,7 @@ class SubcontractorsListController @Inject() (
 
   private def rowsFromUserAnswers(
     userAnswers: UserAnswers
-  ): Option[Seq[SubcontractorsListRow]] =
+  )(implicit lang: Lang): Option[Seq[SubcontractorsListRow]] =
     userAnswers.get(SubcontractorListPage).map { subcontractors =>
       if (subcontractors.subcontractors.isEmpty) {
         Seq.empty
@@ -127,7 +127,7 @@ class SubcontractorsListController @Inject() (
 
   private def toListRow(
     subcontractor: GetSubcontractor
-  ): SubcontractorsListRow = {
+  )(implicit lang: Lang): SubcontractorsListRow = {
 
     val subbieResourceRef = getSubbieResourceRef(subcontractor)
 
@@ -161,7 +161,7 @@ class SubcontractorsListController @Inject() (
       verificationNumber = verificationNumber,
       taxTreatment = taxTreatment,
       dateAdded = subcontractor.createDate
-        .map(_.format(dateAddedFormatter))
+        .map(_.format(DateTimeFormats.shortDateFormat()))
         .getOrElse(""),
       subbieResourceRef = subbieResourceRef,
       amendUrl = s"${config.cisTypeOfSubcontractorUrl}/amend/start/$subbieResourceRef"
@@ -513,26 +513,31 @@ class SubcontractorsListController @Inject() (
     mode: Mode,
     page: Int = 1
   ): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen hasClientGuard.forInstanceId(instanceId)) {
-      implicit request =>
-        rowsFromUserAnswers(request.userAnswers) match {
-          case Some(allRows) if allRows.nonEmpty =>
-            renderPage(
-              allRows,
-              instanceId,
-              mode,
-              page,
-              getListFilters(request)
-            )
+    (identify
+      andThen getData
+      andThen requireData
+      andThen hasClientGuard.forInstanceId(instanceId)
+    ) { implicit request =>
+      implicit val lang: Lang = messagesApi.preferred(request).lang
 
-          case Some(_) =>
-            Redirect(routes.NoSubcontractorsExistController.onPageLoad())
+      rowsFromUserAnswers(request.userAnswers) match {
+        case Some(allRows) if allRows.nonEmpty =>
+          renderPage(
+            allRows,
+            instanceId,
+            mode,
+            page,
+            getListFilters(request)
+          )
 
-          case None =>
-            Redirect(
-              controllers.routes.JourneyRecoveryController.onPageLoad()
-            )
-        }
+        case Some(_) =>
+          Redirect(routes.NoSubcontractorsExistController.onPageLoad())
+
+        case None =>
+          Redirect(
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+          )
+      }
     }
 
   def onSubmit(
@@ -541,6 +546,7 @@ class SubcontractorsListController @Inject() (
     page: Int = 1
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
+      implicit val lang: Lang = messagesApi.preferred(request).lang
       rowsFromUserAnswers(request.userAnswers) match {
         case Some(allRows) =>
           val formData =

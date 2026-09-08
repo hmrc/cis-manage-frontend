@@ -74,7 +74,7 @@
         ),
         ptaCard(
             title = messages("contractorLanding.landing.card.appealPenalty.title"),
-            link = "#",
+            link = vm.cisOrgAppealUrl,
             content = Html(messages("contractorLanding.landing.card.appealPenalty.p")),
             id = Some("appeal-a-penalty")
         )
@@ -83,7 +83,7 @@
     @oneColumnGrid(
         ptaCard(
             title = messages("contractorLanding.landing.card.noticesAndStatements.title"),
-            link = "#",
+            link = vm.cisOrgGenericNoticesUrl,
             content = Html(messages("contractorLanding.landing.card.noticesAndStatements.p")),
             id = Some("notices-and-statements")
         )

@@ -46,6 +46,7 @@ class NoAuthorisedClientsViewSpec extends SpecBase {
       doc.select("li").text                     must include(messages("agent.noAuthorisedClients.listItem2.afterLinkText"))
       doc.select("p").text                      must include(messages("agent.noAuthorisedClients.p4"))
       doc.getElementsByClass("govuk-link").text must include(messages("agent.noAuthorisedClients.returnToHome.link"))
+      doc.getElementsByClass("hmrc-sign-out-nav__link").size mustBe 1
     }
   }
 

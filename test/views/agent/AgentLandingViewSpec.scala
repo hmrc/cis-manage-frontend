@@ -123,6 +123,16 @@ class AgentLandingViewSpec extends SpecBase {
       doc.text() should include(messages(app).apply("agent.landing.card.noticesAndStatements.title"))
       doc.text() should include(messages(app).apply("agent.landing.card.noticesAndStatements.p"))
     }
+
+    "link the contractor details card to the agent target click" in {
+      val (doc, _) = render()
+
+      doc
+        .getElementById("manage-your-contractor-details")
+        .selectFirst("a")
+        .attr("href") shouldBe
+        controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "contractorDetails").url
+    }
   }
 
   private def render(
@@ -137,12 +147,16 @@ class AgentLandingViewSpec extends SpecBase {
       FakeRequest(GET, "/agent/authorised-client-manage-CIS-returns")
     implicit val msgs: Messages                               = messages(application)
 
-    val view = application.injector.instanceOf[AgentLandingView]
-    val html = view(
+    val view                    = application.injector.instanceOf[AgentLandingView]
+    val cisOrgAppealUrl         = "/foo/appeal"
+    val cisOrgGenericNoticesUrl = "/foo/notices"
+    val html                    = view(
       uniqueId = uniqueId,
       agentName = agentName,
       employerRef = employerRef,
-      schemeName = schemeName
+      schemeName = schemeName,
+      cisOrgAppealUrl = cisOrgAppealUrl,
+      cisOrgGenericNoticesUrl = cisOrgGenericNoticesUrl
     )
 
     (Jsoup.parse(html.body), appConfig)

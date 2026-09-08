@@ -21,6 +21,7 @@ import models.UserAnswers
 import models.response.GetSubmittedVerificationsResponse
 import models.verify.{VerificationHistoryData, VerificationRequestData}
 import org.mockito.ArgumentMatchers.any
+import play.api.i18n.Lang
 import org.mockito.Mockito.{verify as mockVerify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CisIdPage
@@ -53,6 +54,7 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
       verificationNumber = verificationNumber,
       dateSubmitted = dateSubmitted,
       taxYear = taxYear,
+      status = "SUBMITTED",
       acceptedDateTime = dateSubmitted.atStartOfDay(),
       contractorName = "Test Scheme",
       employerReference = "123PA000001",
@@ -125,17 +127,17 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
   "VerificationRequestController" - {
 
     "onPageLoad must return OK using VerificationHistoryDataPage when data is available" in new Setup {
-      val userAnswers = userAnswersWithVerificationHistoryData
+      val userAnswers: UserAnswers = userAnswersWithVerificationHistoryData
 
       when(
         mockVerificationHistoryService.buildVerificationRequestViewModel(
           verificationHistoryData,
           verificationBatchId,
           cisId
-        )
+        )(Lang("en"))
       ).thenReturn(Some(viewModel))
 
-      val app = application(userAnswers)
+      val app: Application = application(userAnswers)
 
       running(app) {
         val request = FakeRequest(GET, routes.VerificationRequestController.onPageLoad(verificationBatchId).url)
@@ -146,13 +148,13 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
 
         mockVerify(mockVerificationHistoryService)
-          .buildVerificationRequestViewModel(verificationHistoryData, verificationBatchId, cisId)
+          .buildVerificationRequestViewModel(verificationHistoryData, verificationBatchId, cisId)(Lang("en"))
         verifyNoInteractions(mockVerificationService)
       }
     }
 
     "onPageLoad must retrieve submitted verifications when VerificationHistoryDataPage is missing" in new Setup {
-      val userAnswers = userAnswersWithCisId
+      val userAnswers: UserAnswers = userAnswersWithCisId
 
       when(mockVerificationService.getSubmittedVerifications(any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(submittedVerificationsResponse))
@@ -163,10 +165,10 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
           verificationHistoryData,
           verificationBatchId,
           cisId
-        )
+        )(Lang("en"))
       ).thenReturn(Some(viewModel))
 
-      val app = application(userAnswers)
+      val app: Application = application(userAnswers)
 
       running(app) {
         val request = FakeRequest(GET, routes.VerificationRequestController.onPageLoad(verificationBatchId).url)
@@ -180,17 +182,17 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "onPageLoad must redirect to JourneyRecovery when the verification number is not found" in new Setup {
-      val userAnswers = userAnswersWithVerificationHistoryData
+      val userAnswers: UserAnswers = userAnswersWithVerificationHistoryData
 
       when(
         mockVerificationHistoryService.buildVerificationRequestViewModel(
           verificationHistoryData,
           verificationBatchId,
           cisId
-        )
+        )(Lang("en"))
       ).thenReturn(None)
 
-      val app = application(userAnswers)
+      val app: Application = application(userAnswers)
 
       running(app) {
         val request = FakeRequest(GET, routes.VerificationRequestController.onPageLoad(verificationBatchId).url)
@@ -202,7 +204,7 @@ class VerificationRequestControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "onPageLoad must redirect when CisIdPage is missing" in new Setup {
-      val app = application(emptyUserAnswers)
+      val app: Application = application(emptyUserAnswers)
 
       running(app) {
         val request = FakeRequest(GET, routes.VerificationRequestController.onPageLoad(verificationBatchId).url)

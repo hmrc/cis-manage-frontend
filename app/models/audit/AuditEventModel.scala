@@ -50,3 +50,16 @@ object ClientDetailsRetrievedAuditEventModel {
   implicit val formats: Format[ClientDetailsRetrievedAuditEventModel] =
     Json.format[ClientDetailsRetrievedAuditEventModel]
 }
+
+case class DeleteSubcontractorAuditEventModel(
+  cisId: String,
+  subcontractorName: String,
+  subbieResourceRef: Long
+) extends AuditEventModel {
+  override val auditType: String   = "deleteSubcontractor"
+  override val detailJson: JsValue = Json.toJson(this)
+}
+
+object DeleteSubcontractorAuditEventModel {
+  implicit val formats: Format[DeleteSubcontractorAuditEventModel] = Json.format[DeleteSubcontractorAuditEventModel]
+}

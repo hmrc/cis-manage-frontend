@@ -32,6 +32,7 @@ case class VerificationRequestData(
   verificationBatchId: Long,
   verificationNumber: String,
   dateSubmitted: LocalDate,
+  status: String,
   taxYear: Int,
   acceptedDateTime: LocalDateTime,
   contractorName: String,

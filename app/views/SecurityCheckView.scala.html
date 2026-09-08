@@ -21,7 +21,7 @@ loadingSpinner: components.LoadingSpinner
 
 @()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("securityCheck.title")), showBackLink = false, showSignOut = false, useFullWidth = true) {
+@layout(pageTitle = titleNoForm(messages("securityCheck.title")), showBackLink = false, useFullWidth = true) {
 
 @loadingSpinner(h1Key = "securityCheck.h1", paragraphKey = "securityCheck.paragraph")
 

@@ -21,5 +21,7 @@ case class ContractorLandingViewModel(
   employerReference: String,
   whatIsUrl: String,
   guidanceUrl: String,
-  penaltiesUrl: String
+  penaltiesUrl: String,
+  cisOrgAppealUrl: String,
+  cisOrgGenericNoticesUrl: String
 )

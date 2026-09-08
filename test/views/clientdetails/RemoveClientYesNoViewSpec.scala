@@ -28,7 +28,8 @@ class RemoveClientYesNoViewSpec extends SpecBase {
   "RemoveClientView" - {
     "must render the content on the page" in new Setup {
       val clientName = "clientName"
-      val html       = view(clientName, form, NormalMode)
+      val uniqueid   = "123"
+      val html       = view(clientName, form, NormalMode, uniqueid)
       val doc        = Jsoup.parse(html.body)
 
       doc.title               must include(messages("clientdetails.removeClient.title", clientName))
