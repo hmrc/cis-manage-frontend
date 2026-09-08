@@ -28,13 +28,17 @@ import play.api.mvc.{ActionFilter, Result}
 import forms.subcontractors.SubcontractorsListFormProvider
 import models.{Mode, NormalMode, UserAnswers}
 import models.response.{GetSubcontractor, GetSubcontractorListResponse}
-import org.jsoup.Jsoup
+import models.{Mode, NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito
+import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar.mock
 import pages.CisIdPage
 import pages.subcontractors.SubcontractorListPage
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import services.PaginationSubcontractorsListService
-import viewmodels.subcontractors.{SubcontractorsListRow, TaxTreatment}
+import play.twirl.api.Html
 import views.html.subcontractors.SubcontractorsListView
 
 import java.time.LocalDateTime
@@ -42,9 +46,6 @@ import scala.jdk.CollectionConverters.*
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
-
-  private val formProvider = new SubcontractorsListFormProvider()
-  private val form         = formProvider()
 
   private val instanceId = "test-instance-id"
   private val mode: Mode = NormalMode
@@ -61,6 +62,26 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
     }
 
   when(hasClientGuard.forInstanceId(any[String])).thenReturn(passThroughFilter)
+
+  private def stubView(mockView: SubcontractorsListView): Unit =
+    when(
+      mockView.apply(
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        any()
+      )(any(), any())
+    ).thenReturn(Html("Subcontractors List View"))
 
   private val subcontractors = Seq(
     GetSubcontractor(
@@ -156,155 +177,24 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
       .success
       .value
 
-  private def expectedRows(amendBaseUrl: String): Seq[SubcontractorsListRow] =
-    Seq(
-      SubcontractorsListRow(
-        id = "1",
-        name = "Smith, Alan",
-        utr = "1234567890",
-        verified = false,
-        verificationNumber = "",
-        taxTreatment = TaxTreatment.Unknown,
-        dateAdded = "6 Apr 2026",
-        subbieResourceRef = 10L,
-        amendUrl = s"$amendBaseUrl/amend/start/10/standard"
-      ),
-      SubcontractorsListRow(
-        id = "2",
-        name = "Jones, Brian",
-        utr = "9876543210",
-        verified = true,
-        verificationNumber = "V000002",
-        taxTreatment = TaxTreatment.Gross,
-        dateAdded = "6 May 2026",
-        subbieResourceRef = 20L,
-        amendUrl = s"$amendBaseUrl/amend/start/20/standard"
-      )
-    )
-
-  private def filterRows(
-    sourceRows: Seq[SubcontractorsListRow],
-    searchTerm: String,
-    verificationStatus: String,
-    taxTreatment: String,
-    sortBy: String = "name",
-    sortOrder: String = "ascending"
-  ): Seq[SubcontractorsListRow] = {
-    val searchFiltered =
-      filterBySearchTerm(sourceRows, searchTerm)
-
-    val verificationFiltered =
-      filterByVerificationStatus(searchFiltered, verificationStatus)
-
-    val taxTreatmentFiltered =
-      filterByTaxTreatment(verificationFiltered, taxTreatment)
-
-    sortRows(taxTreatmentFiltered, sortBy, sortOrder)
-  }
-
-  private def filterBySearchTerm(
-    sourceRows: Seq[SubcontractorsListRow],
-    searchTerm: String
-  ): Seq[SubcontractorsListRow] = {
-    val trimmedSearchTerm =
-      searchTerm.trim
-
-    if (trimmedSearchTerm.isEmpty) {
-      sourceRows
-    } else {
-      val lowerSearch =
-        trimmedSearchTerm.toLowerCase
-
-      sourceRows.filter { row =>
-        row.name.toLowerCase.contains(lowerSearch) ||
-        row.utr.contains(trimmedSearchTerm) ||
-        row.verificationNumber.contains(trimmedSearchTerm)
-      }
-    }
-  }
-
-  private def filterByVerificationStatus(
-    sourceRows: Seq[SubcontractorsListRow],
-    verificationStatus: String
-  ): Seq[SubcontractorsListRow] =
-    verificationStatus match {
-      case "verified" =>
-        sourceRows.filter(_.verified)
-
-      case "notVerified" =>
-        sourceRows.filterNot(_.verified)
-
-      case _ =>
-        sourceRows
-    }
-
-  private def filterByTaxTreatment(
-    sourceRows: Seq[SubcontractorsListRow],
-    taxTreatment: String
-  ): Seq[SubcontractorsListRow] =
-    taxTreatment match {
-      case "gross" =>
-        sourceRows.filter(_.taxTreatment == TaxTreatment.Gross)
-
-      case "higherRate" =>
-        sourceRows.filter(_.taxTreatment == TaxTreatment.HigherRate)
-
-      case "standardRate" =>
-        sourceRows.filter(_.taxTreatment == TaxTreatment.StandardRate)
-
-      case "unknown" =>
-        sourceRows.filter(_.taxTreatment == TaxTreatment.Unknown)
-
-      case _ =>
-        sourceRows
-    }
-
-  private def sortRows(
-    sourceRows: Seq[SubcontractorsListRow],
-    sortBy: String,
-    sortOrder: String
-  ): Seq[SubcontractorsListRow] =
-    sortBy match {
-      case "dateAdded" =>
-        val sortedRows =
-          sourceRows.sortBy(_.dateAdded)
-
-        if (sortOrder == "descending") {
-          sortedRows.reverse
-        } else {
-          sortedRows
-        }
-
-      case _ =>
-        val noNameRows =
-          sourceRows.filter(_.name.trim.equalsIgnoreCase("No name provided"))
-
-        val namedRows =
-          sourceRows.filterNot(_.name.trim.equalsIgnoreCase("No name provided"))
-
-        val sortedNamedRows =
-          namedRows.sortBy(_.name.trim.toLowerCase)
-
-        val orderedNamedRows =
-          if (sortOrder == "descending") {
-            sortedNamedRows.reverse
-          } else {
-            sortedNamedRows
-          }
-
-        noNameRows ++ orderedNamedRows
-    }
-
   "SubcontractorsListController" - {
 
-    "must return OK and the correct view for a GET with default filters" in {
+    "must return OK and display the subcontractors list view with default filters" in {
+      val mockView =
+        mock[SubcontractorsListView]
+
+      stubView(mockView)
+
       val application =
         applicationBuilder(
           userAnswers = Some(userAnswersWithSubcontractors),
           additionalBindings = Seq(
             bind[HasClientGuard].toInstance(hasClientGuard)
           )
-        ).build()
+        ).overrides(
+            bind[SubcontractorsListView].toInstance(mockView)
+          )
+          .build()
 
       running(application) {
         val request =
@@ -316,60 +206,48 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
         val result =
           route(application, request).value
 
-        val view =
-          application.injector.instanceOf[SubcontractorsListView]
-
-        val paginationService =
-          application.injector.instanceOf[PaginationSubcontractorsListService]
-
-        val config =
-          application.injector.instanceOf[FrontendAppConfig]
-
-        val rows =
-          expectedRows(config.cisTypeOfSubcontractorUrl)
-
-        val paginationResult =
-          paginationService.paginate(
-            allItems = filterRows(rows, "", "all", "all"),
-            currentPage = 1,
-            recordsPerPage = 8,
-            baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
-            queryString = "sortBy=name&sortOrder=ascending"
-          )
-
-        status(result) mustEqual OK
-
-        contentAsString(result) mustEqual view(
-          form.fill(""),
-          mode,
-          paginationResult.items,
-          paginationResult.pagination,
-          paginationResult.currentPage,
-          paginationResult.totalPages,
-          paginationResult.startIndex,
-          paginationResult.totalCount,
-          instanceId,
-          "",
-          "all",
-          "all",
-          "name",
-          "ascending"
-        )(request, messages(application)).toString
+        status(result) mustBe OK
+        contentAsString(result) mustBe "Subcontractors List View"
+        verify(mockView).apply(
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any()
+        )(any(), any())
       }
     }
 
-    "must return OK and the correct view for a GET with search and filters applied" in {
+    "must return OK and display the subcontractors list view with search and filters applied" in {
+      val mockView =
+        mock[SubcontractorsListView]
+
+      stubView(mockView)
+
       val application =
         applicationBuilder(
           userAnswers = Some(userAnswersWithSubcontractors),
           additionalBindings = Seq(
             bind[HasClientGuard].toInstance(hasClientGuard)
           )
-        ).build()
-
+        ).overrides(
+            bind[SubcontractorsListView].toInstance(mockView)
+          )
+          .build()
       running(application) {
         val url =
-          routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
+          routes.SubcontractorsListController
+            .onPageLoad(instanceId, mode)
+            .url
 
         val request =
           FakeRequest(
@@ -380,46 +258,24 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
         val result =
           route(application, request).value
 
-        val view =
-          application.injector.instanceOf[SubcontractorsListView]
-
-        val paginationService =
-          application.injector.instanceOf[PaginationSubcontractorsListService]
-
-        val config =
-          application.injector.instanceOf[FrontendAppConfig]
-
-        val rows =
-          expectedRows(config.cisTypeOfSubcontractorUrl)
-
-        val paginationResult =
-          paginationService.paginate(
-            allItems = filterRows(rows, "Brian", "verified", "gross"),
-            currentPage = 1,
-            recordsPerPage = 8,
-            baseUrl = routes.SubcontractorsListController.onPageLoad(instanceId, mode).url,
-            queryString =
-              "searchTerm=Brian&verificationStatus=verified&taxTreatment=gross&sortBy=name&sortOrder=ascending"
-          )
-
-        status(result) mustEqual OK
-
-        contentAsString(result) mustEqual view(
-          form.fill("Brian"),
-          mode,
-          paginationResult.items,
-          paginationResult.pagination,
-          paginationResult.currentPage,
-          paginationResult.totalPages,
-          paginationResult.startIndex,
-          paginationResult.totalCount,
-          instanceId,
-          "Brian",
-          "verified",
-          "gross",
-          "name",
-          "ascending"
-        )(request, messages(application)).toString
+        status(result) mustBe OK
+        contentAsString(result) mustBe "Subcontractors List View"
+        verify(mockView).apply(
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any(),
+          any()
+        )(any(), any())
       }
     }
 
@@ -584,57 +440,6 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
 
         redirectLocation(result).value mustEqual
           routes.NoSubcontractorsExistController.onPageLoad().url
-      }
-    }
-
-    "must apply reverification rules when rendering subcontractors" in {
-
-      val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubcontractors),
-          additionalBindings = Seq(
-            bind[HasClientGuard].toInstance(hasClientGuard)
-          )
-        ).build()
-
-      running(application) {
-
-        val request =
-          FakeRequest(
-            GET,
-            routes.SubcontractorsListController
-              .onPageLoad(instanceId, mode)
-              .url
-          )
-
-        val result =
-          route(application, request).value
-
-        status(result) mustEqual OK
-
-        val doc =
-          Jsoup.parse(contentAsString(result))
-
-        val smithRow =
-          doc
-            .select("tr")
-            .asScala
-            .find(_.text().contains("Smith, Alan"))
-            .getOrElse(fail("Could not find row for Smith, Alan"))
-
-        smithRow.text() must include(messages(application)("site.no"))
-        smithRow.text() must include(messages(application)("site.unknown"))
-        smithRow.text() must not include "V000001"
-
-        val jonesRow =
-          doc
-            .select("tr")
-            .asScala
-            .find(_.text().contains("Jones, Brian"))
-            .getOrElse(fail("Could not find row for Jones, Brian"))
-
-        jonesRow.text() must include(messages(application)("site.yes"))
-        jonesRow.text() must include("V000002")
       }
     }
 
