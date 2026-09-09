@@ -110,11 +110,11 @@ unauthorised.org.standard.heading        =  Sorry, you are unable to use this se
 unauthorised.org.standard.p1             =  Only users with an organisation or agent account can use this service.
 unauthorised.org.standard.guidance.link  =  More information about the Construction Industry Scheme (CIS)
 
-unauthorised.individual.title            =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
-unauthorised.individual.heading          =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
-unauthorised.individual.p1               =  Rydych wedi mewngofnodi gan ddefnyddio cyfrif unigolyn.
-unauthorised.individual.p2               =  Dim ond defnyddwyr sydd â chyfrif sefydliad neu asiant sy’n cael defnyddio’r gwasanaeth hwn.
-unauthorised.individual.link             =  Rhagor o wybodaeth am Gynllun y Diwydiant Adeiladu (CIS)
+unauthorised.individual.title            =  Sorry, you are unable to use this service
+unauthorised.individual.heading          =  Sorry, you are unable to use this service
+unauthorised.individual.p1               =  You are signed in with an individual account.
+unauthorised.individual.p2               =  Only users with an organisation or agent account can use this service.
+unauthorised.individual.link             =  More information about the Construction Industry Scheme (CIS)
 
 unauthorised.agent.title                 =  Sorry, you are unable to use this service
 unauthorised.agent.heading               =  Sorry, you are unable to use this service
