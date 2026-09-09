@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.actions.{ClientListStatusGuard, HasClientGuard}
 import controllers.routes
 import forms.clientdetails.RemoveClientYesNoFormProvider
+import models.agent.ClientListFormData
 import models.requests.{DataRequest, IdentifierRequest}
 import models.{CisTaxpayer, CisTaxpayerSearchResult, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
@@ -27,7 +28,8 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.clientdetails.RemoveClientYesNoPage
-import pages.AgentClientsPage
+import pages.{AgentClientsPage, ClientListSearchPage}
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.{ActionFilter, Call, Result}
 import play.api.test.FakeRequest
@@ -47,8 +49,8 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new RemoveClientYesNoFormProvider()
-  val form         = formProvider()
+  val formProvider        = new RemoveClientYesNoFormProvider()
+  val form: Form[Boolean] = formProvider()
 
   val employerRef = "123456"
   val uniqueId    = "123"
@@ -65,10 +67,8 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
       )
     )
 
-  lazy val removeClientRoute =
-    controllers.clientdetails.routes.RemoveClientYesNoController
-      .onPageLoad(uniqueId, NormalMode)
-      .url
+  private lazy val removeClientRoute =
+    controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(uniqueId, NormalMode).url
 
   private val clientListStatusGuard = mock[ClientListStatusGuard]
   private val hasClientGuard        = mock[HasClientGuard]
@@ -115,11 +115,9 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
   )
 
   private def mockGuards(): Unit = {
-    when(clientListStatusGuard.groupB(any[Call]))
-      .thenReturn(passThroughIdentifierFilter)
+    when(clientListStatusGuard.groupB(any[Call])).thenReturn(passThroughIdentifierFilter)
 
-    when(hasClientGuard.forInstanceId(any[String]))
-      .thenReturn(passThroughDataFilter)
+    when(hasClientGuard.forInstanceId(any[String])).thenReturn(passThroughDataFilter)
   }
 
   private def mockClientLookup(): Unit =
@@ -218,6 +216,25 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       mockClientLookup()
 
+      val cisClients: List[CisTaxpayerSearchResult] = List(
+        CisTaxpayerSearchResult(
+          uniqueId = "UID-001",
+          taxOfficeNumber = "123",
+          taxOfficeRef = "AB45678",
+          agentOwnRef = Some("ABC-001"),
+          schemeName = Some("ABC Construction Ltd"),
+          utr = Some("1234567890")
+        ),
+        CisTaxpayerSearchResult(
+          uniqueId = "UID-002",
+          taxOfficeNumber = "789",
+          taxOfficeRef = "EF23456",
+          agentOwnRef = Some("ABC-002"),
+          schemeName = Some("ABC Property Services"),
+          utr = Some("1234567890")
+        )
+      )
+
       val userAnswers = UserAnswers(userAnswersId)
         .set(RemoveClientYesNoPage, true)
         .success
@@ -225,9 +242,17 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
         .set(AgentClientsPage, client)
         .success
         .value
+        .set(ClientListSearchPage, ClientListFormData("CN", "ABC"))
+        .success
+        .value
 
-      when(mockSessionRepository.set(any()))
-        .thenReturn(Future.successful(true))
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      when(mockManageService.removeClient(any[String], any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(()))
+
+      when(mockManageService.resolveAndStoreAgentClients(any[UserAnswers])(using any[HeaderCarrier]))
+        .thenReturn(Future.successful((cisClients, userAnswers)))
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
@@ -326,17 +351,21 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to System Error for a POST if be failed" in {
+    "must redirect to System Error for a POST if api failed" in {
 
-      val mockSessionRepository = mock[SessionRepository]
-      val mockManageService     = mock[ManageService]
+      mockClientLookup()
+
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(AgentClientsPage, client)
+        .success
+        .value
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockManageService.removeClient(any[String], any[UserAnswers])(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),

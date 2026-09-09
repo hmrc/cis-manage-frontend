@@ -276,7 +276,6 @@ class ManageService @Inject() (
         Future.failed(new RuntimeException("Missing AgentClientsPage in user answers"))
     }
 
-
   private def buildReturnPeriodEnd(taxMonth: Int, taxYear: Int)(implicit lang: Lang): String =
     YearMonth.of(taxYear, taxMonth).format(DateTimeFormats.monthYearFormat())
 

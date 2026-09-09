@@ -23,6 +23,7 @@ import navigation.{ClientListCheckNavigator, Navigator}
 import pages.clientdetails.RemoveClientYesNoPage
 import pages.{AgentClientsPage, ClientListSearchPage}
 import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -52,7 +53,7 @@ class RemoveClientYesNoController @Inject() (
     with I18nSupport
     with Logging {
 
-  val form = formProvider()
+  val form: Form[Boolean] = formProvider()
 
   def onPageLoad(uniqueId: String, mode: Mode): Action[AnyContent] =
     (identify
@@ -96,7 +97,6 @@ class RemoveClientYesNoController @Inject() (
             .getClientByEmployerReference(client.taxOfficeNumber, client.taxOfficeRef)
             .flatMap { response =>
               val clientName = response.schemeName.getOrElse("")
-
               form
                 .bindFromRequest()
                 .fold(
@@ -104,8 +104,7 @@ class RemoveClientYesNoController @Inject() (
                     Future.successful(
                       BadRequest(view(clientName, formWithErrors, mode, uniqueId))
                     ),
-                  value =>
-                  {
+                  value => {
                     val result =
                       for {
                         updatedAnswers            <- Future.fromTry(request.userAnswers.set(RemoveClientYesNoPage, value))
