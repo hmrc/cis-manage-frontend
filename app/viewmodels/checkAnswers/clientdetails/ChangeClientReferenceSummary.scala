@@ -33,7 +33,7 @@ object ChangeClientReferenceSummary {
         key = "clientdetails.changeClientReference.checkYourAnswersLabel",
         value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
-          ActionItemViewModel("site.change", routes.ChangeClientReferenceController.onPageLoad(CheckMode).url)
+          ActionItemViewModel("site.change", routes.ChangeClientReferenceController.onPageLoad("", CheckMode).url)
             .withVisuallyHiddenText(messages("clientdetails.changeClientReference.change.hidden"))
             .withAttribute("id" -> "change-client-reference")
         )

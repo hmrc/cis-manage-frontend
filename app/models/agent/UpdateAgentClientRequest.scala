@@ -19,7 +19,8 @@ package models.agent
 import play.api.libs.json.{Json, OFormat}
 case class UpdateAgentClientRequest(
   taxOfficeNumber: String,
-  taxOfficeReference: String
+  taxOfficeReference: String,
+  clientRef: String
 )
 
 object UpdateAgentClientRequest {

@@ -1106,10 +1106,11 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
     "delegate to connector and return response (happy path)" in {
       val (service, connector, sessionRepo) = newService()
+      val clientRef                         = "123456"
+      val request                           = UpdateAgentClientRequest(taxOfficeNumber = "123", taxOfficeReference = "ABC123", clientRef)
 
-      val request = UpdateAgentClientRequest(taxOfficeNumber = "123", taxOfficeReference = "ABC123")
+      val uniqueId = "900063"
 
-      val uniqueId        = "900063"
       val existingClients = List(createClient(uniqueId, "123", "ABC123"), createClient("CLIENT-002", "456", "XYZ456"))
 
       val userAnswers: UserAnswers = UserAnswers("userId")
@@ -1120,7 +1121,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       when(connector.updateClient(eqTo(request))(any[HeaderCarrier]))
         .thenReturn(Future.successful(()))
 
-      service.updateClient(uniqueId, userAnswers).futureValue mustBe ()
+      service.updateClient(uniqueId, userAnswers, clientRef).futureValue mustBe ()
 
       verify(connector).updateClient(eqTo(request))(any[HeaderCarrier])
     }
@@ -1131,8 +1132,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       val uniqueId = "900063"
 
       val userAnswers: UserAnswers = UserAnswers("userId")
-
-      val exception = service.updateClient(uniqueId, userAnswers).failed.futureValue
+      val clientRef                = "123456"
+      val exception                = service.updateClient(uniqueId, userAnswers, clientRef).failed.futureValue
       exception mustBe a[RuntimeException]
       exception.getMessage mustBe "Missing AgentClientsPage in user answers"
 
@@ -1141,8 +1142,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
     "propagate failure from connector" in {
       val (service, connector, sessionRepo) = newService()
-
-      val request = UpdateAgentClientRequest(taxOfficeNumber = "123", taxOfficeReference = "ABC123")
+      val clientRef                         = "123456"
+      val request                           = UpdateAgentClientRequest(taxOfficeNumber = "123", taxOfficeReference = "ABC123", clientRef)
 
       val uniqueId        = "900063"
       val existingClients = List(createClient(uniqueId, "123", "ABC123"), createClient("CLIENT-002", "456", "XYZ456"))
@@ -1157,7 +1158,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       when(connector.updateClient(eqTo(request))(any[HeaderCarrier]))
         .thenReturn(Future.failed(boom))
 
-      val ex = service.updateClient(uniqueId, userAnswers).failed.futureValue
+      val ex = service.updateClient(uniqueId, userAnswers, clientRef).failed.futureValue
       ex mustBe boom
 
       verify(connector).updateClient(eqTo(request))(any[HeaderCarrier])

@@ -24,6 +24,7 @@ import pages.clientdetails.ChangeClientReferencePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.ManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.clientdetails.ChangeClientReferenceView
 
@@ -41,6 +42,7 @@ class ChangeClientReferenceController @Inject() (
   clientListStatusGuard: ClientListStatusGuard,
   clientListCheckNavigator: ClientListCheckNavigator,
   formProvider: ChangeClientReferenceFormProvider,
+  manageService: ManageService,
   val controllerComponents: MessagesControllerComponents,
   view: ChangeClientReferenceView
 )(implicit ec: ExecutionContext)
@@ -49,7 +51,7 @@ class ChangeClientReferenceController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (
+  def onPageLoad(uniqueId: String, mode: Mode): Action[AnyContent] = (
     identify
       andThen clientListStatusGuard.groupB(clientListCheckNavigator.changeClientReference(mode))
       andThen getData
@@ -62,20 +64,21 @@ class ChangeClientReferenceController @Inject() (
       case Some(value) => form.fill(value)
     }
 
-    Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, uniqueId, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(uniqueId: String, mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, uniqueId, mode))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(ChangeClientReferencePage, value))
+              _              <- manageService.updateClient(uniqueId, updatedAnswers, value)
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(ChangeClientReferencePage, mode, updatedAnswers))
         )
-  }
+    }
 }

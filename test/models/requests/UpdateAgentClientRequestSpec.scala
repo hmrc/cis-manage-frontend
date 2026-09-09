@@ -28,28 +28,32 @@ class UpdateAgentClientRequestSpec extends AnyFreeSpec with Matchers {
     "read from JSON correctly" in {
       val json = Json.obj(
         "taxOfficeNumber"    -> "123",
-        "taxOfficeReference" -> "ABC1234"
+        "taxOfficeReference" -> "ABC1234",
+        "clientRef"          -> "clientRef"
       )
 
       val result = json.as[UpdateAgentClientRequest]
 
       result mustBe UpdateAgentClientRequest(
         taxOfficeNumber = "123",
-        taxOfficeReference = "ABC1234"
+        taxOfficeReference = "ABC1234",
+        clientRef = "clientRef"
       )
     }
 
     "write to JSON correctly" in {
       val model = UpdateAgentClientRequest(
         taxOfficeNumber = "123",
-        taxOfficeReference = "ABC1234"
+        taxOfficeReference = "ABC1234",
+        clientRef = "clientRef"
       )
 
       val json = Json.toJson(model)
 
       json mustBe Json.obj(
         "taxOfficeNumber"    -> "123",
-        "taxOfficeReference" -> "ABC1234"
+        "taxOfficeReference" -> "ABC1234",
+        "clientRef"          -> "clientRef"
       )
     }
   }

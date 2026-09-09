@@ -56,7 +56,7 @@ class ChangeClientReferenceSummarySpec extends AnyFreeSpec with Matchers {
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.ChangeClientReferenceController.onPageLoad(CheckMode).url
+      val expectedHref       = routes.ChangeClientReferenceController.onPageLoad(uniqueId = "", CheckMode).url
       val expectedHiddenText = messages("clientdetails.changeClientReference.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
