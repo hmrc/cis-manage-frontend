@@ -84,9 +84,10 @@ systemError.p2                           =  Contact the
 systemError.link                         =  HMRC Online Services Helpdesk
 systemError.p3                           =  if you need to speak to someone about Construction Industry Scheme and quote the reference number:
 
-accessDenied.title                       =  Sorry, there is a problem with the service
-accessDenied.heading                     =  Sorry, there is a problem with the service
-accessDenied.link                        =  Return to the Construction Industry Scheme start page.
+accessDenied.title                       =  Sorry, you are unable to use this service
+accessDenied.heading                     =  Sorry, you are unable to use this service
+accessDenied.paragraph                   =  Only users with an organisation or agent account can use this service.
+accessDenied.link                        =  More information about the Construction Industry Scheme (CIS)
 
 unauthorised.title                       =  Sorry, you are unable to use this service
 unauthorised.heading                     =  Sorry, you are unable to use this service
