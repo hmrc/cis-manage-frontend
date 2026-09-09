@@ -40,13 +40,13 @@ class SubmittedReturnsService @Inject() (
   connector: ConstructionIndustrySchemeConnector
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext) {
 
-  private val ukTimezone: ZoneId                         = ZoneId.of("Europe/London")
-  private val displayDateFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("d MMM yyyy")
-  private val shortMonthYearFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM yyyy")
-  private val amendmentCutOffInstant: Instant            = ZonedDateTime.of(2016, 2, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant
-  private val displayTimeFormatter: DateTimeFormatter    = DateTimeFormatter.ofPattern("h:mma", Locale.UK)
+  private val ukTimezone: ZoneId                      = ZoneId.of("Europe/London")
+  private val amendmentCutOffInstant: Instant         = ZonedDateTime.of(2016, 2, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant
+  private val displayTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("h:mma", Locale.UK)
 
-  def buildAllYearsViewModel(data: SubmittedReturnsData, instanceId: String): Option[SubmittedReturnsPageViewModel] =
+  def buildAllYearsViewModel(data: SubmittedReturnsData, instanceId: String)(implicit
+    lang: Lang
+  ): Option[SubmittedReturnsPageViewModel] =
     val taxYearSections = buildTaxYearSections(data, AllYears, instanceId)
 
     Some(
@@ -61,7 +61,7 @@ class SubmittedReturnsService @Inject() (
     data: SubmittedReturnsData,
     taxYear: String,
     instanceId: String
-  ): Option[SubmittedReturnsPageViewModel] =
+  )(implicit lang: Lang): Option[SubmittedReturnsPageViewModel] =
     taxYear.toIntOption.map { taxYearInt =>
       val taxYearSections = buildTaxYearSections(data, SingleYear, instanceId)
 
@@ -176,7 +176,7 @@ class SubmittedReturnsService @Inject() (
     data: SubmittedReturnsData,
     source: SubmittedReturnsHistorySource,
     instanceId: String
-  ): Seq[TaxYearHistoryViewModel] = {
+  )(implicit lang: Lang): Seq[TaxYearHistoryViewModel] = {
     val rowsWithTaxYear =
       data.monthlyReturns
         .sortBy(mr => (mr.taxYear, mr.taxMonth))(Ordering.Tuple2(Ordering.Int, Ordering.Int).reverse)
@@ -217,7 +217,7 @@ class SubmittedReturnsService @Inject() (
     submissionOpt: Option[SubmittedSubmissionData],
     source: SubmittedReturnsHistorySource,
     instanceId: String
-  ): SubmittedReturnsRowViewModel = {
+  )(implicit lang: Lang): SubmittedReturnsRowViewModel = {
     val periodEndText     = buildReturnPeriodEnd(monthlyReturn)
     val returnType        = buildReturnType(monthlyReturn)
     val dateSubmittedText = buildDateSubmittedText(submissionOpt)
@@ -244,10 +244,10 @@ class SubmittedReturnsService @Inject() (
     )
   }
 
-  private def buildReturnPeriodEnd(monthlyReturn: SubmittedMonthlyReturnData): String =
+  private def buildReturnPeriodEnd(monthlyReturn: SubmittedMonthlyReturnData)(implicit lang: Lang): String =
     YearMonth
       .of(monthlyReturn.taxYear, monthlyReturn.taxMonth)
-      .format(shortMonthYearFormatter)
+      .format(DateTimeFormats.monthYearFormat())
 
   private def buildReturnType(monthlyReturn: SubmittedMonthlyReturnData): ReturnTypeViewModel =
     monthlyReturn.nilReturnIndicator match {
@@ -256,11 +256,11 @@ class SubmittedReturnsService @Inject() (
       case _                                     => ReturnTypeViewModel.Unknown
     }
 
-  private def buildDateSubmittedText(submissionOpt: Option[SubmittedSubmissionData]): String =
+  private def buildDateSubmittedText(submissionOpt: Option[SubmittedSubmissionData])(implicit lang: Lang): String =
     submissionOpt
       .flatMap(_.acceptedTime)
       .map { instant =>
-        instant.atZone(ukTimezone).toLocalDate.format(displayDateFormatter)
+        instant.atZone(ukTimezone).toLocalDate.format(DateTimeFormats.shortDateFormat())
       }
       .getOrElse("")
 
@@ -300,7 +300,7 @@ class SubmittedReturnsService @Inject() (
     submissionOpt: Option[SubmittedSubmissionData],
     amendUrl: String,
     instanceId: String
-  ): StatusViewModel = {
+  )(implicit lang: Lang): StatusViewModel = {
     val acceptedTimeOpt = submissionOpt.flatMap(_.acceptedTime)
 
     acceptedTimeOpt match {
@@ -338,7 +338,7 @@ class SubmittedReturnsService @Inject() (
     monthlyReturn: SubmittedMonthlyReturnData,
     amendUrl: String,
     instanceId: String
-  ): StatusViewModel =
+  )(implicit lang: Lang): StatusViewModel =
     monthlyReturn.amendmentStatus match {
       case Some("STARTED") | Some("VALIDATED")                               =>
         StatusViewModel.Link(
@@ -387,7 +387,7 @@ class SubmittedReturnsService @Inject() (
     taxYear: Int,
     taxMonth: Int,
     amendment: String
-  )(implicit hc: HeaderCarrier): Future[Either[String, SubmissionReceiptViewModel]] =
+  )(implicit hc: HeaderCarrier, lang: Lang): Future[Either[String, SubmissionReceiptViewModel]] =
     connector.getMonthlyReturnComplete(instanceId, taxYear, taxMonth, amendment).map { response =>
       val submission = response.submission.headOption
 
@@ -421,12 +421,12 @@ class SubmittedReturnsService @Inject() (
     instanceId: String,
     taxYear: Int,
     taxMonth: Int
-  ): SubmissionReceiptViewModel = {
+  )(implicit lang: Lang): SubmissionReceiptViewModel = {
     val scheme     = response.scheme.headOption
     val mr         = response.monthlyReturn.headOption
     val submission = response.submission.headOption
 
-    val monthName = Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.UK)
+    val monthName = Month.of(taxMonth).getDisplayName(TextStyle.FULL, Locale.forLanguageTag(lang.code))
 
     val returnType = buildReceiptReturnType(mr.flatMap(_.nilReturnIndicator))
 
@@ -444,7 +444,7 @@ class SubmittedReturnsService @Inject() (
         scala.util.Try {
           val dateTime = LocalDateTime.parse(ts.take(19)).atZone(ukTimezone)
           val time     = dateTime.format(displayTimeFormatter)
-          val date     = dateTime.toLocalDate.format(displayDateFormatter)
+          val date     = dateTime.toLocalDate.format(DateTimeFormats.shortDateFormat())
           s"$time on $date"
         }.toOption
       }

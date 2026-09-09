@@ -20,6 +20,7 @@ import base.SpecBase
 import models.UserAnswers
 import models.history.{SubcontractorPayment, SubmittedMonthlyReturnData, SubmittedReturnsData, SubmittedSchemeData, SubmittedSubmissionData}
 import org.mockito.ArgumentMatchers.any
+import play.api.i18n.Lang
 import org.mockito.Mockito.{verify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.CisIdPage
@@ -186,7 +187,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
           any[SubmittedReturnsData],
           any[String],
           any[String]
-        )
+        )(any[Lang]())
       ).thenReturn(model)
 
     def mockAllYearsViewModelReturns(model: Option[SubmittedReturnsPageViewModel]): Unit =
@@ -194,7 +195,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         mockSubmittedReturnsService.buildAllYearsViewModel(
           any[SubmittedReturnsData],
           any[String]
-        )
+        )(any[Lang]())
       ).thenReturn(model)
 
     def mockCreateAmendmentHandoffReturns(result: Either[String, String]): Unit =
@@ -224,7 +225,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
           any[Int],
           any[Int],
           any[String]
-        )(any[HeaderCarrier])
+        )(any[HeaderCarrier], any[Lang]())
       ).thenReturn(Future.successful(result))
 
     def mockReceiptFails(): Unit =
@@ -234,7 +235,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
           any[Int],
           any[Int],
           any[String]
-        )(any[HeaderCarrier])
+        )(any[HeaderCarrier], any[Lang]())
       ).thenReturn(Future.failed(new RuntimeException("upstream error")))
 
     def confirmAmendmentUrl(handoffId: String): String =
@@ -252,7 +253,11 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
     "onPageLoadSingleYear must return OK using SubmittedReturnsDataPage when present" in new Setup {
       val userAnswers = userAnswersWithSubmittedReturnsData
 
-      when(mockSubmittedReturnsService.buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String]))
+      when(
+        mockSubmittedReturnsService.buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String])(
+          any[Lang]()
+        )
+      )
         .thenReturn(Some(viewModel))
 
       val app = application(userAnswers)
@@ -266,7 +271,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
 
         verify(mockSubmittedReturnsService)
-          .buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String])
+          .buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String])(any[Lang]())
         verifyNoInteractions(mockManageService)
       }
     }
@@ -274,7 +279,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
     "onPageLoadAllYears must return OK using SubmittedReturnsDataPage when present" in new Setup {
       val userAnswers = userAnswersWithSubmittedReturnsData
 
-      when(mockSubmittedReturnsService.buildAllYearsViewModel(any[SubmittedReturnsData], any[String]))
+      when(mockSubmittedReturnsService.buildAllYearsViewModel(any[SubmittedReturnsData], any[String])(any[Lang]()))
         .thenReturn(Some(viewModel))
 
       val app = application(userAnswers)
@@ -287,7 +292,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
 
-        verify(mockSubmittedReturnsService).buildAllYearsViewModel(any[SubmittedReturnsData], any[String])
+        verify(mockSubmittedReturnsService).buildAllYearsViewModel(any[SubmittedReturnsData], any[String])(any[Lang]())
         verifyNoInteractions(mockManageService)
       }
     }
@@ -308,7 +313,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
 
         verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
         verify(mockSubmittedReturnsService)
-          .buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String])
+          .buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String])(any[Lang]())
       }
     }
 
@@ -327,7 +332,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
 
         verify(mockManageService).getSubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
-        verify(mockSubmittedReturnsService).buildAllYearsViewModel(any[SubmittedReturnsData], any[String])
+        verify(mockSubmittedReturnsService).buildAllYearsViewModel(any[SubmittedReturnsData], any[String])(any[Lang]())
       }
     }
 
@@ -358,7 +363,11 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
     "onPageLoadSingleYear must redirect to JourneyRecovery when buildSingleYearViewModel returns None" in new Setup {
       val userAnswers = userAnswersWithSubmittedReturnsData
 
-      when(mockSubmittedReturnsService.buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String]))
+      when(
+        mockSubmittedReturnsService.buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String])(
+          any[Lang]()
+        )
+      )
         .thenReturn(None)
 
       val app = application(userAnswers)
@@ -371,7 +380,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual journeyRecoveryUrl
 
         verify(mockSubmittedReturnsService)
-          .buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String])
+          .buildSingleYearViewModel(any[SubmittedReturnsData], any[String], any[String])(any[Lang]())
       }
     }
 
@@ -396,7 +405,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
     "onPageLoadAllYears must redirect to JourneyRecovery when buildAllYearsViewModel returns None" in new Setup {
       val userAnswers = userAnswersWithSubmittedReturnsData
 
-      when(mockSubmittedReturnsService.buildAllYearsViewModel(any[SubmittedReturnsData], any[String]))
+      when(mockSubmittedReturnsService.buildAllYearsViewModel(any[SubmittedReturnsData], any[String])(any[Lang]()))
         .thenReturn(None)
 
       val app = application(userAnswers)
@@ -408,7 +417,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual journeyRecoveryUrl
 
-        verify(mockSubmittedReturnsService).buildAllYearsViewModel(any[SubmittedReturnsData], any[String])
+        verify(mockSubmittedReturnsService).buildAllYearsViewModel(any[SubmittedReturnsData], any[String])(any[Lang]())
       }
     }
 
@@ -543,7 +552,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustBe view(receiptViewModelWithEmail)(request, messages(app)).toString
 
         verify(mockSubmittedReturnsService)
-          .getMonthlyReturnComplete(any[String], any[Int], any[Int], any[String])(any[HeaderCarrier])
+          .getMonthlyReturnComplete(any[String], any[Int], any[Int], any[String])(any[HeaderCarrier], any[Lang]())
       }
     }
 
@@ -563,7 +572,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustBe view(receiptViewModelWithoutEmail)(request, messages(app)).toString
 
         verify(mockSubmittedReturnsService)
-          .getMonthlyReturnComplete(any[String], any[Int], any[Int], any[String])(any[HeaderCarrier])
+          .getMonthlyReturnComplete(any[String], any[Int], any[Int], any[String])(any[HeaderCarrier], any[Lang]())
       }
     }
 

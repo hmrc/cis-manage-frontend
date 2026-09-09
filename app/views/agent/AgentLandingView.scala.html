@@ -89,7 +89,7 @@
     @twoColumnGrid(
         ptaCard(
             title = messages("agent.landing.card.manageYourContractorDetails.title"),
-            link = "#",
+            link = controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, "contractorDetails").url,
             content = Html(messages("agent.landing.card.manageYourContractorDetails.p")),
             id = Some("manage-your-contractor-details")
         ),
@@ -104,13 +104,13 @@
     @twoColumnGrid(
         ptaCard(
             title = messages("agent.landing.card.manageClientDetails.title"),
-            link = "#",
+            link = controllers.clientdetails.routes.ManageClientDetailsController.onPageLoad().url,
             content = Html(messages("agent.landing.card.manageClientDetails.p")),
             id = Some("manage-client-details")
         ),
         ptaCard(
             title = messages("agent.landing.card.removeClient.title"),
-            link = "#",
+            link = controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(uniqueId, NormalMode).url,
             content = Html(messages("agent.landing.card.removeClient.p")),
             id = Some("remove-client")
         )

@@ -39,6 +39,7 @@ class ReturnsLandingController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  hasClientGuard: HasClientGuard,
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: ReturnsLandingView,
@@ -49,7 +50,10 @@ class ReturnsLandingController @Inject() (
     with Logging {
 
   def onPageLoad(instanceId: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify
+      andThen getData
+      andThen requireData
+      andThen hasClientGuard.forInstanceId(instanceId)).async { implicit request =>
       given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       updateContractorNameFromQueryParam(request.userAnswers)
