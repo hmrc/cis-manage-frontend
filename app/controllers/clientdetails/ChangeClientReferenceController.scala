@@ -64,11 +64,11 @@ class ChangeClientReferenceController @Inject() (
       case Some(value) => form.fill(value)
     }
 
-      Ok(view(preparedForm, uniqueId, mode))
+    Ok(view(preparedForm, uniqueId, mode))
   }
 
-  def onSubmit(uniqueId: String, mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(uniqueId: String, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
