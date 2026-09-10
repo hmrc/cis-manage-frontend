@@ -17,6 +17,7 @@ site.unknown                                            =  Unknown
 site.pagination.landmark                                =  Pagination
 site.pagination.previous                                =  Previous
 site.pagination.next                                    =  Next
+site.pagination.pageTitle                               =  (page {0} of {1})
 
 site.delete                                             =  Delete
 site.or                                                 =  or

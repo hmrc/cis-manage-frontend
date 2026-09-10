@@ -361,6 +361,52 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
       paginationIndex must be >= 0
       paginationIndex must be > tableIndex
     }
+
+    "must include the current page number in the title when there are multiple pages" in new Setup {
+      val paginationViewModel = PaginationViewModel(
+        items = Seq(
+          PaginationItemViewModel("1", "/test?page=1"),
+          PaginationItemViewModel("2", "/test?page=2"),
+          PaginationItemViewModel("3", "/test?page=3"),
+          PaginationItemViewModel("4", "/test?page=4").withCurrent(true)
+        ),
+        previous = Some(PaginationLinkViewModel("/test?page=3").withText("site.pagination.previous")),
+        next = Some(PaginationLinkViewModel("/test?page=5").withText("site.pagination.next"))
+      )
+
+      val html: HtmlFormat.Appendable = view(
+        form = form,
+        searchByOptions = searchOptions,
+        clientList = clientList,
+        paginationViewModel = paginationViewModel,
+        sortBy = None,
+        sortOrder = None,
+        currentPage = 4,
+        totalPages = 10
+      )
+      val doc: Document               = Jsoup.parse(html.body)
+
+      doc.title mustBe
+        s"${messages("agent.clientListSearch.title")} ${messages("site.pagination.pageTitle", 4, 10)} - ${messages("service.name")} - ${messages("site.govuk")}"
+    }
+
+    "must not include a page number in the title when there is only one page" in new Setup {
+      val html: HtmlFormat.Appendable = view(
+        form = form,
+        searchByOptions = searchOptions,
+        clientList = clientList,
+        paginationViewModel = PaginationViewModel(),
+        sortBy = None,
+        sortOrder = None,
+        currentPage = 1,
+        totalPages = 1
+      )
+      val doc: Document               = Jsoup.parse(html.body)
+
+      doc.title mustBe
+        s"${messages("agent.clientListSearch.title")} - ${messages("service.name")} - ${messages("site.govuk")}"
+      doc.title must not include messages("site.pagination.pageTitle", 1, 1)
+    }
     "must render visually hidden text for the client name link" in new Setup {
       val html: HtmlFormat.Appendable = view(
         form = form,
