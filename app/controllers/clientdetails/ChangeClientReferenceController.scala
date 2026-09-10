@@ -51,21 +51,18 @@ class ChangeClientReferenceController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(uniqueId: String, mode: Mode): Action[AnyContent] = (
-    identify
+  def onPageLoad(uniqueId: String, mode: Mode): Action[AnyContent] =
+    (identify
       andThen clientListStatusGuard.groupB(clientListCheckNavigator.changeClientReference(mode))
       andThen getData
       andThen requireData
-      andThen hasClientGuard.currentClient
-  ) { implicit request =>
-
-    val preparedForm = request.userAnswers.get(ChangeClientReferencePage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+      andThen hasClientGuard.forInstanceId(uniqueId)).async { implicit request =>
+      val preparedForm = request.userAnswers.get(ChangeClientReferencePage) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
+      Future(Ok(view(preparedForm, uniqueId, mode)))
     }
-
-    Ok(view(preparedForm, uniqueId, mode))
-  }
 
   def onSubmit(uniqueId: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>

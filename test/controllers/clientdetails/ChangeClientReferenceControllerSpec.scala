@@ -43,17 +43,39 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider          = new ChangeClientReferenceFormProvider()
-  val form                  = formProvider()
-  val uniqueId              = "123456"
-  val mockMangeService      = mock[ManageService]
-  val mockSessionRepository = mock[SessionRepository]
+  val formProvider                  = new ChangeClientReferenceFormProvider()
+  val form                          = formProvider()
+  val uniqueId                      = "123456"
+  val mockMangeService              = mock[ManageService]
+  val mockSessionRepository         = mock[SessionRepository]
+  implicit val ec: ExecutionContext = ExecutionContext.global
 
   lazy val changeClientReferenceRoute: String =
     controllers.clientdetails.routes.ChangeClientReferenceController.onPageLoad(uniqueId, NormalMode).url
 
   private val mockClientListStatusGuard = mock[ClientListStatusGuard]
   private val mockHasClientGuard        = mock[HasClientGuard]
+  private val mockManageService         = mock[ManageService]
+
+  private val passThroughIdentifierFilter =
+    new ActionFilter[IdentifierRequest] {
+      override protected def executionContext: ExecutionContext = ec
+
+      override protected def filter[A](
+        request: IdentifierRequest[A]
+      ): Future[Option[Result]] =
+        Future.successful(None)
+    }
+
+  private val passThroughDataFilter =
+    new ActionFilter[DataRequest] {
+      override protected def executionContext: ExecutionContext = ec
+
+      override protected def filter[A](
+        request: DataRequest[A]
+      ): Future[Option[Result]] =
+        Future.successful(None)
+    }
 
   private val passThroughClientListStatusGuard =
     new ActionFilter[IdentifierRequest] {
@@ -75,14 +97,46 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     bind[HasClientGuard].toInstance(mockHasClientGuard)
   )
 
+  private def mockGuards(): Unit = {
+    when(mockClientListStatusGuard.groupB(any[Call]))
+      .thenReturn(passThroughIdentifierFilter)
+
+    when(mockHasClientGuard.forInstanceId(any[String]))
+      .thenReturn(passThroughDataFilter)
+  }
+
+  private def userAnswersWithClient: UserAnswers =
+    UserAnswers(userAnswersId)
+      .set(AgentClientsPage, client)
+      .success
+      .value
+
+  val client =
+    List(
+      CisTaxpayerSearchResult(
+        uniqueId = "123",
+        taxOfficeNumber = "111",
+        taxOfficeRef = "test111",
+        agentOwnRef = Option("TEST LTD"),
+        schemeName = Option("ABCD"),
+        utr = Option("ABCD")
+      )
+    )
+
   "ChangeClientReference Controller" - {
 
     "must return OK and the correct view for a GET" in {
+      mockGuards()
 
-      val application = applicationBuilder(
-        userAnswers = Some(emptyUserAnswers),
-        additionalBindings = guardBindings
-      ).build()
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithClient))
+          .overrides(
+            bind[ClientListStatusGuard].toInstance(mockClientListStatusGuard),
+            bind[HasClientGuard].toInstance(mockHasClientGuard),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[ManageService].toInstance(mockManageService)
+          )
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, changeClientReferenceRoute)
@@ -97,13 +151,18 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-
+      mockGuards()
       val userAnswers = UserAnswers(userAnswersId).set(ChangeClientReferencePage, "answer").success.value
 
-      val application = applicationBuilder(
-        userAnswers = Some(userAnswers),
-        additionalBindings = guardBindings
-      ).build()
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[ClientListStatusGuard].toInstance(mockClientListStatusGuard),
+            bind[HasClientGuard].toInstance(mockHasClientGuard),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[ManageService].toInstance(mockManageService)
+          )
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, changeClientReferenceRoute)
