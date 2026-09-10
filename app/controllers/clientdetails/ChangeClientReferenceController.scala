@@ -78,7 +78,7 @@ class ChangeClientReferenceController @Inject() (
               updatedAnswers <- Future.fromTry(request.userAnswers.set(ChangeClientReferencePage, value))
               _              <- manageService.updateClient(uniqueId, updatedAnswers, value)
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(ChangeClientReferencePage, mode, updatedAnswers))
+            } yield Redirect(controllers.clientdetails.routes.ClientRefUpdateConfirmationController.onPageLoad())
         )
     }
 }

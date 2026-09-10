@@ -35,6 +35,7 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.ManageService
 import views.html.clientdetails.ChangeClientReferenceView
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -122,22 +123,34 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
-      val client                =
-        List(
-          CisTaxpayerSearchResult(
-            uniqueId = "123456",
-            taxOfficeNumber = "111",
-            taxOfficeRef = "test111",
-            agentOwnRef = Option("TEST LTD"),
-            schemeName = Option("ABCD"),
-            utr = Option("ABCD")
-          )
+      val client                = List(
+        CisTaxpayerSearchResult(
+          uniqueId = "123456",
+          taxOfficeNumber = "111",
+          taxOfficeRef = "test111",
+          agentOwnRef = Option("TEST LTD"),
+          schemeName = Option("ABCD"),
+          utr = Option("ABCD")
         )
+      )
+
+      when(
+        mockMangeService.updateClient(any, any, any)(using any[HeaderCarrier])
+      ).thenReturn(Future.unit)
+
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(
-          userAnswers = Some(emptyUserAnswers.set(AgentClientsPage, client).success.value),
+          userAnswers = Some(
+            emptyUserAnswers
+              .set(AgentClientsPage, client)
+              .success
+              .value
+              .set(ChangeClientReferencePage, "clientOwnRef")
+              .success
+              .value
+          ),
           additionalBindings = guardBindings ++ Seq(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[ManageService].toInstance(mockMangeService),
@@ -153,7 +166,9 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual controllers.clientdetails.routes.ClientRefUpdateConfirmationController
+          .onPageLoad()
+          .url
       }
     }
 
