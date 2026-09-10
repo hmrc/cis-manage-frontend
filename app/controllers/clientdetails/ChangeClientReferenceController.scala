@@ -80,5 +80,8 @@ class ChangeClientReferenceController @Inject() (
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(controllers.clientdetails.routes.ClientRefUpdateConfirmationController.onPageLoad())
         )
+        .recover { case _ =>
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
     }
 }
