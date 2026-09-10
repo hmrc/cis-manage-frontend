@@ -1261,7 +1261,7 @@ class ConstructionIndustrySchemeConnectorSpec
 
   "updateClient" should {
 
-    val request = UpdateAgentClientRequest(taxOfficeNumber = "123", taxOfficeReference = "AB456")
+    val request = UpdateAgentClientRequest(taxOfficeNumber = "123", taxOfficeReference = "AB456", clientRef="clientRef")
 
     "return Unit when BE returns 204" in {
       stubFor(
