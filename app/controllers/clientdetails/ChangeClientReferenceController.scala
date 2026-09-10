@@ -65,7 +65,11 @@ class ChangeClientReferenceController @Inject() (
     }
 
   def onSubmit(uniqueId: String, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify
+      andThen clientListStatusGuard.groupB(clientListCheckNavigator.changeClientReference(mode))
+      andThen getData
+      andThen requireData
+      andThen hasClientGuard.forInstanceId(uniqueId)).async { implicit request =>
       form
         .bindFromRequest()
         .fold(

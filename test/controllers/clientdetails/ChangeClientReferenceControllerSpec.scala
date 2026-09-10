@@ -180,7 +180,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the next page when valid data is submitted" in {
-
+      mockGuards()
       val mockSessionRepository = mock[SessionRepository]
       val client                = List(
         CisTaxpayerSearchResult(
@@ -232,7 +232,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-
+      mockGuards()
       val application = applicationBuilder(
         userAnswers = Some(emptyUserAnswers),
         additionalBindings = guardBindings
@@ -255,7 +255,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
+      mockGuards()
       val application = applicationBuilder(
         userAnswers = None,
         additionalBindings = guardBindings
@@ -272,7 +272,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
+      mockGuards()
       val application = applicationBuilder(
         userAnswers = None,
         additionalBindings = guardBindings
