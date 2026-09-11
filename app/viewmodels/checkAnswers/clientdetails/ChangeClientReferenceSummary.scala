@@ -27,13 +27,16 @@ import viewmodels.implicits.*
 
 object ChangeClientReferenceSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: UserAnswers, uniqueId: String)(implicit messages: Messages): Option[SummaryListRow] =
     answers.get(ChangeClientReferencePage).map { answer =>
       SummaryListRowViewModel(
         key = "clientdetails.changeClientReference.checkYourAnswersLabel",
         value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
-          ActionItemViewModel("site.change", routes.ChangeClientReferenceController.onPageLoad("", CheckMode).url)
+          ActionItemViewModel(
+            "site.change",
+            routes.ChangeClientReferenceController.onPageLoad(uniqueId = "", CheckMode).url
+          )
             .withVisuallyHiddenText(messages("clientdetails.changeClientReference.change.hidden"))
             .withAttribute("id" -> "change-client-reference")
         )
