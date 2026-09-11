@@ -35,7 +35,7 @@ object ChangeClientReferenceSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            routes.ChangeClientReferenceController.onPageLoad(uniqueId = "", CheckMode).url
+            routes.ChangeClientReferenceController.onPageLoad(uniqueId, CheckMode).url
           )
             .withVisuallyHiddenText(messages("clientdetails.changeClientReference.change.hidden"))
             .withAttribute("id" -> "change-client-reference")

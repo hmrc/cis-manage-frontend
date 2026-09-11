@@ -82,7 +82,7 @@ class ChangeClientReferenceController @Inject() (
             } yield Redirect(controllers.clientdetails.routes.ClientRefUpdateConfirmationController.onPageLoad())
         )
         .recover { case _ =>
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          Redirect(controllers.routes.SystemErrorController.onPageLoad())
         }
     }
 }

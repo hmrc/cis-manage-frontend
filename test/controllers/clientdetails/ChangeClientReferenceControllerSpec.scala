@@ -231,6 +231,58 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to the system error controller page when connector service returns integer/exception instead of Unit" in {
+      mockGuards()
+      val mockSessionRepository = mock[SessionRepository]
+      val client                = List(
+        CisTaxpayerSearchResult(
+          uniqueId = "123456",
+          taxOfficeNumber = "111",
+          taxOfficeRef = "test111",
+          agentOwnRef = Option("TEST LTD"),
+          schemeName = Option("ABCD"),
+          utr = Option("ABCD")
+        )
+      )
+
+      when(
+        mockMangeService.updateClient(any, any, any)(using any[HeaderCarrier])
+      ).thenReturn(Future(1))
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(
+            emptyUserAnswers
+              .set(AgentClientsPage, client)
+              .success
+              .value
+              .set(ChangeClientReferencePage, "clientOwnRef")
+              .success
+              .value
+          ),
+          additionalBindings = guardBindings ++ Seq(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[ManageService].toInstance(mockMangeService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+        ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, changeClientReferenceRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.SystemErrorController
+          .onPageLoad()
+          .url
+      }
+    }
+
     "must return a Bad Request and errors when invalid data is submitted" in {
       mockGuards()
       val application = applicationBuilder(
@@ -271,7 +323,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
+    "must redirect to system error controller for a POST if no existing data is found" in {
       mockGuards()
       val application = applicationBuilder(
         userAnswers = None,
@@ -286,7 +338,10 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        result.futureValue.header.headers
+          .get("Location")
+          .value
+          .contains(controllers.routes.SystemErrorController.onPageLoad().url)
       }
     }
   }
