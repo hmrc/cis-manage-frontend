@@ -17,6 +17,7 @@
 package views.clientdetails
 
 import base.SpecBase
+import config.FrontendAppConfig
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
@@ -43,6 +44,9 @@ class ClientRefUpdateConfirmationViewSpec extends SpecBase {
 
       doc.select(".govuk-link").text must include(messages("clientdetails.clientRefUpdateConfirmation.survey.link"))
       doc.select("p").text           must include(messages("clientdetails.clientRefUpdateConfirmation.survey.suffix"))
+      doc
+        .select(s"a[href='${appConfig.cisFeedbackSurveyUrl}']")
+        .text                        must include(messages("clientdetails.clientRefUpdateConfirmation.survey.link"))
     }
 
     "must not show a back link" in new Setup {
@@ -56,6 +60,7 @@ class ClientRefUpdateConfirmationViewSpec extends SpecBase {
   trait Setup {
     val app: Application                          = applicationBuilder().build()
     val view: ClientRefUpdateConfirmationView     = app.injector.instanceOf[ClientRefUpdateConfirmationView]
+    val appConfig: FrontendAppConfig              = app.injector.instanceOf[FrontendAppConfig]
     implicit val request: play.api.mvc.Request[_] = FakeRequest()
     implicit val messages: Messages               = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,
