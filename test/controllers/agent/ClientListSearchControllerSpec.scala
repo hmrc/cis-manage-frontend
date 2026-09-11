@@ -131,7 +131,9 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
             paginationResult.paginatedData,
             paginationResult.paginationViewModel,
             Some("clientName"),
-            Some("ascending")
+            Some("ascending"),
+            paginationResult.currentPage,
+            paginationResult.totalPages
           )(req, messages(app)).toString
       }
     }
@@ -166,7 +168,9 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
             paginationResult.paginatedData,
             paginationResult.paginationViewModel,
             Some("clientName"),
-            Some("ascending")
+            Some("ascending"),
+            paginationResult.currentPage,
+            paginationResult.totalPages
           )(req, messages(app)).toString
       }
     }
@@ -215,7 +219,9 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
             paginationResult.paginatedData,
             paginationResult.paginationViewModel,
             None,
-            None
+            None,
+            paginationResult.currentPage,
+            paginationResult.totalPages
           )(req, messages(app)).toString
       }
     }
