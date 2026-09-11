@@ -237,7 +237,8 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
     "buildSingleYearViewModel" - {
 
       "must return a view model filtered to the selected tax year" in {
-        val result = service.buildSingleYearViewModel(data, "2026", instanceId)(Lang("en"))
+        val givenTaxYear = 2026
+        val result       = service.buildSingleYearViewModel(data, givenTaxYear, instanceId)(Lang("en"))
 
         result mustBe defined
 
@@ -245,18 +246,13 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
         vm.selectedTaxYear mustBe Some("2026")
         vm.instanceId mustBe instanceId
         vm.taxYears.size mustBe 1
-        vm.taxYears.head.fromYear mustBe 2026
+        vm.taxYears.head.fromYear mustBe givenTaxYear
         vm.taxYears.head.rows.size mustBe 2
       }
 
-      "must return None for an invalid (non-numeric) tax year" in {
-        val result = service.buildSingleYearViewModel(data, "invalid", instanceId)(Lang("en"))
-
-        result mustBe None
-      }
-
       "must return None for a year with no data" in {
-        val result = service.buildSingleYearViewModel(data, "2020", instanceId)(Lang("en"))
+        val emptyTaxYear = 2020
+        val result       = service.buildSingleYearViewModel(data, emptyTaxYear, instanceId)(Lang("en"))
 
         result mustBe None
       }

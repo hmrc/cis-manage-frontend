@@ -39,6 +39,9 @@ import repositories.SessionRepository
 
 import scala.concurrent.Future
 
+@Deprecated(
+  "To avoid spinning up and shutting down applications for unit tests, please consider using UnitSpec instead."
+)
 trait SpecBase
     extends AnyFreeSpec
     with Matchers
@@ -47,7 +50,6 @@ trait SpecBase
     with ScalaFutures
     with GuiceOneAppPerSuite
     with IntegrationPatience {
-
   override def fakeApplication(): Application = applicationBuilder().build()
 
   implicit lazy val applicationConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
