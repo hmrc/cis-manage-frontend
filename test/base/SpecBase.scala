@@ -85,7 +85,8 @@ trait SpecBase
             .qualifiedWith("AgentIdentifier")
             .to(new FakeIdentifierAction(true, agentCode, itmpName)(parsers)),
           bind[IdentifierAction].qualifiedWith("ContractorIdentifier").to(new FakeIdentifierAction(false)(parsers)),
-          bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
+          bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
+          bind[FormpRdsReconcileAction].toInstance(new FakeFormpRdsReconcileAction)
         ) ++ additionalBindings
       )
 }
