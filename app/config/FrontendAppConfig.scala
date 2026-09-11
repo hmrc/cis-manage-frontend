@@ -21,9 +21,6 @@ import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
 
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
-
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration) {
 
@@ -99,8 +96,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   private lazy val noticeViewerBaseUrl: String                      =
     configuration.get[String]("microservice.services.notice-viewer.baseUrl")
   private lazy val portalAccountBaseUrl: String                     = configuration.get[String]("portal-account.host")
-  private lazy val fileStandardReturnPath: String                   = configuration.get[String]("urls.fileStandardReturn")
-  private lazy val fileNilReturnPath: String                        = configuration.get[String]("urls.fileNilReturn")
   private lazy val continueReturnJourneyPath: String                = configuration.get[String]("urls.continueReturnJourney")
   private lazy val continueAmendReturnJourneyPath: String           = configuration.get[String]("urls.continueAmendReturnJourney")
   private lazy val confirmAmendmentPath: String                     = configuration.get[String]("urls.confirmAmendment")
@@ -111,21 +106,20 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   private lazy val cisOrgAppealPath: String                         = configuration.get[String]("urls.cisOrgAppeal")
   private lazy val cisOrgGenericNoticesPath: String                 = configuration.get[String]("urls.cisOrgGenericNotices")
 
-  def fileStandardReturnUrl: String = s"$cisFrontendBaseUrl$fileStandardReturnPath"
+  private val cisContractorFrontendBaseUrl: String =
+    configuration.get[String]("microservice.services.cis-contractor-frontend.baseUrl")
 
-  def fileStandardReturnUrl(instanceId: String): String = {
-    def encode(s: String) = URLEncoder.encode(s, StandardCharsets.UTF_8.name())
-    s"$cisFrontendBaseUrl$fileStandardReturnPath" +
-      s"?instanceId=${encode(instanceId)}"
-  }
+  def fileStandardReturnUrl: String =
+    s"$cisContractorFrontendBaseUrl${configuration.get[String]("urls.finalValidationFileMonthlyReturn")}"
 
-  def fileNilReturnUrl: String = s"$cisFrontendBaseUrl$fileNilReturnPath"
+  def fileStandardReturnUrl(instanceId: String): String =
+    fileStandardReturnUrl
 
-  def fileNilReturnUrl(instanceId: String): String = {
-    def encode(s: String) = URLEncoder.encode(s, StandardCharsets.UTF_8.name())
-    s"$cisFrontendBaseUrl$fileNilReturnPath" +
-      s"?instanceId=${encode(instanceId)}"
-  }
+  def fileNilReturnUrl: String =
+    s"$cisContractorFrontendBaseUrl${configuration.get[String]("urls.finalValidationFileNilReturn")}"
+
+  def fileNilReturnUrl(instanceId: String): String =
+    fileNilReturnUrl
 
   def continueReturnJourneyUrl(instanceId: String, taxYear: String, taxMonth: String): String =
     s"$cisFrontendBaseUrl$continueReturnJourneyPath" +
@@ -151,8 +145,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   def authoriseClientRequestUrl(agentCode: String): String =
     s"$portalAccountBaseUrl${authoriseClientRequestPath.replace("{agentCode}", agentCode)}"
 
-  private val cisContractorFrontendBaseUrl: String                                 =
-    configuration.get[String]("microservice.services.cis-contractor-frontend.baseUrl")
   def cisOrgAppealUrl(taxOfficeNumber: String, taxOfficeReference: String): String =
     s"$pasBaseUrl${cisOrgAppealPath.replace("{taxOfficeNumber}", taxOfficeNumber).replace("{taxOfficeReference}", taxOfficeReference)}"
 
