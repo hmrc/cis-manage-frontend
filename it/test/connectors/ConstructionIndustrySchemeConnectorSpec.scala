@@ -19,7 +19,7 @@ package connectors
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import itutil.ApplicationWithWiremock
 import models.Scheme
-import models.agent.{AgentClientData, ClientListStatus}
+import models.agent.{AgentClientData, ClientListStatus, UpdateAgentClientRequest}
 import models.history.{SubmittedSchemeData, SubmittedSubmissionData}
 import models.requests.{DeleteSubcontractorRequest, DeleteUnsubmittedMonthlyReturnRequest, GetSubmittedMonthlyReturnsDataRequest, RemoveAgentClientRequest}
 import models.response.{GetSubcontractorForDeleteResponse, GetSubmittedMonthlyReturnsDataResponse}
@@ -245,7 +245,7 @@ class ConstructionIndustrySchemeConnectorSpec
       ex.getMessage must include("returned 500")
     }
   }
-  
+
   "startClientList" should {
 
     "return GetClientListStatusResponse with 'succeeded' when BE returns succeeded" in {
@@ -1255,6 +1255,36 @@ class ConstructionIndustrySchemeConnectorSpec
       ex mustBe a[UpstreamErrorResponse]
 
       ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe INTERNAL_SERVER_ERROR
+      ex.getMessage must include("boom")
+    }
+  }
+
+  "updateClient" should {
+
+    val request = UpdateAgentClientRequest(taxOfficeNumber = "123", taxOfficeReference = "AB456", clientRef="clientRef")
+
+    "return Unit when BE returns 204" in {
+      stubFor(
+        post(urlPathEqualTo(s"/cis/agent/update-client"))
+          .withHeader("Content-Type", containing("application/json"))
+          .withRequestBody(equalToJson(Json.toJson(request).toString(), true, true))
+          .willReturn(aResponse().withStatus(NO_CONTENT))
+      )
+
+      connector.updateClient(request).futureValue mustBe ((): Unit)
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      stubFor(
+        post(urlPathEqualTo(s"/cis/agent/update-client"))
+          .withHeader("Content-Type", containing("application/json"))
+          .withRequestBody(equalToJson(Json.toJson(request).toString(), true, true))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = intercept[Exception] {
+        connector.updateClient(request).futureValue
+      }
       ex.getMessage must include("boom")
     }
   }

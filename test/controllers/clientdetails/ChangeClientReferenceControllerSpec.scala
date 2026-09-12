@@ -20,19 +20,22 @@ import base.SpecBase
 import controllers.actions.{ClientListStatusGuard, HasClientGuard}
 import controllers.routes
 import forms.clientdetails.ChangeClientReferenceFormProvider
-import models.{NormalMode, UserAnswers}
+import models.{CisTaxpayerSearchResult, NormalMode, UserAnswers}
 import models.requests.{DataRequest, IdentifierRequest}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import pages.AgentClientsPage
 import pages.clientdetails.ChangeClientReferencePage
 import play.api.inject.bind
 import play.api.mvc.{ActionFilter, Call, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import services.ManageService
 import views.html.clientdetails.ChangeClientReferenceView
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,14 +43,37 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new ChangeClientReferenceFormProvider()
-  val form         = formProvider()
+  val formProvider                  = new ChangeClientReferenceFormProvider()
+  val form                          = formProvider()
+  val uniqueId                      = "123456"
+  val mockManageService             = mock[ManageService]
+  val mockSessionRepository         = mock[SessionRepository]
+  implicit val ec: ExecutionContext = ExecutionContext.global
 
   lazy val changeClientReferenceRoute: String =
-    controllers.clientdetails.routes.ChangeClientReferenceController.onPageLoad(NormalMode).url
+    controllers.clientdetails.routes.ChangeClientReferenceController.onPageLoad(uniqueId, NormalMode).url
 
-  private val mockClientListStatusGuard = mock[ClientListStatusGuard]
-  private val mockHasClientGuard        = mock[HasClientGuard]
+  private val mockClientListStatusGuard   = mock[ClientListStatusGuard]
+  private val mockHasClientGuard          = mock[HasClientGuard]
+  private val passThroughIdentifierFilter =
+    new ActionFilter[IdentifierRequest] {
+      override protected def executionContext: ExecutionContext = ec
+
+      override protected def filter[A](
+        request: IdentifierRequest[A]
+      ): Future[Option[Result]] =
+        Future.successful(None)
+    }
+
+  private val passThroughDataFilter =
+    new ActionFilter[DataRequest] {
+      override protected def executionContext: ExecutionContext = ec
+
+      override protected def filter[A](
+        request: DataRequest[A]
+      ): Future[Option[Result]] =
+        Future.successful(None)
+    }
 
   private val passThroughClientListStatusGuard =
     new ActionFilter[IdentifierRequest] {
@@ -69,14 +95,46 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     bind[HasClientGuard].toInstance(mockHasClientGuard)
   )
 
+  private def mockGuards(): Unit = {
+    when(mockClientListStatusGuard.groupB(any[Call]))
+      .thenReturn(passThroughIdentifierFilter)
+
+    when(mockHasClientGuard.forInstanceId(any[String]))
+      .thenReturn(passThroughDataFilter)
+  }
+
+  private def userAnswersWithClient: UserAnswers =
+    UserAnswers(userAnswersId)
+      .set(AgentClientsPage, client)
+      .success
+      .value
+
+  val client =
+    List(
+      CisTaxpayerSearchResult(
+        uniqueId = "123456",
+        taxOfficeNumber = "111",
+        taxOfficeRef = "test111",
+        agentOwnRef = Option("TEST LTD"),
+        schemeName = Option("ABCD"),
+        utr = Option("ABCD")
+      )
+    )
+
   "ChangeClientReference Controller" - {
 
     "must return OK and the correct view for a GET" in {
+      mockGuards()
 
-      val application = applicationBuilder(
-        userAnswers = Some(emptyUserAnswers),
-        additionalBindings = guardBindings
-      ).build()
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithClient))
+          .overrides(
+            bind[ClientListStatusGuard].toInstance(mockClientListStatusGuard),
+            bind[HasClientGuard].toInstance(mockHasClientGuard),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[ManageService].toInstance(mockManageService)
+          )
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, changeClientReferenceRoute)
@@ -86,18 +144,23 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[ChangeClientReferenceView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, uniqueId, NormalMode)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-
+      mockGuards()
       val userAnswers = UserAnswers(userAnswersId).set(ChangeClientReferencePage, "answer").success.value
 
-      val application = applicationBuilder(
-        userAnswers = Some(userAnswers),
-        additionalBindings = guardBindings
-      ).build()
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[ClientListStatusGuard].toInstance(mockClientListStatusGuard),
+            bind[HasClientGuard].toInstance(mockHasClientGuard),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[ManageService].toInstance(mockManageService)
+          )
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, changeClientReferenceRoute)
@@ -107,21 +170,47 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), uniqueId, NormalMode)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
-
+      mockGuards()
       val mockSessionRepository = mock[SessionRepository]
+      val client                = List(
+        CisTaxpayerSearchResult(
+          uniqueId = "123456",
+          taxOfficeNumber = "111",
+          taxOfficeRef = "test111",
+          agentOwnRef = Option("TEST LTD"),
+          schemeName = Option("ABCD"),
+          utr = Option("ABCD")
+        )
+      )
+
+      when(
+        mockManageService.updateClient(any, any, any)(using any[HeaderCarrier])
+      ).thenReturn(Future.unit)
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
         applicationBuilder(
-          userAnswers = Some(emptyUserAnswers),
+          userAnswers = Some(
+            emptyUserAnswers
+              .set(AgentClientsPage, client)
+              .success
+              .value
+              .set(ChangeClientReferencePage, "clientOwnRef")
+              .success
+              .value
+          ),
           additionalBindings = guardBindings ++ Seq(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[ManageService].toInstance(mockManageService),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
         ).build()
@@ -134,12 +223,66 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual controllers.clientdetails.routes.ClientRefUpdateConfirmationController
+          .onPageLoad()
+          .url
+      }
+    }
+
+    "must redirect to the system error controller page when connector service returns integer/exception instead of Unit" in {
+      mockGuards()
+      val mockSessionRepository = mock[SessionRepository]
+      val client                = List(
+        CisTaxpayerSearchResult(
+          uniqueId = "123456",
+          taxOfficeNumber = "111",
+          taxOfficeRef = "test111",
+          agentOwnRef = Option("TEST LTD"),
+          schemeName = Option("ABCD"),
+          utr = Option("ABCD")
+        )
+      )
+
+      when(
+        mockManageService.updateClient(any, any, any)(using any[HeaderCarrier])
+      ).thenReturn(Future(1))
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(
+            emptyUserAnswers
+              .set(AgentClientsPage, client)
+              .success
+              .value
+              .set(ChangeClientReferencePage, "clientOwnRef")
+              .success
+              .value
+          ),
+          additionalBindings = guardBindings ++ Seq(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[ManageService].toInstance(mockManageService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+        ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, changeClientReferenceRoute)
+            .withFormUrlEncodedBody(("value", "answer"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.SystemErrorController
+          .onPageLoad()
+          .url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-
+      mockGuards()
       val application = applicationBuilder(
         userAnswers = Some(emptyUserAnswers),
         additionalBindings = guardBindings
@@ -157,12 +300,12 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, uniqueId, NormalMode)(request, messages(application)).toString
       }
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
+      mockGuards()
       val application = applicationBuilder(
         userAnswers = None,
         additionalBindings = guardBindings
@@ -178,8 +321,8 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
+    "must redirect to system error controller for a POST if no existing data is found" in {
+      mockGuards()
       val application = applicationBuilder(
         userAnswers = None,
         additionalBindings = guardBindings
@@ -193,7 +336,12 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+        controllers.routes.SystemErrorController.onPageLoad().url must include(
+          result.futureValue.header.headers
+            .get("Location")
+            .value
+        )
       }
     }
   }

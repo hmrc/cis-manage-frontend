@@ -24,8 +24,10 @@ import pages.clientdetails.ChangeClientReferencePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.ManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.clientdetails.ChangeClientReferenceView
+import play.api.Logging
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,7 +35,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class ChangeClientReferenceController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
-  navigator: Navigator,
   @Named("AgentIdentifier") identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -41,41 +42,49 @@ class ChangeClientReferenceController @Inject() (
   clientListStatusGuard: ClientListStatusGuard,
   clientListCheckNavigator: ClientListCheckNavigator,
   formProvider: ChangeClientReferenceFormProvider,
+  manageService: ManageService,
   val controllerComponents: MessagesControllerComponents,
   view: ChangeClientReferenceView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (
-    identify
+  def onPageLoad(uniqueId: String, mode: Mode): Action[AnyContent] =
+    (identify
       andThen clientListStatusGuard.groupB(clientListCheckNavigator.changeClientReference(mode))
       andThen getData
       andThen requireData
-      andThen hasClientGuard.currentClient
-  ) { implicit request =>
-
-    val preparedForm = request.userAnswers.get(ChangeClientReferencePage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+      andThen hasClientGuard.forInstanceId(uniqueId)).async { implicit request =>
+      val preparedForm = request.userAnswers.get(ChangeClientReferencePage) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
+      Future(Ok(view(preparedForm, uniqueId, mode)))
     }
 
-    Ok(view(preparedForm, mode))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(uniqueId: String, mode: Mode): Action[AnyContent] =
+    (identify
+      andThen clientListStatusGuard.groupB(clientListCheckNavigator.changeClientReference(mode))
+      andThen getData
+      andThen requireData
+      andThen hasClientGuard.forInstanceId(uniqueId)).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, uniqueId, mode))),
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(ChangeClientReferencePage, value))
+              _              <- manageService.updateClient(uniqueId, updatedAnswers, value)
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(ChangeClientReferencePage, mode, updatedAnswers))
+            } yield Redirect(controllers.clientdetails.routes.ClientRefUpdateConfirmationController.onPageLoad())
         )
-  }
+        .recover { case ex =>
+          logger.error(s"Failed to update client reference for uniqueId $uniqueId", ex)
+          Redirect(controllers.routes.SystemErrorController.onPageLoad())
+        }
+    }
 }
