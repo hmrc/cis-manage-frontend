@@ -27,6 +27,7 @@ import repositories.SessionRepository
 import services.ManageService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.clientdetails.ChangeClientReferenceView
+import play.api.Logging
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
@@ -46,7 +47,8 @@ class ChangeClientReferenceController @Inject() (
   view: ChangeClientReferenceView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   val form = formProvider()
 
@@ -80,7 +82,8 @@ class ChangeClientReferenceController @Inject() (
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(controllers.clientdetails.routes.ClientRefUpdateConfirmationController.onPageLoad())
         )
-        .recover { case _ =>
+        .recover { case ex =>
+          logger.error(s"Failed to update client reference for uniqueId $uniqueId", ex)
           Redirect(controllers.routes.SystemErrorController.onPageLoad())
         }
     }

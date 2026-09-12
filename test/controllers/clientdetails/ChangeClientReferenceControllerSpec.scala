@@ -46,17 +46,15 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
   val formProvider                  = new ChangeClientReferenceFormProvider()
   val form                          = formProvider()
   val uniqueId                      = "123456"
-  val mockMangeService              = mock[ManageService]
+  val mockManageService             = mock[ManageService]
   val mockSessionRepository         = mock[SessionRepository]
   implicit val ec: ExecutionContext = ExecutionContext.global
 
   lazy val changeClientReferenceRoute: String =
     controllers.clientdetails.routes.ChangeClientReferenceController.onPageLoad(uniqueId, NormalMode).url
 
-  private val mockClientListStatusGuard = mock[ClientListStatusGuard]
-  private val mockHasClientGuard        = mock[HasClientGuard]
-  private val mockManageService         = mock[ManageService]
-
+  private val mockClientListStatusGuard   = mock[ClientListStatusGuard]
+  private val mockHasClientGuard          = mock[HasClientGuard]
   private val passThroughIdentifierFilter =
     new ActionFilter[IdentifierRequest] {
       override protected def executionContext: ExecutionContext = ec
@@ -114,7 +112,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
   val client =
     List(
       CisTaxpayerSearchResult(
-        uniqueId = "123",
+        uniqueId = "123456",
         taxOfficeNumber = "111",
         taxOfficeRef = "test111",
         agentOwnRef = Option("TEST LTD"),
@@ -194,7 +192,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
       )
 
       when(
-        mockMangeService.updateClient(any, any, any)(using any[HeaderCarrier])
+        mockManageService.updateClient(any, any, any)(using any[HeaderCarrier])
       ).thenReturn(Future.unit)
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -212,7 +210,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
           ),
           additionalBindings = guardBindings ++ Seq(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[ManageService].toInstance(mockMangeService),
+            bind[ManageService].toInstance(mockManageService),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
         ).build()
@@ -246,7 +244,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
       )
 
       when(
-        mockMangeService.updateClient(any, any, any)(using any[HeaderCarrier])
+        mockManageService.updateClient(any, any, any)(using any[HeaderCarrier])
       ).thenReturn(Future(1))
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -264,7 +262,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
           ),
           additionalBindings = guardBindings ++ Seq(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[ManageService].toInstance(mockMangeService),
+            bind[ManageService].toInstance(mockManageService),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
         ).build()
@@ -338,10 +336,12 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        result.futureValue.header.headers
-          .get("Location")
-          .value
-          .contains(controllers.routes.SystemErrorController.onPageLoad().url)
+
+        controllers.routes.SystemErrorController.onPageLoad().url must include(
+          result.futureValue.header.headers
+            .get("Location")
+            .value
+        )
       }
     }
   }

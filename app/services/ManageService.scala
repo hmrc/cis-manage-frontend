@@ -346,11 +346,17 @@ class ManageService @Inject() (
   }
 
   def updateClient(uniqueId: String, ua: UserAnswers, clientRef: String)(implicit hc: HeaderCarrier): Future[Unit] =
-    ua.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId)) match {
-      case Some(client) =>
-        cisConnector.updateClient(UpdateAgentClientRequest(client.taxOfficeNumber, client.taxOfficeRef, clientRef))
-      case _            =>
-        logger.error(s"[updateClient] missing AgentClientsPage in user answers")
-        Future.failed(new RuntimeException("Missing AgentClientsPage in user answers"))
+    ua.get(AgentClientsPage) match {
+      case None          =>
+        logger.error(s"[updateClient] AgentClientsPage not found in user answers")
+        Future.failed(new RuntimeException("AgentClientsPage not found in user answers"))
+      case Some(clients) =>
+        clients.find(_.uniqueId == uniqueId) match {
+          case Some(client) =>
+            cisConnector.updateClient(UpdateAgentClientRequest(client.taxOfficeNumber, client.taxOfficeRef, clientRef))
+          case None         =>
+            logger.error(s"[updateClient] no client found with uniqueId $uniqueId in AgentClientsPage")
+            Future.failed(new RuntimeException(s"No client found with uniqueId $uniqueId in AgentClientsPage"))
+        }
     }
 }

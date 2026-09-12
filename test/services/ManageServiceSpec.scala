@@ -1135,7 +1135,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       val clientRef                = "123456"
       val exception                = service.updateClient(uniqueId, userAnswers, clientRef).failed.futureValue
       exception mustBe a[RuntimeException]
-      exception.getMessage mustBe "Missing AgentClientsPage in user answers"
+      exception.getMessage mustBe "AgentClientsPage not found in user answers"
 
       verifyNoInteractions(connector)
     }
