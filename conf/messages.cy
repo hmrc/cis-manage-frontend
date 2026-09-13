@@ -2,45 +2,45 @@
 service.name                                            =  Cynllun y Diwydiant Adeiladu
 
 site.back                                               =  Yn ôl
-site.remove                                             =  xxxxxxxxxxxxxxxxxxxx
+site.remove                                             =  Dileu
 site.change                                             =  Newid
 site.no                                                 =  Na
 site.yes                                                =  Iawn
 site.continue                                           =  Parhau
 site.search                                             =  Chwilio
-site.start                                              =  xxxxxxxxxxxxxxxxxxxx
-site.startAgain                                         =  xxxxxxxxxxxxxxxxxxxx
-site.signIn                                             =  xxxxxxxxxxxxxxxxxxxx
+site.start                                              =  Dechrau nawr
+site.startAgain                                         =  Dechrau eto
+site.signIn                                             =  Mewngofnodi
 site.govuk                                              =  GOV.UK
-site.unknown                                            =  xxxxxxxxxxxxxxxxxxxx
+site.unknown                                            =  Anhysbys
 
 site.pagination.landmark                                =  xxxxxxxxxxxxxxxxxxxx
 site.pagination.previous                                =  xxxxxxxxxxxxxxxxxxxx
 site.pagination.next                                    =  xxxxxxxxxxxxxxxxxxxx
 
-site.delete                                             =  xxxxxxxxxxxxxxxxxxxx
-site.or                                                 =  xxxxxxxxxxxxxxxxxxxx
-site.view                                               =  xxxxxxxxxxxxxxxxxxxx
+site.delete                                             =  Dileu
+site.or                                                 =  neu
+site.view                                               =  Gweld
 site.saveAndContinue                                    =  Cadw a pharhau
 
-date.day                                                =  xxxxxxxxxxxxxxxxxxxx
-date.month                                              =  xxxxxxxxxxxxxxxxxxxx
-date.year                                               =  xxxxxxxxxxxxxxxxxxxx
+date.day                                                =  Diwrnod
+date.month                                              =  Mis
+date.year                                               =  Blwyddyn
 
-date.error.day                                          =  xxxxxxxxxxxxxxxxxxxx
-date.error.month                                        =  xxxxxxxxxxxxxxxxxxxx
-date.error.year                                         =  xxxxxxxxxxxxxxxxxxxx
+date.error.day                                          =  diwrnod
+date.error.month                                        =  mis
+date.error.year                                         =  blwyddyn
 
-timeout.title                                           =  xxxxxxxxxxxxxxxxxxxx
-timeout.message                                         =  xxxxxxxxxxxxxxxxxxxx
-timeout.keepAlive                                       =  xxxxxxxxxxxxxxxxxxxx
-timeout.signOut                                         =  xxxxxxxxxxxxxxxxxxxx
+timeout.title                                           =  Rydych ar fin cael eich allgofnodi
+timeout.message                                         =  Am resymau diogelwch, cewch eich allgofnodi o’r gwasanaeth hwn ymhen
+timeout.keepAlive                                       =  Peidio ag allgofnodi
+timeout.signOut                                         =  Allgofnodi
 
-error.title.prefix                                      =  Error:
+error.title.prefix                                      =  Gwall:
 
-error.prefix                                            =  xxxxxxxxxxxxxxxxxxxx
+error.prefix                                            =  Gwall
 
-error.summary.title                                     =  xxxxxxxxxxxxxxxxxxxx
+error.summary.title                                     =  Mae problem
 
 index.title                                             =  xxxxxxxxxxxxxxxxxxxx
 index.heading                                           =  xxxxxxxxxxxxxxxxxxxx
@@ -427,18 +427,18 @@ submissionConfirmation.returnType.nil        =  xxxxxxxxxxxxxxxxxxxx
 # History
 history.submittedReturnsChooseTaxYear.title                                  =  Pa flwyddyn dreth ydych am fwrw golwg drosti?
 history.submittedReturnsChooseTaxYear.heading                                =  Pa flwyddyn dreth ydych am fwrw golwg drosti?
-history.submittedReturnsChooseTaxYear.caption                                =  xxxxxxxxxxxxxxxxxxxx
+history.submittedReturnsChooseTaxYear.caption                                =  Datganiadau a gyflwynwyd
 history.submittedReturnsChooseTaxYear.viewAll                                =  Bwrw golwg dros bob blwyddyn dreth
 history.submittedReturnsChooseTaxYear.error.required                         =  Dewiswch flwyddyn dreth neu bob blwyddyn dreth
 
 history.printSubmissionDetails.title                                         =  Datganiad misol ar gyfer cyfnod sy’n dod i ben {0}
 history.printSubmissionDetails.heading                                       =  Datganiad misol ar gyfer cyfnod sy’n dod i ben {0}
 history.printSubmissionDetails.submissionDetails.heading                     =  Manylion y cyflwyniad
-history.printSubmissionDetails.submissionDetails.p                           =  xxxxxxxxxxxxxxxxxxxx
-history.printSubmissionDetails.submissionDetails.referenceNumber             =  xxxxxxxxxxxxxxxxxxxx
+history.printSubmissionDetails.submissionDetails.p                           =  Cyflwynwyd ar {0} am {1}.
+history.printSubmissionDetails.submissionDetails.referenceNumber             =  Cyfeirnod y dderbynneb
 history.printSubmissionDetails.submissionDetails.submissionType              =  Math o gyflwyniad
-history.printSubmissionDetails.submissionDetails.submissionType.nil          =  xxxxxxxxxxxxxxxxxxxx
-history.printSubmissionDetails.submissionDetails.submissionType.standard     =  xxxxxxxxxxxxxxxxxxxx
+history.printSubmissionDetails.submissionDetails.submissionType.nil          =  Datganiad ‘dim’ misol
+history.printSubmissionDetails.submissionDetails.submissionType.standard     =  Datganiad misol
 history.printSubmissionDetails.submissionDetails.contractorName              =  Enw’r contractwr
 history.printSubmissionDetails.submissionDetails.payeReference               =  Cyfeirnod TWE
 history.printSubmissionDetails.paymentDetails.heading                        =  Manylion talu
@@ -456,10 +456,10 @@ history.printSubmissionDetails.monthlyReturnHistory.link                     =  
 
 history.returnHistory.allYears.title                                         =  Hanes eich datganiadau ar gyfer pob blwyddyn dreth
 history.returnHistory.allYears.heading                                       =  Hanes eich datganiadau ar gyfer pob blwyddyn dreth
-history.returnHistory.singleYear.title                                       =  xxxxxxxxxxxxxxxxxxxx
-history.returnHistory.singleYear.heading                                     =  xxxxxxxxxxxxxxxxxxxx
-history.returnHistory.caption                                                =  xxxxxxxxxxxxxxxxxxxx
-history.returnHistory.noSubmittedReturns                                     =  xxxxxxxxxxxxxxxxxxxx
+history.returnHistory.singleYear.title                                       =  Hanes datganiadau misol ar gyfer blwyddyn dreth {0} i {1}
+history.returnHistory.singleYear.heading                                     =  Hanes datganiadau misol ar gyfer blwyddyn dreth {0} i {1}
+history.returnHistory.caption                                                =  Datganiadau a gyflwynwyd
+history.returnHistory.noSubmittedReturns                                     =  Nid ydych wedi cyflwyno unrhyw ddatganiad misol.
 history.returnHistory.taxYear.caption                                        =  Blwyddyn dreth {0} i {1}
 history.returnHistory.table.returnPeriodEnd                                  =  Cyfnod dod i ben y datganiad
 history.returnHistory.table.returnType                                       =  Math
@@ -475,10 +475,10 @@ history.returnHistory.status.amend                                           =  
 history.returnHistory.status.notAvailable                                    =  Ddim ar gael
 history.returnHistory.status.inProgress                                      =  Ar y gweill
 history.returnHistory.status.unsuccessful                                    =  Aflwyddiannus
-history.returnHistory.hidden.status.amend                                    =  xxxxxxxxxxxxxxxxxxxx
-history.returnHistory.hidden.status.inProgress                               =  xxxxxxxxxxxxxxxxxxxx
-history.returnHistory.hidden.monthlyReturn                                   =  xxxxxxxxxxxxxxxxxxxx
-history.returnHistory.hidden.submissionReceipt                               =  xxxxxxxxxxxxxxxxxxxx
+history.returnHistory.hidden.status.amend                                    =  diwygio’r datganiad ar gyfer {0}
+history.returnHistory.hidden.status.inProgress                               =  datganiad a gyflwynwyd ar gyfer {0}
+history.returnHistory.hidden.monthlyReturn                                   =  datganiad misol ar gyfer {0}
+history.returnHistory.hidden.submissionReceipt                               =  derbynneb am gyflwyno ar gyfer {0}
 
 # Delete
 delete.deleteMonthlyReturn.title                     =  A ydych yn siŵr eich bod am ddileu’r datganiad misol ar gyfer {0}?
@@ -636,60 +636,6 @@ verify.noVerificationHistory.backTo                          =  xxxxxxxxxxxxxxxx
 verify.noVerificationHistory.manageYourSubcontractors.link   =  xxxxxxxxxxxxxxxxxxxx
 
 # Client Details
-clientdetails.manageClientDetails.title                      =  Manylion y cleient
-clientdetails.manageClientDetails.heading                    =  Manylion ar gyfer {0}
-clientdetails.manageClientDetails.employerRef.key            =  Cyfeirnod cyflogwr
-clientdetails.manageClientDetails.clientRef.key              =  Cyfeirnod y cleient
-clientdetails.manageClientDetails.clientRef.key.hidden       =  cyfeirnod y cleient
-clientdetails.manageClientDetails.clientRef.link             =  Newid
-clientdetails.manageClientDetails.return.link                =  Dychwelyd i ddangosfwrdd y cleient
-
-clientdetails.changeClientReference.title                    =  Beth yw cyfeirnod y cleient?
-clientdetails.changeClientReference.heading                  =  Beth yw cyfeirnod y cleient?
-clientdetails.changeClientReference.error.required           =  Nodwch gyfeirnod eich cleient
-clientdetails.changeClientReference.error.invalidCharacters  =  Rydych wedi nodi cyfeirnod y cleient yn y fformat anghywir
-
-clientdetails.clientRefUpdateConfirmation.title              =  Cyfeirnod y cleient wedi’i ddiweddaru
-clientdetails.clientRefUpdateConfirmation.heading            =  Cyfeirnod y cleient wedi’i ddiweddaru
-clientdetails.clientRefUpdateConfirmation.p1                 =  Mae cyfeirnod eich cleient wedi’i ddiweddaru’n llwyddiannus.
-clientdetails.clientRefUpdateConfirmation.p2                 =  Gallwch fwrw golwg dros y newid hwn
-clientdetails.clientRefUpdateConfirmation.p2.link            =  ar eich rhestr o gleientiaid
-clientdetails.clientRefUpdateConfirmation.p3                 =  Gall gymryd hyd at 5 diwrnod i’r newid hwn ddigwydd.
-clientdetails.clientRefUpdateConfirmation.h2                 =  Yr hyn sy’n digwydd nesaf
-clientdetails.clientRefUpdateConfirmation.survey.link        =  Beth oedd eich barn am y gwasanaeth hwn?
-clientdetails.clientRefUpdateConfirmation.survey.suffix      =  (mae’n cymryd 30 eiliad)
-
-clientdetails.removeClient.title                             =  A ydych yn siŵr eich bod am dynnu’ch cleient?
-clientdetails.removeClient.heading                           =  A ydych yn siŵr eich bod am dynnu {0}?
-clientdetails.removeClient.error.required                    =  Dewiswch ‘Iawn’ i dynnu’r cleient hwn
-
-clientdetails.clientRemoved.title                            =  Cleient wedi’i dynnu
-clientdetails.clientRemoved.heading                          =  Cleient wedi’i dynnu
-clientdetails.clientRemoved.h2                               =  Yr hyn sy’n digwydd nesaf
-clientdetails.clientRemoved.p1                               =  Gall gymryd hyd at hanner awr i’r newid hwn ddigwydd.
-clientdetails.clientRemoved.return.link                      =  Dychwelyd i’ch rhestr o gleientiaid
-clientdetails.clientRemoved.survey.link                      =  Beth oedd eich barn am y gwasanaeth hwn?
-clientdetails.clientRemoved.survey.suffix                    =  (mae’n cymryd 30 eiliad)
-
-submissionConfirmation.title                 =  {0} datganiad wedi''i gyflwyno''n llwyddiannus
-submissionConfirmation.panel.heading         =  {0} datganiad wedi''i gyflwyno''n llwyddiannus
-submissionConfirmation.panel.referenceLabel  =  Cyfeirnod eich derbynneb yw
-submissionConfirmation.details.heading       =  Manylion y cyflwyniad
-submissionConfirmation.submittedOn           =  Cyflwynwyd ar
-submissionConfirmation.contractorName        =  Enw’r contractwr
-submissionConfirmation.payeReference         =  Cyfeirnod TWE
-submissionConfirmation.returnPeriod          =  Cyfnod dod i ben y datganiad
-submissionConfirmation.email                 =  E-bost
-submissionConfirmation.whatYouCanDo.heading  =  Yr hyn y gallwch ei wneud
-submissionConfirmation.noEmail               =  Os ydych am nodi e-bost, bydd angen i chi newid eich manylion yn yr adran ynglŷn â’ch sefydliad/ffỳrm, o dan ‘Eich gwasanaethau CThEF’.
-submissionConfirmation.inset                 =  Gallwch gadw’r dudalen hon neu argraffu copi ar gyfer eich cofnodion.
-submissionConfirmation.print                 =  Argraffu’r dudalen hon
-submissionConfirmation.backToManage          =  Yn ôl i ‘Rheoli’ch Datganiad CIS’
-submissionConfirmation.needHelp.heading      =  Angen help?
-submissionConfirmation.needHelp.p1           =  Os oes gennych unrhyw gwestiynau am eich datganiad, cysylltwch â
-submissionConfirmation.needHelp.link         =  Gwasanaeth Cwsmeriaid Cymraeg CThEF (yn agor tab newydd).
-submissionConfirmation.returnType.monthly    =  Misol
-submissionConfirmation.returnType.nil        =  Dim
 clientdetails.manageClientDetails.title                                  =  Manylion y cleient
 clientdetails.manageClientDetails.heading                                =  Manylion ar gyfer {0}
 clientdetails.manageClientDetails.employerRef.key                        =  Cyfeirnod cyflogwr
@@ -698,25 +644,10 @@ clientdetails.manageClientDetails.clientRef.key.hidden                   =  cyfe
 clientdetails.manageClientDetails.clientRef.link                         =  Newid
 clientdetails.manageClientDetails.return.link                            =  Dychwelyd i ddangosfwrdd y cleient
 
-clientdetails.clientRemoved.title                                        =  Cleient wedi’i dynnu
-clientdetails.clientRemoved.heading                                      =  Cleient wedi’i dynnu
-clientdetails.clientRemoved.h2                                           =  Yr hyn sy’n digwydd nesaf
-clientdetails.clientRemoved.p1                                           =  Gall gymryd hyd at hanner awr i’r newid hwn ddigwydd.
-clientdetails.clientRemoved.return.link                                  =  Dychwelyd i’ch rhestr o gleientiaid
-clientdetails.clientRemoved.survey.link                                  =  Beth oedd eich barn am y gwasanaeth hwn?
-clientdetails.clientRemoved.survey.suffix                                =  (mae’n cymryd 30 eiliad)
-
-clientdetails.removeClient.title                                         =  A ydych yn siŵr eich bod am dynnu’ch cleient?
-clientdetails.removeClient.heading                                       =  A ydych yn siŵr eich bod am dynnu {0}?
-clientdetails.removeClient.error.required                                =  Dewiswch ‘Iawn’ i dynnu’r cleient hwn
-
 clientdetails.changeClientReference.title                                =  Beth yw cyfeirnod y cleient?
 clientdetails.changeClientReference.heading                              =  Beth yw cyfeirnod y cleient?
-clientdetails.changeClientReference.hint                                 =  xxxxxxxxxxxxxxxxxxxx
-clientdetails.changeClientReference.checkYourAnswersLabel                =  xxxxxxxxxxxxxxxxxxxx
 clientdetails.changeClientReference.error.required                       =  Nodwch gyfeirnod eich cleient
 clientdetails.changeClientReference.error.invalidCharacters              =  Rydych wedi nodi cyfeirnod y cleient yn y fformat anghywir
-clientdetails.changeClientReference.change.hidden                        =  xxxxxxxxxxxxxxxxxxxx
 
 clientdetails.clientRefUpdateConfirmation.title                          =  Cyfeirnod y cleient wedi’i ddiweddaru
 clientdetails.clientRefUpdateConfirmation.heading                        =  Cyfeirnod y cleient wedi’i ddiweddaru
@@ -727,6 +658,22 @@ clientdetails.clientRefUpdateConfirmation.p3                             =  Gall
 clientdetails.clientRefUpdateConfirmation.h2                             =  Yr hyn sy’n digwydd nesaf
 clientdetails.clientRefUpdateConfirmation.survey.link                    =  Beth oedd eich barn am y gwasanaeth hwn?
 clientdetails.clientRefUpdateConfirmation.survey.suffix                  =  (mae’n cymryd 30 eiliad)
+
+clientdetails.removeClient.title                                         =  A ydych yn siŵr eich bod am dynnu’ch cleient?
+clientdetails.removeClient.heading                                       =  A ydych yn siŵr eich bod am dynnu {0}?
+clientdetails.removeClient.error.required                                =  Dewiswch ‘Iawn’ i dynnu’r cleient hwn
+
+clientdetails.clientRemoved.title                                        =  Cleient wedi’i dynnu
+clientdetails.clientRemoved.heading                                      =  Cleient wedi’i dynnu
+clientdetails.clientRemoved.h2                                           =  Yr hyn sy’n digwydd nesaf
+clientdetails.clientRemoved.p1                                           =  Gall gymryd hyd at hanner awr i’r newid hwn ddigwydd.
+clientdetails.clientRemoved.return.link                                  =  Dychwelyd i’ch rhestr o gleientiaid
+clientdetails.clientRemoved.survey.link                                  =  Beth oedd eich barn am y gwasanaeth hwn?
+clientdetails.clientRemoved.survey.suffix                                =  (mae’n cymryd 30 eiliad)
+
+clientdetails.changeClientReference.hint                                 =  Nodwch y cyfeirnod yr ydych yn ei ddefnyddio nawr er mwyn adnabod eich cleient.
+clientdetails.changeClientReference.checkYourAnswersLabel                =  Newid cyfeirnod y cleient
+clientdetails.changeClientReference.change.hidden                        =  xxxxxxxxxxxxxxxxxxxx
 
 subcontractors.subcontractorsList.title                                  =  xxxxxxxxxxxxxxxxxxxx
 subcontractors.subcontractorsList.heading                                =  xxxxxxxxxxxxxxxxxxxx
@@ -739,7 +686,7 @@ subcontractors.subcontractorsList.filter.verificationStatus.notVerified  =  xxxx
 subcontractors.subcontractorsList.filter.taxTreatment.gross              =  xxxxxxxxxxxxxxxxxxxx
 subcontractors.subcontractorsList.filter.taxTreatment.higherRate         =  xxxxxxxxxxxxxxxxxxxx
 subcontractors.subcontractorsList.filter.taxTreatment.standardRate       =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.filter.taxTreatment.unknown            =  xxxxxxxxxxxxxxxxxxxx
+subcontractors.subcontractorsList.filter.taxTreatment.unknown            =  Anhysbys
 subcontractors.subcontractorsList.hint                                   =  xxxxxxxxxxxxxxxxxxxx
 subcontractors.subcontractorsList.showingResults                         =  xxxxxxxxxxxxxxxxxxxx
 subcontractors.subcontractorsList.search.error.length                    =  xxxxxxxxxxxxxxxxxxxx

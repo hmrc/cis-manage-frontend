@@ -28,7 +28,6 @@ GET   /authorisation-check-in-progress                        controllers.Securi
 GET   /authorisation-check-in-progress/client-list/:returnTo  controllers.SecurityCheckController.onClientListCheck(returnTo: String, instanceId: Option[String] ?= None, mode: Option[String] ?= None)
 GET   /authorisation-check-in-progress/:returnTo/poll         controllers.SecurityCheckController.pollClientListCheck(returnTo: String, instanceId: Option[String] ?= None, mode: Option[String] ?= None, retryCount: Int ?= 0)
 
-
 GET   /subcontractors/:instanceId/your-subcontractors         controllers.subcontractors.SubcontractorsListController.onPageLoad(instanceId: String, mode: Mode = NormalMode, page: Int ?= 1)
 POST  /subcontractors/:instanceId/your-subcontractors         controllers.subcontractors.SubcontractorsListController.onSubmit(instanceId: String, mode: Mode = NormalMode, page: Int ?= 1)
 GET   /subcontractors/:instanceId/change-your-subcontractors  controllers.subcontractors.SubcontractorsListController.onPageLoad(instanceId: String, mode: Mode = CheckMode, page: Int ?= 1)
