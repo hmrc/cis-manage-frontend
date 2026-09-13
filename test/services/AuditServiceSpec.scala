@@ -50,7 +50,7 @@ class AuditServiceSpec extends SpecBase with MockitoSugar with FutureAwaits with
 
       result mustBe AuditResult.Success
 
-      auditEvent.auditType mustBe "authoriseServiceGuardFailure"
+      auditEvent.auditType mustBe "AuthoriseServiceGuardFailure"
     }
   }
 }

@@ -18,7 +18,6 @@ package services
 
 import com.google.inject.{Inject, Singleton}
 import models.audit.*
-import play.api.libs.json.{Json, Writes}
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions
@@ -36,11 +35,11 @@ class AuditService @Inject (
 
   def sendEvent[A <: AuditEventModel](
     auditEvent: A
-  )(implicit hc: HeaderCarrier, writes: Writes[A], request: Request[?]): Future[AuditResult] = {
+  )(implicit hc: HeaderCarrier, request: Request[?]): Future[AuditResult] = {
     val extendedDataEvent = ExtendedDataEvent(
       auditSource = auditSource,
       auditType = auditEvent.auditType,
-      detail = Json.toJson(auditEvent),
+      detail = auditEvent.detailJson,
       tags = AuditExtensions.auditHeaderCarrier(hc).toAuditTags()
     )
 
