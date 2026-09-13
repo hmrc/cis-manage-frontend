@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package viewmodels
+package models.requests
 
-case class IncompleteReturnsRowViewModel(
-  returnPeriodEnd: String,
-  returnType: ReturnTypeViewModel,
-  lastUpdate: String,
-  status: StatusViewModel,
-  action: Seq[ActionLinkViewModel],
-  amendment: Option[String]
+import play.api.libs.json.{Json, OFormat}
+
+case class RemoveAgentClientRequest(
+  taxOfficeNumber: String,
+  taxOfficeReference: String
 )
 
-case class ActionLinkViewModel(
-  textKey: String,
-  href: String,
-  hiddenTextKey: Option[String] = None
-)
+object RemoveAgentClientRequest {
+  given format: OFormat[RemoveAgentClientRequest] = Json.format[RemoveAgentClientRequest]
+}

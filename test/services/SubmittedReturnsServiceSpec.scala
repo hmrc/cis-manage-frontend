@@ -216,7 +216,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         )
       )
 
-      row.status shouldBe StatusViewModel.Text("history.returnHistory.status.awaitingConfirmation")
+      row.status shouldBe StatusViewModel.AwaitingConfirmation
     }
 
     "returns notAvailable for SUBMITTED before amendment cutoff" in new Setup {
@@ -321,7 +321,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         )
       )
 
-      row.status shouldBe StatusViewModel.Text("history.returnHistory.status.awaitingConfirmation")
+      row.status shouldBe StatusViewModel.AwaitingConfirmation
     }
 
     "returns amend for superseded return with amendment status SUBMITTED" in new Setup {

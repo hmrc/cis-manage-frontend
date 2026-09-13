@@ -21,7 +21,7 @@ import itutil.ApplicationWithWiremock
 import models.Scheme
 import models.agent.{AgentClientData, ClientListStatus}
 import models.history.{SubmittedSchemeData, SubmittedSubmissionData}
-import models.requests.{DeleteSubcontractorRequest, DeleteUnsubmittedMonthlyReturnRequest, GetSubmittedMonthlyReturnsDataRequest}
+import models.requests.{DeleteSubcontractorRequest, DeleteUnsubmittedMonthlyReturnRequest, GetSubmittedMonthlyReturnsDataRequest, RemoveAgentClientRequest}
 import models.response.{GetSubcontractorForDeleteResponse, GetSubmittedMonthlyReturnsDataResponse}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
@@ -29,6 +29,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpException, UpstreamErrorResponse}
+import viewmodels.{ReturnTypeViewModel, StatusViewModel}
 
 import java.time.Instant
 
@@ -664,8 +665,8 @@ class ConstructionIndustrySchemeConnectorSpec
       result.unsubmittedCisReturns.length mustBe 1
       result.unsubmittedCisReturns.head.taxYear mustBe 2025
       result.unsubmittedCisReturns.head.taxMonth mustBe 1
-      result.unsubmittedCisReturns.head.returnType mustBe "Nil"
-      result.unsubmittedCisReturns.head.status mustBe "PENDING"
+      result.unsubmittedCisReturns.head.returnType mustBe ReturnTypeViewModel.Nil
+      result.unsubmittedCisReturns.head.status mustBe StatusViewModel.Text("PENDING")
       result.unsubmittedCisReturns.head.monthlyReturnId mustBe 12345
       result.unsubmittedCisReturns.head.lastUpdate mustBe None
       result.unsubmittedCisReturns.head.amendment mustBe Some("N")
@@ -805,12 +806,12 @@ class ConstructionIndustrySchemeConnectorSpec
 
       val result = connector.getMonthlyReturnComplete("900063", 2024, 2, "N").futureValue
 
-      result.scheme.head.instanceId                 mustBe "900063"
-      result.monthlyReturn.head.nilReturnIndicator  mustBe Some("Y")
-      result.submission.head.submissionType         mustBe "Nil return"
-      result.submission.head.hmrcMarkGenerated      mustBe Some("ABC")
-      result.monthlyReturnItems                     mustBe empty
-      result.subcontractors                         mustBe empty
+      result.scheme.head.instanceId mustBe "900063"
+      result.monthlyReturn.head.nilReturnIndicator mustBe Some("Y")
+      result.submission.head.submissionType mustBe "Nil return"
+      result.submission.head.hmrcMarkGenerated mustBe Some("ABC")
+      result.monthlyReturnItems mustBe empty
+      result.subcontractors mustBe empty
     }
 
     "propagate an upstream error when BE returns 500" in {
@@ -985,10 +986,10 @@ class ConstructionIndustrySchemeConnectorSpec
       val journeyType = "amend-monthly-return"
 
       val requestBody = Json.obj(
-        "instanceId" -> "1",
-        "taxYear" -> 2026,
-        "taxMonth" -> 4,
-        "returnType" -> "standard",
+        "instanceId"   -> "1",
+        "taxYear"      -> 2026,
+        "taxMonth"     -> 4,
+        "returnType"   -> "standard",
         "acceptedTime" -> "2026-04-20T21:49:19.702Z"
       )
 
@@ -1018,8 +1019,8 @@ class ConstructionIndustrySchemeConnectorSpec
 
       val requestBody = Json.obj(
         "instanceId" -> "1",
-        "taxYear" -> 2026,
-        "taxMonth" -> 4,
+        "taxYear"    -> 2026,
+        "taxMonth"   -> 4,
         "returnType" -> "standard"
       )
 
@@ -1042,7 +1043,7 @@ class ConstructionIndustrySchemeConnectorSpec
 
   "getSubcontractorDeleteStatus" should {
 
-    val cisId = "123"
+    val cisId             = "123"
     val subbieResourceRef = 10L
 
     "return response when BE returns 200 with valid JSON" in {
@@ -1169,7 +1170,7 @@ class ConstructionIndustrySchemeConnectorSpec
 
       connector
         .deleteSubcontractor(request)
-        .futureValue mustBe()
+        .futureValue mustBe ()
     }
 
     "fail with UpstreamErrorResponse when BE returns 400" in {
@@ -1254,6 +1255,36 @@ class ConstructionIndustrySchemeConnectorSpec
       ex mustBe a[UpstreamErrorResponse]
 
       ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe INTERNAL_SERVER_ERROR
+      ex.getMessage must include("boom")
+    }
+  }
+
+  "removeClient" should {
+
+    val request = RemoveAgentClientRequest(taxOfficeNumber = "123", taxOfficeReference = "AB456")
+
+    "return Unit when BE returns 204" in {
+      stubFor(
+        post(urlPathEqualTo(s"/cis/agent/remove-client"))
+          .withHeader("Content-Type", containing("application/json"))
+          .withRequestBody(equalToJson(Json.toJson(request).toString(), true, true))
+          .willReturn(aResponse().withStatus(NO_CONTENT))
+      )
+
+      connector.removeClient(request).futureValue mustBe ((): Unit)
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      stubFor(
+        post(urlPathEqualTo(s"/cis/agent/remove-client"))
+          .withHeader("Content-Type", containing("application/json"))
+          .withRequestBody(equalToJson(Json.toJson(request).toString(), true, true))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = intercept[Exception] {
+        connector.removeClient(request).futureValue
+      }
       ex.getMessage must include("boom")
     }
   }

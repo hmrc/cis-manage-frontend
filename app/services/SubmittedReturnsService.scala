@@ -326,7 +326,7 @@ class SubmittedReturnsService @Inject() (
             }
 
           case "SUBMITTED_NO_RECEIPT" =>
-            StatusViewModel.Text("history.returnHistory.status.awaitingConfirmation")
+            StatusViewModel.AwaitingConfirmation
 
           case _ =>
             StatusViewModel.Text("")
@@ -355,7 +355,7 @@ class SubmittedReturnsService @Inject() (
           hiddenTextKey = "history.returnHistory.hidden.status.inProgress"
         )
       case Some("PENDING") | Some("ACCEPTED") | Some("SUBMITTED_NO_RECEIPT") =>
-        StatusViewModel.Text("history.returnHistory.status.awaitingConfirmation")
+        StatusViewModel.AwaitingConfirmation
       case Some("SUBMITTED")                                                 =>
         StatusViewModel.Link(
           link = LinkViewModel(
