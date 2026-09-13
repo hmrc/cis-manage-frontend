@@ -18,6 +18,7 @@ package controllers.agent
 
 import config.FrontendAppConfig
 import controllers.actions.IdentifierAction
+import models.agent.ClientListStatus
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import services.ConstructionIndustrySchemeService
@@ -48,10 +49,10 @@ class RetrievingClientController @Inject() (
   def start: Action[AnyContent] = identify.async { implicit request =>
     cisService.startClientListRetrieval
       .map {
-        case "succeeded"   => Redirect(controllers.agent.routes.ClientListSearchController.onPageLoad())
-        case "failed"      => Redirect(controllers.agent.routes.FailedToRetrieveClientController.onPageLoad())
-        case "in-progress" => refreshResult(nextRetry = 1)
-        case _             => Redirect(controllers.routes.SystemErrorController.onPageLoad())
+        case ClientListStatus.Succeeded  => Redirect(controllers.agent.routes.ClientListSearchController.onPageLoad())
+        case ClientListStatus.Failed     => Redirect(controllers.agent.routes.FailedToRetrieveClientController.onPageLoad())
+        case ClientListStatus.InProgress => refreshResult(nextRetry = 1)
+        case _                           => Redirect(controllers.routes.SystemErrorController.onPageLoad())
       }
       .recover { case _ =>
         Redirect(controllers.routes.SystemErrorController.onPageLoad())
@@ -68,10 +69,10 @@ class RetrievingClientController @Inject() (
     } else {
       cisService.getClientListStatus
         .map {
-          case "succeeded"   => Redirect(routes.ClientListSearchController.onPageLoad())
-          case "failed"      => Redirect(routes.FailedToRetrieveClientController.onPageLoad())
-          case "in-progress" => refreshResult(nextRetry)
-          case _             => Redirect(controllers.routes.SystemErrorController.onPageLoad())
+          case ClientListStatus.Succeeded  => Redirect(routes.ClientListSearchController.onPageLoad())
+          case ClientListStatus.Failed     => Redirect(routes.FailedToRetrieveClientController.onPageLoad())
+          case ClientListStatus.InProgress => refreshResult(nextRetry)
+          case _                           => Redirect(controllers.routes.SystemErrorController.onPageLoad())
         }
         .recover { case _ =>
           Redirect(controllers.routes.SystemErrorController.onPageLoad())

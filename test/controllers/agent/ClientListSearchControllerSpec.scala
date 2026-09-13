@@ -18,15 +18,20 @@ package controllers.agent
 
 import base.SpecBase
 import controllers.routes
+import controllers.actions.ClientListStatusGuard
 import forms.ClientListSearchFormProvider
 import models.agent.ClientListFormData
 import models.{CisTaxpayerSearchResult, UserAnswers}
+import models.requests.IdentifierRequest
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.ClientListSearchPage
 import play.api.data.Form
+import play.api.i18n.Messages
+import play.api.i18n.Messages.implicitMessagesProviderToMessages
 import play.api.inject.bind
+import play.api.mvc.{ActionFilter, Call, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -35,16 +40,32 @@ import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.agent.{ClientListViewModel, SearchByList}
 import views.html.agent.ClientListSearchView
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
   implicit val hc: HeaderCarrier     = HeaderCarrier()
   val formProvider                   = new ClientListSearchFormProvider()
   val form: Form[ClientListFormData] = formProvider()
+  implicit val messages: Messages    = play.api.i18n.MessagesImpl(
+    play.api.i18n.Lang.defaultLang,
+    app.injector.instanceOf[play.api.i18n.MessagesApi]
+  )
 
   private val onPageLoadRoute  = controllers.agent.routes.ClientListSearchController.onPageLoad().url
   private val clearFilterRoute = controllers.agent.routes.ClientListSearchController.clearFilter().url
   private val downloadRoute    = controllers.agent.routes.ClientListSearchController.downloadClientList().url
+
+  private val clientListStatusGuard = mock[ClientListStatusGuard]
+
+  private val passThroughClientListStatusGuard =
+    new ActionFilter[IdentifierRequest] {
+      override protected def executionContext: ExecutionContext                               = ExecutionContext.global
+      override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] =
+        Future.successful(None)
+    }
+
+  when(clientListStatusGuard.groupB(any[Call]))
+    .thenReturn(passThroughClientListStatusGuard)
 
   private val cisClients: List[CisTaxpayerSearchResult] = List(
     CisTaxpayerSearchResult(
@@ -82,7 +103,8 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
     applicationBuilder(userAnswers = ua, isAgent = true)
       .overrides(
         bind[ManageService].toInstance(manageService),
-        bind[SessionRepository].toInstance(sessionRepo)
+        bind[SessionRepository].toInstance(sessionRepo),
+        bind[ClientListStatusGuard].toInstance(clientListStatusGuard)
       )
       .build()
   }
@@ -206,7 +228,11 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(
+          bind[ClientListStatusGuard].toInstance(clientListStatusGuard)
+        )
+        .build()
 
       running(application) {
         val request = FakeRequest(GET, onPageLoadRoute)
@@ -386,7 +412,7 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
       "journey recovery when no userAnswers" in {
         val app = appWith(ua = None)
         running(app) {
-          val req    = FakeRequest(GET, onPageLoadRoute)
+          val req    = FakeRequest(GET, downloadRoute)
           val result = route(app, req).value
 
           status(result) mustBe SEE_OTHER

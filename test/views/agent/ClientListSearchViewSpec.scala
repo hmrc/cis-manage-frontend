@@ -410,6 +410,10 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
     val view: ClientListSearchView                 = app.injector.instanceOf[ClientListSearchView]
     val formProvider: ClientListSearchFormProvider = app.injector.instanceOf[ClientListSearchFormProvider]
     val form: Form[ClientListFormData]             = formProvider()
+    implicit val messages: Messages                = play.api.i18n.MessagesImpl(
+      play.api.i18n.Lang.defaultLang,
+      app.injector.instanceOf[play.api.i18n.MessagesApi]
+    )
     val searchOptions: Seq[SearchByList]           = SearchByList.searchByOptions
     val clientList: Seq[ClientListViewModel]       = Seq(
       ClientListViewModel("123", "ABC Construction Ltd", "123/AB45678", "AOR-001", Active),
@@ -417,9 +421,5 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
       ClientListViewModel("123", "Capital Construction Group", "345/IJ67890", "AOR-003", Active)
     )
     implicit val request: play.api.mvc.Request[_]  = FakeRequest()
-    implicit val messages: Messages                = play.api.i18n.MessagesImpl(
-      play.api.i18n.Lang.defaultLang,
-      app.injector.instanceOf[play.api.i18n.MessagesApi]
-    )
   }
 }

@@ -18,6 +18,7 @@ package services
 
 import com.google.inject.{Inject, Singleton}
 import connectors.ConstructionIndustrySchemeConnector
+import models.agent.ClientListStatus
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -28,11 +29,19 @@ class ConstructionIndustrySchemeService @Inject() (cisConnector: ConstructionInd
   ExecutionContext
 ) extends Logging {
 
-  def startClientListRetrieval(using HeaderCarrier): Future[String] =
+  def startClientListRetrieval(using HeaderCarrier): Future[ClientListStatus] =
     cisConnector.startClientList
       .map(_.result)
 
-  def getClientListStatus(using HeaderCarrier): Future[String] =
+  def getClientListStatus(using HeaderCarrier): Future[ClientListStatus] =
     cisConnector.getClientListStatus
       .map(_.result)
+
+  def hasClient(
+    taxOfficeNumber: String,
+    taxOfficeReference: String
+  )(using HeaderCarrier): Future[Boolean] =
+    cisConnector
+      .hasClient(taxOfficeNumber, taxOfficeReference)
+      .map(_.hasClient)
 }
