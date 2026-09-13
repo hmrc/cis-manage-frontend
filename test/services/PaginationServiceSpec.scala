@@ -194,5 +194,34 @@ class PaginationServiceSpec extends AnyWordSpec with Matchers {
       result.paginationViewModel.items.nonEmpty mustBe true
       result.paginationViewModel.items.exists(_.current) mustBe true
     }
+
+    "set aria label for the previous pagination link" in {
+      val clients = (1 to 25).map(i => createClient(s"$i", s"Client $i"))
+      val result  = service.paginateClientList(clients, 2, baseUrl, None, None)
+
+      result.paginationViewModel.previous.get.attributes must contain(
+        "aria-label" -> "site.pagination.goToPrevious"
+      )
+    }
+
+    "set aria label for the next pagination link" in {
+      val clients = (1 to 25).map(i => createClient(s"$i", s"Client $i"))
+      val result  = service.paginateClientList(clients, 2, baseUrl, None, None)
+
+      result.paginationViewModel.next.get.attributes must contain(
+        "aria-label" -> "site.pagination.goToNext"
+      )
+    }
+
+    "set visually hidden text for pagination page items" in {
+      val clients = (1 to 25).map(i => createClient(s"$i", s"Client $i"))
+      val result  = service.paginateClientList(clients, 2, baseUrl, None, None)
+
+      result.paginationViewModel.items
+        .filterNot(_.ellipsis)
+        .foreach { item =>
+          item.visuallyHiddenText mustBe Some("site.pagination.goToPage")
+        }
+    }
   }
 }

@@ -48,8 +48,14 @@ class PageNavigatorSubcontractorsListSpec extends SpecBase with Matchers {
             PaginationItemViewModel("2", "/page/2").withCurrent(true),
             PaginationItemViewModel("3", "/page/3")
           ),
-          previous = Some(PaginationLinkViewModel("/page/1").withText("site.pagination.previous")),
-          next = Some(PaginationLinkViewModel("/page/3").withText("site.pagination.next"))
+          previous = Some(
+            PaginationLinkViewModel("/page/1")
+              .withText("site.pagination.previous")
+          ),
+          next = Some(
+            PaginationLinkViewModel("/page/3")
+              .withText("site.pagination.next")
+          )
         )
 
       val html = view(pagination)
@@ -60,6 +66,64 @@ class PageNavigatorSubcontractorsListSpec extends SpecBase with Matchers {
 
       doc.select(".govuk-pagination__next a").attr("href") mustBe "/page/3"
       doc.select(".govuk-pagination__next a").attr("rel") mustBe "next"
+    }
+
+    "must render previous link with visually hidden text" in new Setup {
+
+      val pagination =
+        PaginationViewModel(
+          items = Seq(
+            PaginationItemViewModel("1", "/page/1"),
+            PaginationItemViewModel("2", "/page/2").withCurrent(true)
+          ),
+          previous = Some(
+            PaginationLinkViewModel("/page/1")
+              .withText("site.pagination.previous")
+          )
+        )
+
+      val html = view(pagination)
+      val doc  = Jsoup.parse(html.body)
+
+      val previousLink =
+        doc.select(".govuk-pagination__prev a")
+
+      previousLink.size() mustBe 1
+
+      val visuallyHiddenText =
+        previousLink.select(".govuk-visually-hidden")
+
+      visuallyHiddenText.size() mustBe 1
+      visuallyHiddenText.text() mustBe messages("site.pagination.goToPrevious")
+    }
+
+    "must render next link with visually hidden text" in new Setup {
+
+      val pagination =
+        PaginationViewModel(
+          items = Seq(
+            PaginationItemViewModel("1", "/page/1"),
+            PaginationItemViewModel("2", "/page/2").withCurrent(true)
+          ),
+          next = Some(
+            PaginationLinkViewModel("/page/3")
+              .withText("site.pagination.next")
+          )
+        )
+
+      val html = view(pagination)
+      val doc  = Jsoup.parse(html.body)
+
+      val nextLink =
+        doc.select(".govuk-pagination__next a")
+
+      nextLink.size() mustBe 1
+
+      val visuallyHiddenText =
+        nextLink.select(".govuk-visually-hidden")
+
+      visuallyHiddenText.size() mustBe 1
+      visuallyHiddenText.text() mustBe messages("site.pagination.goToNext")
     }
 
     "must render page number links" in new Setup {
@@ -76,7 +140,8 @@ class PageNavigatorSubcontractorsListSpec extends SpecBase with Matchers {
       val html = view(pagination)
       val doc  = Jsoup.parse(html.body)
 
-      val pageLinks = doc.select(".govuk-pagination__list .govuk-pagination__link")
+      val pageLinks =
+        doc.select(".govuk-pagination__list .govuk-pagination__link")
 
       pageLinks.size() mustBe 3
       pageLinks.get(0).text() mustBe "1"
@@ -87,6 +152,29 @@ class PageNavigatorSubcontractorsListSpec extends SpecBase with Matchers {
 
       pageLinks.get(2).text() mustBe "3"
       pageLinks.get(2).attr("href") mustBe "/page/3"
+    }
+
+    "must render the correct aria-label for page links" in new Setup {
+
+      val pagination =
+        PaginationViewModel(
+          items = Seq(
+            PaginationItemViewModel("1", "/page/1"),
+            PaginationItemViewModel("2", "/page/2").withCurrent(true)
+          )
+        )
+
+      val html = view(pagination)
+      val doc  = Jsoup.parse(html.body)
+
+      val pageLinks =
+        doc.select(".govuk-pagination__list .govuk-pagination__link")
+
+      pageLinks.get(0).attr("aria-label") mustBe
+        messages("site.pagination.goToPage", "1")
+
+      pageLinks.get(1).attr("aria-label") mustBe
+        messages("site.pagination.goToPage", "2")
     }
 
     "must render the current page with aria-current page" in new Setup {
@@ -103,11 +191,34 @@ class PageNavigatorSubcontractorsListSpec extends SpecBase with Matchers {
       val html = view(pagination)
       val doc  = Jsoup.parse(html.body)
 
-      val currentItem = doc.select(".govuk-pagination__item--current a")
+      val currentItem =
+        doc.select(".govuk-pagination__item--current a")
 
       currentItem.size() mustBe 1
       currentItem.text() mustBe "2"
       currentItem.attr("aria-current") mustBe "page"
+    }
+
+    "must not render aria-current for non-current pages" in new Setup {
+
+      val pagination =
+        PaginationViewModel(
+          items = Seq(
+            PaginationItemViewModel("1", "/page/1"),
+            PaginationItemViewModel("2", "/page/2").withCurrent(true),
+            PaginationItemViewModel("3", "/page/3")
+          )
+        )
+
+      val html = view(pagination)
+      val doc  = Jsoup.parse(html.body)
+
+      val pageLinks =
+        doc.select(".govuk-pagination__list .govuk-pagination__link")
+
+      pageLinks.get(0).hasAttr("aria-current") mustBe false
+      pageLinks.get(1).attr("aria-current") mustBe "page"
+      pageLinks.get(2).hasAttr("aria-current") mustBe false
     }
 
     "must render ellipsis when pagination item is ellipsis" in new Setup {
@@ -124,29 +235,11 @@ class PageNavigatorSubcontractorsListSpec extends SpecBase with Matchers {
       val html = view(pagination)
       val doc  = Jsoup.parse(html.body)
 
-      val ellipsis = doc.select(".govuk-pagination__item--ellipses")
+      val ellipsis =
+        doc.select(".govuk-pagination__item--ellipses")
 
       ellipsis.size() mustBe 1
       ellipsis.text() mustBe "⋯"
-    }
-
-    "must render the correct aria-label for page links" in new Setup {
-
-      val pagination =
-        PaginationViewModel(
-          items = Seq(
-            PaginationItemViewModel("1", "/page/1"),
-            PaginationItemViewModel("2", "/page/2").withCurrent(true)
-          )
-        )
-
-      val html = view(pagination)
-      val doc  = Jsoup.parse(html.body)
-
-      val pageLinks = doc.select(".govuk-pagination__list .govuk-pagination__link")
-
-      pageLinks.get(0).attr("aria-label") mustBe "Page 1"
-      pageLinks.get(1).attr("aria-label") mustBe "Page 2"
     }
 
     "must render pagination landmark label" in new Setup {
@@ -162,19 +255,54 @@ class PageNavigatorSubcontractorsListSpec extends SpecBase with Matchers {
       val html = view(pagination)
       val doc  = Jsoup.parse(html.body)
 
-      doc.select("nav.govuk-pagination").attr("aria-label") mustBe messages(pagination.landmarkLabel)
+      doc.select("nav.govuk-pagination").attr("aria-label") mustBe
+        messages(pagination.landmarkLabel)
+    }
+
+    "must not render previous link when previous is not provided" in new Setup {
+
+      val pagination =
+        PaginationViewModel(
+          items = Seq(
+            PaginationItemViewModel("1", "/page/1")
+          )
+        )
+
+      val html = view(pagination)
+      val doc  = Jsoup.parse(html.body)
+
+      doc.select(".govuk-pagination__prev").size() mustBe 0
+    }
+
+    "must not render next link when next is not provided" in new Setup {
+
+      val pagination =
+        PaginationViewModel(
+          items = Seq(
+            PaginationItemViewModel("1", "/page/1")
+          )
+        )
+
+      val html = view(pagination)
+      val doc  = Jsoup.parse(html.body)
+
+      doc.select(".govuk-pagination__next").size() mustBe 0
     }
   }
 
   trait Setup {
 
-    val app: Application = applicationBuilder().build()
+    val app: Application =
+      applicationBuilder().build()
 
     implicit val request: FakeRequest[_] =
       FakeRequest()
 
     implicit val messages: Messages =
-      MessagesImpl(Lang.defaultLang, app.injector.instanceOf[MessagesApi])
+      MessagesImpl(
+        Lang.defaultLang,
+        app.injector.instanceOf[MessagesApi]
+      )
 
     val view: PageNavigatorSubcontractorsList =
       app.injector.instanceOf[PageNavigatorSubcontractorsList]

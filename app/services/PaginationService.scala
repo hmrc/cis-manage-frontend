@@ -129,6 +129,7 @@ class PaginationService @Inject() {
       Some(
         PaginationLinkViewModel(buildUrlWithParams(baseUrl, currentPage - 1, sortBy, sortOrder))
           .withText("site.pagination.previous")
+          .withAriaLabel("site.pagination.goToPrevious")
       )
     } else {
       None
@@ -145,10 +146,30 @@ class PaginationService @Inject() {
       Some(
         PaginationLinkViewModel(buildUrlWithParams(baseUrl, currentPage + 1, sortBy, sortOrder))
           .withText("site.pagination.next")
+          .withAriaLabel("site.pagination.goToNext")
       )
     } else {
       None
     }
+
+  private def createPageItem(
+    page: Int,
+    currentPage: Int,
+    baseUrl: String,
+    sortBy: Option[String],
+    sortOrder: Option[String]
+  ): PaginationItemViewModel =
+    PaginationItemViewModel(
+      number = page.toString,
+      href = buildUrlWithParams(
+        baseUrl,
+        page,
+        sortBy,
+        sortOrder
+      )
+    )
+      .withVisuallyHiddenText("site.pagination.goToPage")
+      .withCurrent(page == currentPage)
 
   private def generatePageItems(
     currentPage: Int,
@@ -161,29 +182,41 @@ class PaginationService @Inject() {
     val items     = scala.collection.mutable.ListBuffer[PaginationItemViewModel]()
 
     if (pageRange.head > 1) {
-      items += PaginationItemViewModel("1", buildUrlWithParams(baseUrl, 1, sortBy, sortOrder)).withCurrent(
-        1 == currentPage
+      items += createPageItem(
+        page = 1,
+        currentPage = currentPage,
+        baseUrl = baseUrl,
+        sortBy = sortBy,
+        sortOrder = sortOrder
       )
+
       if (pageRange.head > 2) {
         items += PaginationItemViewModel.ellipsis()
       }
     }
 
     pageRange.foreach { page =>
-      items += PaginationItemViewModel(
-        number = page.toString,
-        href = buildUrlWithParams(baseUrl, page, sortBy, sortOrder)
-      ).withCurrent(page == currentPage)
+      items += createPageItem(
+        page = page,
+        currentPage = currentPage,
+        baseUrl = baseUrl,
+        sortBy = sortBy,
+        sortOrder = sortOrder
+      )
     }
 
     if (pageRange.last < totalPages) {
       if (pageRange.last < totalPages - 1) {
         items += PaginationItemViewModel.ellipsis()
       }
-      items += PaginationItemViewModel(totalPages.toString, buildUrlWithParams(baseUrl, totalPages, sortBy, sortOrder))
-        .withCurrent(
-          totalPages == currentPage
-        )
+
+      items += createPageItem(
+        page = totalPages,
+        currentPage = currentPage,
+        baseUrl = baseUrl,
+        sortBy = sortBy,
+        sortOrder = sortOrder
+      )
     }
 
     items.toSeq
