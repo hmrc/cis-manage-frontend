@@ -68,7 +68,7 @@ class PageNavigatorSubcontractorsListSpec extends SpecBase with Matchers {
       doc.select(".govuk-pagination__next a").attr("rel") mustBe "next"
     }
 
-    "must render previous link with visually hidden text" in new Setup {
+    "must render previous link with visually hidden destination page text" in new Setup {
 
       val pagination =
         PaginationViewModel(
@@ -79,6 +79,7 @@ class PageNavigatorSubcontractorsListSpec extends SpecBase with Matchers {
           previous = Some(
             PaginationLinkViewModel("/page/1")
               .withText("site.pagination.previous")
+              .withLabelText(messages("site.pagination.goToPage", "1"))
           )
         )
 
@@ -94,10 +95,11 @@ class PageNavigatorSubcontractorsListSpec extends SpecBase with Matchers {
         previousLink.select(".govuk-visually-hidden")
 
       visuallyHiddenText.size() mustBe 1
-      visuallyHiddenText.text() mustBe messages("site.pagination.goToPrevious")
+      visuallyHiddenText.text() mustBe
+        messages("site.pagination.goToPage", "1")
     }
 
-    "must render next link with visually hidden text" in new Setup {
+    "must render next link with visually hidden destination page text" in new Setup {
 
       val pagination =
         PaginationViewModel(
@@ -108,6 +110,7 @@ class PageNavigatorSubcontractorsListSpec extends SpecBase with Matchers {
           next = Some(
             PaginationLinkViewModel("/page/3")
               .withText("site.pagination.next")
+              .withLabelText(messages("site.pagination.goToPage", "3"))
           )
         )
 
@@ -123,7 +126,8 @@ class PageNavigatorSubcontractorsListSpec extends SpecBase with Matchers {
         nextLink.select(".govuk-visually-hidden")
 
       visuallyHiddenText.size() mustBe 1
-      visuallyHiddenText.text() mustBe messages("site.pagination.goToNext")
+      visuallyHiddenText.text() mustBe
+        messages("site.pagination.goToPage", "3")
     }
 
     "must render page number links" in new Setup {

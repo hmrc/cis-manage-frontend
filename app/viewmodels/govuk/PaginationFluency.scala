@@ -177,7 +177,7 @@ object PaginationFluency {
         labelText = labelText.map(messages(_)),
         attributes = attributes.map {
           case ("aria-label", value) =>
-            "aria-label" -> messages(value)
+            "aria-label" -> value
           case other                 =>
             other
         }

@@ -28,6 +28,7 @@ import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.ClientListSearchPage
 import play.api.data.Form
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.{ActionFilter, Call, Result}
 import play.api.test.FakeRequest
@@ -42,6 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
   implicit val hc: HeaderCarrier     = HeaderCarrier()
+  implicit val messages: Messages    = messages(app)
   val formProvider                   = new ClientListSearchFormProvider()
   val form: Form[ClientListFormData] = formProvider()
 

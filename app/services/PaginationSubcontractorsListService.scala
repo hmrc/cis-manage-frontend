@@ -16,6 +16,8 @@
 
 package services
 
+import play.api.i18n.Messages
+
 import javax.inject.{Inject, Singleton}
 import viewmodels.govuk.PaginationFluency.*
 import viewmodels.subcontractors.SubcontractorsListConstants
@@ -60,7 +62,7 @@ class PaginationSubcontractorsListService @Inject() () {
     baseUrl: String,
     pageParam: String = "page",
     queryString: String = ""
-  ): PaginatedResult[T] = {
+  )(implicit messages: Messages): PaginatedResult[T] = {
 
     val totalCount =
       allItems.size
@@ -96,7 +98,7 @@ class PaginationSubcontractorsListService @Inject() () {
     baseUrl: String,
     pageParam: String,
     queryString: String
-  ): PaginationViewModel =
+  )(implicit messages: Messages): PaginationViewModel =
     if (totalPages <= 1) {
       PaginationViewModel()
     } else {
@@ -147,12 +149,20 @@ class PaginationSubcontractorsListService @Inject() () {
         .withItems(items)
         .copy(
           previous = if (page > 1) {
-            Some(PaginationLinkViewModel(url(page - 1)).withText("site.pagination.previous"))
+            Some(
+              PaginationLinkViewModel(url(page - 1))
+                .withText("site.pagination.previous")
+                .withLabelText(messages("site.pagination.goToPage", page - 1))
+            )
           } else {
             None
           },
           next = if (page < totalPages) {
-            Some(PaginationLinkViewModel(url(page + 1)).withText("site.pagination.next"))
+            Some(
+              PaginationLinkViewModel(url(page + 1))
+                .withText("site.pagination.next")
+                .withLabelText(messages("site.pagination.goToPage", page + 1))
+            )
           } else {
             None
           }

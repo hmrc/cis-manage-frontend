@@ -13,6 +13,7 @@ site.startAgain                                         =  xxxxxxxxxxxxxxxxxxxx
 site.signIn                                             =  xxxxxxxxxxxxxxxxxxxx
 site.govuk                                              =  GOV.UK
 site.unknown                                            =  xxxxxxxxxxxxxxxxxxxx
+site.pagination.goToPage                                =  xxxxxxxxxxxxxxxxxxxx
 
 site.pagination.landmark                                =  xxxxxxxxxxxxxxxxxxxx
 site.pagination.previous                                =  xxxxxxxxxxxxxxxxxxxx

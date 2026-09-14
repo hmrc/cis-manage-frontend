@@ -104,10 +104,10 @@ class PaginationFluencySpec extends AnyWordSpec with Matchers {
       val link =
         PaginationFluency
           .PaginationLinkViewModel("/test-url?page=2")
-          .withAriaLabel("site.pagination.goToNext")
+          .withAriaLabel("Go to page 2")
 
       link.attributes must contain(
-        "aria-label" -> "site.pagination.goToNext"
+        "aria-label" -> "Go to page 2"
       )
     }
 

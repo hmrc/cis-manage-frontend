@@ -31,6 +31,7 @@ import models.response.{GetSubcontractor, GetSubcontractorListResponse}
 import org.jsoup.Jsoup
 import pages.CisIdPage
 import pages.subcontractors.SubcontractorListPage
+import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.PaginationSubcontractorsListService
@@ -50,8 +51,8 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
   private val mode: Mode = NormalMode
 
   implicit val ec: ExecutionContext = ExecutionContext.global
-
-  private val hasClientGuard = mock[HasClientGuard]
+  implicit val messages: Messages   = messages(app)
+  private val hasClientGuard        = mock[HasClientGuard]
 
   private val passThroughFilter =
     new ActionFilter[DataRequest] {

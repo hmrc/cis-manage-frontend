@@ -16,6 +16,7 @@
 
 package services
 
+import play.api.i18n.Messages
 import viewmodels.agent.ClientListViewModel
 import viewmodels.govuk.PaginationFluency.*
 
@@ -46,7 +47,7 @@ class PaginationService @Inject() {
     baseUrl: String,
     sortBy: Option[String] = None,
     sortOrder: Option[String] = None
-  ): ClientListPaginationResult = {
+  )(implicit messages: Messages): ClientListPaginationResult = {
 
     val totalRecords     = allClients.length
     val totalPages       = calculateTotalPages(totalRecords)
@@ -91,7 +92,7 @@ class PaginationService @Inject() {
     baseUrl: String,
     sortBy: Option[String],
     sortOrder: Option[String]
-  ): PaginationViewModel =
+  )(implicit messages: Messages): PaginationViewModel =
     if (totalPages <= 1) {
       PaginationViewModel()
     } else {
@@ -124,12 +125,12 @@ class PaginationService @Inject() {
     baseUrl: String,
     sortBy: Option[String],
     sortOrder: Option[String]
-  ): Option[PaginationLinkViewModel] =
+  )(implicit messages: Messages): Option[PaginationLinkViewModel] =
     if (currentPage > 1) {
       Some(
         PaginationLinkViewModel(buildUrlWithParams(baseUrl, currentPage - 1, sortBy, sortOrder))
           .withText("site.pagination.previous")
-          .withAriaLabel("site.pagination.goToPrevious")
+          .withAriaLabel(messages("site.pagination.goToPage", currentPage - 1))
       )
     } else {
       None
@@ -141,12 +142,12 @@ class PaginationService @Inject() {
     baseUrl: String,
     sortBy: Option[String],
     sortOrder: Option[String]
-  ): Option[PaginationLinkViewModel] =
+  )(implicit messages: Messages): Option[PaginationLinkViewModel] =
     if (currentPage < totalPages) {
       Some(
         PaginationLinkViewModel(buildUrlWithParams(baseUrl, currentPage + 1, sortBy, sortOrder))
           .withText("site.pagination.next")
-          .withAriaLabel("site.pagination.goToNext")
+          .withAriaLabel(messages("site.pagination.goToPage", currentPage + 1))
       )
     } else {
       None

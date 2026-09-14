@@ -14,8 +14,6 @@ site.signIn                                             =  Sign in
 site.govuk                                              =  GOV.UK
 site.unknown                                            =  Unknown
 site.pagination.goToPage                                =  Go to page {0}
-site.pagination.goToPrevious                            =  Go to previous page
-site.pagination.goToNext                                =  Go to next page
 
 site.pagination.landmark                                =  Pagination
 site.pagination.previous                                =  Previous
