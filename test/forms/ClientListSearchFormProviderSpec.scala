@@ -16,15 +16,21 @@
 
 package forms
 
+import base.SpecBase
 import forms.behaviours.StringFieldBehaviours
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import play.api.data.FormError
+import play.api.i18n.Messages
 import viewmodels.agent.SearchByList
 
-class ClientListSearchFormProviderSpec extends StringFieldBehaviours {
+class ClientListSearchFormProviderSpec extends SpecBase with StringFieldBehaviours {
 
-  val form = new ClientListSearchFormProvider()()
+  val form                        = new ClientListSearchFormProvider()()
+  implicit val messages: Messages = play.api.i18n.MessagesImpl(
+    play.api.i18n.Lang.defaultLang,
+    app.injector.instanceOf[play.api.i18n.MessagesApi]
+  )
 
   ".searchBy" - {
 

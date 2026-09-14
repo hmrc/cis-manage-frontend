@@ -40,7 +40,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class AgentIdentifierAction @Inject() (
   override val authConnector: AuthConnector,
   config: FrontendAppConfig,
-  val parser: BodyParsers.Default
+  val parser: BodyParsers.Default,
+  clientListCheckEnforcer: ClientListCheckEnforcer
 )(implicit val executionContext: ExecutionContext)
     extends IdentifierAction
     with AuthorisedFunctions
@@ -79,9 +80,9 @@ class AgentIdentifierAction @Inject() (
                   .map(name => Seq(name.givenName, name.middleName, name.familyName).flatten.mkString(" "))
                   .filter(_.nonEmpty)
 
-              block(
+              val identifierRequest =
                 IdentifierRequest(request, internalId, None, Some(agentReference), true, agentCodeOpt, itmpFullNameOpt)
-              )
+              clientListCheckEnforcer(identifierRequest)(block)
             }
             .getOrElse(
               Future.successful(

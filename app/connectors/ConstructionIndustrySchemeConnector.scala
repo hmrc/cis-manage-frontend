@@ -17,7 +17,7 @@
 package connectors
 
 import models.*
-import models.agent.AgentClientData
+import models.agent.{AgentClientData, HasClientResponse}
 import models.history.*
 import models.requests.*
 import models.response.*
@@ -56,6 +56,14 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
     http
       .post(url"$cisBaseUrl/agent/client-list/retrieval/status")
       .execute[GetClientListStatusResponse]
+
+  def hasClient(
+    taxOfficeNumber: String,
+    taxOfficeReference: String
+  )(implicit hc: HeaderCarrier): Future[HasClientResponse] =
+    http
+      .get(url"$cisBaseUrl/agent/has-client/$taxOfficeNumber/$taxOfficeReference")
+      .execute[HasClientResponse]
 
   def getAllClients(implicit hc: HeaderCarrier): Future[List[CisTaxpayerSearchResult]] =
     http
@@ -273,4 +281,15 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .get(url"$cisBaseUrl/subcontractors/$cisId")
       .execute[GetSubcontractorListResponse]
 
+  def removeClient(request: RemoveAgentClientRequest)(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/agent/remove-client")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { response =>
+        response.status match {
+          case NO_CONTENT => Future.unit
+          case status     => Future.failed(UpstreamErrorResponse(response.body, status, status))
+        }
+      }
 }

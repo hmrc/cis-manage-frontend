@@ -19,10 +19,11 @@ package controllers.clientdetails
 import controllers.actions.*
 import forms.clientdetails.RemoveClientYesNoFormProvider
 import models.Mode
-import navigation.Navigator
-import pages.AgentClientsPage
+import navigation.{ClientListCheckNavigator, Navigator}
 import pages.clientdetails.RemoveClientYesNoPage
-import play.api.i18n.Lang.logger
+import pages.{AgentClientsPage, ClientListSearchPage}
+import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -40,36 +41,51 @@ class RemoveClientYesNoController @Inject() (
   @Named("AgentIdentifier") identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  hasClientGuard: HasClientGuard,
+  clientListStatusGuard: ClientListStatusGuard,
+  clientListCheckNavigator: ClientListCheckNavigator,
   formProvider: RemoveClientYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
   manageService: ManageService,
   view: RemoveClientYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
-  val form = formProvider()
+  val form: Form[Boolean] = formProvider()
 
   def onPageLoad(uniqueId: String, mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify
+      andThen clientListStatusGuard.groupB(clientListCheckNavigator.removeClient(mode))
+      andThen getData
+      andThen requireData
+      andThen hasClientGuard.forInstanceId(uniqueId)).async { implicit request =>
       request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId)) match {
         case Some(client) =>
           manageService
             .getClientByEmployerReference(client.taxOfficeNumber, client.taxOfficeRef)
-            .flatMap { response =>
+            .map { response =>
               val clientName   = response.schemeName.getOrElse("")
               val preparedForm = request.userAnswers.get(RemoveClientYesNoPage) match {
                 case None        => form
                 case Some(value) => form.fill(value)
               }
-              Future(Ok(view(clientName, preparedForm, mode, uniqueId)))
+
+              Ok(view(clientName, preparedForm, mode, uniqueId))
             }
             .recover { case e =>
-              logger.error(s"[RemoveClientYesNoController][onPageLoad] Failed for uniqueId=$uniqueId", e)
+              logger.error(
+                s"[RemoveClientYesNoController][onPageLoad] Failed for uniqueId=$uniqueId",
+                e
+              )
               Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
             }
-        case _            =>
-          Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+
+        case None =>
+          Future.successful(
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          )
       }
     }
 
@@ -84,20 +100,51 @@ class RemoveClientYesNoController @Inject() (
               form
                 .bindFromRequest()
                 .fold(
-                  formWithErrors => Future.successful(BadRequest(view(clientName, formWithErrors, mode, uniqueId))),
-                  value =>
-                    for {
-                      updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveClientYesNoPage, value))
-                      _              <- sessionRepository.set(updatedAnswers)
-                    } yield Redirect(navigator.nextPage(RemoveClientYesNoPage, mode, updatedAnswers))
+                  formWithErrors =>
+                    Future.successful(
+                      BadRequest(view(clientName, formWithErrors, mode, uniqueId))
+                    ),
+                  value => {
+                    val result =
+                      for {
+                        updatedAnswers            <- Future.fromTry(request.userAnswers.set(RemoveClientYesNoPage, value))
+                        updatedAnswersWithClients <-
+                          if (value) {
+                            for {
+                              _                    <- manageService.removeClient(uniqueId, updatedAnswers)
+                              uaWithClients        <- Future.fromTry(updatedAnswers.remove(ClientListSearchPage))
+                              (_, resolvedAnswers) <- manageService.resolveAndStoreAgentClients(uaWithClients)
+                            } yield resolvedAnswers
+                          } else {
+                            Future.successful(updatedAnswers)
+                          }
+                        _                         <- sessionRepository.set(updatedAnswersWithClients)
+                      } yield Redirect(
+                        navigator.nextPage(RemoveClientYesNoPage, mode, updatedAnswersWithClients)
+                      )
+
+                    result.recover { case ex =>
+                      logger.error(
+                        s"[RemoveClientYesNoController][onSubmit] Failed to process remove client: ${ex.getMessage}",
+                        ex
+                      )
+                      Redirect(controllers.routes.SystemErrorController.onPageLoad())
+                    }
+                  }
                 )
             }
             .recover { case e =>
-              logger.error(s"[RemoveClientYesNoController][onSubmit] Failed for uniqueId=$uniqueId", e)
+              logger.error(
+                s"[RemoveClientYesNoController][onSubmit] Failed for uniqueId=$uniqueId",
+                e
+              )
               Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
             }
-        case _            =>
-          Future(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+
+        case None =>
+          Future.successful(
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          )
       }
     }
 }

@@ -18,6 +18,13 @@ package controllers.subcontractors
 
 import base.SpecBase
 import config.FrontendAppConfig
+import controllers.actions.HasClientGuard
+import models.requests.DataRequest
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
+import play.api.mvc.{ActionFilter, Result}
 import forms.subcontractors.SubcontractorsListFormProvider
 import models.{Mode, NormalMode, UserAnswers}
 import models.response.{GetSubcontractor, GetSubcontractorListResponse}
@@ -32,14 +39,28 @@ import views.html.subcontractors.SubcontractorsListView
 
 import java.time.LocalDateTime
 import scala.jdk.CollectionConverters.*
+import scala.concurrent.{ExecutionContext, Future}
 
-class SubcontractorsListControllerSpec extends SpecBase {
+class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
 
   private val formProvider = new SubcontractorsListFormProvider()
   private val form         = formProvider()
 
   private val instanceId = "test-instance-id"
   private val mode: Mode = NormalMode
+
+  implicit val ec: ExecutionContext = ExecutionContext.global
+
+  private val hasClientGuard = mock[HasClientGuard]
+
+  private val passThroughFilter =
+    new ActionFilter[DataRequest] {
+      override protected def executionContext: ExecutionContext                         = ec
+      override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
+        Future.successful(None)
+    }
+
+  when(hasClientGuard.forInstanceId(any[String])).thenReturn(passThroughFilter)
 
   private val subcontractors = Seq(
     GetSubcontractor(
@@ -279,7 +300,10 @@ class SubcontractorsListControllerSpec extends SpecBase {
     "must return OK and the correct view for a GET with default filters" in {
       val application =
         applicationBuilder(
-          userAnswers = Some(userAnswersWithSubcontractors)
+          userAnswers = Some(userAnswersWithSubcontractors),
+          additionalBindings = Seq(
+            bind[HasClientGuard].toInstance(hasClientGuard)
+          )
         ).build()
 
       running(application) {
@@ -337,7 +361,10 @@ class SubcontractorsListControllerSpec extends SpecBase {
     "must return OK and the correct view for a GET with search and filters applied" in {
       val application =
         applicationBuilder(
-          userAnswers = Some(userAnswersWithSubcontractors)
+          userAnswers = Some(userAnswersWithSubcontractors),
+          additionalBindings = Seq(
+            bind[HasClientGuard].toInstance(hasClientGuard)
+          )
         ).build()
 
       running(application) {
@@ -399,7 +426,10 @@ class SubcontractorsListControllerSpec extends SpecBase {
     "must redirect to the selected page with filters preserved when pagination is submitted" in {
       val application =
         applicationBuilder(
-          userAnswers = Some(userAnswersWithSubcontractors)
+          userAnswers = Some(userAnswersWithSubcontractors),
+          additionalBindings = Seq(
+            bind[HasClientGuard].toInstance(hasClientGuard)
+          )
         ).build()
 
       running(application) {
@@ -438,7 +468,10 @@ class SubcontractorsListControllerSpec extends SpecBase {
     "must redirect to page 1 when gotoPage is not submitted" in {
       val application =
         applicationBuilder(
-          userAnswers = Some(userAnswersWithSubcontractors)
+          userAnswers = Some(userAnswersWithSubcontractors),
+          additionalBindings = Seq(
+            bind[HasClientGuard].toInstance(hasClientGuard)
+          )
         ).build()
 
       running(application) {
@@ -558,7 +591,10 @@ class SubcontractorsListControllerSpec extends SpecBase {
 
       val application =
         applicationBuilder(
-          userAnswers = Some(userAnswersWithSubcontractors)
+          userAnswers = Some(userAnswersWithSubcontractors),
+          additionalBindings = Seq(
+            bind[HasClientGuard].toInstance(hasClientGuard)
+          )
         ).build()
 
       running(application) {
