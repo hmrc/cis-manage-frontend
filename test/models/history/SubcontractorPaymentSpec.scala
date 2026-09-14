@@ -27,6 +27,7 @@ class SubcontractorPaymentSpec extends AnyFreeSpec with Matchers {
     "must write to JSON and read back (round-trip)" in {
       val model = SubcontractorPayment(
         name = "BuildRight Construction",
+        verificationNumber = "V1234567890",
         paymentsMade = "£165",
         costOfMaterials = "£95",
         taxDeducted = "£95"
@@ -35,10 +36,11 @@ class SubcontractorPaymentSpec extends AnyFreeSpec with Matchers {
       val json = Json.toJson(model)
 
       json mustBe Json.obj(
-        "name"            -> "BuildRight Construction",
-        "paymentsMade"    -> "£165",
-        "costOfMaterials" -> "£95",
-        "taxDeducted"     -> "£95"
+        "name"               -> "BuildRight Construction",
+        "verificationNumber" -> "V1234567890",
+        "paymentsMade"       -> "£165",
+        "costOfMaterials"    -> "£95",
+        "taxDeducted"        -> "£95"
       )
 
       json.as[SubcontractorPayment] mustBe model
@@ -46,14 +48,41 @@ class SubcontractorPaymentSpec extends AnyFreeSpec with Matchers {
 
     "must read valid JSON" in {
       val json = Json.obj(
-        "name"            -> "Northern Trades Ltd",
-        "paymentsMade"    -> "£75",
-        "costOfMaterials" -> "£55",
-        "taxDeducted"     -> "£55"
+        "name"               -> "Northern Trades Ltd",
+        "verificationNumber" -> "V0987654321",
+        "paymentsMade"       -> "£75",
+        "costOfMaterials"    -> "£55",
+        "taxDeducted"        -> "£55"
       )
 
       json.validate[SubcontractorPayment] mustBe JsSuccess(
-        SubcontractorPayment("Northern Trades Ltd", "£75", "£55", "£55")
+        SubcontractorPayment(
+          name = "Northern Trades Ltd",
+          verificationNumber = "V0987654321",
+          paymentsMade = "£75",
+          costOfMaterials = "£55",
+          taxDeducted = "£55"
+        )
+      )
+    }
+
+    "must read valid JSON when verification number is empty" in {
+      val json = Json.obj(
+        "name"               -> "TyneWear Ltd",
+        "verificationNumber" -> "",
+        "paymentsMade"       -> "£165",
+        "costOfMaterials"    -> "£125",
+        "taxDeducted"        -> "£55"
+      )
+
+      json.validate[SubcontractorPayment] mustBe JsSuccess(
+        SubcontractorPayment(
+          name = "TyneWear Ltd",
+          verificationNumber = "",
+          paymentsMade = "£165",
+          costOfMaterials = "£125",
+          taxDeducted = "£55"
+        )
       )
     }
 
@@ -67,15 +96,39 @@ class SubcontractorPaymentSpec extends AnyFreeSpec with Matchers {
 
     "must serialise a sequence of subcontractors" in {
       val list = Seq(
-        SubcontractorPayment("A", "£1", "£2", "£3"),
-        SubcontractorPayment("B", "£4", "£5", "£6")
+        SubcontractorPayment(
+          name = "A",
+          verificationNumber = "V1111111111",
+          paymentsMade = "£1",
+          costOfMaterials = "£2",
+          taxDeducted = "£3"
+        ),
+        SubcontractorPayment(
+          name = "B",
+          verificationNumber = "",
+          paymentsMade = "£4",
+          costOfMaterials = "£5",
+          taxDeducted = "£6"
+        )
       )
 
       val json = Json.toJson(list)
 
       json mustBe Json.arr(
-        Json.obj("name" -> "A", "paymentsMade" -> "£1", "costOfMaterials" -> "£2", "taxDeducted" -> "£3"),
-        Json.obj("name" -> "B", "paymentsMade" -> "£4", "costOfMaterials" -> "£5", "taxDeducted" -> "£6")
+        Json.obj(
+          "name"               -> "A",
+          "verificationNumber" -> "V1111111111",
+          "paymentsMade"       -> "£1",
+          "costOfMaterials"    -> "£2",
+          "taxDeducted"        -> "£3"
+        ),
+        Json.obj(
+          "name"               -> "B",
+          "verificationNumber" -> "",
+          "paymentsMade"       -> "£4",
+          "costOfMaterials"    -> "£5",
+          "taxDeducted"        -> "£6"
+        )
       )
 
       json.as[Seq[SubcontractorPayment]] mustBe list

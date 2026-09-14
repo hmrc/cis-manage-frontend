@@ -875,7 +875,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
             unmatchedTaxRateIndicator = None,
             subcontractorId = None,
             subcontractorName = Some("Contractor 01"),
-            verificationNumber = None,
+            verificationNumber = Some("V1234567890"),
             itemResourceReference = None
           ),
           MonthlyReturnItem(
@@ -914,8 +914,8 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       out.totalCostOfMaterials mustBe "£30,000.00"
       out.totalTaxDeducted mustBe "£30,000.00"
       out.subcontractors mustBe Seq(
-        SubcontractorPayment("Contractor 01", "£10,000.00", "£10,000.00", "£10,000.00"),
-        SubcontractorPayment("Contractor 02", "£20,000.00", "£20,000.00", "£20,000.00")
+        SubcontractorPayment("Contractor 01", "V1234567890", "£10,000.00", "£10,000.00", "£10,000.00"),
+        SubcontractorPayment("Contractor 02", "", "£20,000.00", "£20,000.00", "£20,000.00")
       )
 
     }

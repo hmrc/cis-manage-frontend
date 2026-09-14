@@ -45,9 +45,27 @@ class PrintSubmissionDetailsViewSpec extends SpecBase {
       val totalTaxDeducted       = "£380"
 
       val subcontractors = Seq(
-        SubcontractorPayment("BuildRight Construction", "£165", "£95", "£95"),
-        SubcontractorPayment("Northern Trades Ltd", "£75", "£55", "£55"),
-        SubcontractorPayment("TyneWear Ltd", "£165", "£125", "£55")
+        SubcontractorPayment(
+          name = "BuildRight Construction",
+          verificationNumber = "V1234567890",
+          paymentsMade = "£165",
+          costOfMaterials = "£95",
+          taxDeducted = "£95"
+        ),
+        SubcontractorPayment(
+          name = "Northern Trades Ltd",
+          verificationNumber = "V0987654321",
+          paymentsMade = "£75",
+          costOfMaterials = "£55",
+          taxDeducted = "£55"
+        ),
+        SubcontractorPayment(
+          name = "TyneWear Ltd",
+          verificationNumber = "",
+          paymentsMade = "£165",
+          costOfMaterials = "£125",
+          taxDeducted = "£55"
+        )
       )
 
       val model = SubmittedReturnPrintViewModel(
@@ -109,6 +127,9 @@ class PrintSubmissionDetailsViewSpec extends SpecBase {
         messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.subcontractor")
       )
       tableHead must include(
+        messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.verificationNumber")
+      )
+      tableHead must include(
         messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.paymentsMade")
       )
       tableHead must include(
@@ -121,6 +142,7 @@ class PrintSubmissionDetailsViewSpec extends SpecBase {
       subcontractors.zipWithIndex.foreach { case (sub, idx) =>
         val row = tableRows.get(idx).text()
         row must include(sub.name)
+        row must include(sub.verificationNumber)
         row must include(sub.paymentsMade)
         row must include(sub.costOfMaterials)
         row must include(sub.taxDeducted)
@@ -133,6 +155,66 @@ class PrintSubmissionDetailsViewSpec extends SpecBase {
       doc.select("a.govuk-link").text must include(
         messages("history.printSubmissionDetails.monthlyReturnHistory.link")
       )
+    }
+
+    "must render verification number column when verification number is empty" in new Setup {
+      val monthYear              = "April 2026"
+      val submittedTime          = "8:46am"
+      val submittedDate          = "16 March 2025"
+      val receiptReferenceNumber = "ABC123456789"
+      val submissionType         = "standard"
+      val contractorName         = "PAL 355 Scheme"
+      val payeReference          = "123/AB456"
+      val totalPaymentsMade      = "£165"
+      val totalCostOfMaterials   = "£95"
+      val totalTaxDeducted       = "£95"
+
+      val subcontractors = Seq(
+        SubcontractorPayment(
+          name = "BuildRight Construction",
+          verificationNumber = "",
+          paymentsMade = "£165",
+          costOfMaterials = "£95",
+          taxDeducted = "£95"
+        )
+      )
+
+      val model = SubmittedReturnPrintViewModel(
+        monthYear = monthYear,
+        submittedTime = submittedTime,
+        submittedDate = submittedDate,
+        receiptReferenceNumber = receiptReferenceNumber,
+        submissionType = submissionType,
+        contractorName = contractorName,
+        payeReference = payeReference,
+        totalPaymentsMade = totalPaymentsMade,
+        totalCostOfMaterials = totalCostOfMaterials,
+        totalTaxDeducted = totalTaxDeducted,
+        subcontractors = subcontractors
+      )
+
+      lazy val html: HtmlFormat.Appendable = view(model, historyUrl)
+
+      val doc: Document = Jsoup.parse(html.toString)
+
+      val tableHeaders: Elements = doc.select("table thead th")
+      tableHeaders.size mustBe 5
+
+      tableHeaders.text must include(
+        messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.verificationNumber")
+      )
+
+      val tableRows: Elements = doc.select("table tbody tr")
+      tableRows.size mustBe 1
+
+      val tableCells: Elements = tableRows.first().select("th, td")
+      tableCells.size mustBe 5
+
+      tableCells.get(0).text mustBe "BuildRight Construction"
+      tableCells.get(1).text mustBe ""
+      tableCells.get(2).text mustBe "£165"
+      tableCells.get(3).text mustBe "£95"
+      tableCells.get(4).text mustBe "£95"
     }
 
     "must render all details correctly when type is nil monthly return but receiptReferenceNumber is empty" in new Setup {
