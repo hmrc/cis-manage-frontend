@@ -32,7 +32,7 @@ object ViewUtils {
 
   def withPagination(title: String, currentPage: Int, totalPages: Int)(implicit messages: Messages): String =
     if (totalPages > 1) {
-      s"$title ${messages("site.pagination.pageTitle", currentPage, totalPages)}"
+      s"$title ${messages("site.pagination.pageTitle", currentPage.toString, totalPages.toString)}"
     } else {
       title
     }
