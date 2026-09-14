@@ -18,6 +18,7 @@
 @import config.FrontendAppConfig
 
 @this(
+    appConfig: FrontendAppConfig,
     layout: templates.LayoutWithSidebar,
     sidebarLinks: templates.SidebarLinks,
     govukInsetText: GovukInsetText,
@@ -33,7 +34,7 @@
     bulletList: BulletList
 )
 
-@()(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
+@()(implicit request: Request[_], messages: Messages)
 
 @detailsHtmlContent = {
     @h3(messages("introduction.details.h3"))

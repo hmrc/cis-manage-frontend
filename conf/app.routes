@@ -53,8 +53,6 @@ GET  /unauthorised/individual          controllers.UnauthorisedIndividualAffinit
 
 GET  /unauthorised/agent               controllers.UnauthorisedAgentAffinityController.onPageLoad()
 
-GET  /access-denied                    controllers.AccessDeniedController.onPageLoad()
-
 GET  /system-error/there-is-a-problem  controllers.SystemErrorController.onPageLoad()
 
 # Agent

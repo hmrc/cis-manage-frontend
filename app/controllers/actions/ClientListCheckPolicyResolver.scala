@@ -76,7 +76,6 @@ class ClientListCheckPolicyResolver @Inject() extends Logging {
       "controllers.SecurityCheckController",
       "controllers.SystemErrorController",
       "controllers.JourneyRecoveryController",
-      "controllers.AccessDeniedController",
       "controllers.UnauthorisedAgentAffinityController",
       "controllers.UnauthorisedController",
       "controllers.UnauthorisedIndividualAffinityController",

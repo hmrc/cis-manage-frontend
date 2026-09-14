@@ -30,12 +30,11 @@ class SubcontractorsLandingPageControllerSpec extends UnitSpec {
   private val stubContent = "Subcontractors Landing Page"
   when(stubView.apply()(any, any)) thenReturn Html(stubContent)
 
-  private val controllerUnderTest = new SubcontractorsLandingPageController(mockControllerComponents, stubView)
+  private val controllerUnderTest = new SubcontractorsLandingPageController(mockCisControllerComponents, stubView)
 
   "SubcontractorsLandingPageController" - {
 
     "must return OK and the correct view for a GET" in {
-      mockControllerComponents.setUserAnswers(Some(emptyUserAnswers))
       val result = controllerUnderTest.onPageLoad(cisId)(FakeRequest())
 
       status(result) mustBe OK

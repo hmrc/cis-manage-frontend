@@ -74,7 +74,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends UnitSpec with Befor
   when(mockVerificationHistoryService.toVerificationHistoryData(any)) thenReturn verificationHistoryData
 
   private val controllerUnderTest = new VerificationHistorySelectTaxYearController(
-    mockControllerComponents,
+    mockCisControllerComponents,
     formProvider,
     mockVerificationService,
     mockVerificationHistoryService,
@@ -84,7 +84,6 @@ class VerificationHistorySelectTaxYearControllerSpec extends UnitSpec with Befor
   "VerificationHistorySelectTaxYear Controller" - {
 
     "must redirect to verification history page when history has 0 tax years" in {
-      mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
       mockVerificationTaxYears(Seq.empty)
 
       val result = controllerUnderTest.onPageLoad()(FakeRequest())
@@ -98,7 +97,6 @@ class VerificationHistorySelectTaxYearControllerSpec extends UnitSpec with Befor
     }
 
     "must redirect to verification history page when history has 1 tax year" in {
-      mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
       mockVerificationTaxYears(Seq(TaxYearPeriod(1999)))
 
       val result = controllerUnderTest.onPageLoad()(FakeRequest())
@@ -113,7 +111,6 @@ class VerificationHistorySelectTaxYearControllerSpec extends UnitSpec with Befor
     "must show select tax year page when history has 2 tax years" in {
       val givenTaxYears = Seq(TaxYearPeriod(1999), TaxYearPeriod(2000))
 
-      mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
       mockVerificationTaxYears(givenTaxYears)
 
       val result = controllerUnderTest.onPageLoad()(FakeRequest())
@@ -125,19 +122,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends UnitSpec with Befor
       verify(mockVerificationService).getSubmittedVerifications(eqTo(cisId))(any)
     }
 
-    "must redirect to Journey Recovery when no user answers exist and form submitted" in {
-      mockControllerComponents.setUserAnswers(None)
-
-      val request = FakeRequest().withFormUrlEncodedBody("value" -> "all")
-      val result  = controllerUnderTest.onSubmit()(request)
-
-      status(result) mustEqual SEE_OTHER
-      redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-    }
-
     "must treat 'all' as AllTaxYears and redirect to all tax years verification history" in {
-      mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
-
       val request = FakeRequest().withFormUrlEncodedBody("value" -> "all")
       val result  = controllerUnderTest.onSubmit()(request)
 
@@ -146,7 +131,6 @@ class VerificationHistorySelectTaxYearControllerSpec extends UnitSpec with Befor
     }
 
     "must redirect to single year verification history when a tax year is submitted" in {
-      mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
       mockVerificationTaxYears(Seq(TaxYearPeriod(2026)))
 
       val request = FakeRequest().withFormUrlEncodedBody("value" -> "2026")
@@ -157,7 +141,6 @@ class VerificationHistorySelectTaxYearControllerSpec extends UnitSpec with Befor
     }
 
     "must return BAD_REQUEST when invalid data is submitted" in {
-      mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
       mockVerificationTaxYears(2024 to 2026 map TaxYearPeriod.apply)
 
       val request = FakeRequest().withFormUrlEncodedBody("value" -> "invalid")
@@ -167,8 +150,9 @@ class VerificationHistorySelectTaxYearControllerSpec extends UnitSpec with Befor
       contentAsString(result) mustEqual givenViewContent
     }
 
-    "must redirect to Journey Recovery for a GET when no existing data is found" in {
-      mockControllerComponents.setUserAnswers(None)
+    "must redirect to Journey Recovery for a GET when service fails" in {
+      when(mockVerificationService.getSubmittedVerifications(any)(any)) thenReturn
+        Future.failed(new RuntimeException("Oh bother"))
 
       val result = controllerUnderTest.onPageLoad()(FakeRequest())
 
@@ -176,8 +160,9 @@ class VerificationHistorySelectTaxYearControllerSpec extends UnitSpec with Befor
       redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
     }
 
-    "redirect to Journey Recovery for a POST if no existing data is found" in {
-      mockControllerComponents.setUserAnswers(None)
+    "redirect to Journey Recovery for a POST when service fails" in {
+      when(mockVerificationService.getSubmittedVerifications(any)(any)) thenReturn
+        Future.failed(new RuntimeException("Whoopsy daisy"))
 
       val request = FakeRequest().withFormUrlEncodedBody("value" -> "all")
       val result  = controllerUnderTest.onPageLoad()(request)

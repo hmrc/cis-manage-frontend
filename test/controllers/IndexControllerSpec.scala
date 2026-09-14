@@ -16,25 +16,20 @@
 
 package controllers
 
-import base.SpecBase
+import base.UnitSpec
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
-class IndexControllerSpec extends SpecBase {
+class IndexControllerSpec extends UnitSpec {
+  private val controllerUnderTest = new IndexController(stubMessagesControllerComponents())
 
   "Index Controller" - {
 
     "must redirect to the introduction page for a GET" in {
+      val result = controllerUnderTest.onPageLoad()(FakeRequest())
 
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
-        val result  = route(application, request).value
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.IntroductionController.onPageLoad().url
-      }
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.IntroductionController.onPageLoad().url
     }
   }
-
 }

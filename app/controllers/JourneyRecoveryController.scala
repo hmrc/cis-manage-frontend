@@ -17,29 +17,24 @@
 package controllers
 
 import config.FrontendAppConfig
-import controllers.actions.IdentifierAction
 import pages.CisIdPage
 import play.api.Logging
-import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent}
 import repositories.SessionRepository
-import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl.*
 import uk.gov.hmrc.play.bootstrap.binders.*
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl.*
 import views.html.{JourneyRecoveryContinueView, JourneyRecoveryStartAgainView}
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class JourneyRecoveryController @Inject() (
-  val controllerComponents: MessagesControllerComponents,
-  identify: IdentifierAction,
+  val controllerComponents: CisControllerComponents,
   sessionRepository: SessionRepository,
   continueView: JourneyRecoveryContinueView,
   startAgainView: JourneyRecoveryStartAgainView
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport
+    extends CisController
     with Logging {
 
   def onPageLoad(continueUrl: Option[RedirectUrl] = None): Action[AnyContent] = identify.async { implicit request =>
@@ -47,7 +42,6 @@ class JourneyRecoveryController @Inject() (
       .get(request.userId)
       .recover { case _ => None }
       .map { maybeAnswers =>
-
         val cisAccountUrl =
           if (!request.isAgent) {
             appConfig.constructionIndustryOrgAccountUrl

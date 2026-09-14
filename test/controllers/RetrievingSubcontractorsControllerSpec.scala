@@ -16,41 +16,31 @@
 
 package controllers
 
-import base.SpecBase
-import controllers.actions.HasClientGuard
+import base.UnitSpec
 import models.Scheme
-import models.requests.DataRequest
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
-import play.api.inject.bind
-import play.api.mvc.{ActionFilter, Result}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.PrepopService
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.RetrievingSubcontractorsView
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class RetrievingSubcontractorsControllerSpec extends SpecBase {
+class RetrievingSubcontractorsControllerSpec extends UnitSpec {
+  private val stubView    = mock[RetrievingSubcontractorsView]
+  private val stubContent = "RetrievingSubcontractors"
+  when(stubView.apply()(any, any)) thenReturn play.twirl.api.Html(stubContent)
 
-  val mockPrepopService: PrepopService   = mock[PrepopService]
-  val mockHasClientGuard: HasClientGuard = mock[HasClientGuard]
+  private val mockPrepopService = mock[PrepopService]
 
-  val passThroughHasClientGuard: ActionFilter[DataRequest] = new ActionFilter[DataRequest] {
-    override protected def executionContext: ExecutionContext                         = ExecutionContext.global
-    override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
-      Future.successful(None)
-  }
-
-  when(mockHasClientGuard.forInstanceId(any[String])).thenReturn(passThroughHasClientGuard)
-
-  private def applicationBuilderWithClientGuard =
-    applicationBuilder(
-      userAnswers = Some(emptyUserAnswers),
-      additionalBindings = Seq(bind[HasClientGuard].toInstance(mockHasClientGuard))
-    )
+  private val controllerUnderTest = new RetrievingSubcontractorsController(
+    mockCisControllerComponents,
+    stubView,
+    mockPrepopService
+  )
 
   val taxOfficeNumber: String    = "101"
   val taxOfficeReference: String = "AB0001"
@@ -60,283 +50,155 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
   "RetrievingSubcontractors Controller" - {
 
     "must return OK and the correct view for a GET" in {
+      val result =
+        controllerUnderTest.onPageLoad(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)(FakeRequest())
 
-      val application = applicationBuilderWithClientGuard.build()
-
-      running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.RetrievingSubcontractorsController
-            .onPageLoad(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
-            .url
-        )
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[RetrievingSubcontractorsView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(
-          request,
-          messages(application)
-        ).toString
-      }
+      status(result) mustEqual OK
+      contentAsString(result) mustEqual stubContent
     }
 
     "start must redirect to SuccessfulAutomaticSubcontractorUpdateController when scheme has prePopSuccessful 'Y' and subcontractors" in {
-
-      val application = applicationBuilderWithClientGuard
-        .overrides(
-          bind[PrepopService].toInstance(mockPrepopService)
+      when(
+        mockPrepopService.prepopulate(eqTo(taxOfficeNumber), eqTo(taxOfficeReference), eqTo(instanceId))(
+          any[HeaderCarrier]
         )
-        .build()
+      ) thenReturn Future.successful(true)
 
-      running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.RetrievingSubcontractorsController
-            .start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
-            .url
-        )
-
-        when(
-          mockPrepopService.prepopulate(eqTo(taxOfficeNumber), eqTo(taxOfficeReference), eqTo(instanceId))(
-            any[HeaderCarrier]
+      when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])) thenReturn Future.successful(
+        Some(
+          Scheme(
+            schemeId = 1,
+            instanceId = instanceId,
+            utr = Some("ABC123"),
+            name = Some("John"),
+            prePopSuccessful = Some("Y"),
+            subcontractorCounter = Some(5)
           )
         )
-          .thenReturn(Future.successful(true))
+      )
 
-        when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
-          Future.successful(
-            Some(
-              Scheme(
-                schemeId = 1,
-                instanceId = instanceId,
-                utr = Some("ABC123"),
-                name = Some("John"),
-                prePopSuccessful = Some("Y"),
-                subcontractorCounter = Some(5)
-              )
-            )
-          )
-        )
+      val result = controllerUnderTest.start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)(FakeRequest())
 
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.SuccessfulAutomaticSubcontractorUpdateController
-          .onPageLoad(instanceId, targetKey)
-          .url
-      }
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.SuccessfulAutomaticSubcontractorUpdateController
+        .onPageLoad(instanceId, targetKey)
+        .url
     }
 
     "start must redirect to SuccessfulNoRecordsFoundController when scheme has prePopSuccessful 'Y' and no subcontractors" in {
-
-      val application = applicationBuilderWithClientGuard
-        .overrides(
-          bind[PrepopService].toInstance(mockPrepopService)
+      when(
+        mockPrepopService.prepopulate(eqTo(taxOfficeNumber), eqTo(taxOfficeReference), eqTo(instanceId))(
+          any[HeaderCarrier]
         )
-        .build()
+      ) thenReturn Future.successful(true)
 
-      running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.RetrievingSubcontractorsController
-            .start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
-            .url
-        )
-
-        when(
-          mockPrepopService.prepopulate(eqTo(taxOfficeNumber), eqTo(taxOfficeReference), eqTo(instanceId))(
-            any[HeaderCarrier]
+      when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])) thenReturn Future.successful(
+        Some(
+          Scheme(
+            schemeId = 1,
+            instanceId = instanceId,
+            utr = Some("ABC123"),
+            name = Some("John"),
+            prePopSuccessful = Some("Y"),
+            subcontractorCounter = Some(0)
           )
         )
-          .thenReturn(Future.successful(true))
+      )
 
-        when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
-          Future.successful(
-            Some(
-              Scheme(
-                schemeId = 1,
-                instanceId = instanceId,
-                utr = Some("ABC123"),
-                name = Some("John"),
-                prePopSuccessful = Some("Y"),
-                subcontractorCounter = Some(0)
-              )
-            )
-          )
-        )
+      val result = controllerUnderTest.start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)(FakeRequest())
 
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.SuccessfulNoRecordsFoundController
-          .onPageLoad(instanceId, targetKey)
-          .url
-      }
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.SuccessfulNoRecordsFoundController
+        .onPageLoad(instanceId, targetKey)
+        .url
     }
 
     "start must redirect to UnsuccessfulAutomaticSubcontractorUpdateController when scheme has prePopSuccessful 'N'" in {
-
-      val application = applicationBuilderWithClientGuard
-        .overrides(
-          bind[PrepopService].toInstance(mockPrepopService)
+      when(
+        mockPrepopService.prepopulate(eqTo(taxOfficeNumber), eqTo(taxOfficeReference), eqTo(instanceId))(
+          any[HeaderCarrier]
         )
-        .build()
+      ) thenReturn Future.successful(true)
 
-      running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.RetrievingSubcontractorsController
-            .start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
-            .url
-        )
-
-        when(
-          mockPrepopService.prepopulate(eqTo(taxOfficeNumber), eqTo(taxOfficeReference), eqTo(instanceId))(
-            any[HeaderCarrier]
+      when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])) thenReturn Future.successful(
+        Some(
+          Scheme(
+            schemeId = 1,
+            instanceId = instanceId,
+            utr = Some("ABC123"),
+            name = Some("John"),
+            prePopSuccessful = Some("N"),
+            subcontractorCounter = Some(1)
           )
         )
-          .thenReturn(Future.successful(true))
+      )
 
-        when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
-          Future.successful(
-            Some(
-              Scheme(
-                schemeId = 1,
-                instanceId = instanceId,
-                utr = Some("ABC123"),
-                name = Some("John"),
-                prePopSuccessful = Some("N"),
-                subcontractorCounter = Some(1)
-              )
-            )
-          )
-        )
+      val result = controllerUnderTest.start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)(FakeRequest())
 
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.UnsuccessfulAutomaticSubcontractorUpdateController
-          .onPageLoad(instanceId)
-          .url
-      }
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.UnsuccessfulAutomaticSubcontractorUpdateController
+        .onPageLoad(instanceId)
+        .url
     }
 
     "start must redirect to UnsuccessfulAutomaticSubcontractorUpdateController when scheme has no prePopSuccessful value" in {
-
-      val application = applicationBuilderWithClientGuard
-        .overrides(
-          bind[PrepopService].toInstance(mockPrepopService)
+      when(
+        mockPrepopService.prepopulate(eqTo(taxOfficeNumber), eqTo(taxOfficeReference), eqTo(instanceId))(
+          any[HeaderCarrier]
         )
-        .build()
+      ) thenReturn Future.successful(true)
 
-      running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.RetrievingSubcontractorsController
-            .start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
-            .url
-        )
-
-        when(
-          mockPrepopService.prepopulate(eqTo(taxOfficeNumber), eqTo(taxOfficeReference), eqTo(instanceId))(
-            any[HeaderCarrier]
+      when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])) thenReturn Future.successful(
+        Some(
+          Scheme(
+            schemeId = 1,
+            instanceId = instanceId,
+            utr = Some("ABC123"),
+            name = Some("John"),
+            prePopSuccessful = None,
+            subcontractorCounter = Some(1)
           )
         )
-          .thenReturn(Future.successful(true))
+      )
 
-        when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
-          Future.successful(
-            Some(
-              Scheme(
-                schemeId = 1,
-                instanceId = instanceId,
-                utr = Some("ABC123"),
-                name = Some("John"),
-                prePopSuccessful = None,
-                subcontractorCounter = Some(1)
-              )
-            )
-          )
-        )
+      val result = controllerUnderTest.start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)(FakeRequest())
 
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.UnsuccessfulAutomaticSubcontractorUpdateController
-          .onPageLoad(instanceId)
-          .url
-      }
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.UnsuccessfulAutomaticSubcontractorUpdateController
+        .onPageLoad(instanceId)
+        .url
     }
 
     "start must redirect to UnsuccessfulAutomaticSubcontractorUpdateController when there is no scheme" in {
-
-      val application = applicationBuilderWithClientGuard
-        .overrides(
-          bind[PrepopService].toInstance(mockPrepopService)
+      when(
+        mockPrepopService.prepopulate(eqTo(taxOfficeNumber), eqTo(taxOfficeReference), eqTo(instanceId))(
+          any[HeaderCarrier]
         )
-        .build()
+      ) thenReturn Future.successful(true)
 
-      running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.RetrievingSubcontractorsController
-            .start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
-            .url
-        )
+      when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])) thenReturn Future.successful(None)
 
-        when(
-          mockPrepopService.prepopulate(eqTo(taxOfficeNumber), eqTo(taxOfficeReference), eqTo(instanceId))(
-            any[HeaderCarrier]
-          )
-        )
-          .thenReturn(Future.successful(true))
+      val result = controllerUnderTest.start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)(FakeRequest())
 
-        when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
-          Future.successful(None)
-        )
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.UnsuccessfulAutomaticSubcontractorUpdateController
-          .onPageLoad(instanceId)
-          .url
-      }
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.UnsuccessfulAutomaticSubcontractorUpdateController
+        .onPageLoad(instanceId)
+        .url
     }
 
     "start must redirect to UnsuccessfulAutomaticSubcontractorUpdateController when prepopulate fails" in {
-
-      val application = applicationBuilderWithClientGuard
-        .overrides(
-          bind[PrepopService].toInstance(mockPrepopService)
+      when(
+        mockPrepopService.prepopulate(eqTo(taxOfficeNumber), eqTo(taxOfficeReference), eqTo(instanceId))(
+          any[HeaderCarrier]
         )
-        .build()
+      ) thenReturn Future.successful(false)
 
-      running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.RetrievingSubcontractorsController
-            .start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
-            .url
-        )
+      val result = controllerUnderTest.start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)(FakeRequest())
 
-        when(
-          mockPrepopService.prepopulate(eqTo(taxOfficeNumber), eqTo(taxOfficeReference), eqTo(instanceId))(
-            any[HeaderCarrier]
-          )
-        )
-          .thenReturn(Future.successful(false))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.UnsuccessfulAutomaticSubcontractorUpdateController
-          .onPageLoad(instanceId)
-          .url
-      }
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.UnsuccessfulAutomaticSubcontractorUpdateController
+        .onPageLoad(instanceId)
+        .url
     }
   }
 }

@@ -83,7 +83,7 @@ class VerificationRequestControllerSpec extends UnitSpec {
     when(stubView.apply(any)(any, any)) thenReturn Html(stubContent)
 
     val controllerUnderTest = new VerificationRequestController(
-      mockControllerComponents,
+      mockCisControllerComponents,
       stubView,
       mockVerificationHistoryService,
       mockVerificationService
@@ -93,7 +93,6 @@ class VerificationRequestControllerSpec extends UnitSpec {
   "onPageLoad must" - {
 
     "return OK when Verification Service returns history data" in new Setup {
-      mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
       when(mockVerificationService.getSubmittedVerifications(any)(any)) thenReturn
         Future.successful(verificationHistoryData)
       when(mockVerificationHistoryService.buildVerificationRequestViewModel(any, any, any)(any)) thenReturn Some(
@@ -111,7 +110,6 @@ class VerificationRequestControllerSpec extends UnitSpec {
     }
 
     "redirect to JourneyRecovery when the verification number is not found" in new Setup {
-      mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
       when(mockVerificationService.getSubmittedVerifications(any)(any)) thenReturn Future.successful(
         verificationHistoryData
       )
@@ -128,7 +126,7 @@ class VerificationRequestControllerSpec extends UnitSpec {
     }
 
     "redirect when CisIdPage is missing" in new Setup {
-      mockControllerComponents.setUserAnswers(Some(emptyUserAnswers))
+      mockUserAnswers(Some(emptyUserAnswers))
 
       private val result = controllerUnderTest.onPageLoad(verificationBatchId)(FakeRequest())
 

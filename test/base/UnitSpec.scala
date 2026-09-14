@@ -16,14 +16,16 @@
 
 package base
 
+import base.MockCisControllerComponents.mock
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.DefaultAwaitTimeout
+import repositories.SessionRepository
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class UnitSpec
     extends AnyFreeSpec
@@ -44,8 +46,6 @@ class UnitSpec
   protected given ExecutionContext = ExecutionContext.global
   protected given HeaderCarrier    = HeaderCarrier()
 
-  protected val mockControllerComponents = new MockCisControllerComponents()
-
   protected val journeyRecoveryUrl: String = controllers.routes.JourneyRecoveryController.onPageLoad().url
   protected val unauthorisedUrl: String    = controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad().url
 
@@ -56,7 +56,16 @@ class UnitSpec
   protected val cisIdData: JsObject               = Json.obj("cisId" -> cisId)
   protected val userAnswersWithCisId: UserAnswers = UserAnswers(userAnswersId, cisIdData)
 
+  protected val mockSessionRepo: SessionRepository = mock
+  mockUserAnswers(Some(userAnswersWithCisId))
+  when(mockSessionRepo.set(any)) thenReturn Future.successful(true)
+
+  protected val mockCisControllerComponents = MockCisControllerComponents(mockSessionRepo)
+
   protected val stubNotFoundView: PageNotFoundView = mock[PageNotFoundView]
   protected val stubNotFoundContent                = "NOT FOUND"
   when(stubNotFoundView.apply()(any, any)) thenReturn Html(stubNotFoundContent)
+
+  protected def mockUserAnswers(userAnswersOpt: Option[UserAnswers]): Unit =
+    when(mockSessionRepo.get(any)) thenReturn Future.successful(userAnswersOpt)
 }

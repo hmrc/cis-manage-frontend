@@ -16,29 +16,21 @@
 
 package controllers
 
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent}
 import services.PrepopService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.RetrievingSubcontractorsView
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, HasClientGuard, IdentifierAction}
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class RetrievingSubcontractorsController @Inject() (
-  override val messagesApi: MessagesApi,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  hasClientGuard: HasClientGuard,
-  val controllerComponents: MessagesControllerComponents,
+  val controllerComponents: CisControllerComponents,
   view: RetrievingSubcontractorsView,
   prepopService: PrepopService
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+    extends CisController {
 
   def onPageLoad(
     taxOfficeNumber: String,
@@ -50,7 +42,7 @@ class RetrievingSubcontractorsController @Inject() (
       implicit request =>
         Ok(view())
           .withHeaders(
-            "Refresh" -> s"0; url=${controllers.routes.RetrievingSubcontractorsController.start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey).url}"
+            "Refresh" -> s"0; url=${routes.RetrievingSubcontractorsController.start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey).url}"
           )
     }
 

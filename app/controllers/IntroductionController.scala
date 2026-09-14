@@ -16,28 +16,20 @@
 
 package controllers
 
-import config.FrontendAppConfig
-import controllers.actions.IdentifierAction
 import models.UserAnswers
-
-import javax.inject.Inject
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent}
 import repositories.SessionRepository
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IntroductionView
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class IntroductionController @Inject() (
-  override val messagesApi: MessagesApi,
-  val controllerComponents: MessagesControllerComponents,
-  identify: IdentifierAction,
+  val controllerComponents: CisControllerComponents,
   sessionRepository: SessionRepository,
   view: IntroductionView
-)(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
-    extends FrontendBaseController
-    with I18nSupport {
+)(implicit ec: ExecutionContext)
+    extends CisController {
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
     Ok(view())
@@ -53,5 +45,4 @@ class IntroductionController @Inject() (
       }
     }
   }
-
 }

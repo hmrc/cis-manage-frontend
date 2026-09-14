@@ -18,7 +18,7 @@ package controllers
 
 import controllers.actions.*
 import play.api.i18n.{I18nSupport, Lang}
-import play.api.mvc.RequestHeader
+import play.api.mvc.{RequestHeader, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 /** This controller base class primarily serves 2 functions.
@@ -36,4 +36,6 @@ abstract class CisController extends FrontendBaseController with I18nSupport {
   protected val requireData: DataRequiredAction   = controllerComponents.requireData
   protected val requireCisId: CisIdRequiredAction = controllerComponents.requiredCisId
   protected val hasClientGuard: HasClientGuard    = controllerComponents.hasClientGuard
+
+  protected def SystemError: Result = Redirect(routes.SystemErrorController.onPageLoad())
 }

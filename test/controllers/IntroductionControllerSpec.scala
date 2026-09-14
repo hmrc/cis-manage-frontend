@@ -16,100 +16,49 @@
 
 package controllers
 
-import base.SpecBase
+import base.UnitSpec
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
-import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import repositories.SessionRepository
 import views.html.IntroductionView
 
-import scala.concurrent.Future
+class IntroductionControllerSpec extends UnitSpec {
+  private val stubView    = mock[IntroductionView]
+  private val stubContent = "IntroductionView"
+  when(stubView.apply()(any, any)) thenReturn play.twirl.api.Html(stubContent)
 
-class IntroductionControllerSpec extends SpecBase {
+  private val controllerUnderTest = new IntroductionController(mockCisControllerComponents, mockSessionRepo, stubView)
 
   "IntroductionController.onPageLoad" - {
     "must return OK and the correct view for a GET" in {
+      val result = controllerUnderTest.onPageLoad(FakeRequest())
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.IntroductionController.onPageLoad().url)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[IntroductionView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(
-          request,
-          applicationConfig,
-          messages(application)
-        ).toString
-
-      }
+      status(result) mustEqual OK
+      contentAsString(result) mustEqual stubContent
     }
   }
 
   "IntroductionController.affinityGroupRouting" - {
-
     "for a contractor" - {
-
       "must redirect to the contractor landing page" in {
+        mockCisControllerComponents.loginAsOrg()
+        val result = controllerUnderTest.affinityGroupRouting(FakeRequest())
 
-        val mockSessionRepository = mock[SessionRepository]
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-        val application = applicationBuilder(userAnswers = None)
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-        running(application) {
-          val request = FakeRequest(GET, routes.IntroductionController.affinityGroupRouting().url)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-
-          redirectLocation(result).value mustEqual controllers.contractor.routes.ContractorLandingController
-            .onPageLoad()
-            .url
-        }
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual contractor.routes.ContractorLandingController.onPageLoad().url
       }
-
     }
 
     "for an agent" - {
-
       "must redirect to the agent landing page" in {
+        mockCisControllerComponents.loginAsAgent()
+        val result = controllerUnderTest.affinityGroupRouting(FakeRequest())
 
-        val mockSessionRepository = mock[SessionRepository]
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-        val application = applicationBuilder(userAnswers = None, isAgent = true)
-          .overrides(
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
-
-        running(application) {
-          val request = FakeRequest(GET, routes.IntroductionController.affinityGroupRouting().url)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-
-          redirectLocation(result).value mustEqual controllers.agent.routes.RetrievingClientController
-            .onPageLoad()
-            .url
-        }
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual agent.routes.RetrievingClientController.onPageLoad().url
       }
-
     }
-
   }
 }

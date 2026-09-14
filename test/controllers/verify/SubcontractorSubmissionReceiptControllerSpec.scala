@@ -79,7 +79,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends UnitSpec {
     when(stubView(any)(any, any)) thenReturn Html(stubContent)
 
     val controllerUnderTest = new SubcontractorSubmissionReceiptController(
-      mockControllerComponents,
+      mockCisControllerComponents,
       stubView,
       mockVerificationHistoryService,
       mockVerificationService
@@ -89,7 +89,6 @@ class SubcontractorSubmissionReceiptControllerSpec extends UnitSpec {
   "SubcontractorSubmissionReceipt Controller" - {
 
     "must return OK when VerificationService retrieves history data and VerificationHistoryService builds view model" in new Setup {
-      mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
       when(mockVerificationService.getSubmittedVerifications(any)(any)) thenReturn
         Future.successful(verificationHistoryData)
       when(mockVerificationHistoryService.buildSubmissionReceiptViewModel(any, any, any)(any)) thenReturn Some(
@@ -108,7 +107,6 @@ class SubcontractorSubmissionReceiptControllerSpec extends UnitSpec {
     }
 
     "must redirect to JourneyRecovery when verification number is not found" in new Setup {
-      mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
       when(mockVerificationService.getSubmittedVerifications(any)(any)) thenReturn
         Future.successful(verificationHistoryData)
       when(mockVerificationHistoryService.buildSubmissionReceiptViewModel(any, any, any)(any)) thenReturn None
@@ -125,7 +123,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends UnitSpec {
     }
 
     "must redirect when CisIdPage is missing" in new Setup {
-      mockControllerComponents.setUserAnswers(Some(emptyUserAnswers))
+      mockUserAnswers(Some(emptyUserAnswers))
 
       private val result = controllerUnderTest.onPageLoad(verificationBatchId)(FakeRequest())
 

@@ -104,7 +104,7 @@ class VerificationHistoryControllerSpec extends UnitSpec {
     when(stubNoHistoryView.apply(any)(any, any)) thenReturn Html(stubNoHistoryContent)
 
     val controllerUnderTest = new VerificationHistoryController(
-      mockControllerComponents,
+      mockCisControllerComponents,
       stubHistoryView,
       stubNoHistoryView,
       stubNotFoundView,
@@ -116,7 +116,6 @@ class VerificationHistoryControllerSpec extends UnitSpec {
   "onPageLoad must" - {
     "return 200 OK and" - {
       "show history page when CIS ID is present, a single tax year is selected, and view model is non-empty" in new Setup {
-        mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
         mockVerificationServiceReturnsData()
         mockSingleYearViewModelReturns(Some(viewModel))
 
@@ -133,8 +132,6 @@ class VerificationHistoryControllerSpec extends UnitSpec {
       }
 
       "show history page when CIS ID is present, all tax years are selected, and view model is non-empty" in new Setup {
-        mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
-
         mockVerificationServiceReturnsData()
         mockAllYearsViewModelReturns(Some(viewModel))
 
@@ -151,7 +148,6 @@ class VerificationHistoryControllerSpec extends UnitSpec {
       }
 
       "and show no history page when CIS ID is present, all tax years are selected, but view model is empty" in new Setup {
-        mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
         mockVerificationServiceReturnsData()
         mockAllYearsViewModelReturns(None)
 
@@ -170,7 +166,7 @@ class VerificationHistoryControllerSpec extends UnitSpec {
 
     "return 303 SEE_OTHER when" - {
       "CisIdPage is missing and redirect to unauthorised page" in new Setup {
-        mockControllerComponents.setUserAnswers(Some(emptyUserAnswers))
+        mockUserAnswers(Some(emptyUserAnswers))
 
         private val result = controllerUnderTest.onPageLoad(TaxYear(2026).toPath)(FakeRequest())
 
@@ -180,7 +176,6 @@ class VerificationHistoryControllerSpec extends UnitSpec {
       }
 
       "resolveVerificationHistoryData fails and redirect to journey recovery" in new Setup {
-        mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
         mockVerificationServiceFails()
 
         private val result = controllerUnderTest.onPageLoad(TaxYear(2026).toPath)(FakeRequest())
@@ -195,8 +190,6 @@ class VerificationHistoryControllerSpec extends UnitSpec {
 
     "return 404 NOT_FOUND when" - {
       "tax year selection is invalid" in new Setup {
-        mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
-
         private val result = controllerUnderTest.onPageLoad("invalid-tax-year-selection")(FakeRequest())
 
         status(result) mustEqual NOT_FOUND
@@ -205,7 +198,6 @@ class VerificationHistoryControllerSpec extends UnitSpec {
       }
 
       "single tax year selection is valid but no history exists for that year" in new Setup {
-        mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
         mockVerificationServiceReturnsData()
         mockSingleYearViewModelReturns(None)
 

@@ -19,7 +19,6 @@ package base
 import base.MockCisControllerComponents.*
 import controllers.CisControllerComponents
 import controllers.actions.*
-import models.UserAnswers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -34,7 +33,12 @@ import scala.concurrent.{ExecutionContext, Future}
 /** Mocks up all our shared CIS controller dependencies for easy unit-testing without having to spin up an entire
   * application with [[org.scalatestplus.play.guice.GuiceOneAppPerSuite]].
   */
-final class MockCisControllerComponents(using ExecutionContext)
+final class MockCisControllerComponents private (
+  mcc: MessagesControllerComponents,
+  mockIdentifierAction: MockIdentifierAction,
+  dataRetrievalAction: DataRetrievalAction,
+  hasClientGuard: HasClientGuard
+)(using ExecutionContext)
     extends CisControllerComponents(
       mcc.messagesActionBuilder,
       mcc.actionBuilder.asInstanceOf[DefaultActionBuilder],
@@ -42,24 +46,31 @@ final class MockCisControllerComponents(using ExecutionContext)
       mcc.messagesApi,
       mcc.langs,
       mcc.fileMimeTypes,
-      new FakeIdentifierAction(isAgent = false)(mcc.parsers),
-      new DataRetrievalActionImpl(sessionRepo),
+      mockIdentifierAction,
+      dataRetrievalAction,
       new DataRequiredActionImpl(),
       new CisIdRequiredActionImpl(),
-      new HasClientGuard(cisService, sessionRepo, auditService)
+      hasClientGuard
     ) {
-  def setUserAnswers(userAnswersOpt: Option[UserAnswers]): Unit =
-    when(sessionRepo.get(any)) thenReturn Future.successful(userAnswersOpt)
+  def loginAsOrg(ton: String = "123", tor: String = "AB12345"): Unit =
+    mockIdentifierAction.setUser(isAgent = false, agentRef = "", ton, tor)
+
+  def loginAsAgent(ref: String = "123456"): Unit =
+    mockIdentifierAction.setUser(isAgent = true, agentRef = ref, ton = "", tor = "")
 }
 object MockCisControllerComponents extends MockitoSugar {
-  private val mcc = stubMessagesControllerComponents()
+  def apply(sessionRepo: SessionRepository)(using ExecutionContext): MockCisControllerComponents =
+    val mcc                  = stubMessagesControllerComponents()
+    val mockIdentifierAction = new MockIdentifierAction(mcc.parsers.default)
 
-  private val auditService = mock[AuditService]
-  when(auditService.sendEvent(any)(any, any, any)) thenReturn Future.successful(Success)
+    val mockAuditService = mock[AuditService]
+    when(mockAuditService.sendEvent(any)(any, any, any)) thenReturn Future.successful(Success)
 
-  private val sessionRepo = mock[SessionRepository]
-  when(sessionRepo.set(any)) thenReturn Future.successful(true)
+    val mockCisService = mock[ConstructionIndustrySchemeService]
+    when(mockCisService.hasClient(any, any)(any)) thenReturn Future.successful(true)
 
-  private val cisService = mock[ConstructionIndustrySchemeService]
-  when(cisService.hasClient(any, any)(any)) thenReturn Future.successful(true)
+    val mockDataRetrievalAction = new DataRetrievalActionImpl(sessionRepo)
+    val mockHasClientGuard      = new HasClientGuard(mockCisService, sessionRepo, mockAuditService)
+
+    new MockCisControllerComponents(mcc, mockIdentifierAction, mockDataRetrievalAction, mockHasClientGuard)
 }

@@ -16,18 +16,12 @@
 
 package controllers
 
-import config.FrontendAppConfig
-import controllers.actions.*
 import models.UserAnswers
 import pages.ContractorNamePage
 import play.api.Logging
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, RequestHeader}
+import play.api.mvc.{Action, AnyContent, RequestHeader}
 import repositories.SessionRepository
 import services.ManageService
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.ReturnsLandingView
 
 import javax.inject.Inject
@@ -35,18 +29,12 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 class ReturnsLandingController @Inject() (
-  override val messagesApi: MessagesApi,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  hasClientGuard: HasClientGuard,
+  val controllerComponents: CisControllerComponents,
   sessionRepository: SessionRepository,
-  val controllerComponents: MessagesControllerComponents,
   view: ReturnsLandingView,
   service: ManageService
-)(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport
+)(using ExecutionContext)
+    extends CisController
     with Logging {
 
   def onPageLoad(instanceId: String): Action[AnyContent] =
@@ -54,8 +42,6 @@ class ReturnsLandingController @Inject() (
       andThen getData
       andThen requireData
       andThen hasClientGuard.forInstanceId(instanceId)).async { implicit request =>
-      given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
       updateContractorNameFromQueryParam(request.userAnswers)
         .flatMap { userAnswers =>
           service
@@ -74,11 +60,11 @@ class ReturnsLandingController @Inject() (
                 logger.warn(
                   s"[ReturnsLandingController] missing context (isAgent=${request.isAgent}, instanceId=$instanceId)"
                 )
-                Redirect(controllers.routes.SystemErrorController.onPageLoad())
+                SystemError
             }
             .recover { case NonFatal(e) =>
               logger.error(s"[ReturnsLandingController] failed for instanceId=$instanceId", e)
-              Redirect(controllers.routes.SystemErrorController.onPageLoad())
+              SystemError
             }
         }
     }
