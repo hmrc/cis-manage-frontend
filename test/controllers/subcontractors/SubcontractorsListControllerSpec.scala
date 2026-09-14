@@ -17,32 +17,25 @@
 package controllers.subcontractors
 
 import base.SpecBase
-import config.FrontendAppConfig
 import controllers.actions.HasClientGuard
 import models.requests.DataRequest
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
-import play.api.inject.bind
-import play.api.mvc.{ActionFilter, Result}
-import forms.subcontractors.SubcontractorsListFormProvider
-import models.{Mode, NormalMode, UserAnswers}
 import models.response.{GetSubcontractor, GetSubcontractorListResponse}
 import models.{Mode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
 import pages.CisIdPage
 import pages.subcontractors.SubcontractorListPage
 import play.api.inject.bind
+import play.api.mvc.{ActionFilter, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.twirl.api.Html
 import views.html.subcontractors.SubcontractorsListView
 
 import java.time.LocalDateTime
-import scala.jdk.CollectionConverters.*
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
@@ -192,9 +185,8 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
             bind[HasClientGuard].toInstance(hasClientGuard)
           )
         ).overrides(
-            bind[SubcontractorsListView].toInstance(mockView)
-          )
-          .build()
+          bind[SubcontractorsListView].toInstance(mockView)
+        ).build()
 
       running(application) {
         val request =
@@ -240,9 +232,8 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
             bind[HasClientGuard].toInstance(hasClientGuard)
           )
         ).overrides(
-            bind[SubcontractorsListView].toInstance(mockView)
-          )
-          .build()
+          bind[SubcontractorsListView].toInstance(mockView)
+        ).build()
       running(application) {
         val url =
           routes.SubcontractorsListController
