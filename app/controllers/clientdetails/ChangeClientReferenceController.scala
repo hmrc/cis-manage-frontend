@@ -19,7 +19,7 @@ package controllers.clientdetails
 import controllers.actions.*
 import forms.clientdetails.ChangeClientReferenceFormProvider
 import models.Mode
-import navigation.Navigator
+import navigation.{ClientListCheckNavigator, Navigator}
 import pages.clientdetails.ChangeClientReferencePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -37,6 +37,9 @@ class ChangeClientReferenceController @Inject() (
   @Named("AgentIdentifier") identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  hasClientGuard: HasClientGuard,
+  clientListStatusGuard: ClientListStatusGuard,
+  clientListCheckNavigator: ClientListCheckNavigator,
   formProvider: ChangeClientReferenceFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: ChangeClientReferenceView
@@ -46,7 +49,13 @@ class ChangeClientReferenceController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (
+    identify
+      andThen clientListStatusGuard.groupB(clientListCheckNavigator.changeClientReference(mode))
+      andThen getData
+      andThen requireData
+      andThen hasClientGuard.currentClient
+  ) { implicit request =>
 
     val preparedForm = request.userAnswers.get(ChangeClientReferencePage) match {
       case None        => form

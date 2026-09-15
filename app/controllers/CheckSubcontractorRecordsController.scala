@@ -16,7 +16,7 @@
 
 package controllers
 
-import controllers.actions.{AuthorizedForSchemeActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{AuthorizedForSchemeActionProvider, DataRequiredAction, DataRetrievalAction, HasClientGuard, IdentifierAction}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.PrepopService
@@ -32,6 +32,7 @@ class CheckSubcontractorRecordsController @Inject() (
   getData: DataRetrievalAction,
   requireSchemeAccess: AuthorizedForSchemeActionProvider,
   requireData: DataRequiredAction,
+  hasClientGuard: HasClientGuard,
   val controllerComponents: MessagesControllerComponents,
   view: CheckSubcontractorRecordsView,
   service: PrepopService
@@ -45,7 +46,11 @@ class CheckSubcontractorRecordsController @Inject() (
     instanceId: String,
     targetKey: String
   ): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen requireSchemeAccess(taxOfficeNumber, taxOfficeReference))
+    (identify
+      andThen getData
+      andThen requireData
+      andThen requireSchemeAccess(taxOfficeNumber, taxOfficeReference)
+      andThen hasClientGuard.forInstanceId(instanceId))
       .async { implicit request =>
         service.getScheme(instanceId).map {
           case None                                                          =>

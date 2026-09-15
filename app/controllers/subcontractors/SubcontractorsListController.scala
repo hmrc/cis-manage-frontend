@@ -45,6 +45,7 @@ class SubcontractorsListController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  hasClientGuard: HasClientGuard,
   formProvider: SubcontractorsListFormProvider,
   paginationService: PaginationSubcontractorsListService,
   clock: Clock,
@@ -61,6 +62,8 @@ class SubcontractorsListController @Inject() (
 
   private val SortOrderAsc  = "ascending"
   private val SortOrderDesc = "descending"
+
+  private val StandardJourneyType = "standard"
 
   private def isNoNameProvided(
     displayName: String
@@ -163,7 +166,7 @@ class SubcontractorsListController @Inject() (
         .map(_.format(DateTimeFormats.shortDateFormat()))
         .getOrElse(""),
       subbieResourceRef = subbieResourceRef,
-      amendUrl = s"${config.cisTypeOfSubcontractorUrl}/amend/start/$subbieResourceRef"
+      amendUrl = s"${config.cisTypeOfSubcontractorUrl}/amend/start/$subbieResourceRef/$StandardJourneyType"
     )
   }
 
@@ -512,8 +515,12 @@ class SubcontractorsListController @Inject() (
     mode: Mode,
     page: Int = 1
   ): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify
+      andThen getData
+      andThen requireData
+      andThen hasClientGuard.forInstanceId(instanceId)) { implicit request =>
       implicit val lang: Lang = messagesApi.preferred(request).lang
+
       rowsFromUserAnswers(request.userAnswers) match {
         case Some(allRows) if allRows.nonEmpty =>
           renderPage(

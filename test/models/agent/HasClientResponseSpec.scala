@@ -14,24 +14,29 @@
  * limitations under the License.
  */
 
-package pages.verify
+package models.agent
 
 import base.SpecBase
-import play.api.libs.json.JsPath
+import play.api.libs.json.{JsError, Json}
 
-class VerificationHistoryDataPageSpec extends SpecBase {
+class HasClientResponseSpec extends SpecBase {
 
-  "VerificationHistoryDataPage" - {
+  "HasClientResponse" - {
 
-    "must have the correct path" in {
-      VerificationHistoryDataPage.path mustBe (
-        JsPath \ "verificationHistoryData"
+    "must deserialize from JSON correctly" in {
+      val json = Json.obj(
+        "hasClient" -> true
       )
+
+      json.as[HasClientResponse] mustEqual HasClientResponse(hasClient = true)
     }
 
-    "must have the correct toString value" in {
-      VerificationHistoryDataPage.toString mustBe
-        "verificationHistoryData"
+    "must fail to deserialize invalid JSON" in {
+      val json = Json.obj(
+        "wrongField" -> true
+      )
+
+      json.validate[HasClientResponse] mustBe a[JsError]
     }
   }
 }

@@ -23,7 +23,7 @@ import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.SuccessfulAutomaticSubcontractorUpdateViewModel
 import views.html.SuccessfulAutomaticSubcontractorUpdateView
-import controllers.actions.{AuthorizedForSchemeActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{AuthorizedForSchemeActionProvider, DataRequiredAction, DataRetrievalAction, HasClientGuard, IdentifierAction}
 import services.PrepopService
 
 import javax.inject.Inject
@@ -34,6 +34,7 @@ class SuccessfulAutomaticSubcontractorUpdateController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  hasClientGuard: HasClientGuard,
   val controllerComponents: MessagesControllerComponents,
   view: SuccessfulAutomaticSubcontractorUpdateView,
   requireSchemeAccess: AuthorizedForSchemeActionProvider,
@@ -43,7 +44,11 @@ class SuccessfulAutomaticSubcontractorUpdateController @Inject() (
     with I18nSupport {
 
   def onPageLoad(instanceId: String, targetKey: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen requireSchemeAccess(instanceId)).async { implicit request =>
+    (identify
+      andThen getData
+      andThen requireData
+      andThen requireSchemeAccess(instanceId)
+      andThen hasClientGuard.forInstanceId(instanceId)).async { implicit request =>
       service.getScheme(instanceId).map {
         case None                                                  =>
           Redirect(routes.SystemErrorController.onPageLoad())

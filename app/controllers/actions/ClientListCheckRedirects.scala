@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package pages.verify
+package controllers.actions
 
-import models.verify.VerificationTaxYearSelection
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 
-case object VerificationHistorySelectTaxYearPage extends QuestionPage[VerificationTaxYearSelection] {
+private[actions] object ClientListCheckRedirects {
+  def systemError: Result =
+    Redirect(controllers.routes.SystemErrorController.onPageLoad())
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "verificationHistorySelectTaxYear"
+  def agentLostAccess: Result =
+    Redirect(controllers.agent.routes.AgentLostAccessController.onPageLoad())
 }

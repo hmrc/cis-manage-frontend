@@ -16,10 +16,11 @@
 
 package models
 
-import play.api.libs.json.{Json, OFormat}
+import models.agent.ClientListStatus
+import play.api.libs.json.{Json, Reads}
 
-case class GetClientListStatusResponse(result: String)
+case class GetClientListStatusResponse(result: ClientListStatus)
 
 object GetClientListStatusResponse {
-  implicit val format: OFormat[GetClientListStatusResponse] = Json.format[GetClientListStatusResponse]
+  implicit val reads: Reads[GetClientListStatusResponse] = Json.reads[GetClientListStatusResponse]
 }
