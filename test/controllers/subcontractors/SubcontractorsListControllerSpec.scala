@@ -17,8 +17,6 @@
 package controllers.subcontractors
 
 import base.SpecBase
-import controllers.actions.HasClientGuard
-import models.requests.DataRequest
 import models.response.{GetSubcontractor, GetSubcontractorListResponse}
 import models.{Mode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
@@ -29,14 +27,13 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import pages.CisIdPage
 import pages.subcontractors.SubcontractorListPage
 import play.api.inject.bind
-import play.api.mvc.{ActionFilter, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.twirl.api.Html
 import views.html.subcontractors.SubcontractorsListView
 
 import java.time.LocalDateTime
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
 
@@ -44,17 +41,6 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
   private val mode: Mode = NormalMode
 
   implicit val ec: ExecutionContext = ExecutionContext.global
-
-  private val hasClientGuard = mock[HasClientGuard]
-
-  private val passThroughFilter =
-    new ActionFilter[DataRequest] {
-      override protected def executionContext: ExecutionContext                         = ec
-      override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
-        Future.successful(None)
-    }
-
-  when(hasClientGuard.forInstanceId(any[String])).thenReturn(passThroughFilter)
 
   private def stubView(mockView: SubcontractorsListView): Unit =
     when(
@@ -173,20 +159,14 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
   "SubcontractorsListController" - {
 
     "must return OK and display the subcontractors list view with default filters" in {
-      val mockView =
-        mock[SubcontractorsListView]
+      val mockView = mock[SubcontractorsListView]
 
       stubView(mockView)
 
-      val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubcontractors),
-          additionalBindings = Seq(
-            bind[HasClientGuard].toInstance(hasClientGuard)
-          )
-        ).overrides(
-          bind[SubcontractorsListView].toInstance(mockView)
-        ).build()
+      val application = applicationBuilder(
+        userAnswers = Some(userAnswersWithSubcontractors),
+        additionalBindings = Seq(bind[SubcontractorsListView] toInstance mockView)
+      ).build()
 
       running(application) {
         val request =
@@ -220,20 +200,15 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return OK and display the subcontractors list view with search and filters applied" in {
-      val mockView =
-        mock[SubcontractorsListView]
+      val mockView = mock[SubcontractorsListView]
 
       stubView(mockView)
 
-      val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubcontractors),
-          additionalBindings = Seq(
-            bind[HasClientGuard].toInstance(hasClientGuard)
-          )
-        ).overrides(
-          bind[SubcontractorsListView].toInstance(mockView)
-        ).build()
+      val application = applicationBuilder(
+        userAnswers = Some(userAnswersWithSubcontractors),
+        additionalBindings = Seq(bind[SubcontractorsListView] toInstance mockView)
+      ).build()
+
       running(application) {
         val url =
           routes.SubcontractorsListController
@@ -271,13 +246,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the selected page with filters preserved when pagination is submitted" in {
-      val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubcontractors),
-          additionalBindings = Seq(
-            bind[HasClientGuard].toInstance(hasClientGuard)
-          )
-        ).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithSubcontractors)).build()
 
       running(application) {
         val request =
@@ -313,13 +282,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to page 1 when gotoPage is not submitted" in {
-      val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubcontractors),
-          additionalBindings = Seq(
-            bind[HasClientGuard].toInstance(hasClientGuard)
-          )
-        ).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithSubcontractors)).build()
 
       running(application) {
         val request =
@@ -354,10 +317,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a GET when subcontractor list data is missing" in {
-      val application =
-        applicationBuilder(
-          userAnswers = Some(emptyUserAnswers)
-        ).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =
@@ -377,10 +337,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a POST when subcontractor list data is missing" in {
-      val application =
-        applicationBuilder(
-          userAnswers = Some(emptyUserAnswers)
-        ).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =
@@ -412,10 +369,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswers)
-        ).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request =
@@ -453,10 +407,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswers)
-        ).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request =

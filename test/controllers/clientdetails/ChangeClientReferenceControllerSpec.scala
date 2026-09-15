@@ -17,11 +17,11 @@
 package controllers.clientdetails
 
 import base.SpecBase
-import controllers.actions.{ClientListStatusGuard, HasClientGuard}
+import controllers.actions.ClientListStatusGuard
 import controllers.routes
 import forms.clientdetails.ChangeClientReferenceFormProvider
+import models.requests.IdentifierRequest
 import models.{NormalMode, UserAnswers}
-import models.requests.{DataRequest, IdentifierRequest}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -47,7 +47,6 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     controllers.clientdetails.routes.ChangeClientReferenceController.onPageLoad(NormalMode).url
 
   private val mockClientListStatusGuard = mock[ClientListStatusGuard]
-  private val mockHasClientGuard        = mock[HasClientGuard]
 
   private val passThroughClientListStatusGuard =
     new ActionFilter[IdentifierRequest] {
@@ -55,18 +54,10 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
       override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = Future.successful(None)
     }
 
-  private val passThroughHasClientGuard =
-    new ActionFilter[DataRequest] {
-      override protected def executionContext: ExecutionContext                         = ExecutionContext.global
-      override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] = Future.successful(None)
-    }
-
   when(mockClientListStatusGuard.groupB(any[Call])).thenReturn(passThroughClientListStatusGuard)
-  when(mockHasClientGuard.currentClient).thenReturn(passThroughHasClientGuard)
 
   private val guardBindings = Seq(
-    bind[ClientListStatusGuard].toInstance(mockClientListStatusGuard),
-    bind[HasClientGuard].toInstance(mockHasClientGuard)
+    bind[ClientListStatusGuard].toInstance(mockClientListStatusGuard)
   )
 
   "ChangeClientReference Controller" - {

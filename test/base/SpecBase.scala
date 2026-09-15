@@ -26,18 +26,18 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
 import org.scalatestplus.mockito.MockitoSugar.mock
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.inject.{Binding, bind}
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.FakeRequest
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.inject.{Binding, bind}
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.PlayBodyParsers
+import play.api.test.FakeRequest
 import play.api.test.Helpers.stubControllerComponents
 import repositories.SessionRepository
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Deprecated(
   "To avoid spinning up and shutting down applications for unit tests, please consider using UnitSpec instead."
@@ -88,7 +88,8 @@ trait SpecBase
             .to(new FakeIdentifierAction(true, agentCode, itmpName)(parsers)),
           bind[IdentifierAction].qualifiedWith("ContractorIdentifier").to(new FakeIdentifierAction(false)(parsers)),
           bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
-          bind[FormpRdsReconcileAction].toInstance(new FakeFormpRdsReconcileAction)
+          bind[FormpRdsReconcileAction].toInstance(new FakeFormpRdsReconcileAction),
+          bind[HasClientGuard] toInstance new FakeHasClientGuard(using ExecutionContext.global)
         ) ++ additionalBindings
       )
 }
