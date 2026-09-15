@@ -55,7 +55,7 @@ object MockCisControllerComponents extends MockitoSugar {
   private val mcc = stubMessagesControllerComponents()
 
   private val auditService = mock[AuditService]
-  when(auditService.sendEvent(any)(any, any, any)) thenReturn Future.successful(Success)
+  when(auditService.sendEvent(any)(any, any)) thenReturn Future.successful(Success)
 
   private val sessionRepo = mock[SessionRepository]
   when(sessionRepo.set(any)) thenReturn Future.successful(true)
