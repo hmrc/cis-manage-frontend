@@ -20,7 +20,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
-@import play.twirl.api.Html
+@import play.twirl.api.{Html, HtmlFormat}
 @import play.api.mvc.RequestHeader
 @import play.api.i18n.Messages
 
@@ -29,7 +29,8 @@
   hmrcTimeoutDialog: HmrcTimeoutDialog,
   hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
   alphaBanner: StandardAlphaBanner,
-  hmrcStandardPage: HmrcStandardPage
+  hmrcStandardPage: HmrcStandardPage,
+  twoThirdsOneThirdLayout: TwoThirdsOneThirdLayout
 )
 
 @(pageTitle: String,
@@ -58,9 +59,12 @@
   }
 }
 
+@reportTechnicalIssue = {
+  <div class="govuk-!-margin-top-4">@hmrcReportTechnicalIssueHelper()</div>
+}
+
 @content = {
   @contentBlock
-  @hmrcReportTechnicalIssueHelper()
 }
 
 @hmrcStandardPage(HmrcStandardPageParams(
@@ -68,20 +72,9 @@
   templateOverrides = TemplateOverrides(
   additionalHeadBlock    = Some(head),
   beforeContentBlock     = beforeContent,
-  mainContentLayout      = Some({ (content: Html) =>
-  Html(
-    s"""
-    |<div class="govuk-grid-row">
-        |  <div class="govuk-grid-column-two-thirds">
-        |    ${content.body}
-        |  </div>
-        |  <div class="govuk-grid-column-one-third">
-        |    ${sidebar.map(_.body).getOrElse("")}
-        |  </div>
-        |</div>
-    |""".stripMargin
-    )
-    })
+  mainContentLayout      = Some(
+    twoThirdsOneThirdLayout(sidebar.getOrElse(HtmlFormat.empty), reportTechnicalIssue)
+  )
   ),
 
   serviceURLs = ServiceURLs(
