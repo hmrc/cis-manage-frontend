@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package pages.verify
+package models.requests
 
-import models.verify.VerificationHistoryData
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Json, OFormat}
 
-case object VerificationHistoryDataPage extends QuestionPage[VerificationHistoryData] {
-  override def path: JsPath = JsPath \ "verificationHistoryData"
+case class RemoveAgentClientRequest(
+  taxOfficeNumber: String,
+  taxOfficeReference: String
+)
 
-  override def toString: String = "verificationHistoryData"
+object RemoveAgentClientRequest {
+  given format: OFormat[RemoveAgentClientRequest] = Json.format[RemoveAgentClientRequest]
 }

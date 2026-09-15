@@ -214,7 +214,6 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .execute[JourneyHandoffResponse]
       .map(_.id)
 
-  // TODO: Replace stub with real API call when available
   def getVerificationRequestDetail(
     instanceId: String,
     verificationNumber: String
@@ -281,4 +280,15 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .get(url"$cisBaseUrl/subcontractors/$cisId")
       .execute[GetSubcontractorListResponse]
 
+  def removeClient(request: RemoveAgentClientRequest)(implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(url"$cisBaseUrl/agent/remove-client")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .flatMap { response =>
+        response.status match {
+          case NO_CONTENT => Future.unit
+          case status     => Future.failed(UpstreamErrorResponse(response.body, status, status))
+        }
+      }
 }

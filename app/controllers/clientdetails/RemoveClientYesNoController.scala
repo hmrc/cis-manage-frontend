@@ -21,8 +21,9 @@ import forms.clientdetails.RemoveClientYesNoFormProvider
 import models.Mode
 import navigation.{ClientListCheckNavigator, Navigator}
 import pages.clientdetails.RemoveClientYesNoPage
-import pages.AgentClientsPage
+import pages.{AgentClientsPage, ClientListSearchPage}
 import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -52,7 +53,7 @@ class RemoveClientYesNoController @Inject() (
     with I18nSupport
     with Logging {
 
-  val form = formProvider()
+  val form: Form[Boolean] = formProvider()
 
   def onPageLoad(uniqueId: String, mode: Mode): Action[AnyContent] =
     (identify
@@ -96,7 +97,6 @@ class RemoveClientYesNoController @Inject() (
             .getClientByEmployerReference(client.taxOfficeNumber, client.taxOfficeRef)
             .flatMap { response =>
               val clientName = response.schemeName.getOrElse("")
-
               form
                 .bindFromRequest()
                 .fold(
@@ -104,14 +104,33 @@ class RemoveClientYesNoController @Inject() (
                     Future.successful(
                       BadRequest(view(clientName, formWithErrors, mode, uniqueId))
                     ),
-                  value =>
-                    for {
-                      updatedAnswers <-
-                        Future.fromTry(request.userAnswers.set(RemoveClientYesNoPage, value))
-                      _              <- sessionRepository.set(updatedAnswers)
-                    } yield Redirect(
-                      navigator.nextPage(RemoveClientYesNoPage, mode, updatedAnswers)
-                    )
+                  value => {
+                    val result =
+                      for {
+                        updatedAnswers            <- Future.fromTry(request.userAnswers.set(RemoveClientYesNoPage, value))
+                        updatedAnswersWithClients <-
+                          if (value) {
+                            for {
+                              _                    <- manageService.removeClient(uniqueId, updatedAnswers)
+                              uaWithClients        <- Future.fromTry(updatedAnswers.remove(ClientListSearchPage))
+                              (_, resolvedAnswers) <- manageService.resolveAndStoreAgentClients(uaWithClients)
+                            } yield resolvedAnswers
+                          } else {
+                            Future.successful(updatedAnswers)
+                          }
+                        _                         <- sessionRepository.set(updatedAnswersWithClients)
+                      } yield Redirect(
+                        navigator.nextPage(RemoveClientYesNoPage, mode, updatedAnswersWithClients)
+                      )
+
+                    result.recover { case ex =>
+                      logger.error(
+                        s"[RemoveClientYesNoController][onSubmit] Failed to process remove client: ${ex.getMessage}",
+                        ex
+                      )
+                      Redirect(controllers.routes.SystemErrorController.onPageLoad())
+                    }
+                  }
                 )
             }
             .recover { case e =>
