@@ -122,7 +122,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
     emailRecipient = Some("user@example.com"),
     instanceId = "1",
     items = Seq(
-      SubcontractorPayment("John Smith", "5000.00", "1000.00", "800.00")
+      SubcontractorPayment("John Smith", "", "5000.00", "1000.00", "800.00")
     )
   )
 

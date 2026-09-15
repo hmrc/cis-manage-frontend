@@ -146,10 +146,11 @@ class SubmittedReturnsService @Inject() (
     val subcontractors       =
       data.monthlyReturnItems.map { item =>
         SubcontractorPayment(
-          item.subcontractorName.getOrElse(""),
-          Utils.formatCurrency(Utils.toBigDecimal(item.totalPayments)),
-          Utils.formatCurrency(Utils.toBigDecimal(item.costOfMaterials)),
-          Utils.formatCurrency(Utils.toBigDecimal(item.totalDeducted))
+          name = item.subcontractorName.getOrElse(""),
+          verificationNumber = item.verificationNumber.getOrElse(""),
+          paymentsMade = Utils.formatCurrency(Utils.toBigDecimal(item.totalPayments)),
+          costOfMaterials = Utils.formatCurrency(Utils.toBigDecimal(item.costOfMaterials)),
+          taxDeducted = Utils.formatCurrency(Utils.toBigDecimal(item.totalDeducted))
         )
       }
 
@@ -451,10 +452,11 @@ class SubmittedReturnsService @Inject() (
 
     val items = response.monthlyReturnItems.map { item =>
       SubcontractorPayment(
-        item.subcontractorName.getOrElse(""),
-        Utils.formatCurrency(Utils.toBigDecimal(item.totalPayments)),
-        Utils.formatCurrency(Utils.toBigDecimal(item.costOfMaterials)),
-        Utils.formatCurrency(Utils.toBigDecimal(item.totalDeducted))
+        name = item.subcontractorName.getOrElse(""),
+        verificationNumber = item.verificationNumber.getOrElse(""),
+        paymentsMade = Utils.formatCurrency(Utils.toBigDecimal(item.totalPayments)),
+        costOfMaterials = Utils.formatCurrency(Utils.toBigDecimal(item.costOfMaterials)),
+        taxDeducted = Utils.formatCurrency(Utils.toBigDecimal(item.totalDeducted))
       )
     }
 
