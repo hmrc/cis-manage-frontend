@@ -37,7 +37,7 @@ class ChangeClientReferenceController @Inject() (
   @Named("AgentIdentifier") identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  hasClientGuard: HasClientGuard,
+  schemeAuthorisationGuard: SchemeAuthorisationGuard,
   clientListStatusGuard: ClientListStatusGuard,
   clientListCheckNavigator: ClientListCheckNavigator,
   formProvider: ChangeClientReferenceFormProvider,
@@ -54,7 +54,7 @@ class ChangeClientReferenceController @Inject() (
       andThen clientListStatusGuard.groupB(clientListCheckNavigator.changeClientReference(mode))
       andThen getData
       andThen requireData
-      andThen hasClientGuard.currentClient
+      andThen schemeAuthorisationGuard.currentClient
   ) { implicit request =>
 
     val preparedForm = request.userAnswers.get(ChangeClientReferencePage) match {

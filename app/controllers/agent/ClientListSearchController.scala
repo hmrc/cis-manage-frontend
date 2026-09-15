@@ -58,6 +58,22 @@ class ClientListSearchController @Inject() (
 
   val form: Form[ClientListFormData] = formProvider()
 
+  def start(): Action[AnyContent] =
+    (identify
+      andThen clientListStatusGuard.groupB(clientListCheckNavigator.fileMonthlyReturns)
+      andThen getData
+      andThen requireData).async { implicit request =>
+      manageService
+        .refreshAndStoreAgentClients(request.userAnswers)
+        .map { _ =>
+          Redirect(routes.ClientListSearchController.onPageLoad())
+        }
+        .recover { case e =>
+          logger.error(s"[ClientListSearchController][start] failed: ${e.getMessage}", e)
+          Redirect(controllers.routes.SystemErrorController.onPageLoad())
+        }
+    }
+
   def onPageLoad(): Action[AnyContent] =
     (identify
       andThen clientListStatusGuard.groupB(clientListCheckNavigator.fileMonthlyReturns)

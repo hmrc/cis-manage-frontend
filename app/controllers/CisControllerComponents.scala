@@ -37,6 +37,6 @@ class CisControllerComponents @Inject() (
   val getData: DataRetrievalAction,
   val requireData: DataRequiredAction,
   val requiredCisId: CisIdRequiredAction,
-  val hasClientGuard: HasClientGuard
+  val schemeAuthorisationGuard: SchemeAuthorisationGuard
 )(using val executionContext: ExecutionContext)
     extends MessagesControllerComponents

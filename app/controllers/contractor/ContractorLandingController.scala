@@ -139,8 +139,6 @@ class ContractorLandingController @Inject() (
 
     val checkSubcontractorRecordsCall =
       controllers.routes.CheckSubcontractorRecordsController.onPageLoad(
-        employerRef.taxOfficeNumber,
-        employerRef.taxOfficeReference,
         instanceId,
         targetKey
       )

@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.HasClientGuard
+import controllers.actions.*
 import models.*
 import models.requests.DataRequest
 import org.mockito.Mockito.{verify, when}
@@ -38,15 +38,15 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
 
   private val instanceId = "CIS-123"
 
-  private val mockHasClientGuard = mock[HasClientGuard]
+  private val mockSchemeAuthorisationGuard = mock[SchemeAuthorisationGuard]
 
-  private val passThroughHasClientGuard = new ActionFilter[DataRequest] {
+  private val passThroughSchemeAuthorisationGuard = new ActionFilter[DataRequest] {
     override protected def executionContext: ExecutionContext                         = ExecutionContext.global
     override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
       Future.successful(None)
   }
 
-  when(mockHasClientGuard.forInstanceId(any[String])).thenReturn(passThroughHasClientGuard)
+  when(mockSchemeAuthorisationGuard.forInstanceId(any[String])).thenReturn(passThroughSchemeAuthorisationGuard)
 
   private val context = ReturnsLandingContext(
     contractorName = "ABC Construction Ltd",
@@ -73,7 +73,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
           userAnswers = Some(userAnswersWithCisId),
           additionalBindings = Seq(
             bind[ManageService].toInstance(mockManageService),
-            bind[HasClientGuard].toInstance(mockHasClientGuard)
+            bind[SchemeAuthorisationGuard].toInstance(mockSchemeAuthorisationGuard)
           )
         ).build()
 
@@ -102,7 +102,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
           isAgent = true,
           additionalBindings = Seq(
             bind[ManageService].toInstance(mockManageService),
-            bind[HasClientGuard].toInstance(mockHasClientGuard)
+            bind[SchemeAuthorisationGuard].toInstance(mockSchemeAuthorisationGuard)
           )
         ).build()
 
@@ -136,7 +136,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
           userAnswers = Some(userAnswersWithCisId),
           additionalBindings = Seq(
             bind[ManageService].toInstance(mockManageService),
-            bind[HasClientGuard].toInstance(mockHasClientGuard)
+            bind[SchemeAuthorisationGuard].toInstance(mockSchemeAuthorisationGuard)
           )
         ).build()
 
@@ -165,7 +165,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
           userAnswers = Some(userAnswersWithCisId),
           additionalBindings = Seq(
             bind[ManageService].toInstance(mockManageService),
-            bind[HasClientGuard].toInstance(mockHasClientGuard)
+            bind[SchemeAuthorisationGuard].toInstance(mockSchemeAuthorisationGuard)
           )
         ).build()
 
@@ -199,7 +199,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
           additionalBindings = Seq(
             bind[ManageService].toInstance(mockManageService),
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[HasClientGuard].toInstance(mockHasClientGuard)
+            bind[SchemeAuthorisationGuard].toInstance(mockSchemeAuthorisationGuard)
           )
         ).build()
 

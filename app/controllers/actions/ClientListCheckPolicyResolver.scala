@@ -52,10 +52,10 @@ class ClientListCheckPolicyResolver @Inject() extends Logging {
 
   private val centralHasClientExemptRoutes: Set[RouteKey] =
     Set(
-      // hasClientGuard intentionally skipped after the client has been removed
+      // live scheme authorisation check intentionally skipped after the client has been removed
       "controllers.clientdetails.ClientRemovedController" -> "onPageLoad",
 
-      // route-specific hasClientGuard via forInstanceId(instanceId), avoiding duplicate hasClient checks
+      // route-specific SchemeAuthorisationGuard via forInstanceId(instanceId), avoiding duplicate live hasClient checks
       "controllers.ReturnsLandingController"                           -> "onPageLoad",
       "controllers.SubcontractorsLandingPageController"                -> "onPageLoad",
       "controllers.CheckSubcontractorRecordsController"                -> "onPageLoad",

@@ -45,7 +45,7 @@ class AgentLandingController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   clientListStatusGuard: ClientListStatusGuard,
-  hasClientGuard: HasClientGuard,
+  schemeAuthorisationGuard: SchemeAuthorisationGuard,
   clientListCheckNavigator: ClientListCheckNavigator,
   manageService: ManageService,
   prepopService: PrepopService,
@@ -63,7 +63,7 @@ class AgentLandingController @Inject() (
       andThen clientListStatusGuard.groupB(clientListCheckNavigator.agentDashboard(uniqueId))
       andThen getData
       andThen requireData
-      andThen hasClientGuard.forInstanceId(uniqueId)).async { implicit request =>
+      andThen schemeAuthorisationGuard.forInstanceId(uniqueId)).async { implicit request =>
 
       given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
@@ -81,7 +81,7 @@ class AgentLandingController @Inject() (
     (identify
       andThen getData
       andThen requireData
-      andThen hasClientGuard.forInstanceId(uniqueId)).async { implicit request =>
+      andThen schemeAuthorisationGuard.forInstanceId(uniqueId)).async { implicit request =>
       val systemErrorRedirect       = Redirect(controllers.routes.SystemErrorController.onPageLoad())
       val unauthorisedAgentRedirect = Redirect(controllers.routes.UnauthorisedAgentAffinityController.onPageLoad())
 
@@ -197,8 +197,6 @@ class AgentLandingController @Inject() (
     val instanceId                    = client.uniqueId
     val manageContractorDetails       = Call(GET, appConfig.contractorDetailsManagementUrl)
     val checkSubcontractorRecordsCall = controllers.routes.CheckSubcontractorRecordsController.onPageLoad(
-      client.taxOfficeNumber,
-      client.taxOfficeRef,
       instanceId,
       targetKey
     )

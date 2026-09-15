@@ -22,7 +22,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.SuccessfulNoRecordsFoundView
-import controllers.actions.{AuthorizedForSchemeActionProvider, DataRequiredAction, DataRetrievalAction, HasClientGuard, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, SchemeAuthorisationGuard}
 import services.PrepopService
 
 import javax.inject.Inject
@@ -33,10 +33,9 @@ class SuccessfulNoRecordsFoundController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  hasClientGuard: HasClientGuard,
+  schemeAuthorisationGuard: SchemeAuthorisationGuard,
   val controllerComponents: MessagesControllerComponents,
   view: SuccessfulNoRecordsFoundView,
-  requireSchemeAccess: AuthorizedForSchemeActionProvider,
   service: PrepopService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -46,8 +45,7 @@ class SuccessfulNoRecordsFoundController @Inject() (
     (identify
       andThen getData
       andThen requireData
-      andThen requireSchemeAccess(instanceId)
-      andThen hasClientGuard.forInstanceId(instanceId)).async { implicit request =>
+      andThen schemeAuthorisationGuard.forInstanceId(instanceId)).async { implicit request =>
       service.getScheme(instanceId).map {
         case None                                                  =>
           Redirect(routes.SystemErrorController.onPageLoad())
@@ -59,7 +57,10 @@ class SuccessfulNoRecordsFoundController @Inject() (
     }
 
   def onSubmit(instanceId: String, targetKey: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen requireSchemeAccess(instanceId)) { implicit request =>
+    (identify
+      andThen getData
+      andThen requireData
+      andThen schemeAuthorisationGuard.validateCachedInstanceId(instanceId)) { implicit request =>
       Target.fromKey(targetKey) match {
         case Some(target) => Redirect(targetCall(target, instanceId))
         case None         => NotFound("Unknown target")

@@ -17,7 +17,7 @@
 package controllers.notices
 
 import base.SpecBase
-import controllers.actions.HasClientGuard
+import controllers.actions.*
 import models.UserAnswers
 import models.requests.DataRequest
 import org.mockito.Mockito.when
@@ -37,7 +37,7 @@ class ManageNoticesStatementsControllerSpec extends SpecBase with MockitoSugar {
 
   implicit val ec: ExecutionContext = ExecutionContext.global
 
-  private val hasClientGuard = mock[HasClientGuard]
+  private val schemeAuthorisationGuard = mock[SchemeAuthorisationGuard]
 
   private val passThroughFilter =
     new ActionFilter[DataRequest] {
@@ -46,7 +46,7 @@ class ManageNoticesStatementsControllerSpec extends SpecBase with MockitoSugar {
         Future.successful(None)
     }
 
-  when(hasClientGuard.forInstanceId(any[String])).thenReturn(passThroughFilter)
+  when(schemeAuthorisationGuard.forInstanceId(any[String])).thenReturn(passThroughFilter)
 
   "ManageNoticesStatements Controller" - {
 
@@ -61,7 +61,7 @@ class ManageNoticesStatementsControllerSpec extends SpecBase with MockitoSugar {
 
       val application = applicationBuilder(
         userAnswers = Some(userAnswers),
-        additionalBindings = Seq(bind[HasClientGuard].toInstance(hasClientGuard))
+        additionalBindings = Seq(bind[SchemeAuthorisationGuard].toInstance(schemeAuthorisationGuard))
       ).build()
 
       running(application) {
@@ -119,7 +119,7 @@ class ManageNoticesStatementsControllerSpec extends SpecBase with MockitoSugar {
 
       val application = applicationBuilder(
         userAnswers = Some(userAnswers),
-        additionalBindings = Seq(bind[HasClientGuard].toInstance(hasClientGuard))
+        additionalBindings = Seq(bind[SchemeAuthorisationGuard].toInstance(schemeAuthorisationGuard))
       ).build()
 
       running(application) {

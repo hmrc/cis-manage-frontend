@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.{AuthorizedForSchemeActionProvider, FakeAuthorizedForSchemeAction, HasClientGuard}
+import controllers.actions.*
 import models.Scheme
 import models.requests.DataRequest
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -35,9 +35,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
 
-  val mockPrepopService: PrepopService                            = mock[PrepopService]
-  val mockSchemeAccessProvider: AuthorizedForSchemeActionProvider = mock[AuthorizedForSchemeActionProvider]
-  val hasClientGuard: HasClientGuard                              = mock[HasClientGuard]
+  val mockPrepopService: PrepopService                       = mock[PrepopService]
+  val mockSchemeAuthorisationGuard: SchemeAuthorisationGuard = mock[SchemeAuthorisationGuard]
 
   private val passThroughFilter =
     new ActionFilter[DataRequest] {
@@ -46,7 +45,8 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
         Future.successful(None)
     }
 
-  when(hasClientGuard.forInstanceId(any[String])).thenReturn(passThroughFilter)
+  when(mockSchemeAuthorisationGuard.forInstanceId(any[String])).thenReturn(passThroughFilter)
+  when(mockSchemeAuthorisationGuard.validateCachedInstanceId(any[String])).thenReturn(passThroughFilter)
 
   "UnsuccessfulAutomaticSubcontractorUpdate Controller" - {
 
@@ -55,8 +55,7 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService),
-          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider),
-          bind[HasClientGuard].toInstance(hasClientGuard)
+          bind[SchemeAuthorisationGuard].toInstance(mockSchemeAuthorisationGuard)
         )
         .build()
 
@@ -83,9 +82,6 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
           )
         )
 
-        when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
-          .thenReturn(new FakeAuthorizedForSchemeAction)
-
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[UnsuccessfulAutomaticSubcontractorUpdateView]
@@ -100,8 +96,7 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService),
-          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider),
-          bind[HasClientGuard].toInstance(hasClientGuard)
+          bind[SchemeAuthorisationGuard].toInstance(mockSchemeAuthorisationGuard)
         )
         .build()
 
@@ -128,9 +123,6 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
           )
         )
 
-        when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
-          .thenReturn(new FakeAuthorizedForSchemeAction)
-
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -144,8 +136,7 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService),
-          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider),
-          bind[HasClientGuard].toInstance(hasClientGuard)
+          bind[SchemeAuthorisationGuard].toInstance(mockSchemeAuthorisationGuard)
         )
         .build()
 
@@ -161,9 +152,6 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
           Future.successful(None)
         )
 
-        when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
-          .thenReturn(new FakeAuthorizedForSchemeAction)
-
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -176,7 +164,7 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
-          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider)
+          bind[SchemeAuthorisationGuard].toInstance(mockSchemeAuthorisationGuard)
         )
         .build()
 
@@ -187,9 +175,6 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
           POST,
           routes.UnsuccessfulAutomaticSubcontractorUpdateController.onSubmit(instanceId).url
         )
-
-        when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
-          .thenReturn(new FakeAuthorizedForSchemeAction)
 
         val result    = route(application, request).value
         val appConfig = application.injector.instanceOf[config.FrontendAppConfig]

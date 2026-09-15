@@ -145,7 +145,7 @@ class SecurityCheckController @Inject() (
         }
 
       case ClientListCheckReturnTarget.FileMonthlyReturns.key =>
-        Some(controllers.agent.routes.ClientListSearchController.onPageLoad())
+        Some(controllers.agent.routes.ClientListSearchController.start())
 
       case ClientListCheckReturnTarget.ManageClientDetails.key =>
         Some(controllers.clientdetails.routes.ManageClientDetailsController.onPageLoad())

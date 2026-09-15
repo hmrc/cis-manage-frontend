@@ -49,7 +49,7 @@ class RetrievingClientController @Inject() (
   def start: Action[AnyContent] = identify.async { implicit request =>
     cisService.startClientListRetrieval
       .map {
-        case ClientListStatus.Succeeded  => Redirect(controllers.agent.routes.ClientListSearchController.onPageLoad())
+        case ClientListStatus.Succeeded  => Redirect(controllers.agent.routes.ClientListSearchController.start())
         case ClientListStatus.Failed     => Redirect(controllers.agent.routes.FailedToRetrieveClientController.onPageLoad())
         case ClientListStatus.InProgress => refreshResult(nextRetry = 1)
         case _                           => Redirect(controllers.routes.SystemErrorController.onPageLoad())
@@ -69,7 +69,7 @@ class RetrievingClientController @Inject() (
     } else {
       cisService.getClientListStatus
         .map {
-          case ClientListStatus.Succeeded  => Redirect(routes.ClientListSearchController.onPageLoad())
+          case ClientListStatus.Succeeded  => Redirect(routes.ClientListSearchController.start())
           case ClientListStatus.Failed     => Redirect(routes.FailedToRetrieveClientController.onPageLoad())
           case ClientListStatus.InProgress => refreshResult(nextRetry)
           case _                           => Redirect(controllers.routes.SystemErrorController.onPageLoad())

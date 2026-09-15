@@ -17,6 +17,7 @@
 package controllers
 
 import base.UnitSpec
+import pages.CisIdPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.SubcontractorsLandingPageView
@@ -35,7 +36,13 @@ class SubcontractorsLandingPageControllerSpec extends UnitSpec {
   "SubcontractorsLandingPageController" - {
 
     "must return OK and the correct view for a GET" in {
-      mockControllerComponents.setUserAnswers(Some(emptyUserAnswers))
+      val userAnswers = emptyUserAnswers
+        .set(CisIdPage, cisId)
+        .success
+        .value
+
+      mockControllerComponents.setUserAnswers(Some(userAnswers))
+
       val result = controllerUnderTest.onPageLoad(cisId)(FakeRequest())
 
       status(result) mustBe OK

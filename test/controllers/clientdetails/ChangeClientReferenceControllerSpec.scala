@@ -17,7 +17,7 @@
 package controllers.clientdetails
 
 import base.SpecBase
-import controllers.actions.{ClientListStatusGuard, HasClientGuard}
+import controllers.actions.*
 import controllers.routes
 import forms.clientdetails.ChangeClientReferenceFormProvider
 import models.{NormalMode, UserAnswers}
@@ -46,8 +46,8 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
   lazy val changeClientReferenceRoute: String =
     controllers.clientdetails.routes.ChangeClientReferenceController.onPageLoad(NormalMode).url
 
-  private val mockClientListStatusGuard = mock[ClientListStatusGuard]
-  private val mockHasClientGuard        = mock[HasClientGuard]
+  private val mockClientListStatusGuard    = mock[ClientListStatusGuard]
+  private val mockSchemeAuthorisationGuard = mock[SchemeAuthorisationGuard]
 
   private val passThroughClientListStatusGuard =
     new ActionFilter[IdentifierRequest] {
@@ -55,18 +55,18 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
       override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = Future.successful(None)
     }
 
-  private val passThroughHasClientGuard =
+  private val passThroughSchemeAuthorisationGuard =
     new ActionFilter[DataRequest] {
       override protected def executionContext: ExecutionContext                         = ExecutionContext.global
       override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] = Future.successful(None)
     }
 
   when(mockClientListStatusGuard.groupB(any[Call])).thenReturn(passThroughClientListStatusGuard)
-  when(mockHasClientGuard.currentClient).thenReturn(passThroughHasClientGuard)
+  when(mockSchemeAuthorisationGuard.currentClient).thenReturn(passThroughSchemeAuthorisationGuard)
 
   private val guardBindings = Seq(
     bind[ClientListStatusGuard].toInstance(mockClientListStatusGuard),
-    bind[HasClientGuard].toInstance(mockHasClientGuard)
+    bind[SchemeAuthorisationGuard].toInstance(mockSchemeAuthorisationGuard)
   )
 
   "ChangeClientReference Controller" - {
@@ -75,7 +75,8 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
 
       val application = applicationBuilder(
         userAnswers = Some(emptyUserAnswers),
-        additionalBindings = guardBindings
+        additionalBindings = guardBindings,
+        isAgent = true
       ).build()
 
       running(application) {
@@ -96,7 +97,8 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
 
       val application = applicationBuilder(
         userAnswers = Some(userAnswers),
-        additionalBindings = guardBindings
+        additionalBindings = guardBindings,
+        isAgent = true
       ).build()
 
       running(application) {
@@ -123,7 +125,8 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
           additionalBindings = guardBindings ++ Seq(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          ),
+          isAgent = true
         ).build()
 
       running(application) {
@@ -142,7 +145,8 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
 
       val application = applicationBuilder(
         userAnswers = Some(emptyUserAnswers),
-        additionalBindings = guardBindings
+        additionalBindings = guardBindings,
+        isAgent = true
       ).build()
 
       running(application) {
@@ -165,7 +169,8 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
 
       val application = applicationBuilder(
         userAnswers = None,
-        additionalBindings = guardBindings
+        additionalBindings = guardBindings,
+        isAgent = true
       ).build()
 
       running(application) {
@@ -182,7 +187,8 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
 
       val application = applicationBuilder(
         userAnswers = None,
-        additionalBindings = guardBindings
+        additionalBindings = guardBindings,
+        isAgent = true
       ).build()
 
       running(application) {
