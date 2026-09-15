@@ -151,11 +151,10 @@ class SecurityCheckController @Inject() (
         Some(controllers.clientdetails.routes.ManageClientDetailsController.onPageLoad())
 
       case ClientListCheckReturnTarget.ChangeClientReference.key =>
-        mode
-          .flatMap(Mode.fromString)
-          .map { parsedMode =>
-            controllers.clientdetails.routes.ChangeClientReferenceController.onPageLoad(parsedMode)
-          }
+        for {
+          id         <- instanceId
+          parsedMode <- mode.flatMap(Mode.fromString)
+        } yield controllers.clientdetails.routes.ChangeClientReferenceController.onPageLoad(id, parsedMode)
 
       case ClientListCheckReturnTarget.RemoveClient.key =>
         for {

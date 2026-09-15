@@ -19,7 +19,7 @@ package services
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.*
-import models.agent.AgentClientData
+import models.agent.{AgentClientData, UpdateAgentClientRequest}
 import models.history.*
 import models.requests.*
 import models.response.GetSubmittedMonthlyReturnsDataResponse
@@ -1098,6 +1098,70 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       verify(connector)
         .getVerificationRequestDetail(eqTo(instanceId), eqTo(verificationNumber))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+  }
+
+  "updateClient" should {
+
+    "delegate to connector and return response (happy path)" in {
+      val (service, connector, sessionRepo) = newService()
+      val clientRef                         = "123456"
+      val request                           = UpdateAgentClientRequest(taxOfficeNumber = "123", taxOfficeReference = "ABC123", clientRef)
+
+      val uniqueId = "900063"
+
+      val existingClients = List(createClient(uniqueId, "123", "ABC123"), createClient("CLIENT-002", "456", "XYZ456"))
+
+      val userAnswers: UserAnswers = UserAnswers("userId")
+        .set(AgentClientsPage, existingClients)
+        .success
+        .value
+
+      when(connector.updateClient(eqTo(request))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(()))
+
+      service.updateClient(uniqueId, userAnswers, clientRef).futureValue mustBe ()
+
+      verify(connector).updateClient(eqTo(request))(any[HeaderCarrier])
+    }
+
+    "return error when AgentClientsPage is missing in the user answers" in {
+      val (service, connector, sessionRepo) = newService()
+
+      val uniqueId = "900063"
+
+      val userAnswers: UserAnswers = UserAnswers("userId")
+      val clientRef                = "123456"
+      val exception                = service.updateClient(uniqueId, userAnswers, clientRef).failed.futureValue
+      exception mustBe a[RuntimeException]
+      exception.getMessage mustBe "AgentClientsPage not found in user answers"
+
+      verifyNoInteractions(connector)
+    }
+
+    "propagate failure from connector" in {
+      val (service, connector, sessionRepo) = newService()
+      val clientRef                         = "123456"
+      val request                           = UpdateAgentClientRequest(taxOfficeNumber = "123", taxOfficeReference = "ABC123", clientRef)
+
+      val uniqueId        = "900063"
+      val existingClients = List(createClient(uniqueId, "123", "ABC123"), createClient("CLIENT-002", "456", "XYZ456"))
+
+      val userAnswers: UserAnswers = UserAnswers("userId")
+        .set(AgentClientsPage, existingClients)
+        .success
+        .value
+
+      val boom = new RuntimeException("Backend error")
+
+      when(connector.updateClient(eqTo(request))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(boom))
+
+      val ex = service.updateClient(uniqueId, userAnswers, clientRef).failed.futureValue
+      ex mustBe boom
+
+      verify(connector).updateClient(eqTo(request))(any[HeaderCarrier])
       verifyNoInteractions(sessionRepo)
     }
   }
