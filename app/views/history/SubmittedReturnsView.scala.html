@@ -52,6 +52,15 @@
 
 @renderStatus(status: StatusViewModel) = @{
     status match {
+        case StatusViewModel.InProgress =>
+            Html(messages("history.returnHistory.status.inProgress"))
+
+        case StatusViewModel.AwaitingConfirmation =>
+            Html(messages("history.returnHistory.status.awaitingConfirmation"))
+
+        case StatusViewModel.Unsuccessful =>
+            Html(messages("history.returnHistory.status.unsuccessful"))
+
         case StatusViewModel.Text(messageKey) =>
             Html(messages(messageKey))
 

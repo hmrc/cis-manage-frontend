@@ -303,9 +303,9 @@ class ClientListViewModelSpec extends SpecBase {
   "SearchByList.searchByOptions" - {
     "contain the correct value-label pairs" in {
       SearchByList.searchByOptions should contain theSameElementsAs Seq(
-        SearchByList("CN", "Client name"),
-        SearchByList("CR", "Client reference"),
-        SearchByList("ER", "Employer reference")
+        SearchByList("CN", messages("agent.clientListSearch.th.clientName")),
+        SearchByList("CR", messages("agent.clientListSearch.th.clientReference")),
+        SearchByList("ER", messages("agent.clientListSearch.th.employersReference"))
       )
     }
     "preserve ordering CN → ER → CR" in {

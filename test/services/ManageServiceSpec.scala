@@ -36,7 +36,7 @@ import pages.*
 import repositories.SessionRepository
 import play.api.i18n.Lang
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel}
+import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel, ReturnTypeViewModel, StatusViewModel}
 import viewmodels.agent.AgentLandingViewModel
 
 import java.time.{Instant, LocalDateTime}
@@ -420,8 +420,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
           UnsubmittedMonthlyReturnsRow(
             taxYear = 2025,
             taxMonth = 1,
-            returnType = "Nil",
-            status = "In progress",
+            returnType = ReturnTypeViewModel.Nil,
+            status = StatusViewModel.InProgress,
             monthlyReturnId = 123L,
             lastUpdate = Some(LocalDateTime.parse("2025-01-01T00:00:00")),
             amendment = Some("N"),
@@ -456,8 +456,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
           UnsubmittedMonthlyReturnsRow(
             taxYear = 2025,
             taxMonth = 1,
-            returnType = "Nil",
-            status = "In progress",
+            returnType = ReturnTypeViewModel.Nil,
+            status = StatusViewModel.InProgress,
             monthlyReturnId = 123L,
             lastUpdate = Some(LocalDateTime.parse("2025-01-01T00:00:00")),
             amendment = Some("N"),
@@ -483,9 +483,9 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       service.getUnsubmittedMonthlyReturnRows(instanceId).futureValue mustBe Seq(
         IncompleteReturnsRowViewModel(
           returnPeriodEnd = "Jan 2025",
-          returnType = "Nil",
+          returnType = ReturnTypeViewModel.Nil,
           lastUpdate = "1 Jan 2025",
-          status = "In progress",
+          status = StatusViewModel.InProgress,
           action = Seq(
             ActionLinkViewModel(
               textKey = "incompleteReturns.action.continue",
@@ -604,8 +604,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
           UnsubmittedMonthlyReturnsRow(
             2025,
             1,
-            "Nil",
-            "In Progress",
+            ReturnTypeViewModel.Nil,
+            StatusViewModel.InProgress,
             3000L,
             None,
             Some("Y"),
@@ -614,8 +614,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
           UnsubmittedMonthlyReturnsRow(
             2025,
             2,
-            "Nil",
-            "In Progress",
+            ReturnTypeViewModel.Nil,
+            StatusViewModel.InProgress,
             3001L,
             Some(LocalDateTime.now()),
             Some("Y"),
@@ -695,8 +695,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         monthlyReturnId = monthlyReturnId,
         taxYear = 2025,
         taxMonth = 1,
-        returnType = "Nil",
-        status = "PENDING",
+        returnType = ReturnTypeViewModel.Nil,
+        status = StatusViewModel.InProgress,
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -725,8 +725,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         monthlyReturnId = monthlyReturnId,
         taxYear = 2025,
         taxMonth = 1,
-        returnType = "Nil",
-        status = "PENDING",
+        returnType = ReturnTypeViewModel.Nil,
+        status = StatusViewModel.InProgress,
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = false
@@ -790,8 +790,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         monthlyReturnId = 3000L,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Nil",
-        status = "In Progress",
+        returnType = ReturnTypeViewModel.Nil,
+        status = StatusViewModel.InProgress,
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -822,8 +822,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         monthlyReturnId = 3000L,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Nil",
-        status = "In Progress",
+        returnType = ReturnTypeViewModel.Nil,
+        status = StatusViewModel.InProgress,
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -849,8 +849,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         monthlyReturnId = 3000L,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Nil",
-        status = "In Progress",
+        returnType = ReturnTypeViewModel.Nil,
+        status = StatusViewModel.InProgress,
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
