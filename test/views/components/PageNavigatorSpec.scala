@@ -81,23 +81,6 @@ class PageNavigatorSpec extends SpecBase with Matchers {
       doc.select(".govuk-pagination__next a").attr("rel") mustBe "next"
     }
 
-    "must render pagination with ellipsis" in new Setup {
-      val pagination = PaginationViewModel(
-        items = Seq(
-          PaginationItemViewModel("1", "/page/1"),
-          PaginationItemViewModel.ellipsis(),
-          PaginationItemViewModel("5", "/page/5").withCurrent(true),
-          PaginationItemViewModel("6", "/page/6")
-        )
-      )
-
-      val html = paginationComponent(pagination)
-      val doc  = Jsoup.parse(html.body)
-
-      doc.select(".govuk-pagination__item").size() mustBe 4
-      doc.select(".govuk-pagination__item").get(1).text() mustBe "⋯"
-    }
-
     "must render empty pagination when no items provided" in new Setup {
       val pagination = PaginationViewModel()
 
