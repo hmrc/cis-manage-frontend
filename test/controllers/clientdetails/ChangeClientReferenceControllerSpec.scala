@@ -17,24 +17,22 @@
 package controllers.clientdetails
 
 import base.SpecBase
-import controllers.actions.{ClientListStatusGuard, HasClientGuard}
 import controllers.routes
 import forms.clientdetails.ChangeClientReferenceFormProvider
 import models.{NormalMode, UserAnswers}
-import models.requests.{DataRequest, IdentifierRequest}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.clientdetails.ChangeClientReferencePage
 import play.api.inject.bind
-import play.api.mvc.{ActionFilter, Call, Result}
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.clientdetails.ChangeClientReferenceView
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
 
@@ -46,37 +44,10 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
   lazy val changeClientReferenceRoute: String =
     controllers.clientdetails.routes.ChangeClientReferenceController.onPageLoad(NormalMode).url
 
-  private val mockClientListStatusGuard = mock[ClientListStatusGuard]
-  private val mockHasClientGuard        = mock[HasClientGuard]
-
-  private val passThroughClientListStatusGuard =
-    new ActionFilter[IdentifierRequest] {
-      override protected def executionContext: ExecutionContext                               = ExecutionContext.global
-      override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = Future.successful(None)
-    }
-
-  private val passThroughHasClientGuard =
-    new ActionFilter[DataRequest] {
-      override protected def executionContext: ExecutionContext                         = ExecutionContext.global
-      override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] = Future.successful(None)
-    }
-
-  when(mockClientListStatusGuard.groupB(any[Call])).thenReturn(passThroughClientListStatusGuard)
-  when(mockHasClientGuard.currentClient).thenReturn(passThroughHasClientGuard)
-
-  private val guardBindings = Seq(
-    bind[ClientListStatusGuard].toInstance(mockClientListStatusGuard),
-    bind[HasClientGuard].toInstance(mockHasClientGuard)
-  )
-
   "ChangeClientReference Controller" - {
 
     "must return OK and the correct view for a GET" in {
-
-      val application = applicationBuilder(
-        userAnswers = Some(emptyUserAnswers),
-        additionalBindings = guardBindings
-      ).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, changeClientReferenceRoute)
@@ -94,10 +65,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(userAnswersId).set(ChangeClientReferencePage, "answer").success.value
 
-      val application = applicationBuilder(
-        userAnswers = Some(userAnswers),
-        additionalBindings = guardBindings
-      ).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, changeClientReferenceRoute)
@@ -120,7 +88,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(
           userAnswers = Some(emptyUserAnswers),
-          additionalBindings = guardBindings ++ Seq(
+          additionalBindings = Seq(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
@@ -139,11 +107,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-
-      val application = applicationBuilder(
-        userAnswers = Some(emptyUserAnswers),
-        additionalBindings = guardBindings
-      ).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =
@@ -162,11 +126,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(
-        userAnswers = None,
-        additionalBindings = guardBindings
-      ).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request = FakeRequest(GET, changeClientReferenceRoute)
@@ -179,11 +139,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(
-        userAnswers = None,
-        additionalBindings = guardBindings
-      ).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =

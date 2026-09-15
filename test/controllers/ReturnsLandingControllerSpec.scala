@@ -17,14 +17,11 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.HasClientGuard
 import models.*
-import models.requests.DataRequest
-import org.mockito.Mockito.{verify, when}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
-import play.api.mvc.{ActionFilter, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -32,21 +29,11 @@ import services.ManageService
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.ReturnsLandingContext
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
 
   private val instanceId = "CIS-123"
-
-  private val mockHasClientGuard = mock[HasClientGuard]
-
-  private val passThroughHasClientGuard = new ActionFilter[DataRequest] {
-    override protected def executionContext: ExecutionContext                         = ExecutionContext.global
-    override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
-      Future.successful(None)
-  }
-
-  when(mockHasClientGuard.forInstanceId(any[String])).thenReturn(passThroughHasClientGuard)
 
   private val context = ReturnsLandingContext(
     contractorName = "ABC Construction Ltd",
@@ -72,8 +59,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
         applicationBuilder(
           userAnswers = Some(userAnswersWithCisId),
           additionalBindings = Seq(
-            bind[ManageService].toInstance(mockManageService),
-            bind[HasClientGuard].toInstance(mockHasClientGuard)
+            bind[ManageService].toInstance(mockManageService)
           )
         ).build()
 
@@ -101,8 +87,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
           userAnswers = Some(userAnswersWithCisId),
           isAgent = true,
           additionalBindings = Seq(
-            bind[ManageService].toInstance(mockManageService),
-            bind[HasClientGuard].toInstance(mockHasClientGuard)
+            bind[ManageService].toInstance(mockManageService)
           )
         ).build()
 
@@ -135,8 +120,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
         applicationBuilder(
           userAnswers = Some(userAnswersWithCisId),
           additionalBindings = Seq(
-            bind[ManageService].toInstance(mockManageService),
-            bind[HasClientGuard].toInstance(mockHasClientGuard)
+            bind[ManageService].toInstance(mockManageService)
           )
         ).build()
 
@@ -164,8 +148,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
         applicationBuilder(
           userAnswers = Some(userAnswersWithCisId),
           additionalBindings = Seq(
-            bind[ManageService].toInstance(mockManageService),
-            bind[HasClientGuard].toInstance(mockHasClientGuard)
+            bind[ManageService].toInstance(mockManageService)
           )
         ).build()
 
@@ -198,8 +181,7 @@ class ReturnsLandingControllerSpec extends SpecBase with MockitoSugar {
           userAnswers = Some(userAnswersWithCisId),
           additionalBindings = Seq(
             bind[ManageService].toInstance(mockManageService),
-            bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[HasClientGuard].toInstance(mockHasClientGuard)
+            bind[SessionRepository].toInstance(mockSessionRepository)
           )
         ).build()
 
