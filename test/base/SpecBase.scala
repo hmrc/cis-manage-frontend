@@ -89,7 +89,8 @@ trait SpecBase
           bind[IdentifierAction].qualifiedWith("ContractorIdentifier").to(new FakeIdentifierAction(false)(parsers)),
           bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
           bind[FormpRdsReconcileAction].toInstance(new FakeFormpRdsReconcileAction),
-          bind[HasClientGuard] toInstance new FakeHasClientGuard(using ExecutionContext.global)
+          bind[HasClientGuard] toInstance new FakeHasClientGuard(using ExecutionContext.global),
+          bind[ClientListStatusGuard] toInstance new FakeClientListStatusGuard(using ExecutionContext.global)
         ) ++ additionalBindings
       )
 }

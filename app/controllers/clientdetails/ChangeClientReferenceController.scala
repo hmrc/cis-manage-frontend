@@ -19,7 +19,7 @@ package controllers.clientdetails
 import controllers.actions.*
 import forms.clientdetails.ChangeClientReferenceFormProvider
 import models.Mode
-import navigation.{ClientListCheckNavigator, Navigator}
+import navigation.ClientListCheckNavigator
 import pages.clientdetails.ChangeClientReferencePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
