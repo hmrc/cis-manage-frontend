@@ -121,31 +121,29 @@ class FrontendAppConfigSpec extends SpecBase {
 
   "fileStandardReturnUrl" - {
 
-    "must build the base URL from cis-frontend.host and urls.fileStandardReturn" in new Setup {
-      appConfig.fileStandardReturnUrl mustBe "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-monthly-return"
+    "must build the base URL from cis-contractor-frontend and the final validation file monthly return path" in new Setup {
+      appConfig.fileStandardReturnUrl mustBe
+        "http://localhost:6998/construction-industry-scheme/final-validations/file-monthly-return"
     }
 
-    "must build a URL with encoded query params" in new Setup {
+    "must build the same final validation URL when an instanceId is provided" in new Setup {
       val url: String = appConfig.fileStandardReturnUrl(instanceId = "inst+id?=x")
 
-      url mustBe
-        "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-monthly-return" +
-        "?instanceId=inst%2Bid%3F%3Dx"
+      url mustBe "http://localhost:6998/construction-industry-scheme/final-validations/file-monthly-return"
     }
   }
 
   "fileNilReturnUrl" - {
 
-    "must build the base URL from cis-frontend.host and urls.fileNilReturn" in new Setup {
-      appConfig.fileNilReturnUrl mustBe "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-nil-return"
+    "must build the base URL from cis-contractor-frontend and the final validation file nil return path" in new Setup {
+      appConfig.fileNilReturnUrl mustBe
+        "http://localhost:6998/construction-industry-scheme/final-validations/file-nil-return"
     }
 
-    "must build a URL with encoded query params" in new Setup {
+    "must build the same final validation URL when an instanceId is provided" in new Setup {
       val url: String = appConfig.fileNilReturnUrl(instanceId = "inst+id?=x")
 
-      url mustBe
-        "http://localhost:6993/construction-industry-scheme/monthly-return/file-your-nil-return" +
-        "?instanceId=inst%2Bid%3F%3Dx"
+      url mustBe "http://localhost:6998/construction-industry-scheme/final-validations/file-nil-return"
     }
   }
 
@@ -184,7 +182,7 @@ class FrontendAppConfigSpec extends SpecBase {
 
     "must contain the verify subcontractor URL" in new Setup {
       appConfig.cisVerifySubcontractorUrl mustBe
-        "http://localhost:6998/construction-industry-scheme/subcontractor/verify/newest"
+        "http://localhost:6998/construction-industry-scheme/final-validations/verify-subcontractors"
     }
 
     "must contain the check verification results URL" in new Setup {
