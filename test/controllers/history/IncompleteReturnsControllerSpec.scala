@@ -28,8 +28,9 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.ManageService
+import play.api.i18n.Lang
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel}
+import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel, ReturnTypeViewModel, StatusViewModel}
 import views.html.IncompleteReturnsView
 
 import scala.concurrent.Future
@@ -44,9 +45,9 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
       val rows = Seq(
         IncompleteReturnsRowViewModel(
           returnPeriodEnd = "5 April 2025",
-          returnType = "Standard",
+          returnType = ReturnTypeViewModel.Standard,
           lastUpdate = "20 April 2026",
-          status = "In progress",
+          status = StatusViewModel.InProgress,
           action = Seq(
             ActionLinkViewModel(
               textKey = "incompleteReturns.action.continue",
@@ -57,7 +58,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         )
       )
 
-      when(mockService.getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier]))
+      when(mockService.getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier], any[Lang]()))
         .thenReturn(Future.successful(rows))
 
       val userAnswers = emptyUserAnswers.set(CisIdPage, "1234567890").success.value
@@ -76,14 +77,14 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(rows)(request, messages(application)).toString
 
-        verify(mockService).getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier])
+        verify(mockService).getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier], any[Lang]())
       }
     }
 
     "must redirect to NoIncompleteReturnsController when there are no incomplete returns" in {
       val mockService = mock[ManageService]
 
-      when(mockService.getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier]))
+      when(mockService.getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier], any[Lang]()))
         .thenReturn(Future.successful(Seq.empty))
 
       val userAnswers = emptyUserAnswers.set(CisIdPage, "123").success.value
@@ -101,7 +102,7 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual
           controllers.history.routes.NoIncompleteReturnsController.onPageLoad().url
 
-        verify(mockService).getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier])
+        verify(mockService).getUnsubmittedMonthlyReturnRows(any[String])(any[HeaderCarrier], any[Lang]())
       }
     }
   }
@@ -121,8 +122,8 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         monthlyReturnId = monthlyReturnId,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Nil",
-        status = "In Progress",
+        returnType = ReturnTypeViewModel.Nil,
+        status = StatusViewModel.InProgress,
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -163,8 +164,8 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         monthlyReturnId = monthlyReturnId,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Nil",
-        status = "In Progress",
+        returnType = ReturnTypeViewModel.Nil,
+        status = StatusViewModel.InProgress,
         lastUpdate = None,
         amendment = Some("N"),
         deletable = true
@@ -205,8 +206,8 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         monthlyReturnId = monthlyReturnId,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Standard",
-        status = "In Progress",
+        returnType = ReturnTypeViewModel.Standard,
+        status = StatusViewModel.InProgress,
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -247,8 +248,8 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         monthlyReturnId = monthlyReturnId,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Standard",
-        status = "In Progress",
+        returnType = ReturnTypeViewModel.Standard,
+        status = StatusViewModel.InProgress,
         lastUpdate = None,
         amendment = Some("N"),
         deletable = true
@@ -320,8 +321,8 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         monthlyReturnId = monthlyReturnId,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Invalid Type",
-        status = "In Progress",
+        returnType = ReturnTypeViewModel.Unknown,
+        status = StatusViewModel.InProgress,
         lastUpdate = None,
         amendment = Some("N"),
         deletable = true
@@ -371,8 +372,8 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
         monthlyReturnId = monthlyReturnId,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Nil",
-        status = "In Progress",
+        returnType = ReturnTypeViewModel.Nil,
+        status = StatusViewModel.InProgress,
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true

@@ -37,7 +37,9 @@ class ContractorLandingViewSpec extends SpecBase {
     employerReference = employerReference,
     whatIsUrl = "https://www.gov.uk/what-is-the-construction-industry-scheme",
     guidanceUrl = "https://www.gov.uk/guidance/cis-monthly-returns",
-    penaltiesUrl = "https://www.gov.uk/government/publications/cis-340"
+    penaltiesUrl = "https://www.gov.uk/government/publications/cis-340",
+    cisOrgAppealUrl = "/foo/appeal",
+    cisOrgGenericNoticesUrl = "/foo/notices"
   )
 
   "ContractorLandingView" - {
@@ -106,6 +108,8 @@ class ContractorLandingViewSpec extends SpecBase {
       links.select("[href=https://www.gov.uk/what-is-the-construction-industry-scheme]").size() shouldBe 1
       links.select("[href=https://www.gov.uk/guidance/cis-monthly-returns]").size()             shouldBe 1
       links.select("[href=https://www.gov.uk/government/publications/cis-340]").size()          shouldBe 1
+      links.select("[href=/foo/appeal]").size()                                                 shouldBe 1
+      links.select("[href=/foo/notices]").size()                                                shouldBe 1
     }
 
     "render all landing page cards with correct links" in {

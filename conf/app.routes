@@ -24,7 +24,9 @@ GET   /subcontractors/no-subcontractors-to-view  controllers.subcontractors.NoSu
 
 GET   /subcontractors/:subbieResourceRef/delete-status  controllers.subcontractors.GetSubcontractorForDeleteController.onPageLoad(subbieResourceRef: Long)
 
-GET   /authorisation-check-in-progress  controllers.SecurityCheckController.onPageLoad()
+GET   /authorisation-check-in-progress                        controllers.SecurityCheckController.onPageLoad()
+GET   /authorisation-check-in-progress/client-list/:returnTo  controllers.SecurityCheckController.onClientListCheck(returnTo: String, instanceId: Option[String] ?= None, mode: Option[String] ?= None)
+GET   /authorisation-check-in-progress/:returnTo/poll         controllers.SecurityCheckController.pollClientListCheck(returnTo: String, instanceId: Option[String] ?= None, mode: Option[String] ?= None, retryCount: Int ?= 0)
 
 GET   /subcontractors/:instanceId/your-subcontractors         controllers.subcontractors.SubcontractorsListController.onPageLoad(instanceId: String, mode: Mode = NormalMode, page: Int ?= 1)
 POST  /subcontractors/:instanceId/your-subcontractors         controllers.subcontractors.SubcontractorsListController.onSubmit(instanceId: String, mode: Mode = NormalMode, page: Int ?= 1)
@@ -50,8 +52,6 @@ GET  /unauthorised/organisation        controllers.UnauthorisedOrganisationAffin
 GET  /unauthorised/individual          controllers.UnauthorisedIndividualAffinityController.onPageLoad()
 
 GET  /unauthorised/agent               controllers.UnauthorisedAgentAffinityController.onPageLoad()
-
-GET  /page-not-found                   controllers.PageNotFoundController.onPageLoad()
 
 GET  /access-denied                    controllers.AccessDeniedController.onPageLoad()
 
@@ -142,31 +142,26 @@ GET   /no-incomplete-returns  controllers.history.NoIncompleteReturnsController.
 GET  /manage-notices-statements/:instanceId  controllers.notices.ManageNoticesStatementsController.onPageLoad(instanceId: String)
 
 # Verify
-GET   /verify/select-tax-year-for-verification-requests     controllers.verify.VerificationHistorySelectTaxYearController.onPageLoad(mode: Mode = NormalMode)
-POST  /verify/select-tax-year-for-verification-requests     controllers.verify.VerificationHistorySelectTaxYearController.onSubmit(mode: Mode = NormalMode)
+GET   /verify/verification-request        controllers.verify.VerificationRequestController.onPageLoad(verificationBatchId: Long)
 
-GET   /verify/history/verification-history-all-tax-years    controllers.verify.VerificationHistoryController.onPageLoadAllYears()
-GET   /verify/history/verification-history-single-tax-year  controllers.verify.VerificationHistoryController.onPageLoadSingleYear()
+GET   /verify/history/submission-receipt  controllers.verify.SubcontractorSubmissionReceiptController.onPageLoad(verificationBatchId: Long)
 
-GET   /verify/history/submission-receipt                    controllers.verify.SubcontractorSubmissionReceiptController.onPageLoad(verificationBatchId: Long)
+GET   /verify/history/select-tax-year     controllers.verify.VerificationHistorySelectTaxYearController.onPageLoad()
+POST  /verify/history/select-tax-year     controllers.verify.VerificationHistorySelectTaxYearController.onSubmit()
 
-GET   /verify/verification-request                          controllers.verify.VerificationRequestController.onPageLoad(verificationBatchId: Long)
-
-GET   /verification-history/retrieve                        controllers.verify.GetSubmittedVerificationsController.onPageLoad()
-
-GET   /verify/no-verification-history                       controllers.verify.NoVerificationHistoryController.onPageLoad()
+GET   /verify/history/:selection          controllers.verify.VerificationHistoryController.onPageLoad(selection: String)
 
 # Client Details
-GET   /client-details/manage-client-details           controllers.clientdetails.ManageClientDetailsController.onPageLoad()
+GET   /client-details/manage-client-details  controllers.clientdetails.ManageClientDetailsController.onPageLoad()
 
-GET   /client-details/client-removed                  controllers.clientdetails.ClientRemovedController.onPageLoad()
+GET   /client-details/client-removed  controllers.clientdetails.ClientRemovedController.onPageLoad()
 
-GET   /client-details/client-reference-updated        controllers.clientdetails.ClientRefUpdateConfirmationController.onPageLoad()
+GET   /client-details/client-reference-updated  controllers.clientdetails.ClientRefUpdateConfirmationController.onPageLoad()
 
-GET   /client-details/remove-client                   controllers.clientdetails.RemoveClientYesNoController.onPageLoad(mode: Mode = NormalMode)
-POST  /client-details/remove-client                   controllers.clientdetails.RemoveClientYesNoController.onSubmit(mode: Mode = NormalMode)
-GET   /client-details/change-remove-client            controllers.clientdetails.RemoveClientYesNoController.onPageLoad(mode: Mode = CheckMode)
-POST  /client-details/change-remove-client            controllers.clientdetails.RemoveClientYesNoController.onSubmit(mode: Mode = CheckMode)
+GET   /client-details/remove-client/:uniqueId         controllers.clientdetails.RemoveClientYesNoController.onPageLoad(uniqueId: String, mode: Mode = NormalMode)
+POST  /client-details/remove-client/:uniqueId         controllers.clientdetails.RemoveClientYesNoController.onSubmit(uniqueId: String, mode: Mode = NormalMode)
+GET   /client-details/change-remove-client/:uniqueId  controllers.clientdetails.RemoveClientYesNoController.onPageLoad(uniqueId: String, mode: Mode = CheckMode)
+POST  /client-details/change-remove-client/:uniqueId  controllers.clientdetails.RemoveClientYesNoController.onSubmit(uniqueId: String, mode: Mode = CheckMode)
 
 GET   /client-details/change-client-reference         controllers.clientdetails.ChangeClientReferenceController.onPageLoad(mode: Mode = NormalMode)
 POST  /client-details/change-client-reference         controllers.clientdetails.ChangeClientReferenceController.onSubmit(mode: Mode = NormalMode)

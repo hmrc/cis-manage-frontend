@@ -99,7 +99,7 @@
                                         TableRow(content = Text(row.verificationNumber)),
                                         TableRow(content = Text(row.dateSubmitted)),
                                         TableRow(content = HtmlContent(renderViewLink(row.verificationRequestLink, messages("verify.verificationHistory.hidden.verificationRequest", row.verificationNumber)))),
-                                        TableRow(content = HtmlContent(renderViewLink(row.submissionReceiptLink, messages("verify.verificationHistory.hidden.submissionReceipt", row.verificationNumber))))
+                                        TableRow(content = row.submissionReceiptLink.fold(HtmlContent("")) { link => HtmlContent(renderViewLink(link, messages("verify.verificationHistory.hidden.submissionReceipt", row.verificationNumber)))})
                                     )
                                 }
                             )
@@ -124,11 +124,14 @@
                                         ),
                                         SummaryListRow(
                                             key = Key(content = Text(messages("verify.verificationHistory.table.submissionReceipt"))),
-                                            value = Value(content = HtmlContent(renderViewLink(row.submissionReceiptLink, messages("verify.verificationHistory.hidden.submissionReceipt", row.verificationNumber))))
+                                            value = Value(content = row.submissionReceiptLink.fold(HtmlContent("")) { link =>
+                                                HtmlContent(renderViewLink(link, messages("verify.verificationHistory.hidden.submissionReceipt", row.verificationNumber)))
+                                            }
                                         )
                                     )
                                 )
                             )
+                        )
                         }
                     </div>
                 }

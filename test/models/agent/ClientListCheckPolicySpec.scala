@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package pages.verify
+package models.agent
 
 import base.SpecBase
-import play.api.libs.json.JsPath
 
-class VerificationHistorySelectTaxYearPageSpec extends SpecBase {
+class ClientListCheckPolicySpec extends SpecBase {
 
-  "VerificationHistorySelectTaxYearPage" - {
+  "ClientListCheckPolicy" - {
 
-    "must have the correct path" in {
-      VerificationHistorySelectTaxYearPage.path mustBe (
-        JsPath \ "verificationHistorySelectTaxYear"
-      )
-    }
-
-    "must have the correct toString value" in {
-      VerificationHistorySelectTaxYearPage.toString mustBe
-        "verificationHistorySelectTaxYear"
+    "must expose GroupA, GroupB and Exempt policies" in {
+      ClientListCheckPolicy.GroupA mustBe a[ClientListCheckPolicy]
+      ClientListCheckPolicy.GroupB mustBe a[ClientListCheckPolicy]
+      ClientListCheckPolicy.Exempt mustBe a[ClientListCheckPolicy]
     }
   }
 }

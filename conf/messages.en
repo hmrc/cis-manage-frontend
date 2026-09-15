@@ -26,6 +26,7 @@ site.saveAndContinue                                    =  Save and continue
 date.day                                                =  Day
 date.month                                              =  Month
 date.year                                               =  Year
+date.period                                             =  {0} to {1}
 
 date.error.day                                          =  day
 date.error.month                                        =  month
@@ -182,16 +183,14 @@ returnsLanding.fileNilReturn.h3.link                              =  File a nil 
 returnsLanding.fileNilReturn.p1                                   =  File a nil return when no payments were made to subcontractors in a tax month.
 
 returnsLanding.viewSubmittedReturns.h3.link                       =  View submitted returns
-returnsLanding.viewSubmittedReturns.p1                            =  View a return to make amendments, change payment details you entered, or check progress.
+returnsLanding.viewSubmittedReturns.p1                            =  View submitted monthly or nil returns.
 
 returnsLanding.incompleteReturns.h3.link                          =  Incomplete returns
-returnsLanding.incompleteReturns.p1                               =  Submit or delete a return in progress. You can also resubmit a return that was not initially accepted.
+returnsLanding.incompleteReturns.p1                               =  Submit a return currently in progress, or resubmit a return not initially accepted.
 
 returnsLanding.aside.h2                                           =  Help and guidance
 returnsLanding.aside.link1                                        =  Construction Industry Scheme: A guide (CIS 340)
 returnsLanding.aside.link2                                        =  Find software suppliers for the Construction Industry Scheme (CIS) - GOV.UK
-
-returnsLanding.returnToHome.link                                  =  Return to home
 
 # Agent
 agent.retrievingClient.title                           =  Retrieving your client list
@@ -225,7 +224,7 @@ agent.noAuthorisedClients.p3                           =  Ask your client to aut
 agent.noAuthorisedClients.listItem1                    =  authorising you through their
 agent.noAuthorisedClients.listItem1.link               =  HMRC online account
 agent.noAuthorisedClients.listItem2                    =  downloading and completing
-agent.noAuthorisedClients.listItem2.link               =  form 64-8
+agent.noAuthorisedClients.listItem2.link               =  form 64—8
 agent.noAuthorisedClients.listItem2.afterLinkText      =  to authorise you by post
 agent.noAuthorisedClients.p4                           =  It can take up to 5 working days for new authorisations to appear in your account.
 agent.noAuthorisedClients.returnToHome.link            =  Return to home
@@ -262,7 +261,7 @@ agent.clientListSearch.details.1.summary               =  Download your client l
 agent.clientListSearch.details.1.p1                    =  You can download a list of all your clients as a CSV file. This may take some time if you have many clients.
 agent.clientListSearch.details.1.link                  =  Download client list (CSV)
 agent.clientListSearch.details.2.summary               =  Filing only service
-agent.clientListSearch.details.2.p1                    =  You can send CIS monthly returns on behalf of a client without completing an authorisation online or form 64-8.
+agent.clientListSearch.details.2.p1                    =  You can send CIS monthly returns on behalf of a client without completing an authorisation online or form 64—8.
 agent.clientListSearch.details.2.p2                    =  This service is only available using commercial software.
 agent.clientListSearch.details.2.link                  =  Find commercial software for CIS returns (opens in new tab)
 agent.clientListSearch.td.actions.remove.hidden        =  Remove {0}
@@ -302,7 +301,7 @@ agent.agentLostAccess.bullet.title                     =  Ask your client to aut
 agent.agentLostAccess.bullet.item.1.prefix             =  authorising you through their
 agent.agentLostAccess.bullet.item.1.link               =  HMRC online account
 agent.agentLostAccess.bullet.item.2.prefix             =  downloading and completing
-agent.agentLostAccess.bullet.item.2.link               =  form 64-8
+agent.agentLostAccess.bullet.item.2.link               =  form 64—8
 agent.agentLostAccess.bullet.item.2.suffix             =  to authorise you by post
 agent.agentLostAccess.p2                               =  It can take up to 5 working days for new authorisations to appear in your account.
 agent.agentLostAccess.return.link                      =  Return to client list
@@ -432,7 +431,7 @@ history.submittedReturnsChooseTaxYear.heading                                =  
 history.submittedReturnsChooseTaxYear.caption                                =  Submitted returns
 history.submittedReturnsChooseTaxYear.viewAll                                =  View all tax years
 history.submittedReturnsChooseTaxYear.error.required                         =  Select a tax year or all tax years
-history.submittedReturnsChooseTaxYear.taxYear                                = {0} to {1}
+history.submittedReturnsChooseTaxYear.taxYear                                =  {0} to {1}
 
 history.printSubmissionDetails.title                                         =  Monthly return for period ending {0}
 history.printSubmissionDetails.heading                                       =  Monthly return for period ending {0}
@@ -477,6 +476,7 @@ history.returnHistory.status.awaitingConfirmation                            =  
 history.returnHistory.status.amend                                           =  Amend
 history.returnHistory.status.notAvailable                                    =  Not available
 history.returnHistory.status.inProgress                                      =  In progress
+history.returnHistory.status.unsuccessful                                    =  Unsuccessful
 history.returnHistory.hidden.status.amend                                    =  amend return for {0}
 history.returnHistory.hidden.status.inProgress                               =  submission return for {0}
 history.returnHistory.hidden.monthlyReturn                                   =  monthly return for {0}
@@ -582,7 +582,7 @@ verify.verificationHistorySelectTaxYear.heading              =  Which tax year d
 verify.verificationHistorySelectTaxYear.currentTaxYear       =  (current tax year)
 verify.verificationHistorySelectTaxYear.viewAll              =  View all tax years
 verify.verificationHistorySelectTaxYear.error.required       =  Select a tax year
-verify.verificationHistorySelectTaxYear.taxYear              = {0} to {1}
+verify.verificationHistorySelectTaxYear.taxYear              =  {0} to {1}
 
 verify.verificationHistory.allYears.title                    =  Verification request history for all tax years
 verify.verificationHistory.allYears.heading                  =  Verification request history for all tax years

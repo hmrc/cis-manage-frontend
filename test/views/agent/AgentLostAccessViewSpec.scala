@@ -51,6 +51,7 @@ class AgentLostAccessViewSpec extends SpecBase {
       doc.select("p").text must include(messages("agent.agentLostAccess.p2"))
 
       doc.getElementsByClass("govuk-link").text must include(messages("agent.agentLostAccess.return.link"))
+      doc.getElementsByClass("hmrc-sign-out-nav__link").size mustBe 1
     }
   }
 

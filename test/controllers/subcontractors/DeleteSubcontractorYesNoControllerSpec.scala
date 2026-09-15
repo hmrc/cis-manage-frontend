@@ -19,6 +19,7 @@ package controllers.subcontractors
 import base.SpecBase
 import controllers.routes
 import forms.subcontractors.DeleteSubcontractorYesNoFormProvider
+import models.audit.DeleteSubcontractorAuditEventModel
 import models.response.{GetSubcontractor, GetSubcontractorListResponse}
 import models.subcontractors.DeleteSubcontractorJourneyData
 import models.{NormalMode, UserAnswers}
@@ -32,7 +33,8 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{AuditService, SubcontractorService}
+import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import views.html.subcontractors.DeleteSubcontractorYesNoView
 
 import scala.concurrent.Future
@@ -228,6 +230,142 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
 
         verify(mockSubcontractorService)
           .deleteSubcontractor(eqTo(cisId), eqTo(subbieResourceRef))(any())
+      }
+    }
+
+    "must send a deleteSubcontractor audit event when Yes is submitted successfully" in {
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
+
+      when(mockSubcontractorService.deleteSubcontractor(eqTo(cisId), eqTo(subbieResourceRef))(any()))
+        .thenReturn(Future.unit)
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      when(mockAuditService.sendEvent(any())(any(), any()))
+        .thenReturn(Future.successful(AuditResult.Success))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithJourney))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, deleteSubcontractorYesNoRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        verify(mockAuditService).sendEvent(
+          eqTo(
+            DeleteSubcontractorAuditEventModel(
+              cisId = cisId,
+              subcontractorName = subcontractorName,
+              subbieResourceRef = subbieResourceRef,
+              typeOfSubcontractor = None
+            )
+          )
+        )(any(), any())
+      }
+    }
+
+    "must include typeOfSubcontractor in the audit event when available from SubcontractorListPage" in {
+
+      val mockSubcontractorService = mock[SubcontractorService]
+      val mockSessionRepository    = mock[SessionRepository]
+      val mockAuditService         = mock[AuditService]
+
+      when(mockSubcontractorService.deleteSubcontractor(eqTo(cisId), eqTo(subbieResourceRef))(any()))
+        .thenReturn(Future.unit)
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      when(mockAuditService.sendEvent(any())(any(), any()))
+        .thenReturn(Future.successful(AuditResult.Success))
+
+      val listSubcontractor = GetSubcontractor(
+        subcontractorId = 1L,
+        utr = None,
+        pageVisited = None,
+        partnerUtr = None,
+        crn = None,
+        firstName = None,
+        nino = None,
+        secondName = None,
+        surname = None,
+        partnershipTradingName = None,
+        tradingName = Some(subcontractorName),
+        subcontractorType = Some("soleTrader"),
+        addressLine1 = None,
+        addressLine2 = None,
+        addressLine3 = None,
+        addressLine4 = None,
+        country = None,
+        postcode = None,
+        emailAddress = None,
+        phoneNumber = None,
+        mobilePhoneNumber = None,
+        worksReferenceNumber = None,
+        createDate = None,
+        lastUpdate = None,
+        subbieResourceRef = Some(subbieResourceRef),
+        matched = None,
+        autoVerified = None,
+        verified = None,
+        verificationNumber = None,
+        taxTreatment = None,
+        verificationDate = None,
+        version = None,
+        updatedTaxTreatment = None,
+        lastMonthlyReturnDate = None,
+        pendingVerifications = None
+      )
+
+      val userAnswersWithList =
+        userAnswersWithJourney
+          .set(SubcontractorListPage, GetSubcontractorListResponse(Seq(listSubcontractor)))
+          .success
+          .value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithList))
+          .overrides(
+            bind[SubcontractorService].toInstance(mockSubcontractorService),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[AuditService].toInstance(mockAuditService)
+          )
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, deleteSubcontractorYesNoRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        verify(mockAuditService).sendEvent(
+          eqTo(
+            DeleteSubcontractorAuditEventModel(
+              cisId = cisId,
+              subcontractorName = subcontractorName,
+              subbieResourceRef = subbieResourceRef,
+              typeOfSubcontractor = Some("soletrader")
+            )
+          )
+        )(any(), any())
       }
     }
 

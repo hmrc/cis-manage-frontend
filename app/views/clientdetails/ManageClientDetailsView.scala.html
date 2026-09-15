@@ -17,7 +17,8 @@
 @import views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import viewmodels.govuk.{summarylist => sl}
-
+@import models.NormalMode
+@import controllers.clientdetails.routes
 
 @this(
     layout: templates.Layout,
@@ -54,7 +55,7 @@
                 actions = Some(Actions(
                     items = Seq(
                         ActionItem(
-                            href = "#",
+                            href = routes.ChangeClientReferenceController.onPageLoad(NormalMode).url,
                             content = Text(messages("site.change")),
                             visuallyHiddenText = Some(messages("clientdetails.manageClientDetails.clientRef.key.hidden"))
                         )

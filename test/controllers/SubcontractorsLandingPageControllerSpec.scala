@@ -16,38 +16,30 @@
 
 package controllers
 
-import base.SpecBase
-import config.FrontendAppConfig
+import base.UnitSpec
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.SubcontractorsLandingPageView
 
-class SubcontractorsLandingPageControllerSpec extends SpecBase {
-  private val instanceId = "CIS-123"
+class SubcontractorsLandingPageControllerSpec extends UnitSpec {
+  import org.mockito.ArgumentMatchers.any
+  import org.mockito.Mockito.when
+  import play.twirl.api.Html
+
+  private val stubView    = mock[SubcontractorsLandingPageView]
+  private val stubContent = "Subcontractors Landing Page"
+  when(stubView.apply()(any, any)) thenReturn Html(stubContent)
+
+  private val controllerUnderTest = new SubcontractorsLandingPageController(mockControllerComponents, stubView)
 
   "SubcontractorsLandingPageController" - {
 
     "must return OK and the correct view for a GET" in {
+      mockControllerComponents.setUserAnswers(Some(emptyUserAnswers))
+      val result = controllerUnderTest.onPageLoad(cisId)(FakeRequest())
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.SubcontractorsLandingPageController.onPageLoad(instanceId).url
-        )
-        val result  = route(application, request).value
-
-        val view = application.injector.instanceOf[SubcontractorsLandingPageView]
-
-        status(result) mustBe OK
-
-        implicit val appConfig: FrontendAppConfig =
-          application.injector.instanceOf[FrontendAppConfig]
-
-        contentAsString(result) mustEqual
-          view()(request, appConfig, messages(application)).toString
-      }
+      status(result) mustBe OK
+      contentAsString(result) mustEqual stubContent
     }
   }
 }

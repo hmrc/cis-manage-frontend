@@ -19,6 +19,7 @@ package controllers.subcontractors
 import controllers.actions.*
 import forms.subcontractors.DeleteSubcontractorYesNoFormProvider
 import models.Mode
+import models.audit.DeleteSubcontractorAuditEventModel
 import models.requests.CisIdDataRequest
 import pages.subcontractors.{DeleteSubcontractorJourneyPage, DeleteSubcontractorYesNoPage, DeletedSubcontractorPage, SubcontractorListPage}
 import play.api.Logging
@@ -26,7 +27,7 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.SubcontractorService
+import services.{AuditService, SubcontractorService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.subcontractors.DeleteSubcontractorYesNoView
 
@@ -37,6 +38,7 @@ class DeleteSubcontractorYesNoController @Inject() (
   override val messagesApi: MessagesApi,
   sessionRepository: SessionRepository,
   subcontractorService: SubcontractorService,
+  auditService: AuditService,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -123,14 +125,24 @@ class DeleteSubcontractorYesNoController @Inject() (
                 .fold(
                   Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
                 ) { journeyData =>
-                  val subcontractorName = request.userAnswers
+                  val foundSubcontractor  = request.userAnswers
                     .get(SubcontractorListPage)
                     .flatMap(_.subcontractors.find(_.subbieResourceRef.contains(verificationNumber)))
+                  val subcontractorName   = foundSubcontractor
                     .flatMap(_.displayName)
                     .getOrElse(journeyData.subcontractorName)
+                  val typeOfSubcontractor = foundSubcontractor.flatMap(_.normalisedType)
                   subcontractorService
                     .deleteSubcontractor(request.cisId, verificationNumber)
                     .flatMap { _ =>
+                      auditService.sendEvent(
+                        DeleteSubcontractorAuditEventModel(
+                          cisId = request.cisId,
+                          subcontractorName = subcontractorName,
+                          subbieResourceRef = verificationNumber,
+                          typeOfSubcontractor = typeOfSubcontractor
+                        )
+                      )
                       cleanupUserAnswers(subcontractorName)
                         .map { _ =>
                           Redirect(

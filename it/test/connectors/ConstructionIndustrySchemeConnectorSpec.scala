@@ -19,9 +19,9 @@ package connectors
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import itutil.ApplicationWithWiremock
 import models.Scheme
-import models.agent.AgentClientData
+import models.agent.{AgentClientData, ClientListStatus}
 import models.history.{SubmittedSchemeData, SubmittedSubmissionData}
-import models.requests.{DeleteSubcontractorRequest, DeleteUnsubmittedMonthlyReturnRequest, GetSubmittedMonthlyReturnsDataRequest}
+import models.requests.{DeleteSubcontractorRequest, DeleteUnsubmittedMonthlyReturnRequest, GetSubmittedMonthlyReturnsDataRequest, RemoveAgentClientRequest}
 import models.response.{GetSubcontractorForDeleteResponse, GetSubmittedMonthlyReturnsDataResponse}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
@@ -29,6 +29,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpException, UpstreamErrorResponse}
+import viewmodels.{ReturnTypeViewModel, StatusViewModel}
 
 import java.time.Instant
 
@@ -95,6 +96,43 @@ class ConstructionIndustrySchemeConnectorSpec
         connector.getCisTaxpayer().futureValue
       }
       ex.getMessage must include("returned 500")
+    }
+  }
+
+  "hasClient" should {
+
+    "return HasClientResponse when BE returns 200" in {
+      stubFor(
+        get(urlPathEqualTo("/cis/agent/has-client/163/AB0063"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withHeader("Content-Type", "application/json")
+              .withBody("""{ "hasClient": true }""")
+          )
+      )
+
+      val result =
+        connector.hasClient("163", "AB0063").futureValue
+
+      result.hasClient mustBe true
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      stubFor(
+        get(urlPathEqualTo("/cis/agent/has-client/163/AB0063"))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody("boom")
+          )
+      )
+
+      val ex =
+        connector.hasClient("163", "AB0063").failed.futureValue
+
+      ex mustBe a[UpstreamErrorResponse]
+      ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe INTERNAL_SERVER_ERROR
     }
   }
 
@@ -207,7 +245,7 @@ class ConstructionIndustrySchemeConnectorSpec
       ex.getMessage must include("returned 500")
     }
   }
-
+  
   "startClientList" should {
 
     "return GetClientListStatusResponse with 'succeeded' when BE returns succeeded" in {
@@ -217,7 +255,7 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val result = connector.startClientList(using hc).futureValue
-      result.result mustBe "succeeded"
+      result.result mustBe ClientListStatus.Succeeded
     }
 
     "return GetClientListStatusResponse with 'in-progress' when BE returns in-progress" in {
@@ -227,7 +265,7 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val result = connector.startClientList(using hc).futureValue
-      result.result mustBe "in-progress"
+      result.result mustBe ClientListStatus.InProgress
     }
 
     "return GetClientListStatusResponse with 'failed' when BE returns failed" in {
@@ -237,7 +275,7 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val result = connector.startClientList(using hc).futureValue
-      result.result mustBe "failed"
+      result.result mustBe ClientListStatus.Failed
     }
 
     "return GetClientListStatusResponse with 'initiate-download' when BE returns initiate-download" in {
@@ -247,7 +285,7 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val result = connector.startClientList(using hc).futureValue
-      result.result mustBe "initiate-download"
+      result.result mustBe ClientListStatus.InitiateDownload
     }
 
     "propagate an upstream error when BE returns 500" in {
@@ -288,7 +326,7 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val result = connector.getClientListStatus(using hc).futureValue
-      result.result mustBe "succeeded"
+      result.result mustBe ClientListStatus.Succeeded
     }
 
     "return GetClientListStatusResponse with 'in-progress' when BE returns 200 with in-progress status" in {
@@ -302,7 +340,7 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val result = connector.getClientListStatus(using hc).futureValue
-      result.result mustBe "in-progress"
+      result.result mustBe ClientListStatus.InProgress
     }
 
     "return GetClientListStatusResponse with 'failed' when BE returns 200 with failed status" in {
@@ -316,7 +354,7 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val result = connector.getClientListStatus(using hc).futureValue
-      result.result mustBe "failed"
+      result.result mustBe ClientListStatus.Failed
     }
 
     "return GetClientListStatusResponse with 'initiate-download' when BE returns 200 with initiate-download status" in {
@@ -330,7 +368,7 @@ class ConstructionIndustrySchemeConnectorSpec
       )
 
       val result = connector.getClientListStatus(using hc).futureValue
-      result.result mustBe "initiate-download"
+      result.result mustBe ClientListStatus.InitiateDownload
     }
 
     "propagate an upstream error when BE returns 500" in {
@@ -627,8 +665,8 @@ class ConstructionIndustrySchemeConnectorSpec
       result.unsubmittedCisReturns.length mustBe 1
       result.unsubmittedCisReturns.head.taxYear mustBe 2025
       result.unsubmittedCisReturns.head.taxMonth mustBe 1
-      result.unsubmittedCisReturns.head.returnType mustBe "Nil"
-      result.unsubmittedCisReturns.head.status mustBe "PENDING"
+      result.unsubmittedCisReturns.head.returnType mustBe ReturnTypeViewModel.Nil
+      result.unsubmittedCisReturns.head.status mustBe StatusViewModel.Text("PENDING")
       result.unsubmittedCisReturns.head.monthlyReturnId mustBe 12345
       result.unsubmittedCisReturns.head.lastUpdate mustBe None
       result.unsubmittedCisReturns.head.amendment mustBe Some("N")
@@ -768,12 +806,12 @@ class ConstructionIndustrySchemeConnectorSpec
 
       val result = connector.getMonthlyReturnComplete("900063", 2024, 2, "N").futureValue
 
-      result.scheme.head.instanceId                 mustBe "900063"
-      result.monthlyReturn.head.nilReturnIndicator  mustBe Some("Y")
-      result.submission.head.submissionType         mustBe "Nil return"
-      result.submission.head.hmrcMarkGenerated      mustBe Some("ABC")
-      result.monthlyReturnItems                     mustBe empty
-      result.subcontractors                         mustBe empty
+      result.scheme.head.instanceId mustBe "900063"
+      result.monthlyReturn.head.nilReturnIndicator mustBe Some("Y")
+      result.submission.head.submissionType mustBe "Nil return"
+      result.submission.head.hmrcMarkGenerated mustBe Some("ABC")
+      result.monthlyReturnItems mustBe empty
+      result.subcontractors mustBe empty
     }
 
     "propagate an upstream error when BE returns 500" in {
@@ -948,10 +986,10 @@ class ConstructionIndustrySchemeConnectorSpec
       val journeyType = "amend-monthly-return"
 
       val requestBody = Json.obj(
-        "instanceId" -> "1",
-        "taxYear" -> 2026,
-        "taxMonth" -> 4,
-        "returnType" -> "standard",
+        "instanceId"   -> "1",
+        "taxYear"      -> 2026,
+        "taxMonth"     -> 4,
+        "returnType"   -> "standard",
         "acceptedTime" -> "2026-04-20T21:49:19.702Z"
       )
 
@@ -981,8 +1019,8 @@ class ConstructionIndustrySchemeConnectorSpec
 
       val requestBody = Json.obj(
         "instanceId" -> "1",
-        "taxYear" -> 2026,
-        "taxMonth" -> 4,
+        "taxYear"    -> 2026,
+        "taxMonth"   -> 4,
         "returnType" -> "standard"
       )
 
@@ -1005,7 +1043,7 @@ class ConstructionIndustrySchemeConnectorSpec
 
   "getSubcontractorDeleteStatus" should {
 
-    val cisId = "123"
+    val cisId             = "123"
     val subbieResourceRef = 10L
 
     "return response when BE returns 200 with valid JSON" in {
@@ -1132,7 +1170,7 @@ class ConstructionIndustrySchemeConnectorSpec
 
       connector
         .deleteSubcontractor(request)
-        .futureValue mustBe()
+        .futureValue mustBe ()
     }
 
     "fail with UpstreamErrorResponse when BE returns 400" in {
@@ -1217,6 +1255,36 @@ class ConstructionIndustrySchemeConnectorSpec
       ex mustBe a[UpstreamErrorResponse]
 
       ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe INTERNAL_SERVER_ERROR
+      ex.getMessage must include("boom")
+    }
+  }
+
+  "removeClient" should {
+
+    val request = RemoveAgentClientRequest(taxOfficeNumber = "123", taxOfficeReference = "AB456")
+
+    "return Unit when BE returns 204" in {
+      stubFor(
+        post(urlPathEqualTo(s"/cis/agent/remove-client"))
+          .withHeader("Content-Type", containing("application/json"))
+          .withRequestBody(equalToJson(Json.toJson(request).toString(), true, true))
+          .willReturn(aResponse().withStatus(NO_CONTENT))
+      )
+
+      connector.removeClient(request).futureValue mustBe ((): Unit)
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      stubFor(
+        post(urlPathEqualTo(s"/cis/agent/remove-client"))
+          .withHeader("Content-Type", containing("application/json"))
+          .withRequestBody(equalToJson(Json.toJson(request).toString(), true, true))
+          .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR).withBody("boom"))
+      )
+
+      val ex = intercept[Exception] {
+        connector.removeClient(request).futureValue
+      }
       ex.getMessage must include("boom")
     }
   }

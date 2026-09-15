@@ -16,52 +16,66 @@
 
 package models
 
+import base.SpecBase
+import models.agent.ClientListStatus
 import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
-import play.api.libs.json._
+import play.api.libs.json.*
 
-class GetClientListStatusResponseSpec extends AnyFreeSpec with Matchers {
+class GetClientListStatusResponseSpec extends SpecBase {
 
   "GetClientListStatusResponse" - {
 
-    "must serialize to JSON correctly" in {
-      val model        = GetClientListStatusResponse("complete")
-      val expectedJson = Json.obj("result" -> "complete")
-
-      Json.toJson(model) mustEqual expectedJson
-    }
-
     "must deserialize from JSON correctly" in {
-      val json          = Json.obj("result" -> "processing")
-      val expectedModel = GetClientListStatusResponse("processing")
+      val json = Json.obj(
+        "result" -> "in-progress"
+      )
+
+      val expectedModel =
+        GetClientListStatusResponse(ClientListStatus.InProgress)
 
       json.as[GetClientListStatusResponse] mustEqual expectedModel
     }
 
-    "must round-trip correctly" in {
-      val model  = GetClientListStatusResponse("pending")
-      val json   = Json.toJson(model)
-      val result = json.as[GetClientListStatusResponse]
+    "must deserialize all valid client list statuses" in {
+      val statuses = Seq(
+        "initiate-download" -> ClientListStatus.InitiateDownload,
+        "in-progress"       -> ClientListStatus.InProgress,
+        "succeeded"         -> ClientListStatus.Succeeded,
+        "failed"            -> ClientListStatus.Failed
+      )
 
-      result mustEqual model
-    }
+      statuses.foreach { case (value, expectedStatus) =>
+        val json = Json.obj(
+          "result" -> value
+        )
 
-    "must handle different status values" in {
-      val statuses = Seq("complete", "processing", "pending", "failed", "error")
-
-      statuses.foreach { status =>
-        val model  = GetClientListStatusResponse(status)
-        val json   = Json.toJson(model)
-        val result = json.as[GetClientListStatusResponse]
-
-        result.result mustEqual status
+        json.as[GetClientListStatusResponse] mustEqual
+          GetClientListStatusResponse(expectedStatus)
       }
     }
 
-    "must fail to deserialize invalid JSON" in {
-      val invalidJson = Json.obj("wrongField" -> "value")
+    "must fail to deserialize when result is missing" in {
+      val json = Json.obj(
+        "wrongField" -> "value"
+      )
 
-      invalidJson.validate[GetClientListStatusResponse] mustBe a[JsError]
+      json.validate[GetClientListStatusResponse] mustBe a[JsError]
+    }
+
+    "must fail to deserialize an invalid client list status" in {
+      val json = Json.obj(
+        "result" -> "invalid-status"
+      )
+
+      json.validate[GetClientListStatusResponse] mustBe a[JsError]
+    }
+
+    "must fail to deserialize result with an invalid type" in {
+      val json = Json.obj(
+        "result" -> 123
+      )
+
+      json.validate[GetClientListStatusResponse] mustBe a[JsError]
     }
   }
 }

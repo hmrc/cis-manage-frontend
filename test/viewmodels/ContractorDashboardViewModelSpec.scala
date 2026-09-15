@@ -30,7 +30,9 @@ class ContractorDashboardViewModelSpec extends SpecBase {
         employerReference = "123/AB45678",
         whatIsUrl = "#",
         guidanceUrl = "#",
-        penaltiesUrl = "#"
+        penaltiesUrl = "#",
+        cisOrgAppealUrl = "#",
+        cisOrgGenericNoticesUrl = "#"
       )
 
       viewModel.employerReference shouldBe "123/AB45678"
@@ -43,7 +45,9 @@ class ContractorDashboardViewModelSpec extends SpecBase {
         employerReference = "123/AB45678",
         whatIsUrl = "#",
         guidanceUrl = "#",
-        penaltiesUrl = "#"
+        penaltiesUrl = "#",
+        cisOrgAppealUrl = "#",
+        cisOrgGenericNoticesUrl = "#"
       )
 
       val modified = original.copy(schemeName = "NEW SCHEME NAME")
@@ -58,7 +62,9 @@ class ContractorDashboardViewModelSpec extends SpecBase {
         employerReference = "123/AB45678",
         whatIsUrl = "#",
         guidanceUrl = "#",
-        penaltiesUrl = "#"
+        penaltiesUrl = "#",
+        cisOrgAppealUrl = "/foo",
+        cisOrgGenericNoticesUrl = "/foo"
       )
 
       val viewModel2 = ContractorLandingViewModel(
@@ -66,7 +72,9 @@ class ContractorDashboardViewModelSpec extends SpecBase {
         employerReference = "123/AB45678",
         whatIsUrl = "#",
         guidanceUrl = "#",
-        penaltiesUrl = "#"
+        penaltiesUrl = "#",
+        cisOrgAppealUrl = "/foo",
+        cisOrgGenericNoticesUrl = "/foo"
       )
 
       viewModel1 shouldBe viewModel2
@@ -78,7 +86,9 @@ class ContractorDashboardViewModelSpec extends SpecBase {
         employerReference = "123/AB45678",
         whatIsUrl = "#",
         guidanceUrl = "#",
-        penaltiesUrl = "#"
+        penaltiesUrl = "#",
+        cisOrgAppealUrl = "/foo",
+        cisOrgGenericNoticesUrl = "/foo"
       )
 
       val viewModel2 = ContractorLandingViewModel(
@@ -86,7 +96,9 @@ class ContractorDashboardViewModelSpec extends SpecBase {
         employerReference = "456/CD12345",
         whatIsUrl = "#",
         guidanceUrl = "#",
-        penaltiesUrl = "#"
+        penaltiesUrl = "#",
+        cisOrgAppealUrl = "#",
+        cisOrgGenericNoticesUrl = "#"
       )
 
       viewModel1 should not be viewModel2

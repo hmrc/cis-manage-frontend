@@ -16,7 +16,7 @@
 
 package models.audit
 
-import play.api.libs.json.{Format, JsValue, Json}
+import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 
 trait AuditEventModel {
@@ -28,11 +28,34 @@ trait AuditEventModel {
     ExtendedDataEvent(auditSource = auditSource, auditType = auditType, detail = detailJson)
 }
 
-case class AuthFailureAuditEventModel() extends AuditEventModel {
-  override val auditType: String   = "authoriseServiceGuardFailure"
-  override val detailJson: JsValue = Json.toJson(this)
+final case class AuthFailureAuditEventModel() extends AuditEventModel {
+  override val auditType: String   = "AuthoriseServiceGuardFailure"
+  override val detailJson: JsValue = Json.obj()
 }
 
-object AuthFailureAuditEventModel {
-  implicit val formats: Format[AuthFailureAuditEventModel] = Json.format[AuthFailureAuditEventModel]
+final case class ClientDetailsRetrievedAuditEventModel(
+  agentReference: String,
+  taxOfficeNumber: String,
+  taxOfficeReference: String
+) extends AuditEventModel {
+  override val auditType: String   = "ClientDetailsRetrieved"
+  override val detailJson: JsValue = Json.obj(
+    "agentReference"     -> agentReference,
+    "taxOfficeNumber"    -> taxOfficeNumber,
+    "taxOfficeReference" -> taxOfficeReference
+  )
+}
+
+final case class DeleteSubcontractorAuditEventModel(
+  cisId: String,
+  subcontractorName: String,
+  subbieResourceRef: Long,
+  typeOfSubcontractor: Option[String] = None
+) extends AuditEventModel {
+  override val auditType: String   = "DeleteSubcontractor"
+  override val detailJson: JsValue = Json.obj(
+    "cisId"             -> cisId,
+    "subcontractorName" -> subcontractorName,
+    "subbieResourceRef" -> subbieResourceRef
+  ) ++ typeOfSubcontractor.fold(Json.obj())(t => Json.obj("typeOfSubcontractor" -> t))
 }

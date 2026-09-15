@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package pages.verify
+package models.agent
 
-import models.verify.VerificationHistoryData
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+sealed trait ClientListCheckPolicy
 
-case object VerificationHistoryDataPage extends QuestionPage[VerificationHistoryData] {
-  override def path: JsPath = JsPath \ "verificationHistoryData"
-
-  override def toString: String = "verificationHistoryData"
+object ClientListCheckPolicy {
+  case object GroupA extends ClientListCheckPolicy
+  case object GroupB extends ClientListCheckPolicy
+  case object Exempt extends ClientListCheckPolicy
 }

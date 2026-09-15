@@ -26,15 +26,15 @@ import models.requests.*
 import models.response.*
 import pages.*
 import play.api.Logging
+import play.api.i18n.Lang
 import play.api.libs.json.Json
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.DateTimeFormats
 import viewmodels.*
 import viewmodels.agent.AgentLandingViewModel
 
 import java.time.*
-import java.time.format.*
-import java.util.Locale
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,9 +44,6 @@ class ManageService @Inject() (
   sessionRepository: SessionRepository
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends Logging {
-
-  private val shortMonthYearFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM yyyy", Locale.UK)
-  private val lastUpdateFormatter: DateTimeFormatter     = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.UK)
 
   def resolveAndStoreCisId(ua: UserAnswers)(implicit hc: HeaderCarrier): Future[(String, UserAnswers)] =
     ua.get(CisIdPage) match {
@@ -123,13 +120,20 @@ class ManageService @Inject() (
         }
     }
 
+  def getClientByEmployerReference(
+    taxOfficeNumber: String,
+    taxOfficeRef: String
+  )(implicit hc: HeaderCarrier): Future[CisTaxpayer] =
+    cisConnector.getAgentClientTaxpayer(taxOfficeNumber, taxOfficeRef)
+
   def getUnsubmittedMonthlyReturns(instanceId: String)(implicit
     hc: HeaderCarrier
   ): Future[UnsubmittedMonthlyReturnsResponse] =
     cisConnector.getUnsubmittedMonthlyReturns(instanceId)
 
   def getUnsubmittedMonthlyReturnRows(instanceId: String)(implicit
-    hc: HeaderCarrier
+    hc: HeaderCarrier,
+    lang: Lang
   ): Future[Seq[IncompleteReturnsRowViewModel]] =
     for {
       unsubmitted <- getUnsubmittedMonthlyReturns(instanceId)
@@ -263,12 +267,21 @@ class ManageService @Inject() (
       GetSubmittedMonthlyReturnsDataRequest(instanceId, taxYear, taxMonth, amendment)
     )
 
-  private def buildReturnPeriodEnd(taxMonth: Int, taxYear: Int): String =
-    YearMonth.of(taxYear, taxMonth).format(shortMonthYearFormatter)
+  def removeClient(uniqueId: String, ua: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] =
+    ua.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId)) match {
+      case Some(client) =>
+        cisConnector.removeClient(RemoveAgentClientRequest(client.taxOfficeNumber, client.taxOfficeRef))
+      case _            =>
+        logger.error(s"[removeClient] missing AgentClientsPage in user answers")
+        Future.failed(new RuntimeException("Missing AgentClientsPage in user answers"))
+    }
 
-  private def formatLastUpdate(lastUpdate: Option[LocalDateTime]): String =
+  private def buildReturnPeriodEnd(taxMonth: Int, taxYear: Int)(implicit lang: Lang): String =
+    YearMonth.of(taxYear, taxMonth).format(DateTimeFormats.monthYearFormat())
+
+  private def formatLastUpdate(lastUpdate: Option[LocalDateTime])(implicit lang: Lang): String =
     lastUpdate match {
-      case Some(dateTime) => dateTime.toLocalDate.format(lastUpdateFormatter)
+      case Some(dateTime) => dateTime.toLocalDate.format(DateTimeFormats.shortDateFormat())
       case None           => ""
     }
 
@@ -281,7 +294,7 @@ class ManageService @Inject() (
     val isAmendment = row.amendment.exists(_.equals("Y"))
 
     row.status match {
-      case "In progress" =>
+      case StatusViewModel.InProgress =>
         Seq(
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.continue",
@@ -309,7 +322,7 @@ class ManageService @Inject() (
           )
         )
 
-      case "Awaiting confirmation" =>
+      case StatusViewModel.AwaitingConfirmation =>
         Seq(
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.view",
@@ -318,7 +331,7 @@ class ManageService @Inject() (
           )
         )
 
-      case "Unsuccessful" =>
+      case StatusViewModel.Unsuccessful =>
         Seq(
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.view",

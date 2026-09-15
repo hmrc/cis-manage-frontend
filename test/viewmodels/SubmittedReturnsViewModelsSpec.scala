@@ -77,7 +77,7 @@ class SubmittedReturnsViewModelsSpec extends AnyWordSpec with Matchers {
           textKey = "site.view",
           hiddenTextKey = "history.returnHistory.receipt.hidden"
         ),
-        status = StatusViewModel.Text("history.returnHistory.status.awaitingConfirmation")
+        status = StatusViewModel.AwaitingConfirmation
       )
 
       row.returnType        shouldBe ReturnTypeViewModel.Standard

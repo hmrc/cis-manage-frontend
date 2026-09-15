@@ -29,7 +29,6 @@
 @(authoriseClientRequestUrl: String)(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("agent.agentLostAccess.title")),
-  showSignOut = false,
   showBackLink = false
 ) {
 

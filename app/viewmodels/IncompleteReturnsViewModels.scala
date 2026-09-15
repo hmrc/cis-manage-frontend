@@ -18,9 +18,9 @@ package viewmodels
 
 case class IncompleteReturnsRowViewModel(
   returnPeriodEnd: String,
-  returnType: String,
+  returnType: ReturnTypeViewModel,
   lastUpdate: String,
-  status: String,
+  status: StatusViewModel,
   action: Seq[ActionLinkViewModel],
   amendment: Option[String]
 )

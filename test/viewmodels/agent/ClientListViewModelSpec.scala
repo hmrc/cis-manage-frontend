@@ -17,7 +17,7 @@
 package viewmodels.agent
 
 import base.SpecBase
-import models.CisTaxpayerSearchResult
+import models.{CisTaxpayerSearchResult, NormalMode}
 import org.scalatest.matchers.should.Matchers.*
 import play.api.i18n.Messages
 import viewmodels.agent.ClientStatus.{Active, InActive}
@@ -63,7 +63,9 @@ class ClientListViewModelSpec extends SpecBase {
       val result = model.removeLink
       result.isDefined shouldBe true
       result.get.text  shouldBe messages("agent.clientListSearch.td.actions.remove")
-      result.get.href  shouldBe "#"
+      result.get.href  shouldBe controllers.clientdetails.routes.RemoveClientYesNoController
+        .onPageLoad("123", NormalMode)
+        .url
     }
 
     "return None when status is NOT Active" in {
@@ -301,9 +303,9 @@ class ClientListViewModelSpec extends SpecBase {
   "SearchByList.searchByOptions" - {
     "contain the correct value-label pairs" in {
       SearchByList.searchByOptions should contain theSameElementsAs Seq(
-        SearchByList("CN", "Client name"),
-        SearchByList("CR", "Client reference"),
-        SearchByList("ER", "Employer reference")
+        SearchByList("CN", messages("agent.clientListSearch.th.clientName")),
+        SearchByList("CR", messages("agent.clientListSearch.th.clientReference")),
+        SearchByList("ER", messages("agent.clientListSearch.th.employersReference"))
       )
     }
     "preserve ordering CN → ER → CR" in {

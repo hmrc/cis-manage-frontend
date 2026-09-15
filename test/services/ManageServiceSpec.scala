@@ -34,8 +34,9 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import pages.*
 import repositories.SessionRepository
+import play.api.i18n.Lang
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel}
+import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel, ReturnTypeViewModel, StatusViewModel}
 import viewmodels.agent.AgentLandingViewModel
 
 import java.time.{Instant, LocalDateTime}
@@ -46,6 +47,7 @@ import scala.util.Failure
 class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
   implicit val hc: HeaderCarrier            = HeaderCarrier()
+  implicit val lang: Lang                   = Lang("en")
   implicit val ec: ExecutionContext         = global
   implicit val appConfig: FrontendAppConfig = mock(classOf[FrontendAppConfig])
 
@@ -372,6 +374,41 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
     }
   }
 
+  "getClientByEmployerReference" should {
+
+    "must return tax payer search result by empRef key" in {
+
+      val okResponse = CisTaxpayer(
+        uniqueId = "CIS-123",
+        taxOfficeNumber = "111",
+        taxOfficeRef = "test111",
+        aoDistrict = None,
+        aoPayType = None,
+        aoCheckCode = None,
+        aoReference = None,
+        validBusinessAddr = None,
+        correlation = None,
+        ggAgentId = None,
+        employerName1 = Some("TEST LTD"),
+        employerName2 = None,
+        agentOwnRef = None,
+        schemeName = Option("ABCD"),
+        utr = Some("1234567890"),
+        enrolledSig = None
+      )
+
+      val (service, connector, sessionRepo) = newService()
+
+      when(connector.getAgentClientTaxpayer(any[String], any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(okResponse))
+
+      service.getClientByEmployerReference(any[String], any[String])(any[HeaderCarrier]).futureValue mustBe okResponse
+
+      verify(connector).getAgentClientTaxpayer(any[String], any[String])(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+  }
+
   "getUnsubmittedMonthlyReturns" should {
 
     "delegate to connector and return raw response" in {
@@ -383,8 +420,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
           UnsubmittedMonthlyReturnsRow(
             taxYear = 2025,
             taxMonth = 1,
-            returnType = "Nil",
-            status = "In progress",
+            returnType = ReturnTypeViewModel.Nil,
+            status = StatusViewModel.InProgress,
             monthlyReturnId = 123L,
             lastUpdate = Some(LocalDateTime.parse("2025-01-01T00:00:00")),
             amendment = Some("N"),
@@ -419,8 +456,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
           UnsubmittedMonthlyReturnsRow(
             taxYear = 2025,
             taxMonth = 1,
-            returnType = "Nil",
-            status = "In progress",
+            returnType = ReturnTypeViewModel.Nil,
+            status = StatusViewModel.InProgress,
             monthlyReturnId = 123L,
             lastUpdate = Some(LocalDateTime.parse("2025-01-01T00:00:00")),
             amendment = Some("N"),
@@ -446,9 +483,9 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       service.getUnsubmittedMonthlyReturnRows(instanceId).futureValue mustBe Seq(
         IncompleteReturnsRowViewModel(
           returnPeriodEnd = "Jan 2025",
-          returnType = "Nil",
-          lastUpdate = "01 Jan 2025",
-          status = "In progress",
+          returnType = ReturnTypeViewModel.Nil,
+          lastUpdate = "1 Jan 2025",
+          status = StatusViewModel.InProgress,
           action = Seq(
             ActionLinkViewModel(
               textKey = "incompleteReturns.action.continue",
@@ -567,8 +604,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
           UnsubmittedMonthlyReturnsRow(
             2025,
             1,
-            "Nil",
-            "In Progress",
+            ReturnTypeViewModel.Nil,
+            StatusViewModel.InProgress,
             3000L,
             None,
             Some("Y"),
@@ -577,8 +614,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
           UnsubmittedMonthlyReturnsRow(
             2025,
             2,
-            "Nil",
-            "In Progress",
+            ReturnTypeViewModel.Nil,
+            StatusViewModel.InProgress,
             3001L,
             Some(LocalDateTime.now()),
             Some("Y"),
@@ -658,8 +695,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         monthlyReturnId = monthlyReturnId,
         taxYear = 2025,
         taxMonth = 1,
-        returnType = "Nil",
-        status = "PENDING",
+        returnType = ReturnTypeViewModel.Nil,
+        status = StatusViewModel.InProgress,
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -688,8 +725,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         monthlyReturnId = monthlyReturnId,
         taxYear = 2025,
         taxMonth = 1,
-        returnType = "Nil",
-        status = "PENDING",
+        returnType = ReturnTypeViewModel.Nil,
+        status = StatusViewModel.InProgress,
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = false
@@ -753,8 +790,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         monthlyReturnId = 3000L,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Nil",
-        status = "In Progress",
+        returnType = ReturnTypeViewModel.Nil,
+        status = StatusViewModel.InProgress,
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -785,8 +822,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         monthlyReturnId = 3000L,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Nil",
-        status = "In Progress",
+        returnType = ReturnTypeViewModel.Nil,
+        status = StatusViewModel.InProgress,
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -812,8 +849,8 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
         monthlyReturnId = 3000L,
         taxYear = 2026,
         taxMonth = 4,
-        returnType = "Nil",
-        status = "In Progress",
+        returnType = ReturnTypeViewModel.Nil,
+        status = StatusViewModel.InProgress,
         lastUpdate = None,
         amendment = Some("Y"),
         deletable = true
@@ -1061,6 +1098,69 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
       verify(connector)
         .getVerificationRequestDetail(eqTo(instanceId), eqTo(verificationNumber))(any[HeaderCarrier])
+      verifyNoInteractions(sessionRepo)
+    }
+  }
+
+  "removeClient" should {
+
+    "delegate to connector and return response (happy path)" in {
+      val (service, connector, sessionRepo) = newService()
+
+      val request = RemoveAgentClientRequest(taxOfficeNumber = "123", taxOfficeReference = "ABC123")
+
+      val uniqueId        = "900063"
+      val existingClients = List(createClient(uniqueId, "123", "ABC123"), createClient("CLIENT-002", "456", "XYZ456"))
+
+      val userAnswers: UserAnswers = UserAnswers("userId")
+        .set(AgentClientsPage, existingClients)
+        .success
+        .value
+
+      when(connector.removeClient(eqTo(request))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(()))
+
+      service.removeClient(uniqueId, userAnswers).futureValue mustBe ()
+
+      verify(connector).removeClient(eqTo(request))(any[HeaderCarrier])
+    }
+
+    "return error when AgentClientsPage is missing in the user answers" in {
+      val (service, connector, sessionRepo) = newService()
+
+      val uniqueId = "900063"
+
+      val userAnswers: UserAnswers = UserAnswers("userId")
+
+      val exception = service.removeClient(uniqueId, userAnswers).failed.futureValue
+      exception mustBe a[RuntimeException]
+      exception.getMessage mustBe "Missing AgentClientsPage in user answers"
+
+      verifyNoInteractions(connector)
+    }
+
+    "propagate failure from connector" in {
+      val (service, connector, sessionRepo) = newService()
+
+      val request = RemoveAgentClientRequest(taxOfficeNumber = "123", taxOfficeReference = "ABC123")
+
+      val uniqueId        = "900063"
+      val existingClients = List(createClient(uniqueId, "123", "ABC123"), createClient("CLIENT-002", "456", "XYZ456"))
+
+      val userAnswers: UserAnswers = UserAnswers("userId")
+        .set(AgentClientsPage, existingClients)
+        .success
+        .value
+
+      val boom = new RuntimeException("Backend error")
+
+      when(connector.removeClient(eqTo(request))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(boom))
+
+      val ex = service.removeClient(uniqueId, userAnswers).failed.futureValue
+      ex mustBe boom
+
+      verify(connector).removeClient(eqTo(request))(any[HeaderCarrier])
       verifyNoInteractions(sessionRepo)
     }
   }
