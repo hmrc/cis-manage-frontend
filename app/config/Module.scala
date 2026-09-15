@@ -30,6 +30,7 @@ class Module extends AbstractModule {
     bind(classOf[DataRetrievalAction]).to(classOf[DataRetrievalActionImpl]).asEagerSingleton()
     bind(classOf[DataRequiredAction]).to(classOf[DataRequiredActionImpl]).asEagerSingleton()
     bind(classOf[CisIdRequiredAction]).to(classOf[CisIdRequiredActionImpl]).asEagerSingleton()
+    bind(classOf[FormpRdsReconcileAction]).to(classOf[FormpRdsReconcileActionImpl]).asEagerSingleton()
     bind(classOf[ReferenceGenerator]).to(classOf[ReferenceGeneratorImpl]).asEagerSingleton()
 
     // For session based storage instead of cred based, change to SessionIdentifierAction

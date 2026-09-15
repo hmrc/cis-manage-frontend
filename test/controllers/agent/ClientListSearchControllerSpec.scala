@@ -29,8 +29,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.ClientListSearchPage
 import play.api.data.Form
 import play.api.i18n.Messages
-import play.api.i18n.Messages.implicitMessagesProviderToMessages
-import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.{ActionFilter, Call, Result}
 import play.api.test.FakeRequest

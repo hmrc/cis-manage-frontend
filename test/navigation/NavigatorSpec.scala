@@ -18,8 +18,9 @@ package navigation
 
 import base.SpecBase
 import controllers.routes
-import pages._
-import models._
+import pages.*
+import models.*
+import pages.clientdetails.{ChangeClientReferencePage, RemoveClientYesNoPage}
 
 class NavigatorSpec extends SpecBase {
 
@@ -33,6 +34,61 @@ class NavigatorSpec extends SpecBase {
 
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
+      }
+
+      "RemoveClientYesNoPage" - {
+
+        "must go to ClientRemovedController when answer is true" in {
+
+          val ua = emptyUserAnswers
+            .set(RemoveClientYesNoPage, true)
+            .success
+            .value
+
+          navigator.nextPage(RemoveClientYesNoPage, NormalMode, ua) mustBe
+            controllers.clientdetails.routes.ClientRemovedController.onPageLoad()
+        }
+
+        "must go to AgentLandingController when answer is false" in {
+
+          val ua = userAnswersWithCisId
+            .set(RemoveClientYesNoPage, false)
+            .success
+            .value
+
+          navigator.nextPage(RemoveClientYesNoPage, NormalMode, ua) mustBe
+            controllers.agent.routes.AgentLandingController.onPageLoad("1")
+        }
+
+        "must go to ClientListSearchController when answer is false" in {
+
+          val ua = emptyUserAnswers
+            .set(RemoveClientYesNoPage, false)
+            .success
+            .value
+
+          navigator.nextPage(RemoveClientYesNoPage, NormalMode, ua) mustBe
+            controllers.agent.routes.ClientListSearchController.onPageLoad()
+        }
+
+        "must go to JourneyRecoveryController when user answer is missing" in {
+
+          navigator.nextPage(RemoveClientYesNoPage, NormalMode, emptyUserAnswers) mustBe
+            controllers.routes.JourneyRecoveryController.onPageLoad()
+        }
+      }
+
+      "ChangeClientReferencePage" - {
+        "must go to ClientRefUpdateConfirmationController" in {
+
+          val ua = emptyUserAnswers
+            .set(ChangeClientReferencePage, "client ref")
+            .success
+            .value
+
+          navigator.nextPage(ChangeClientReferencePage, NormalMode, ua) mustBe
+            controllers.clientdetails.routes.ClientRefUpdateConfirmationController.onPageLoad()
+        }
       }
     }
 

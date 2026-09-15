@@ -43,7 +43,7 @@ class UnauthorisedAgentAffinityControllerSpec extends SpecBase {
         )
         .build()
 
-      when(mockAuditService.sendEvent(any())(any(), any(), any())).thenReturn(Future.successful(AuditResult.Success))
+      when(mockAuditService.sendEvent(any())(any(), any())).thenReturn(Future.successful(AuditResult.Success))
 
       running(application) {
         val request =
