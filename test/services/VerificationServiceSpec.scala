@@ -16,62 +16,77 @@
 
 package services
 
+import base.UnitSpec
 import connectors.ConstructionIndustrySchemeConnector
 import models.requests.GetSubmittedVerificationsRequest
 import models.response.GetSubmittedVerificationsResponse
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito.{verify, when}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{reset, verify, verifyNoMoreInteractions, when}
+import org.scalatest.BeforeAndAfterEach
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Await
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationInt
 
-class VerificationServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar {
+class VerificationServiceSpec extends UnitSpec with BeforeAndAfterEach {
+  import repositories.VerificationHistoryCache
 
-  private implicit val hc: HeaderCarrier = HeaderCarrier()
+  private val cache            = mock[VerificationHistoryCache]
+  private val connector        = mock[ConstructionIndustrySchemeConnector]
+  private val dataBuilder      = new VerificationHistoryService
+  private val serviceUnderTest = new VerificationService(cache, connector, dataBuilder)
 
-  private val connector = mock[ConstructionIndustrySchemeConnector]
-  private val service   = new VerificationService(connector)
+  "getSubmittedVerifications must fetch verification history from" - {
+    val instanceId   = "900063"
+    val response     = GetSubmittedVerificationsResponse(
+      scheme = Seq.empty,
+      subcontractors = Seq.empty,
+      verificationBatches = Seq.empty,
+      verifications = Seq.empty,
+      submissions = Seq.empty
+    )
+    val expectedData = dataBuilder.toVerificationHistoryData(response)
 
-  "VerificationService" - {
+    "connector and populate the cache in non-blocking fashion (i.e. succeed even if cache fails) when" - {
+      val request = GetSubmittedVerificationsRequest(instanceId)
 
-    "getSubmittedVerifications" - {
+      "cache is empty" in {
+        when(cache.getFromCache(any)) thenReturn Future.successful(None)
+        when(cache.putCache(any)(any)(any)) thenReturn Future.failed(new Exception("Failed to put in cache"))
+        when(connector.getSubmittedVerifications(any)(any)) thenReturn Future.successful(response)
 
-      "must call the connector with the submitted verifications request and return the response" in {
-        val instanceId = "900063"
+        val result = serviceUnderTest.getSubmittedVerifications(instanceId).futureValue
+        result mustBe expectedData
 
-        val response = GetSubmittedVerificationsResponse(
-          scheme = Seq.empty,
-          subcontractors = Seq.empty,
-          verificationBatches = Seq.empty,
-          verifications = Seq.empty,
-          submissions = Seq.empty
-        )
+        verify(cache).getFromCache(instanceId)
+        verify(cache).putCache(eqTo(instanceId))(eqTo(expectedData))(any)
+        verify(connector).getSubmittedVerifications(eqTo(request))(any[HeaderCarrier])
+      }
 
-        val request = GetSubmittedVerificationsRequest(instanceId)
+      "cache throws an exception" in {
+        when(cache.getFromCache(any)) thenReturn Future.failed(new Exception("Failed to get from cache"))
+        when(cache.putCache(any)(any)(any)) thenReturn Future.failed(new Exception("Failed to put in cache"))
+        when(connector.getSubmittedVerifications(any)(any)) thenReturn Future.successful(response)
 
-        when(
-          connector.getSubmittedVerifications(
-            eqTo(request)
-          )(any[HeaderCarrier])
-        ).thenReturn(Future.successful(response))
+        val result = serviceUnderTest.getSubmittedVerifications(instanceId).futureValue
+        result mustBe expectedData
 
-        val result =
-          Await.result(
-            service.getSubmittedVerifications(instanceId),
-            5.seconds
-          )
-
-        result mustBe response
-
-        verify(connector).getSubmittedVerifications(
-          eqTo(request)
-        )(any[HeaderCarrier])
+        verify(cache).getFromCache(instanceId)
+        verify(cache).putCache(eqTo(instanceId))(eqTo(expectedData))(any)
+        verify(connector).getSubmittedVerifications(eqTo(request))(any[HeaderCarrier])
       }
     }
+
+    "cache when it is non-empty" in {
+      when(cache.getFromCache(any)) thenReturn Future.successful(Some(expectedData))
+
+      val result = serviceUnderTest.getSubmittedVerifications(instanceId).futureValue
+      result mustBe expectedData
+
+      verify(cache).getFromCache(instanceId)
+    }
   }
+
+  override def afterEach(): Unit =
+    verifyNoMoreInteractions(cache, connector)
+    reset(cache, connector)
 }
