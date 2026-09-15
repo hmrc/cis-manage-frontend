@@ -17,6 +17,7 @@ site.unknown                                            =  Anhysbys
 site.pagination.landmark                                =  xxxxxxxxxxxxxxxxxxxx
 site.pagination.previous                                =  xxxxxxxxxxxxxxxxxxxx
 site.pagination.next                                    =  xxxxxxxxxxxxxxxxxxxx
+site.pagination.pageTitle                               =  xxxxxxxxxxxxxxxxxxxx
 
 site.delete                                             =  Dileu
 site.or                                                 =  neu
