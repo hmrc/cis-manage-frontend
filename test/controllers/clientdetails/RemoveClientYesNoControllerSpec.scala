@@ -17,11 +17,9 @@
 package controllers.clientdetails
 
 import base.SpecBase
-import controllers.actions.ClientListStatusGuard
 import controllers.routes
 import forms.clientdetails.RemoveClientYesNoFormProvider
 import models.agent.ClientListFormData
-import models.requests.IdentifierRequest
 import models.{CisTaxpayer, CisTaxpayerSearchResult, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -31,7 +29,7 @@ import pages.clientdetails.RemoveClientYesNoPage
 import pages.{AgentClientsPage, ClientListSearchPage}
 import play.api.data.Form
 import play.api.inject.bind
-import play.api.mvc.{ActionFilter, Call, Result}
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -70,19 +68,8 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
   private lazy val removeClientRoute =
     controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(uniqueId, NormalMode).url
 
-  private val clientListStatusGuard = mock[ClientListStatusGuard]
   private val mockManageService     = mock[ManageService]
   private val mockSessionRepository = mock[SessionRepository]
-
-  private val passThroughIdentifierFilter =
-    new ActionFilter[IdentifierRequest] {
-      override protected def executionContext: ExecutionContext = ec
-
-      override protected def filter[A](
-        request: IdentifierRequest[A]
-      ): Future[Option[Result]] =
-        Future.successful(None)
-    }
 
   private val okResponse = CisTaxpayer(
     uniqueId = "CIS-123",
@@ -103,9 +90,6 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
     enrolledSig = None
   )
 
-  private def mockGuards(): Unit =
-    when(clientListStatusGuard.groupB(any[Call])).thenReturn(passThroughIdentifierFilter)
-
   private def mockClientLookup(): Unit =
     when(
       mockManageService.getClientByEmployerReference(any, any)(using any[HeaderCarrier])
@@ -120,14 +104,11 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
   "RemoveClient Controller" - {
 
     "must return OK and the correct view for a GET" in {
-
-      mockGuards()
       mockClientLookup()
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswersWithClient))
           .overrides(
-            bind[ClientListStatusGuard].toInstance(clientListStatusGuard),
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[ManageService].toInstance(mockManageService)
           )
@@ -154,8 +135,6 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      mockGuards()
       mockClientLookup()
 
       val userAnswers = UserAnswers(userAnswersId)
@@ -169,7 +148,6 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
-            bind[ClientListStatusGuard].toInstance(clientListStatusGuard),
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[ManageService].toInstance(mockManageService)
           )
@@ -296,16 +274,7 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      mockGuards()
-
-      val application =
-        applicationBuilder(
-          userAnswers = None,
-          additionalBindings = Seq(
-            bind[ClientListStatusGuard].toInstance(clientListStatusGuard)
-          )
-        ).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request = FakeRequest(GET, removeClientRoute)

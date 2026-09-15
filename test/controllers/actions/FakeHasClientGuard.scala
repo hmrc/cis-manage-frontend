@@ -16,11 +16,10 @@
 
 package controllers.actions
 
-import controllers.actions.HasClientGuard
 import models.requests.DataRequest
-import play.api.mvc.{ActionFilter, Result}
+import play.api.mvc.ActionFilter
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 //noinspection ScalaStyle to stop complaint about null arguments. They are never used so this is OK.
 class FakeHasClientGuard(using ExecutionContext) extends HasClientGuard(null, null, null) {

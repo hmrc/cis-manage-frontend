@@ -17,9 +17,7 @@
 package controllers.agent
 
 import base.SpecBase
-import controllers.actions.ClientListStatusGuard
 import models.audit.ClientDetailsRetrievedAuditEventModel
-import models.requests.IdentifierRequest
 import models.{CisTaxpayerSearchResult, Scheme, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
@@ -29,7 +27,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.{AgentClientsPage, CisIdPage}
 import play.api.Application
 import play.api.inject.bind
-import play.api.mvc.{ActionFilter, Call, Request, Result}
+import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -38,7 +36,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import viewmodels.agent.AgentLandingViewModel
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterAll with BeforeAndAfterEach {
 
@@ -49,13 +47,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
   private val mockSessionRepository = mock[SessionRepository]
   private val mockPrepopService     = mock[PrepopService]
   private val mockAuditService      = mock[AuditService]
-
-  private val mockClientListStatusGuard        = mock[ClientListStatusGuard]
-  private val passThroughClientListStatusGuard =
-    new ActionFilter[IdentifierRequest] {
-      override protected def executionContext: ExecutionContext                               = ExecutionContext.global
-      override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = Future.successful(None)
-    }
 
   private val landingViewModel = AgentLandingViewModel(
     schemeName = "Test scheme name",
@@ -87,7 +78,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
     bind[ManageService].toInstance(mockManageService),
     bind[SessionRepository].toInstance(mockSessionRepository),
     bind[PrepopService].toInstance(mockPrepopService),
-    bind[ClientListStatusGuard].toInstance(mockClientListStatusGuard),
     bind[AuditService].toInstance(mockAuditService)
   )
 
@@ -98,7 +88,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
   override def beforeEach(): Unit = {
     super.beforeEach()
     when(mockSessionRepository.set(any[UserAnswers])).thenReturn(Future.successful(true))
-    when(mockClientListStatusGuard.groupB(any[Call])).thenReturn(passThroughClientListStatusGuard)
     when(
       mockAuditService
         .sendEvent(any[ClientDetailsRetrievedAuditEventModel])(using
@@ -115,7 +104,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
       mockManageService,
       mockSessionRepository,
       mockPrepopService,
-      mockClientListStatusGuard,
       mockAuditService
     )
     super.afterEach()

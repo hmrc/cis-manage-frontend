@@ -16,10 +16,15 @@
 
 package controllers.actions
 
-import play.api.mvc.{ActionFilter, Result}
+import models.requests.IdentifierRequest
+import play.api.mvc.{ActionFilter, Call, Result}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-final class PassThroughFilter[R[_]](using val executionContext: ExecutionContext) extends ActionFilter[R] {
-  def filter[A](request: R[A]): Future[Option[Result]] = Future.successful(None)
+class FakeClientListStatusGuard(using ExecutionContext) extends ClientListStatusGuard(null) {
+  private val passThroughFilter = new PassThroughFilter[IdentifierRequest]
+
+  override def checkGroupA[A](request: IdentifierRequest[A]): Future[Option[Result]] = passThroughFilter.filter(request)
+
+  override def groupB(securityCheckCall: Call): ActionFilter[IdentifierRequest] = passThroughFilter
 }
