@@ -17,8 +17,8 @@
 package controllers.clientdetails
 
 import base.SpecBase
-import controllers.actions.{ClientListStatusGuard, HasClientGuard}
-import models.requests.{DataRequest, IdentifierRequest}
+import controllers.actions.ClientListStatusGuard
+import models.requests.IdentifierRequest
 import models.{CisTaxpayer, CisTaxpayerSearchResult, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -41,7 +41,6 @@ class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
   implicit val ec: ExecutionContext = ExecutionContext.global
 
   private val clientListStatusGuard = mock[ClientListStatusGuard]
-  private val hasClientGuard        = mock[HasClientGuard]
 
   private val passThroughIdentifierFilter =
     new ActionFilter[IdentifierRequest] {
@@ -49,16 +48,6 @@ class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
 
       override protected def filter[A](
         request: IdentifierRequest[A]
-      ): Future[Option[Result]] =
-        Future.successful(None)
-    }
-
-  private val passThroughDataFilter =
-    new ActionFilter[DataRequest] {
-      override protected def executionContext: ExecutionContext = ec
-
-      override protected def filter[A](
-        request: DataRequest[A]
       ): Future[Option[Result]] =
         Future.successful(None)
     }
@@ -109,9 +98,6 @@ class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
       when(clientListStatusGuard.groupB(any()))
         .thenReturn(passThroughIdentifierFilter)
 
-      when(hasClientGuard.currentClient)
-        .thenReturn(passThroughDataFilter)
-
       val mockSessionRepository = mock[SessionRepository]
       val mockManageService     = mock[ManageService]
 
@@ -134,7 +120,6 @@ class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
         applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[ClientListStatusGuard].toInstance(clientListStatusGuard),
-            bind[HasClientGuard].toInstance(hasClientGuard),
             bind[ManageService].toInstance(mockManageService),
             bind[SessionRepository].toInstance(mockSessionRepository),
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute))

@@ -17,11 +17,11 @@
 package controllers.clientdetails
 
 import base.SpecBase
-import controllers.actions.{ClientListStatusGuard, HasClientGuard}
+import controllers.actions.ClientListStatusGuard
 import controllers.routes
 import forms.clientdetails.RemoveClientYesNoFormProvider
 import models.agent.ClientListFormData
-import models.requests.{DataRequest, IdentifierRequest}
+import models.requests.IdentifierRequest
 import models.{CisTaxpayer, CisTaxpayerSearchResult, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -71,7 +71,6 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
     controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(uniqueId, NormalMode).url
 
   private val clientListStatusGuard = mock[ClientListStatusGuard]
-  private val hasClientGuard        = mock[HasClientGuard]
   private val mockManageService     = mock[ManageService]
   private val mockSessionRepository = mock[SessionRepository]
 
@@ -81,16 +80,6 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       override protected def filter[A](
         request: IdentifierRequest[A]
-      ): Future[Option[Result]] =
-        Future.successful(None)
-    }
-
-  private val passThroughDataFilter =
-    new ActionFilter[DataRequest] {
-      override protected def executionContext: ExecutionContext = ec
-
-      override protected def filter[A](
-        request: DataRequest[A]
       ): Future[Option[Result]] =
         Future.successful(None)
     }
@@ -114,11 +103,8 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
     enrolledSig = None
   )
 
-  private def mockGuards(): Unit = {
+  private def mockGuards(): Unit =
     when(clientListStatusGuard.groupB(any[Call])).thenReturn(passThroughIdentifierFilter)
-
-    when(hasClientGuard.forInstanceId(any[String])).thenReturn(passThroughDataFilter)
-  }
 
   private def mockClientLookup(): Unit =
     when(
@@ -142,7 +128,6 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
         applicationBuilder(userAnswers = Some(userAnswersWithClient))
           .overrides(
             bind[ClientListStatusGuard].toInstance(clientListStatusGuard),
-            bind[HasClientGuard].toInstance(hasClientGuard),
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[ManageService].toInstance(mockManageService)
           )
@@ -185,7 +170,6 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
         applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[ClientListStatusGuard].toInstance(clientListStatusGuard),
-            bind[HasClientGuard].toInstance(hasClientGuard),
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[ManageService].toInstance(mockManageService)
           )
@@ -319,8 +303,7 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
         applicationBuilder(
           userAnswers = None,
           additionalBindings = Seq(
-            bind[ClientListStatusGuard].toInstance(clientListStatusGuard),
-            bind[HasClientGuard].toInstance(hasClientGuard)
+            bind[ClientListStatusGuard].toInstance(clientListStatusGuard)
           )
         ).build()
 
