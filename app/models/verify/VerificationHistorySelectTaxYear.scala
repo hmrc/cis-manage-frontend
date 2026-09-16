@@ -59,19 +59,11 @@ object VerificationHistorySelectTaxYear {
     currentTaxYearStart: Int
   )(implicit messages: Messages): String = {
 
-    val taxYear = s"${taxYearPeriod.startYear} to ${taxYearPeriod.endYear}"
-
-    val taxYearLabel =
-      taxYear.split(" to ") match {
-        case Array(start, end) =>
-          messages(
-            "verify.verificationHistorySelectTaxYear.taxYear",
-            start,
-            end
-          )
-        case _                 =>
-          taxYear
-      }
+    val taxYearLabel = messages(
+      "verify.verificationHistorySelectTaxYear.taxYear",
+      taxYearPeriod.startYear.toString,
+      taxYearPeriod.endYear.toString
+    )
 
     if (taxYearPeriod.startYear == currentTaxYearStart) {
       s"$taxYearLabel ${messages("verify.verificationHistorySelectTaxYear.currentTaxYear")}"
