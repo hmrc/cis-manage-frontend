@@ -19,9 +19,7 @@ package controllers
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.PrepopService
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.RetrievingSubcontractorsView
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, SchemeAuthorisationGuard}
 import models.EmployerReference
@@ -62,8 +60,6 @@ class RetrievingSubcontractorsController @Inject() (
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen schemeAuthorisationGuard.forInstanceId(instanceId)).async {
       implicit request =>
-        implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
         resolveEmployerReference(request, instanceId) match {
 
           case None =>

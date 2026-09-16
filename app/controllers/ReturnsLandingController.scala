@@ -25,9 +25,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, RequestHeader}
 import repositories.SessionRepository
 import services.ManageService
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.ReturnsLandingView
 
 import javax.inject.Inject
@@ -54,8 +52,6 @@ class ReturnsLandingController @Inject() (
       andThen getData
       andThen requireData
       andThen authorisationGuard.forInstanceId(instanceId)).async { implicit request =>
-      given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
       updateContractorNameFromQueryParam(request.userAnswers)
         .flatMap { userAnswers =>
           service

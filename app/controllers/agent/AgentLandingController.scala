@@ -32,7 +32,6 @@ import services.{AuditService, ManageService, PrepopService}
 import uk.gov.hmrc.http.HttpVerbs.GET
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.agent.AgentLandingView
 
 import javax.inject.{Inject, Named}
@@ -64,9 +63,6 @@ class AgentLandingController @Inject() (
       andThen getData
       andThen requireData
       andThen schemeAuthorisationGuard.forInstanceId(uniqueId)).async { implicit request =>
-
-      given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
       AgentClientsPage.findClient(request.userAnswers, uniqueId) match {
         case Some(client) =>
           loadLandingPage(uniqueId, client)

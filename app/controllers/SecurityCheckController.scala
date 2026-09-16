@@ -25,9 +25,7 @@ import javax.inject.{Inject, Named}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.*
 import services.ConstructionIndustrySchemeService
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.SecurityCheckView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -82,8 +80,6 @@ class SecurityCheckController @Inject() (
     retryCount: Int = 0
   ): Action[AnyContent] =
     (agentIdentify andThen getData andThen requireData).async { implicit request =>
-      given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
       returnCall(returnTo, instanceId, mode) match {
 
         case None =>
