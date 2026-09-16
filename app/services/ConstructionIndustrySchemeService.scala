@@ -40,7 +40,7 @@ class ConstructionIndustrySchemeService @Inject() (cisConnector: ConstructionInd
   def hasClient(
     taxOfficeNumber: String,
     taxOfficeReference: String
-  )(using HeaderCarrier): Future[Boolean] =
+  )(implicit hc: HeaderCarrier): Future[Boolean] =
     cisConnector
       .hasClient(taxOfficeNumber, taxOfficeReference)
       .map(_.hasClient)

@@ -214,7 +214,6 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
       .execute[JourneyHandoffResponse]
       .map(_.id)
 
-  // TODO: Replace stub with real API call when available
   def getVerificationRequestDetail(
     instanceId: String,
     verificationNumber: String

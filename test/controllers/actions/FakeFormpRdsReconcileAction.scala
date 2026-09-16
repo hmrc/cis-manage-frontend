@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package pages.verify
+package controllers.actions
 
-import models.verify.VerificationHistoryData
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import models.requests.CisIdDataRequest
+import play.api.mvc.*
 
-case object VerificationHistoryDataPage extends QuestionPage[VerificationHistoryData] {
-  override def path: JsPath = JsPath \ "verificationHistoryData"
+import scala.concurrent.ExecutionContext.global
+import scala.concurrent.{ExecutionContext, Future}
 
-  override def toString: String = "verificationHistoryData"
+class FakeFormpRdsReconcileAction extends FormpRdsReconcileAction {
+
+  override protected def filter[A](request: CisIdDataRequest[A]): Future[Option[Result]] =
+    Future.successful(None)
+
+  override protected def executionContext: ExecutionContext = global
 }
