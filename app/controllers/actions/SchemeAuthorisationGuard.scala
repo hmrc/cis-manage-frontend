@@ -16,7 +16,7 @@
 
 package controllers.actions
 
-import controllers.actions.ClientListCheckRedirects.{agentLostAccess, systemError, unauthorised}
+import controllers.actions.ClientListCheckRedirects.{systemError, unauthorised}
 import models.audit.AuthFailureAuditEventModel
 import models.requests.{DataRequest, IdentifierRequest}
 import pages.{AgentClientsPage, CisIdPage}
@@ -180,7 +180,7 @@ class SchemeAuthorisationGuard @Inject() (
             logger.warn(s"[SchemeAuthorisationGuard] Agent does not have client for instanceId: $instanceId")
             auditService
               .sendEvent(AuthFailureAuditEventModel())
-              .map(_ => Some(agentLostAccess))
+              .map(_ => Some(systemError))
               .recover { case NonFatal(ex) =>
                 logger.error(s"[SchemeAuthorisationGuard] Error sending audit event for instanceId: $instanceId", ex)
                 Some(systemError)
