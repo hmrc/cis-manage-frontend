@@ -23,14 +23,13 @@ import models.verify.VerificationTaxYearSelection.TaxYearPeriod
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.data.Form
-import play.api.i18n.Messages
+import play.api.i18n.{Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import views.html.verify.VerificationHistorySelectTaxYearView
 
 class VerificationHistorySelectTaxYearViewSpec extends SpecBase {
-  import play.api.test.Helpers.*
 
   private val view = app.injector.instanceOf[VerificationHistorySelectTaxYearView]
 
@@ -52,7 +51,9 @@ class VerificationHistorySelectTaxYearViewSpec extends SpecBase {
 
       taxYears.zipWithIndex.foreach { case (year, index) =>
         doc.select(s"input[type=radio][value='${year.startYear}']").size() mustBe 1
-        doc.select(s"label[for=value_$index]").text() must include(year.toString)
+        doc.select(s"label[for=value_$index]").text() must include(
+          s"${year.startYear} to ${year.startYear + 1}"
+        )
       }
     }
 
@@ -65,7 +66,9 @@ class VerificationHistorySelectTaxYearViewSpec extends SpecBase {
       val labels =
         doc.select("label").eachText().toArray.toList
 
-      labels must contain("verify.verificationHistorySelectTaxYear.viewAll")
+      labels must contain(
+        messages("verify.verificationHistorySelectTaxYear.viewAll")
+      )
     }
 
     "must show error summary when form has errors" in new Setup {
@@ -88,7 +91,11 @@ class VerificationHistorySelectTaxYearViewSpec extends SpecBase {
 
     implicit val request: Request[_] = FakeRequest()
 
-    implicit val messages: Messages = stubMessages()
+    implicit val messages: Messages =
+      MessagesImpl(
+        play.api.i18n.Lang.defaultLang,
+        app.injector.instanceOf[MessagesApi]
+      )
 
     val html: HtmlFormat.Appendable = view(form, taxYears)
   }
