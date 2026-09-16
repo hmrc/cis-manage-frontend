@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.HasClientGuard
+import controllers.actions.*
 import models.Scheme
 import models.requests.DataRequest
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -35,21 +35,23 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
-  val mockPrepopService: PrepopService   = mock[PrepopService]
-  val mockHasClientGuard: HasClientGuard = mock[HasClientGuard]
+  val mockPrepopService: PrepopService                       = mock[PrepopService]
+  val mockSchemeAuthorisationGuard: SchemeAuthorisationGuard = mock[SchemeAuthorisationGuard]
 
-  val passThroughHasClientGuard: ActionFilter[DataRequest] = new ActionFilter[DataRequest] {
+  val passThroughSchemeAuthorisationGuard: ActionFilter[DataRequest] = new ActionFilter[DataRequest] {
     override protected def executionContext: ExecutionContext                         = ExecutionContext.global
     override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
       Future.successful(None)
   }
 
-  when(mockHasClientGuard.forInstanceId(any[String])).thenReturn(passThroughHasClientGuard)
+  when(mockSchemeAuthorisationGuard.forInstanceId(any[String])).thenReturn(passThroughSchemeAuthorisationGuard)
 
-  private def applicationBuilderWithClientGuard =
+  private def applicationBuilderWithSchemeAuthorisationGuard =
     applicationBuilder(
       userAnswers = Some(emptyUserAnswers),
-      additionalBindings = Seq(bind[HasClientGuard].toInstance(mockHasClientGuard))
+      additionalBindings = Seq(
+        bind[SchemeAuthorisationGuard].toInstance(mockSchemeAuthorisationGuard)
+      )
     )
 
   val taxOfficeNumber: String    = "101"
@@ -61,13 +63,13 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilderWithClientGuard.build()
+      val application = applicationBuilderWithSchemeAuthorisationGuard.build()
 
       running(application) {
         val request = FakeRequest(
           GET,
           routes.RetrievingSubcontractorsController
-            .onPageLoad(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
+            .onPageLoad(instanceId, targetKey)
             .url
         )
 
@@ -85,7 +87,7 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
     "start must redirect to SuccessfulAutomaticSubcontractorUpdateController when scheme has prePopSuccessful 'Y' and subcontractors" in {
 
-      val application = applicationBuilderWithClientGuard
+      val application = applicationBuilderWithSchemeAuthorisationGuard
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService)
         )
@@ -95,12 +97,12 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
         val request = FakeRequest(
           GET,
           routes.RetrievingSubcontractorsController
-            .start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
+            .start(instanceId, targetKey)
             .url
         )
 
         when(
-          mockPrepopService.prepopulate(eqTo(taxOfficeNumber), eqTo(taxOfficeReference), eqTo(instanceId))(
+          mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
             any[HeaderCarrier]
           )
         )
@@ -132,7 +134,7 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
     "start must redirect to SuccessfulNoRecordsFoundController when scheme has prePopSuccessful 'Y' and no subcontractors" in {
 
-      val application = applicationBuilderWithClientGuard
+      val application = applicationBuilderWithSchemeAuthorisationGuard
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService)
         )
@@ -142,12 +144,12 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
         val request = FakeRequest(
           GET,
           routes.RetrievingSubcontractorsController
-            .start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
+            .start(instanceId, targetKey)
             .url
         )
 
         when(
-          mockPrepopService.prepopulate(eqTo(taxOfficeNumber), eqTo(taxOfficeReference), eqTo(instanceId))(
+          mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
             any[HeaderCarrier]
           )
         )
@@ -179,7 +181,7 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
     "start must redirect to UnsuccessfulAutomaticSubcontractorUpdateController when scheme has prePopSuccessful 'N'" in {
 
-      val application = applicationBuilderWithClientGuard
+      val application = applicationBuilderWithSchemeAuthorisationGuard
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService)
         )
@@ -189,12 +191,12 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
         val request = FakeRequest(
           GET,
           routes.RetrievingSubcontractorsController
-            .start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
+            .start(instanceId, targetKey)
             .url
         )
 
         when(
-          mockPrepopService.prepopulate(eqTo(taxOfficeNumber), eqTo(taxOfficeReference), eqTo(instanceId))(
+          mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
             any[HeaderCarrier]
           )
         )
@@ -226,7 +228,7 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
     "start must redirect to UnsuccessfulAutomaticSubcontractorUpdateController when scheme has no prePopSuccessful value" in {
 
-      val application = applicationBuilderWithClientGuard
+      val application = applicationBuilderWithSchemeAuthorisationGuard
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService)
         )
@@ -236,12 +238,12 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
         val request = FakeRequest(
           GET,
           routes.RetrievingSubcontractorsController
-            .start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
+            .start(instanceId, targetKey)
             .url
         )
 
         when(
-          mockPrepopService.prepopulate(eqTo(taxOfficeNumber), eqTo(taxOfficeReference), eqTo(instanceId))(
+          mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
             any[HeaderCarrier]
           )
         )
@@ -273,7 +275,7 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
     "start must redirect to UnsuccessfulAutomaticSubcontractorUpdateController when there is no scheme" in {
 
-      val application = applicationBuilderWithClientGuard
+      val application = applicationBuilderWithSchemeAuthorisationGuard
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService)
         )
@@ -283,12 +285,12 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
         val request = FakeRequest(
           GET,
           routes.RetrievingSubcontractorsController
-            .start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
+            .start(instanceId, targetKey)
             .url
         )
 
         when(
-          mockPrepopService.prepopulate(eqTo(taxOfficeNumber), eqTo(taxOfficeReference), eqTo(instanceId))(
+          mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
             any[HeaderCarrier]
           )
         )
@@ -309,7 +311,7 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
     "start must redirect to UnsuccessfulAutomaticSubcontractorUpdateController when prepopulate fails" in {
 
-      val application = applicationBuilderWithClientGuard
+      val application = applicationBuilderWithSchemeAuthorisationGuard
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService)
         )
@@ -319,12 +321,12 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
         val request = FakeRequest(
           GET,
           routes.RetrievingSubcontractorsController
-            .start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
+            .start(instanceId, targetKey)
             .url
         )
 
         when(
-          mockPrepopService.prepopulate(eqTo(taxOfficeNumber), eqTo(taxOfficeReference), eqTo(instanceId))(
+          mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
             any[HeaderCarrier]
           )
         )

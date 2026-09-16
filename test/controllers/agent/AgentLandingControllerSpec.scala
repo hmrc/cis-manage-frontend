@@ -17,7 +17,7 @@
 package controllers.agent
 
 import base.SpecBase
-import controllers.actions.{ClientListStatusGuard, HasClientGuard}
+import controllers.actions.*
 import models.audit.ClientDetailsRetrievedAuditEventModel
 import models.{CisTaxpayerSearchResult, Scheme, UserAnswers}
 import models.requests.{DataRequest, IdentifierRequest}
@@ -50,8 +50,8 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
   private val mockPrepopService     = mock[PrepopService]
   private val mockAuditService      = mock[AuditService]
 
-  private val mockClientListStatusGuard = mock[ClientListStatusGuard]
-  private val mockHasClientGuard        = mock[HasClientGuard]
+  private val mockClientListStatusGuard    = mock[ClientListStatusGuard]
+  private val mockSchemeAuthorisationGuard = mock[SchemeAuthorisationGuard]
 
   private val passThroughClientListStatusGuard =
     new ActionFilter[IdentifierRequest] {
@@ -59,7 +59,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
       override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = Future.successful(None)
     }
 
-  private val passThroughHasClientGuard =
+  private val passThroughSchemeAuthorisationGuard =
     new ActionFilter[DataRequest] {
       override protected def executionContext: ExecutionContext                         = ExecutionContext.global
       override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] = Future.successful(None)
@@ -96,7 +96,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
     bind[SessionRepository].toInstance(mockSessionRepository),
     bind[PrepopService].toInstance(mockPrepopService),
     bind[ClientListStatusGuard].toInstance(mockClientListStatusGuard),
-    bind[HasClientGuard].toInstance(mockHasClientGuard),
+    bind[SchemeAuthorisationGuard].toInstance(mockSchemeAuthorisationGuard),
     bind[AuditService].toInstance(mockAuditService)
   )
 
@@ -108,7 +108,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
     super.beforeEach()
     when(mockSessionRepository.set(any[UserAnswers])).thenReturn(Future.successful(true))
     when(mockClientListStatusGuard.groupB(any[Call])).thenReturn(passThroughClientListStatusGuard)
-    when(mockHasClientGuard.forInstanceId(any[String])).thenReturn(passThroughHasClientGuard)
+    when(mockSchemeAuthorisationGuard.forInstanceId(any[String])).thenReturn(passThroughSchemeAuthorisationGuard)
     when(
       mockAuditService
         .sendEvent(any[ClientDetailsRetrievedAuditEventModel])(using
@@ -126,7 +126,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
       mockSessionRepository,
       mockPrepopService,
       mockClientListStatusGuard,
-      mockHasClientGuard,
+      mockSchemeAuthorisationGuard,
       mockAuditService
     )
     super.afterEach()

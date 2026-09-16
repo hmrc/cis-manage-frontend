@@ -17,7 +17,7 @@
 package controllers.clientdetails
 
 import base.SpecBase
-import controllers.actions.{ClientListStatusGuard, HasClientGuard}
+import controllers.actions.*
 import models.requests.{DataRequest, IdentifierRequest}
 import models.{CisTaxpayer, CisTaxpayerSearchResult, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
@@ -40,8 +40,8 @@ class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   implicit val ec: ExecutionContext = ExecutionContext.global
 
-  private val clientListStatusGuard = mock[ClientListStatusGuard]
-  private val hasClientGuard        = mock[HasClientGuard]
+  private val clientListStatusGuard    = mock[ClientListStatusGuard]
+  private val schemeAuthorisationGuard = mock[SchemeAuthorisationGuard]
 
   private val passThroughIdentifierFilter =
     new ActionFilter[IdentifierRequest] {
@@ -109,7 +109,7 @@ class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
       when(clientListStatusGuard.groupB(any()))
         .thenReturn(passThroughIdentifierFilter)
 
-      when(hasClientGuard.currentClient)
+      when(schemeAuthorisationGuard.currentClient)
         .thenReturn(passThroughDataFilter)
 
       val mockSessionRepository = mock[SessionRepository]
@@ -131,10 +131,13 @@ class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
         .thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
+        applicationBuilder(
+          userAnswers = Some(userAnswers),
+          isAgent = true
+        )
           .overrides(
             bind[ClientListStatusGuard].toInstance(clientListStatusGuard),
-            bind[HasClientGuard].toInstance(hasClientGuard),
+            bind[SchemeAuthorisationGuard].toInstance(schemeAuthorisationGuard),
             bind[ManageService].toInstance(mockManageService),
             bind[SessionRepository].toInstance(mockSessionRepository),
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute))

@@ -32,7 +32,6 @@ import services.{AuditService, ManageService, PrepopService}
 import uk.gov.hmrc.http.HttpVerbs.GET
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.agent.AgentLandingView
 
 import javax.inject.{Inject, Named}
@@ -45,7 +44,7 @@ class AgentLandingController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   clientListStatusGuard: ClientListStatusGuard,
-  hasClientGuard: HasClientGuard,
+  schemeAuthorisationGuard: SchemeAuthorisationGuard,
   clientListCheckNavigator: ClientListCheckNavigator,
   manageService: ManageService,
   prepopService: PrepopService,
@@ -63,10 +62,7 @@ class AgentLandingController @Inject() (
       andThen clientListStatusGuard.groupB(clientListCheckNavigator.agentDashboard(uniqueId))
       andThen getData
       andThen requireData
-      andThen hasClientGuard.forInstanceId(uniqueId)).async { implicit request =>
-
-      given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
+      andThen schemeAuthorisationGuard.forInstanceId(uniqueId)).async { implicit request =>
       AgentClientsPage.findClient(request.userAnswers, uniqueId) match {
         case Some(client) =>
           loadLandingPage(uniqueId, client)
@@ -81,7 +77,7 @@ class AgentLandingController @Inject() (
     (identify
       andThen getData
       andThen requireData
-      andThen hasClientGuard.forInstanceId(uniqueId)).async { implicit request =>
+      andThen schemeAuthorisationGuard.forInstanceId(uniqueId)).async { implicit request =>
       val systemErrorRedirect       = Redirect(controllers.routes.SystemErrorController.onPageLoad())
       val unauthorisedAgentRedirect = Redirect(controllers.routes.UnauthorisedAgentAffinityController.onPageLoad())
 
@@ -197,8 +193,6 @@ class AgentLandingController @Inject() (
     val instanceId                    = client.uniqueId
     val manageContractorDetails       = Call(GET, appConfig.contractorDetailsManagementUrl)
     val checkSubcontractorRecordsCall = controllers.routes.CheckSubcontractorRecordsController.onPageLoad(
-      client.taxOfficeNumber,
-      client.taxOfficeRef,
       instanceId,
       targetKey
     )

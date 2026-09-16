@@ -41,7 +41,7 @@ class RemoveClientYesNoController @Inject() (
   @Named("AgentIdentifier") identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  hasClientGuard: HasClientGuard,
+  schemeAuthorisationGuard: SchemeAuthorisationGuard,
   clientListStatusGuard: ClientListStatusGuard,
   clientListCheckNavigator: ClientListCheckNavigator,
   formProvider: RemoveClientYesNoFormProvider,
@@ -60,7 +60,7 @@ class RemoveClientYesNoController @Inject() (
       andThen clientListStatusGuard.groupB(clientListCheckNavigator.removeClient(mode))
       andThen getData
       andThen requireData
-      andThen hasClientGuard.forInstanceId(uniqueId)).async { implicit request =>
+      andThen schemeAuthorisationGuard.forInstanceId(uniqueId)).async { implicit request =>
       request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId)) match {
         case Some(client) =>
           manageService

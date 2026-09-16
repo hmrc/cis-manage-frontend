@@ -29,9 +29,7 @@ import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import services.{ClientListPaginationResult, ManageService, PaginationService}
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import viewmodels.agent.{ClientListViewModel, SearchByList}
 import views.html.agent.ClientListSearchView
 
@@ -58,14 +56,27 @@ class ClientListSearchController @Inject() (
 
   val form: Form[ClientListFormData] = formProvider()
 
+  def start(): Action[AnyContent] =
+    (identify
+      andThen clientListStatusGuard.groupB(clientListCheckNavigator.fileMonthlyReturns)
+      andThen getData
+      andThen requireData).async { implicit request =>
+      manageService
+        .refreshAndStoreAgentClients(request.userAnswers)
+        .map { _ =>
+          Redirect(routes.ClientListSearchController.onPageLoad())
+        }
+        .recover { case e =>
+          logger.error(s"[ClientListSearchController][start] failed: ${e.getMessage}", e)
+          Redirect(controllers.routes.SystemErrorController.onPageLoad())
+        }
+    }
+
   def onPageLoad(): Action[AnyContent] =
     (identify
       andThen clientListStatusGuard.groupB(clientListCheckNavigator.fileMonthlyReturns)
       andThen getData
       andThen requireData).async { implicit request =>
-
-      implicit val hc: HeaderCarrier =
-        HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       val sortBy      = request.getQueryString("sortBy").orElse(Some("clientName"))
       val sortOrder   = request.getQueryString("sortOrder").orElse(Some("ascending"))
@@ -115,10 +126,6 @@ class ClientListSearchController @Inject() (
 
   def clearFilter(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-
-      implicit val hc: HeaderCarrier =
-        HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
       manageService
         .resolveAndStoreAgentClients(request.userAnswers)
         .flatMap { case (_, uaWithClients) =>
@@ -135,10 +142,6 @@ class ClientListSearchController @Inject() (
 
   def onSubmit: Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-
-      implicit val hc: HeaderCarrier =
-        HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
       manageService
         .resolveAndStoreAgentClients(request.userAnswers)
         .flatMap { case (cisClients, uaWithClients) =>
@@ -183,10 +186,6 @@ class ClientListSearchController @Inject() (
 
   def downloadClientList(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-
-      implicit val hc: HeaderCarrier =
-        HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
       implicit val msgs: Messages = messagesApi.preferred(request)
 
       manageService

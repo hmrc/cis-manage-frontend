@@ -25,4 +25,7 @@ private[actions] object ClientListCheckRedirects {
 
   def agentLostAccess: Result =
     Redirect(controllers.agent.routes.AgentLostAccessController.onPageLoad())
+
+  def unauthorised: Result =
+    Redirect(controllers.routes.UnauthorisedController.onPageLoad())
 }

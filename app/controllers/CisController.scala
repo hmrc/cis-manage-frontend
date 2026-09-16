@@ -31,9 +31,9 @@ abstract class CisController extends FrontendBaseController with I18nSupport {
 
   protected val controllerComponents: CisControllerComponents
 
-  protected val identify: IdentifierAction        = controllerComponents.identify
-  protected val getData: DataRetrievalAction      = controllerComponents.getData
-  protected val requireData: DataRequiredAction   = controllerComponents.requireData
-  protected val requireCisId: CisIdRequiredAction = controllerComponents.requiredCisId
-  protected val hasClientGuard: HasClientGuard    = controllerComponents.hasClientGuard
+  protected val identify: IdentifierAction                         = controllerComponents.identify
+  protected val getData: DataRetrievalAction                       = controllerComponents.getData
+  protected val requireData: DataRequiredAction                    = controllerComponents.requireData
+  protected val requireCisId: CisIdRequiredAction                  = controllerComponents.requiredCisId
+  protected val schemeAuthorisationGuard: SchemeAuthorisationGuard = controllerComponents.schemeAuthorisationGuard
 }

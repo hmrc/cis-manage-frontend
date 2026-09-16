@@ -28,7 +28,6 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{ManageService, SubmittedReturnsService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.history.SubmittedReturnsView
 import views.html.monthlyreturns.SubmissionSuccessView
 
@@ -54,9 +53,7 @@ class SubmittedReturnsController @Inject() (
 
   def onPageLoadSingleYear(taxYear: String): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
-
-      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-      implicit val lang: Lang        = messagesApi.preferred(request).lang
+      implicit val lang: Lang = messagesApi.preferred(request).lang
 
       resolveSubmittedReturnsData
         .map { data =>
@@ -72,9 +69,7 @@ class SubmittedReturnsController @Inject() (
 
   def onPageLoadAllYears: Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
-
-      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-      implicit val lang: Lang        = messagesApi.preferred(request).lang
+      implicit val lang: Lang = messagesApi.preferred(request).lang
 
       resolveSubmittedReturnsData
         .map { data =>
@@ -101,8 +96,7 @@ class SubmittedReturnsController @Inject() (
 
   def viewSubmissionReceipt(taxYear: Int, taxMonth: Int, amendment: String): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
-      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-      implicit val lang: Lang        = messagesApi.preferred(request).lang
+      implicit val lang: Lang = messagesApi.preferred(request).lang
 
       submittedReturnsService
         .getMonthlyReturnComplete(request.cisId, taxYear, taxMonth, amendment)
@@ -120,8 +114,6 @@ class SubmittedReturnsController @Inject() (
 
   def startAmendment(taxYear: Int, taxMonth: Int): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
-      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
       resolveSubmittedReturnsData
         .flatMap { data =>
           submittedReturnsService

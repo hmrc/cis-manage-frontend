@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.{AuthorizedForSchemeActionProvider, FakeAuthorizedForSchemeAction, HasClientGuard}
+import controllers.actions.*
 import models.Scheme
 import models.requests.DataRequest
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -35,45 +35,50 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CheckSubcontractorRecordsControllerSpec extends SpecBase {
 
-  val mockPrepopService: PrepopService                            = mock[PrepopService]
-  val mockSchemeAccessProvider: AuthorizedForSchemeActionProvider = mock[AuthorizedForSchemeActionProvider]
-  val mockHasClientGuard: HasClientGuard                          = mock[HasClientGuard]
+  val mockPrepopService: PrepopService =
+    mock[PrepopService]
 
-  private val passThroughHasClientGuard =
+  val mockSchemeAuthorisationGuard: SchemeAuthorisationGuard =
+    mock[SchemeAuthorisationGuard]
+
+  private val passThroughSchemeAuthorisationGuard =
     new ActionFilter[DataRequest] {
-      override protected def executionContext: ExecutionContext                         = ExecutionContext.global
+      override protected def executionContext: ExecutionContext                         =
+        ExecutionContext.global
       override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
         Future.successful(None)
     }
 
-  when(mockHasClientGuard.forInstanceId(any[String])).thenReturn(passThroughHasClientGuard)
+  when(
+    mockSchemeAuthorisationGuard.forInstanceId(any[String])
+  ).thenReturn(passThroughSchemeAuthorisationGuard)
+
+  when(
+    mockSchemeAuthorisationGuard.validateCachedInstanceId(any[String])
+  ).thenReturn(passThroughSchemeAuthorisationGuard)
 
   "CheckSubcontractorRecords Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(
-          bind[PrepopService].toInstance(mockPrepopService),
-          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider),
-          bind[HasClientGuard].toInstance(mockHasClientGuard)
-        )
-        .build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[PrepopService].toInstance(mockPrepopService),
+            bind[SchemeAuthorisationGuard]
+              .toInstance(mockSchemeAuthorisationGuard)
+          )
+          .build()
 
-      val taxOfficeNumber    = "101"
-      val taxOfficeReference = "AB0001"
-      val instanceId         = "900001"
-      val targetKey          = "subcontractors"
+      val instanceId = "900001"
+      val targetKey  = "subcontractors"
 
       running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.CheckSubcontractorRecordsController
-            .onPageLoad(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
-            .url
-        )
 
-        when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
+        when(
+          mockPrepopService
+            .getScheme(eqTo(instanceId))(any[HeaderCarrier])
+        ).thenReturn(
           Future.successful(
             Some(
               Scheme(
@@ -88,47 +93,51 @@ class CheckSubcontractorRecordsControllerSpec extends SpecBase {
           )
         )
 
-        when(
-          mockSchemeAccessProvider.apply(eqTo(taxOfficeNumber), eqTo(taxOfficeReference))(using any[ExecutionContext])
-        )
-          .thenReturn(new FakeAuthorizedForSchemeAction)
+        val request =
+          FakeRequest(
+            GET,
+            routes.CheckSubcontractorRecordsController
+              .onPageLoad(instanceId, targetKey)
+              .url
+          )
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
 
-        val view = application.injector.instanceOf[CheckSubcontractorRecordsView]
+        val view =
+          application.injector
+            .instanceOf[CheckSubcontractorRecordsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)(
-          request,
-          messages(application)
-        ).toString
+
+        contentAsString(result) mustEqual
+          view(instanceId, targetKey)(
+            request,
+            messages(application)
+          ).toString
       }
     }
 
     "must redirect to journey recovery if prepopSuccessful is 'Y'" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(
-          bind[PrepopService].toInstance(mockPrepopService),
-          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider),
-          bind[HasClientGuard].toInstance(mockHasClientGuard)
-        )
-        .build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[PrepopService].toInstance(mockPrepopService),
+            bind[SchemeAuthorisationGuard]
+              .toInstance(mockSchemeAuthorisationGuard)
+          )
+          .build()
 
-      val taxOfficeNumber    = "101"
-      val taxOfficeReference = "AB0001"
-      val instanceId         = "900001"
-      val targetKey          = "subcontractors"
+      val instanceId = "900001"
+      val targetKey  = "subcontractors"
 
       running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.CheckSubcontractorRecordsController
-            .onPageLoad(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
-            .url
-        )
 
-        when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
+        when(
+          mockPrepopService
+            .getScheme(eqTo(instanceId))(any[HeaderCarrier])
+        ).thenReturn(
           Future.successful(
             Some(
               Scheme(
@@ -143,85 +152,97 @@ class CheckSubcontractorRecordsControllerSpec extends SpecBase {
           )
         )
 
-        when(
-          mockSchemeAccessProvider.apply(eqTo(taxOfficeNumber), eqTo(taxOfficeReference))(using any[ExecutionContext])
-        )
-          .thenReturn(new FakeAuthorizedForSchemeAction)
+        val request =
+          FakeRequest(
+            GET,
+            routes.CheckSubcontractorRecordsController
+              .onPageLoad(instanceId, targetKey)
+              .url
+          )
 
-        val result = route(application, request).value
+        val result =
+          route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).isDefined mustEqual true
-        redirectLocation(result).value mustEqual "/there-is-a-problem"
+
+        redirectLocation(result).value mustEqual
+          "/there-is-a-problem"
       }
     }
 
     "must redirect to system error if there is no scheme" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(
-          bind[PrepopService].toInstance(mockPrepopService),
-          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider),
-          bind[HasClientGuard].toInstance(mockHasClientGuard)
-        )
-        .build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[PrepopService].toInstance(mockPrepopService),
+            bind[SchemeAuthorisationGuard]
+              .toInstance(mockSchemeAuthorisationGuard)
+          )
+          .build()
 
-      val taxOfficeNumber    = "101"
-      val taxOfficeReference = "AB0001"
-      val instanceId         = "900001"
-      val targetKey          = "subcontractors"
+      val instanceId = "900001"
+      val targetKey  = "subcontractors"
 
       running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.CheckSubcontractorRecordsController
-            .onPageLoad(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
-            .url
-        )
-
-        when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
-          Future.successful(
-            None
-          )
-        )
 
         when(
-          mockSchemeAccessProvider.apply(eqTo(taxOfficeNumber), eqTo(taxOfficeReference))(using any[ExecutionContext])
+          mockPrepopService
+            .getScheme(eqTo(instanceId))(any[HeaderCarrier])
+        ).thenReturn(
+          Future.successful(None)
         )
-          .thenReturn(new FakeAuthorizedForSchemeAction)
 
-        val result = route(application, request).value
+        val request =
+          FakeRequest(
+            GET,
+            routes.CheckSubcontractorRecordsController
+              .onPageLoad(instanceId, targetKey)
+              .url
+          )
+
+        val result =
+          route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).isDefined mustEqual true
-        redirectLocation(result).value mustEqual "/system-error/there-is-a-problem"
+
+        redirectLocation(result).value mustEqual
+          "/system-error/there-is-a-problem"
       }
     }
 
     "must redirect to RetrievingSubcontractorsController on submit" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[SchemeAuthorisationGuard]
+              .toInstance(mockSchemeAuthorisationGuard)
+          )
+          .build()
 
-      val taxOfficeNumber    = "101"
-      val taxOfficeReference = "AB0001"
-      val instanceId         = "900001"
-      val targetKey          = "subcontractors"
+      val instanceId = "900001"
+      val targetKey  = "subcontractors"
 
       running(application) {
-        val request = FakeRequest(
-          POST,
-          routes.CheckSubcontractorRecordsController
-            .onSubmit(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
-            .url
-        )
 
-        val result = route(application, request).value
+        val request =
+          FakeRequest(
+            POST,
+            routes.CheckSubcontractorRecordsController
+              .onSubmit(instanceId, targetKey)
+              .url
+          )
+
+        val result =
+          route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.RetrievingSubcontractorsController
-          .onPageLoad(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
-          .url
+
+        redirectLocation(result).value mustEqual
+          routes.RetrievingSubcontractorsController
+            .onPageLoad(instanceId, targetKey)
+            .url
       }
     }
   }
