@@ -456,61 +456,6 @@ history.printSubmissionDetails.paymentsMadeToSubcontractors.taxDeducted      =  
 history.printSubmissionDetails.printThisPage.link                            =  Argraffu’r dudalen hon
 history.printSubmissionDetails.monthlyReturnHistory.link                     =  Dychwelyd i ‘Hanes datganiadau misol’
 
-subcontractors.deleteSubcontractorYesNo.heading                          =  Ydych chi’n siŵr eich bod chi am ddileu {0}?
-subcontractors.deleteSubcontractorYesNo.p                                =  Bydd yr is-gontractwr hwn hefyd yn cael ei dynnu oddi ar unrhyw ddatganiad misol nad ydych wedi’i chyflwyno hyd yma.
-subcontractors.deleteSubcontractorYesNo.error.required                   =  Dewiswch ‘Iawn’ os ydych chi am ddileu’r is-gontractwr hwn
-
-subcontractors.cannotDeleteSubcontractor.heading                         =  Ni allwch ddileu {0}
-subcontractors.cannotDeleteSubcontractor.p1                              =  Ar hyn o bryd, mae’r is-gontractwr hwn yn rhan o ddatganiad misol, neu gais i ddilysu, sydd ar y gweill.
-subcontractors.cannotDeleteSubcontractor.p2                              =  Rhaid i chi aros nes bod y datganiad misol, neu’r cais i ddilysu, hwnnw wedi’i gwblhau cyn y gallwch ei ddileu.
-subcontractors.cannotDeleteSubcontractor.p3.text                         =  Yn ôl i
-subcontractors.cannotDeleteSubcontractor.p3.link                         =  Eich is-gontractwyr
-
-subcontractors.subcontractorDeletedConfirmation.title                    =  Is-gontractwr wedi’i ddileu
-subcontractors.subcontractorDeletedConfirmation.heading                  =  Is-gontractwr wedi’i ddileu
-subcontractors.subcontractorDeletedConfirmation.p1                       =  Rydych chi wedi dileu {0} o’ch rhestr o is-gontractwyr.
-subcontractors.subcontractorDeletedConfirmation.p2.text                  =  Yn ôl i
-subcontractors.subcontractorDeletedConfirmation.p2.link                  =  Eich is-gontractwyr
-subcontractors.subcontractorDeletedConfirmation.h2                       =  Cyn i chi fynd
-subcontractors.subcontractorDeletedConfirmation.p3                       =  Mae’ch adborth yn ein helpu i wella ein gwasanaeth.
-subcontractors.subcontractorDeletedConfirmation.p4.text                  =  i rannu’ch adborth ar y gwasanaeth hwn.
-subcontractors.subcontractorDeletedConfirmation.p4.link                  =  Llenwch arolwg byr
-
-subcontractors.subcontractorsList.title                                  =  Eich is-gontractwyr
-subcontractors.subcontractorsList.heading                                =  Eich is-gontractwyr
-subcontractors.subcontractorsList.h2                                     =  Chwilio am is-gontractwr
-subcontractors.subcontractorsList.filter.verificationStatus              =  Hidlo yn ôl y statws dilysu
-subcontractors.subcontractorsList.filter.taxTreatment                    =  Hidlo yn ôl y driniaeth o ran treth
-subcontractors.subcontractorsList.filter.verificationStatus.verified     =  Wedi’i ddilysu
-subcontractors.subcontractorsList.filter.taxTreatment.gross              =  Gros
-subcontractors.subcontractorsList.filter.taxTreatment.higherRate         =  Cyfradd uwch
-subcontractors.subcontractorsList.filter.taxTreatment.standardRate       =  Cyfradd safonol
-subcontractors.subcontractorsList.filter.taxTreatment.unknown            =  Anhysbys
-subcontractors.subcontractorsList.hint                                   =  Chwilio yn ôl yr enw, UTR neu rif dilysu
-subcontractors.subcontractorsList.search.error.length                    =  Rhaid i dermau chwilio fod yn 35 o gymeriadau neu lai
-subcontractors.subcontractorsList.search.error.invalid                   =  Rhaid i dermau chwilio gynnwys y llythrennau a-z, rhifau, collnodau, symbolau ampersand, comas, cysylltnodau, atalnodau llawn, blaenslaesau a bylchau yn unig
-subcontractors.subcontractorsList.search.label                           =  Chwilio am is-gontractwr
-subcontractors.subcontractorsList.name                                   =  Enw
-subcontractors.subcontractorsList.utr                                    =  UTR
-subcontractors.subcontractorsList.verified                               =  Wedi’i ddilysu
-subcontractors.subcontractorsList.verificationNumber                     =  Rhif dilysu
-subcontractors.subcontractorsList.taxTreatment                           =  Triniaeth o ran treth
-subcontractors.subcontractorsList.dateAdded                              =  Dyddiad yr ychwanegwyd
-subcontractors.subcontractorsList.action                                 =  Camau
-subcontractors.subcontractorsList.backTo                                 =  Yn ôl i
-subcontractors.subcontractorsList.manage                                 =  Rheoli’ch is-gontractwyr
-subcontractors.subcontractorsList.searchAndFilter                        =  Chwilio a hidlo
-subcontractors.subcontractorsList.clearFilters                           =  Clirio
-subcontractors.subcontractorsList.delete                                 =  Dileu
-
-subcontractors.noSubcontractorsExist.heading                             =  Eich is-gontractwyr
-subcontractors.noSubcontractorsExist.p1                                  =  Does dim is-gontractwyr gennych ar hyn o bryd.
-subcontractors.noSubcontractorsExist.p2.prefix                           =  Bydd angen i chi
-subcontractors.noSubcontractorsExist.p2.link                             =  ychwanegu is-gontractwyr yn gyntaf
-subcontractors.noSubcontractorsExist.p2.suffix                           =  cyn y gallwch greu cais i ddilysu neu ddatganiad misol.
-subcontractors.noSubcontractorsExist.p3.prefix                           =  Yn ôl i
-subcontractors.noSubcontractorsExist.p3.link                             =  Rheoli’ch is-gontractwyr
-
 history.returnHistory.allYears.title                                         =  Hanes eich datganiadau ar gyfer pob blwyddyn dreth
 history.returnHistory.allYears.heading                                       =  Hanes eich datganiadau ar gyfer pob blwyddyn dreth
 history.returnHistory.singleYear.title                                       =  Hanes datganiadau misol ar gyfer blwyddyn dreth {0} i {1}
@@ -694,6 +639,61 @@ verify.noVerificationHistory.backTo                          =  Yn ôl i
 verify.noVerificationHistory.manageYourSubcontractors.link   =  Rheoli’ch is-gontractwyr
 
 # Client Details
+subcontractors.deleteSubcontractorYesNo.heading                          =  Ydych chi’n siŵr eich bod chi am ddileu {0}?
+subcontractors.deleteSubcontractorYesNo.p                                =  Bydd yr is-gontractwr hwn hefyd yn cael ei dynnu oddi ar unrhyw ddatganiad misol nad ydych wedi’i chyflwyno hyd yma.
+subcontractors.deleteSubcontractorYesNo.error.required                   =  Dewiswch ‘Iawn’ os ydych chi am ddileu’r is-gontractwr hwn
+
+subcontractors.cannotDeleteSubcontractor.heading                         =  Ni allwch ddileu {0}
+subcontractors.cannotDeleteSubcontractor.p1                              =  Ar hyn o bryd, mae’r is-gontractwr hwn yn rhan o ddatganiad misol, neu gais i ddilysu, sydd ar y gweill.
+subcontractors.cannotDeleteSubcontractor.p2                              =  Rhaid i chi aros nes bod y datganiad misol, neu’r cais i ddilysu, hwnnw wedi’i gwblhau cyn y gallwch ei ddileu.
+subcontractors.cannotDeleteSubcontractor.p3.text                         =  Yn ôl i
+subcontractors.cannotDeleteSubcontractor.p3.link                         =  Eich is-gontractwyr
+
+subcontractors.subcontractorDeletedConfirmation.title                    =  Is-gontractwr wedi’i ddileu
+subcontractors.subcontractorDeletedConfirmation.heading                  =  Is-gontractwr wedi’i ddileu
+subcontractors.subcontractorDeletedConfirmation.p1                       =  Rydych chi wedi dileu {0} o’ch rhestr o is-gontractwyr.
+subcontractors.subcontractorDeletedConfirmation.p2.text                  =  Yn ôl i
+subcontractors.subcontractorDeletedConfirmation.p2.link                  =  Eich is-gontractwyr
+subcontractors.subcontractorDeletedConfirmation.h2                       =  Cyn i chi fynd
+subcontractors.subcontractorDeletedConfirmation.p3                       =  Mae’ch adborth yn ein helpu i wella ein gwasanaeth.
+subcontractors.subcontractorDeletedConfirmation.p4.text                  =  i rannu’ch adborth ar y gwasanaeth hwn.
+subcontractors.subcontractorDeletedConfirmation.p4.link                  =  Llenwch arolwg byr
+
+subcontractors.subcontractorsList.title                                  =  Eich is-gontractwyr
+subcontractors.subcontractorsList.heading                                =  Eich is-gontractwyr
+subcontractors.subcontractorsList.h2                                     =  Chwilio am is-gontractwr
+subcontractors.subcontractorsList.filter.verificationStatus              =  Hidlo yn ôl y statws dilysu
+subcontractors.subcontractorsList.filter.taxTreatment                    =  Hidlo yn ôl y driniaeth o ran treth
+subcontractors.subcontractorsList.filter.verificationStatus.verified     =  Wedi’i ddilysu
+subcontractors.subcontractorsList.filter.taxTreatment.gross              =  Gros
+subcontractors.subcontractorsList.filter.taxTreatment.higherRate         =  Cyfradd uwch
+subcontractors.subcontractorsList.filter.taxTreatment.standardRate       =  Cyfradd safonol
+subcontractors.subcontractorsList.filter.taxTreatment.unknown            =  Anhysbys
+subcontractors.subcontractorsList.hint                                   =  Chwilio yn ôl yr enw, UTR neu rif dilysu
+subcontractors.subcontractorsList.search.error.length                    =  Rhaid i dermau chwilio fod yn 35 o gymeriadau neu lai
+subcontractors.subcontractorsList.search.error.invalid                   =  Rhaid i dermau chwilio gynnwys y llythrennau a-z, rhifau, collnodau, symbolau ampersand, comas, cysylltnodau, atalnodau llawn, blaenslaesau a bylchau yn unig
+subcontractors.subcontractorsList.search.label                           =  Chwilio am is-gontractwr
+subcontractors.subcontractorsList.name                                   =  Enw
+subcontractors.subcontractorsList.utr                                    =  UTR
+subcontractors.subcontractorsList.verified                               =  Wedi’i ddilysu
+subcontractors.subcontractorsList.verificationNumber                     =  Rhif dilysu
+subcontractors.subcontractorsList.taxTreatment                           =  Triniaeth o ran treth
+subcontractors.subcontractorsList.dateAdded                              =  Dyddiad yr ychwanegwyd
+subcontractors.subcontractorsList.action                                 =  Camau
+subcontractors.subcontractorsList.backTo                                 =  Yn ôl i
+subcontractors.subcontractorsList.manage                                 =  Rheoli’ch is-gontractwyr
+subcontractors.subcontractorsList.searchAndFilter                        =  Chwilio a hidlo
+subcontractors.subcontractorsList.clearFilters                           =  Clirio
+subcontractors.subcontractorsList.delete                                 =  Dileu
+
+subcontractors.noSubcontractorsExist.heading                             =  Eich is-gontractwyr
+subcontractors.noSubcontractorsExist.p1                                  =  Does dim is-gontractwyr gennych ar hyn o bryd.
+subcontractors.noSubcontractorsExist.p2.prefix                           =  Bydd angen i chi
+subcontractors.noSubcontractorsExist.p2.link                             =  ychwanegu is-gontractwyr yn gyntaf
+subcontractors.noSubcontractorsExist.p2.suffix                           =  cyn y gallwch greu cais i ddilysu neu ddatganiad misol.
+subcontractors.noSubcontractorsExist.p3.prefix                           =  Yn ôl i
+subcontractors.noSubcontractorsExist.p3.link                             =  Rheoli’ch is-gontractwyr
+
 clientdetails.manageClientDetails.title                                  =  Manylion y cleient
 clientdetails.manageClientDetails.heading                                =  Manylion ar gyfer {0}
 clientdetails.manageClientDetails.employerRef.key                        =  Cyfeirnod cyflogwr
@@ -733,68 +733,17 @@ clientdetails.changeClientReference.hint                                 =  Nodw
 clientdetails.changeClientReference.checkYourAnswersLabel                =  Newid cyfeirnod y cleient
 clientdetails.changeClientReference.change.hidden                        =  xxxxxxxxxxxxxxxxxxxx
 
-subcontractors.subcontractorsList.title                                  =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.heading                                =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.h2                                     =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.filter.verificationStatus              =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.filter.taxTreatment                    =  xxxxxxxxxxxxxxxxxxxx
 subcontractors.subcontractorsList.filter.all                             =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.filter.verificationStatus.verified     =  xxxxxxxxxxxxxxxxxxxx
 subcontractors.subcontractorsList.filter.verificationStatus.notVerified  =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.filter.taxTreatment.gross              =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.filter.taxTreatment.higherRate         =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.filter.taxTreatment.standardRate       =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.filter.taxTreatment.unknown            =  Anhysbys
-subcontractors.subcontractorsList.hint                                   =  xxxxxxxxxxxxxxxxxxxx
 subcontractors.subcontractorsList.showingResults                         =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.search.error.length                    =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.search.error.invalid                   =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.search.label                           =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.name                                   =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.utr                                    =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.verified                               =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.verificationNumber                     =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.taxTreatment                           =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.dateAdded                              =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.action                                 =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.backTo                                 =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.manage                                 =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.searchAndFilter                        =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.clearFilters                           =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.delete                                 =  xxxxxxxxxxxxxxxxxxxx
 subcontractors.subcontractorsList.noNameProvided                         =  xxxxxxxxxxxxxxxxxxxx
 subcontractors.subcontractorsList.showDetailsFor                         =  xxxxxxxxxxxxxxxxxxxx
 
 subcontractors.noSubcontractorsExist.title                               =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.noSubcontractorsExist.heading                             =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.noSubcontractorsExist.p1                                  =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.noSubcontractorsExist.p2.prefix                           =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.noSubcontractorsExist.p2.link                             =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.noSubcontractorsExist.p2.suffix                           =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.noSubcontractorsExist.p3.prefix                           =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.noSubcontractorsExist.p3.link                             =  xxxxxxxxxxxxxxxxxxxx
-
-subcontractors.subcontractorDeletedConfirmation.title                    =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorDeletedConfirmation.heading                  =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorDeletedConfirmation.p1                       =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorDeletedConfirmation.p2.text                  =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorDeletedConfirmation.p2.link                  =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorDeletedConfirmation.h2                       =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorDeletedConfirmation.p3                       =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorDeletedConfirmation.p4.text                  =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorDeletedConfirmation.p4.link                  =  xxxxxxxxxxxxxxxxxxxx
 
 subcontractors.cannotDeleteSubcontractor.title                           =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.cannotDeleteSubcontractor.heading                         =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.cannotDeleteSubcontractor.p1                              =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.cannotDeleteSubcontractor.p2                              =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.cannotDeleteSubcontractor.p3.text                         =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.cannotDeleteSubcontractor.p3.link                         =  xxxxxxxxxxxxxxxxxxxx
 
 subcontractors.deleteSubcontractorYesNo.title                            =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.deleteSubcontractorYesNo.heading                          =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.deleteSubcontractorYesNo.p                                =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.deleteSubcontractorYesNo.error.required                   =  xxxxxxxxxxxxxxxxxxxx
 
 securityCheck.title                                                      =  xxxxxxxxxxxxxxxxxxxx
 securityCheck.h1                                                         =  xxxxxxxxxxxxxxxxxxxx
