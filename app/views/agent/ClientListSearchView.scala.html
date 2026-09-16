@@ -77,7 +77,7 @@
         <a href="@link.href" class="govuk-link">
             @link.text
             <span class="govuk-visually-hidden">
-                @{messages("agent.clientListSearch.td.clientName.hidden", link.text)}
+                @{messages("agent.clientListSearch.td.clientName.hidden")}
             </span>
         </a>
     }
@@ -88,7 +88,7 @@
         <a href="@link.href" class="govuk-link">
             @link.text
             <span class="govuk-visually-hidden">
-                @{messages("agent.clientListSearch.td.actions.remove.hidden", agentClient.clientName)}
+                @agentClient.clientName
             </span>
         </a>
     }

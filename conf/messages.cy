@@ -256,7 +256,6 @@ agent.clientListSearch.details.2.summary               =  Gwasanaeth cyflwyno yn
 agent.clientListSearch.details.2.p1                    =  Gallwch anfon datganiadau CIS misol ar ran cleient heb gwblhau awdurdodiad ar-lein neu ffurflen FBI-2.
 agent.clientListSearch.details.2.p2                    =  Mae’r gwasanaeth hwn ar gael wrth ddefnyddio meddalwedd fasnachol yn unig.
 agent.clientListSearch.details.2.link                  =  Dewch o hyd i feddalwedd fasnachol ar gyfer datganiadau CIS
-agent.clientListSearch.td.actions.remove.hidden        =  xxxxxxxxxxxxxxxxxxxx
 agent.clientListSearch.td.clientName.hidden            =  xxxxxxxxxxxxxxxxxxxx
 agent.clientListSearch.searchBy.error.required         =  xxxxxxxxxxxxxxxxxxxx
 agent.clientListSearch.searchFilter.error.required     =  xxxxxxxxxxxxxxxxxxxx
