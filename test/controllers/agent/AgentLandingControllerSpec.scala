@@ -29,7 +29,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.{AgentClientsPage, CisIdPage}
 import play.api.Application
 import play.api.inject.bind
-import play.api.libs.json.Writes
 import play.api.mvc.{ActionFilter, Call, Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -114,7 +113,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
       mockAuditService
         .sendEvent(any[ClientDetailsRetrievedAuditEventModel])(using
           any[HeaderCarrier],
-          any[Writes[ClientDetailsRetrievedAuditEventModel]],
           any[Request[?]]
         )
     ).thenReturn(
@@ -179,13 +177,12 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
         verify(mockAuditService)
           .sendEvent(auditCaptor.capture())(using
             any[HeaderCarrier],
-            any[Writes[ClientDetailsRetrievedAuditEventModel]],
             any[Request[?]]
           )
 
         val auditEvent = auditCaptor.getValue
 
-        auditEvent.auditType mustBe "clientDetailsRetrieved"
+        auditEvent.auditType mustBe "ClientDetailsRetrieved"
         auditEvent.taxOfficeNumber mustBe "163"
         auditEvent.taxOfficeReference mustBe "AB0063"
       }
@@ -292,7 +289,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
         mockAuditService
           .sendEvent(any[ClientDetailsRetrievedAuditEventModel])(using
             any[HeaderCarrier],
-            any[Writes[ClientDetailsRetrievedAuditEventModel]],
             any[Request[?]]
           )
       ).thenReturn(Future.failed(new RuntimeException("audit failed")))

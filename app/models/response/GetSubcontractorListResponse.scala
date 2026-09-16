@@ -71,7 +71,7 @@ final case class GetSubcontractor(
   def isVerified: Boolean =
     verified.exists(_.equalsIgnoreCase("Y"))
 
-  private def normalisedType: Option[String] =
+  def normalisedType: Option[String] =
     subcontractorType.map(_.trim.toLowerCase.replace(" ", ""))
 
   private def personalNameValue: Option[String] =

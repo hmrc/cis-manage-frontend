@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import models.Target
 import models.Target.*
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -23,7 +24,7 @@ import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.SuccessfulAutomaticSubcontractorUpdateViewModel
 import views.html.SuccessfulAutomaticSubcontractorUpdateView
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, SchemeAuthorisationGuard}
+import controllers.actions.*
 import services.PrepopService
 
 import javax.inject.Inject
@@ -37,7 +38,8 @@ class SuccessfulAutomaticSubcontractorUpdateController @Inject() (
   schemeAuthorisationGuard: SchemeAuthorisationGuard,
   val controllerComponents: MessagesControllerComponents,
   view: SuccessfulAutomaticSubcontractorUpdateView,
-  service: PrepopService
+  service: PrepopService,
+  appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -71,9 +73,10 @@ class SuccessfulAutomaticSubcontractorUpdateController @Inject() (
 
   private def targetCall(target: Target, instanceId: String): Call =
     target match {
-      case Returns       => controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
-      case Notices       => controllers.routes.JourneyRecoveryController.onPageLoad()
-      case Subcontractor => controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId)
+      case Returns                 => controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
+      case Notices                 => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case Subcontractor           => controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId)
+      case ManageContractorDetails => Call("GET", appConfig.contractorDetailsManagementUrl)
     }
 
   private def getSubcontractorsList: Seq[SuccessfulAutomaticSubcontractorUpdateViewModel] =
