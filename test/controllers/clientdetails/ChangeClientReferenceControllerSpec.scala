@@ -17,11 +17,9 @@
 package controllers.clientdetails
 
 import base.SpecBase
-import controllers.actions.{ClientListStatusGuard, HasClientGuard}
 import controllers.routes
 import forms.clientdetails.ChangeClientReferenceFormProvider
 import models.{CisTaxpayerSearchResult, NormalMode, UserAnswers}
-import models.requests.{DataRequest, IdentifierRequest}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -29,7 +27,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.AgentClientsPage
 import pages.clientdetails.ChangeClientReferencePage
 import play.api.inject.bind
-import play.api.mvc.{ActionFilter, Call, Result}
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -53,84 +51,29 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
   lazy val changeClientReferenceRoute: String =
     controllers.clientdetails.routes.ChangeClientReferenceController.onPageLoad(uniqueId, NormalMode).url
 
-  private val mockClientListStatusGuard   = mock[ClientListStatusGuard]
-  private val mockHasClientGuard          = mock[HasClientGuard]
-  private val passThroughIdentifierFilter =
-    new ActionFilter[IdentifierRequest] {
-      override protected def executionContext: ExecutionContext = ec
-
-      override protected def filter[A](
-        request: IdentifierRequest[A]
-      ): Future[Option[Result]] =
-        Future.successful(None)
-    }
-
-  private val passThroughDataFilter =
-    new ActionFilter[DataRequest] {
-      override protected def executionContext: ExecutionContext = ec
-
-      override protected def filter[A](
-        request: DataRequest[A]
-      ): Future[Option[Result]] =
-        Future.successful(None)
-    }
-
-  private val passThroughClientListStatusGuard =
-    new ActionFilter[IdentifierRequest] {
-      override protected def executionContext: ExecutionContext                               = ExecutionContext.global
-      override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = Future.successful(None)
-    }
-
-  private val passThroughHasClientGuard =
-    new ActionFilter[DataRequest] {
-      override protected def executionContext: ExecutionContext                         = ExecutionContext.global
-      override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] = Future.successful(None)
-    }
-
-  when(mockClientListStatusGuard.groupB(any[Call])).thenReturn(passThroughClientListStatusGuard)
-  when(mockHasClientGuard.currentClient).thenReturn(passThroughHasClientGuard)
-
-  private val guardBindings = Seq(
-    bind[ClientListStatusGuard].toInstance(mockClientListStatusGuard),
-    bind[HasClientGuard].toInstance(mockHasClientGuard)
-  )
-
-  private def mockGuards(): Unit = {
-    when(mockClientListStatusGuard.groupB(any[Call]))
-      .thenReturn(passThroughIdentifierFilter)
-
-    when(mockHasClientGuard.forInstanceId(any[String]))
-      .thenReturn(passThroughDataFilter)
-  }
-
   private def userAnswersWithClient: UserAnswers =
     UserAnswers(userAnswersId)
       .set(AgentClientsPage, client)
       .success
       .value
 
-  val client =
-    List(
-      CisTaxpayerSearchResult(
-        uniqueId = "123456",
-        taxOfficeNumber = "111",
-        taxOfficeRef = "test111",
-        agentOwnRef = Option("TEST LTD"),
-        schemeName = Option("ABCD"),
-        utr = Option("ABCD")
-      )
+  val client = List(
+    CisTaxpayerSearchResult(
+      uniqueId = "123456",
+      taxOfficeNumber = "111",
+      taxOfficeRef = "test111",
+      agentOwnRef = Option("TEST LTD"),
+      schemeName = Option("ABCD"),
+      utr = Option("ABCD")
     )
+  )
 
   "ChangeClientReference Controller" - {
 
     "must return OK and the correct view for a GET" in {
-      mockGuards()
-
       val application =
         applicationBuilder(userAnswers = Some(userAnswersWithClient))
           .overrides(
-            bind[ClientListStatusGuard].toInstance(mockClientListStatusGuard),
-            bind[HasClientGuard].toInstance(mockHasClientGuard),
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[ManageService].toInstance(mockManageService)
           )
@@ -149,14 +92,11 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-      mockGuards()
       val userAnswers = UserAnswers(userAnswersId).set(ChangeClientReferencePage, "answer").success.value
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
-            bind[ClientListStatusGuard].toInstance(mockClientListStatusGuard),
-            bind[HasClientGuard].toInstance(mockHasClientGuard),
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[ManageService].toInstance(mockManageService)
           )
@@ -178,7 +118,6 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the next page when valid data is submitted" in {
-      mockGuards()
       val mockSessionRepository = mock[SessionRepository]
       val client                = List(
         CisTaxpayerSearchResult(
@@ -208,7 +147,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
               .success
               .value
           ),
-          additionalBindings = guardBindings ++ Seq(
+          additionalBindings = Seq(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[ManageService].toInstance(mockManageService),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -230,7 +169,6 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the system error controller page when connector service returns integer/exception instead of Unit" in {
-      mockGuards()
       val mockSessionRepository = mock[SessionRepository]
       val client                = List(
         CisTaxpayerSearchResult(
@@ -260,7 +198,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
               .success
               .value
           ),
-          additionalBindings = guardBindings ++ Seq(
+          additionalBindings = Seq(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[ManageService].toInstance(mockManageService),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -282,11 +220,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-      mockGuards()
-      val application = applicationBuilder(
-        userAnswers = Some(emptyUserAnswers),
-        additionalBindings = guardBindings
-      ).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =
@@ -305,11 +239,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
-      mockGuards()
-      val application = applicationBuilder(
-        userAnswers = None,
-        additionalBindings = guardBindings
-      ).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request = FakeRequest(GET, changeClientReferenceRoute)
@@ -322,11 +252,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to system error controller for a POST if no existing data is found" in {
-      mockGuards()
-      val application = applicationBuilder(
-        userAnswers = None,
-        additionalBindings = guardBindings
-      ).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request =
