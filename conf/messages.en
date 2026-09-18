@@ -450,6 +450,7 @@ history.printSubmissionDetails.paymentDetails.totalCostOfMaterials           =  
 history.printSubmissionDetails.paymentDetails.totalTaxDeducted               =  Total tax deducted
 history.printSubmissionDetails.paymentsMadeToSubcontractors.heading          =  Payments made to subcontractors
 history.printSubmissionDetails.paymentsMadeToSubcontractors.subcontractor    =  Subcontractor
+history.printSubmissionDetails.paymentsMadeToSubcontractors.verificationNumber =  Verification number
 history.printSubmissionDetails.paymentsMadeToSubcontractors.paymentsMade     =  Payments made
 history.printSubmissionDetails.paymentsMadeToSubcontractors.costOfMaterials  =  Cost of materials
 history.printSubmissionDetails.paymentsMadeToSubcontractors.taxDeducted      =  Tax deducted

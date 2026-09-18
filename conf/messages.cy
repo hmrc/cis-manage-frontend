@@ -449,6 +449,7 @@ history.printSubmissionDetails.paymentDetails.totalPaymentsMade              =  
 history.printSubmissionDetails.paymentDetails.totalCostOfMaterials           =  Cyfanswm y gost ar gyfer deunyddiau
 history.printSubmissionDetails.paymentDetails.totalTaxDeducted               =  Cyfanswm y dreth a ddidynnwyd
 history.printSubmissionDetails.paymentsMadeToSubcontractors.heading          =  Taliadau a wnaed i is-gontractwyr
+history.printSubmissionDetails.paymentsMadeToSubcontractors.verificationNumber =  Rhif dilysu
 history.printSubmissionDetails.paymentsMadeToSubcontractors.subcontractor    =  Is-gontractwr
 history.printSubmissionDetails.paymentsMadeToSubcontractors.paymentsMade     =  Taliadau a wnaed
 history.printSubmissionDetails.paymentsMadeToSubcontractors.costOfMaterials  =  Cost deunyddiau
