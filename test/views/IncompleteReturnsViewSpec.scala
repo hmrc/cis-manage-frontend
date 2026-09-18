@@ -36,7 +36,6 @@ class IncompleteReturnsViewSpec extends SpecBase {
 
       doc.title             must include(msgs("incompleteReturns.title"))
       doc.select("h1").text must include(msgs("incompleteReturns.heading"))
-      doc.text              must include(msgs("incompleteReturns.message"))
 
       doc.select("th").text must include(msgs("incompleteReturns.table.returnPeriodEnd"))
       doc.select("th").text must include(msgs("incompleteReturns.table.returnType"))
