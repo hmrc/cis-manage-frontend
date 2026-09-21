@@ -184,13 +184,10 @@ class SubmittedReturnsService @Inject() (
     val rowsWithTaxYear =
       data.monthlyReturns
         .sortBy(mr => (mr.taxYear, mr.taxMonth))(Ordering.Tuple2(Ordering.Int, Ordering.Int).reverse)
-        .flatMap { monthlyReturn =>
-          data.submissions
-            .find(_.activeObjectId.contains(monthlyReturn.monthlyReturnId))
-            .map { submission =>
-              val fromYear = taxYearFromYear(monthlyReturn)
-              fromYear -> toRowViewModel(monthlyReturn, Some(submission), source, instanceId)
-            }
+        .map { monthlyReturn =>
+          val submissionOpt = data.submissions.find(_.activeObjectId.contains(monthlyReturn.monthlyReturnId))
+          val fromYear      = taxYearFromYear(monthlyReturn)
+          fromYear -> toRowViewModel(monthlyReturn, submissionOpt, source, instanceId)
         }
 
     rowsWithTaxYear

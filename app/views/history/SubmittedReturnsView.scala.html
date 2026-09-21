@@ -22,7 +22,6 @@
     govukTable: GovukTable,
     govukSummaryList: GovukSummaryList,
     h1: H1,
-    paragraph: Paragraph,
     link: Link
 )
 
@@ -94,10 +93,6 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             @h1(pageHeading)
-
-            @if(viewModel.taxYears.isEmpty) {
-                @paragraph(messages("history.returnHistory.noSubmittedReturns"))
-            }
         </div>
     </div>
 
