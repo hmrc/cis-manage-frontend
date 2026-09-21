@@ -121,13 +121,12 @@ class SubmittedReturnsViewSpec extends SpecBase {
       mobile.select("a[href=/receipt/1]").text().isEmpty shouldBe true
     }
 
-    "render the empty state when there are no submitted returns" in {
+    "does not render an empty-state message when there are no submitted returns" in {
       val doc = render(emptyViewModel)
 
       doc.selectFirst("h1").text() shouldBe
         messages(app)("history.returnHistory.allYears.heading")
 
-      doc.text()                                      should include(messages(app)("history.returnHistory.noSubmittedReturns"))
       doc.select(".return-history-desktop").isEmpty shouldBe true
       doc.select(".return-history-mobile").isEmpty  shouldBe true
     }

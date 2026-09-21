@@ -30,7 +30,7 @@ import viewmodels.StatusViewModel.Text
 import play.api.libs.json.Json
 
 import java.time.*
-import java.time.format.{DateTimeFormatter, TextStyle}
+import java.time.format.TextStyle
 import java.util.Locale
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,9 +40,8 @@ class SubmittedReturnsService @Inject() (
   connector: ConstructionIndustrySchemeConnector
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext) {
 
-  private val ukTimezone: ZoneId                      = ZoneId.of("Europe/London")
-  private val amendmentCutOffInstant: Instant         = ZonedDateTime.of(2016, 2, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant
-  private val displayTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("h:mma", Locale.UK)
+  private val ukTimezone: ZoneId              = ZoneId.of("Europe/London")
+  private val amendmentCutOffInstant: Instant = ZonedDateTime.of(2016, 2, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant
 
   def buildAllYearsViewModel(data: SubmittedReturnsData, instanceId: String)(implicit
     lang: Lang
@@ -119,16 +118,6 @@ class SubmittedReturnsService @Inject() (
   ): SubmittedReturnPrintViewModel = {
     val langCode = lang.code
 
-    val submittedTime = data.submission.acceptedTime
-      .map(_.atZone(ukTimezone))
-      .map(_.format(DateTimeFormats.timeFormat()(lang)).toLowerCase)
-      .getOrElse("")
-
-    val submittedDate = data.submission.acceptedTime
-      .map(_.atZone(ukTimezone))
-      .map(_.format(DateTimeFormats.dateTimeFormat()(lang)))
-      .getOrElse("")
-
     val receiptReferenceNumber = data.submission.hmrcMarkGgis.map(IrMarkReferenceGenerator.fromBase64).getOrElse("")
 
     val totalPaymentsMade    =
@@ -156,8 +145,8 @@ class SubmittedReturnsService @Inject() (
 
     SubmittedReturnPrintViewModel(
       monthYear = Utils.monthYear(data.taxYear, data.taxMonth, langCode),
-      submittedTime = submittedTime,
-      submittedDate = submittedDate,
+      submittedTime = "",
+      submittedDate = "",
       receiptReferenceNumber = receiptReferenceNumber,
       submissionType = if (data.nilReturnIndicator == "Y") {
         ReturnTypeViewModel.Nil.toString.toLowerCase
@@ -181,13 +170,10 @@ class SubmittedReturnsService @Inject() (
     val rowsWithTaxYear =
       data.monthlyReturns
         .sortBy(mr => (mr.taxYear, mr.taxMonth))(Ordering.Tuple2(Ordering.Int, Ordering.Int).reverse)
-        .flatMap { monthlyReturn =>
-          data.submissions
-            .find(_.activeObjectId.contains(monthlyReturn.monthlyReturnId))
-            .map { submission =>
-              val fromYear = taxYearFromYear(monthlyReturn)
-              fromYear -> toRowViewModel(monthlyReturn, Some(submission), source, instanceId)
-            }
+        .map { monthlyReturn =>
+          val submissionOpt = data.submissions.find(_.activeObjectId.contains(monthlyReturn.monthlyReturnId))
+          val fromYear      = taxYearFromYear(monthlyReturn)
+          fromYear -> toRowViewModel(monthlyReturn, submissionOpt, source, instanceId)
         }
 
     rowsWithTaxYear
@@ -439,17 +425,6 @@ class SubmittedReturnsService @Inject() (
       }
       .getOrElse("")
 
-    val submittedAt = submission
-      .flatMap(_.acceptedTime)
-      .flatMap { ts =>
-        scala.util.Try {
-          val dateTime = LocalDateTime.parse(ts.take(19)).atZone(ukTimezone)
-          val time     = dateTime.format(displayTimeFormatter)
-          val date     = dateTime.toLocalDate.format(DateTimeFormats.shortDateFormat())
-          s"$time on $date"
-        }.toOption
-      }
-
     val items = response.monthlyReturnItems.map { item =>
       SubcontractorPayment(
         name = item.subcontractorName.getOrElse(""),
@@ -471,7 +446,7 @@ class SubmittedReturnsService @Inject() (
       hmrcMark = submission.flatMap(_.hmrcMarkGenerated).map { mark =>
         scala.util.Try(utils.IrMarkReferenceGenerator.fromBase64(mark)).getOrElse(mark)
       },
-      submittedAt = submittedAt,
+      submittedAt = None,
       emailRecipient = submission.flatMap(_.emailRecipient),
       instanceId = instanceId,
       items = items

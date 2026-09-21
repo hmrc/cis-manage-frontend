@@ -23,7 +23,6 @@
     govukTable: GovukTable,
     h1: components.H1,
     h2: components.H2,
-    paragraph: components.Paragraph,
     printLink: components.PrintLink,
     link: components.Link
 )
@@ -35,10 +34,6 @@
     @h1(messages("history.printSubmissionDetails.heading", data.monthYear))
 
     @h2(messages("history.printSubmissionDetails.submissionDetails.heading"))
-    @paragraph(
-        message = "history.printSubmissionDetails.submissionDetails.p",
-        args    = Seq(data.submittedTime, data.submittedDate)
-    )
 
     @govukSummaryList(
         SummaryListViewModel({
