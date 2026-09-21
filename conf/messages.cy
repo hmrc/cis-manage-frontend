@@ -177,10 +177,10 @@ returnsLanding.title                                              =  Rheoli’ch
 returnsLanding.heading                                            =  Rheoli’ch datganiad CIS
 
 returnsLanding.fileMonthlyReturn.h3.link                          =  Cyflwyno datganiad misol
-returnsLanding.fileMonthlyReturn.p1                               =  Cyflwyno datganiad CIS ar gyfer unrhyw is-gontractwyr a dalwyd mewn mis treth.
+returnsLanding.fileMonthlyReturn.p1                               =  xxxxxxxxxxxxxxxxxxxx
 
 returnsLanding.fileNilReturn.h3.link                              =  Cyflwyno datganiad ’dim’
-returnsLanding.fileNilReturn.p1                                   =  Cyflwyno datganiad ’dim’ pan na chafodd unrhyw daliadau eu gwneud i is-gontractwyr mewn mis treth.
+returnsLanding.fileNilReturn.p1                                   =  xxxxxxxxxxxxxxxxxxxx
 
 returnsLanding.viewSubmittedReturns.h3.link                       =  Gweld datganiad a gyflwynwyd
 returnsLanding.viewSubmittedReturns.p1                            =  Gweld datganiadau misol neu ddatganiadau ‘dim’ a gyflwynwyd.
@@ -379,7 +379,6 @@ successfulNoRecordsFound.p2.link                              =  ychwanegu is-go
 # Returns & Submissions
 incompleteReturns.title                      =  Datganiadau anghyflawn
 incompleteReturns.heading                    =  Datganiadau anghyflawn neu aflwyddiannus
-incompleteReturns.message                    =  Ni ellir newid mis treth os yw’n anghywir a bod y datganiad ar y gweill. Mae’n rhaid i chi ei ddileu, a chyflwyno datganiad newydd gyda’r mis treth cywir.
 
 incompleteReturns.table.returnPeriodEnd      =  Cyfnod y datganiad wedi dod i ben
 incompleteReturns.table.returnType           =  Math
