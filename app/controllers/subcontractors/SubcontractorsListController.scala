@@ -102,12 +102,12 @@ class SubcontractorsListController @Inject() (
   private val dateFormatters: Seq[DateTimeFormatter] =
     Seq(
       DateTimeFormatter.ISO_LOCAL_DATE,
-      DateTimeFormatter.ofPattern("d MMM yyyy", Locale.UK),
-      DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK),
+      DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH),
+      DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.ENGLISH),
       DateTimeFormatter.ofPattern("d MMM yyyy", Locale.forLanguageTag("cy")),
       DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("cy")),
-      DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.UK),
-      DateTimeFormatter.ofPattern("d/M/yyyy", Locale.UK)
+      DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH),
+      DateTimeFormatter.ofPattern("d/M/yyyy", Locale.ENGLISH)
     )
 
   private def parseDateAdded(value: String): LocalDate =
