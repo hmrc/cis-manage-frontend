@@ -398,10 +398,7 @@ class ClientListSearchViewSpec extends SpecBase with Matchers with ViewSpecGette
       val hiddenText = removeCell.select(".govuk-visually-hidden").first()
 
       hiddenText must not be null
-      hiddenText.text mustBe messages(
-        "agent.clientListSearch.td.actions.remove.hidden",
-        clientList.head.clientName
-      )
+      hiddenText.text mustBe clientList.head.clientName
     }
   }
 

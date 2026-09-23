@@ -18,12 +18,16 @@ package services
 
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import play.api.i18n.Messages
+import play.api.test.FakeRequest
+import play.api.test.Helpers.stubMessagesApi
 import viewmodels.agent.{ClientListViewModel, ClientStatus}
 
 class PaginationServiceSpec extends AnyWordSpec with Matchers {
 
-  private val service = new PaginationService()
-  private val baseUrl = "/test-url"
+  private val service             = new PaginationService()
+  private val baseUrl             = "/test-url"
+  implicit val messages: Messages = stubMessagesApi().preferred(FakeRequest())
 
   private def createClient(id: String, name: String): ClientListViewModel =
     ClientListViewModel(
@@ -193,6 +197,51 @@ class PaginationServiceSpec extends AnyWordSpec with Matchers {
       result.paginatedData.length mustBe 10
       result.paginationViewModel.items.nonEmpty mustBe true
       result.paginationViewModel.items.exists(_.current) mustBe true
+    }
+
+    "set accessible aria label for the previous pagination link" in {
+      val clients = (1 to 25).map(i => createClient(s"$i", s"Client $i"))
+
+      val result =
+        service.paginateClientList(
+          clients,
+          2,
+          baseUrl,
+          None,
+          None
+        )
+
+      result.paginationViewModel.previous.get.attributes must contain(
+        "aria-label" -> messages("site.pagination.goToPage", 1)
+      )
+    }
+
+    "set accessible aria label for the next pagination link" in {
+      val clients = (1 to 25).map(i => createClient(s"$i", s"Client $i"))
+
+      val result =
+        service.paginateClientList(
+          clients,
+          2,
+          baseUrl,
+          None,
+          None
+        )
+
+      result.paginationViewModel.next.get.attributes must contain(
+        "aria-label" -> messages("site.pagination.goToPage", 3)
+      )
+    }
+
+    "set visually hidden text for pagination page items" in {
+      val clients = (1 to 25).map(i => createClient(s"$i", s"Client $i"))
+      val result  = service.paginateClientList(clients, 2, baseUrl, None, None)
+
+      result.paginationViewModel.items
+        .filterNot(_.ellipsis)
+        .foreach { item =>
+          item.visuallyHiddenText mustBe Some("site.pagination.goToPage")
+        }
     }
   }
 }
