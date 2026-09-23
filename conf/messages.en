@@ -177,10 +177,10 @@ returnsLanding.title                                              =  Manage your
 returnsLanding.heading                                            =  Manage your CIS return
 
 returnsLanding.fileMonthlyReturn.h3.link                          =  File a monthly return
-returnsLanding.fileMonthlyReturn.p1                               =  File a CIS return for any subcontractors paid in a tax month.
+returnsLanding.fileMonthlyReturn.p1                               =  File a CIS return for any subcontractors paid in a return period.
 
 returnsLanding.fileNilReturn.h3.link                              =  File a nil return
-returnsLanding.fileNilReturn.p1                                   =  File a nil return when no payments were made to subcontractors in a tax month.
+returnsLanding.fileNilReturn.p1                                   =  File a nil return when no payments were made to subcontractors in a return period.
 
 returnsLanding.viewSubmittedReturns.h3.link                       =  View submitted returns
 returnsLanding.viewSubmittedReturns.p1                            =  View submitted monthly or nil returns.
@@ -410,7 +410,6 @@ submissionConfirmation.returnType.nil        =  Nil
 
 incompleteReturns.title                      =  Incomplete returns
 incompleteReturns.heading                    =  Incomplete returns
-incompleteReturns.message                    =  A tax month cannot be changed if it is incorrect and the return is in progress. You must delete it and file a new return with the correct tax month.
 
 incompleteReturns.table.returnPeriodEnd      =  Return period ended
 incompleteReturns.table.returnType           =  Type
@@ -431,6 +430,7 @@ history.submittedReturnsChooseTaxYear.heading                                =  
 history.submittedReturnsChooseTaxYear.caption                                =  Submitted returns
 history.submittedReturnsChooseTaxYear.viewAll                                =  View all tax years
 history.submittedReturnsChooseTaxYear.error.required                         =  Select a tax year or all tax years
+history.submittedReturnsChooseTaxYear.taxYear                                =  {0} to {1}
 
 history.printSubmissionDetails.title                                         =  Monthly return for period ending {0}
 history.printSubmissionDetails.heading                                       =  Monthly return for period ending {0}
@@ -449,6 +449,7 @@ history.printSubmissionDetails.paymentDetails.totalCostOfMaterials           =  
 history.printSubmissionDetails.paymentDetails.totalTaxDeducted               =  Total tax deducted
 history.printSubmissionDetails.paymentsMadeToSubcontractors.heading          =  Payments made to subcontractors
 history.printSubmissionDetails.paymentsMadeToSubcontractors.subcontractor    =  Subcontractor
+history.printSubmissionDetails.paymentsMadeToSubcontractors.verificationNumber =  Verification number
 history.printSubmissionDetails.paymentsMadeToSubcontractors.paymentsMade     =  Payments made
 history.printSubmissionDetails.paymentsMadeToSubcontractors.costOfMaterials  =  Cost of materials
 history.printSubmissionDetails.paymentsMadeToSubcontractors.taxDeducted      =  Tax deducted
@@ -578,10 +579,10 @@ manageNoticesStatements.searchResults.viewAll                   =  View all noti
 # Verify
 verify.verificationHistorySelectTaxYear.title                =  Which tax year do you want to view verification requests from?
 verify.verificationHistorySelectTaxYear.heading              =  Which tax year do you want to view verification requests from?
-verify.verificationHistorySelectTaxYear.or                   =  or
 verify.verificationHistorySelectTaxYear.currentTaxYear       =  (current tax year)
 verify.verificationHistorySelectTaxYear.viewAll              =  View all tax years
 verify.verificationHistorySelectTaxYear.error.required       =  Select a tax year
+verify.verificationHistorySelectTaxYear.taxYear              =  {0} to {1}
 
 verify.verificationHistory.allYears.title                    =  Verification request history for all tax years
 verify.verificationHistory.allYears.heading                  =  Verification request history for all tax years

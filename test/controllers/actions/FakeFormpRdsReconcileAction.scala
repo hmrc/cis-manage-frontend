@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package models.history
+package controllers.actions
 
-import play.api.libs.json.{Json, OFormat}
+import models.requests.CisIdDataRequest
+import play.api.mvc.*
 
-case class SubcontractorPayment(
-  name: String,
-  verificationNumber: String,
-  paymentsMade: String,
-  costOfMaterials: String,
-  taxDeducted: String
-)
+import scala.concurrent.ExecutionContext.global
+import scala.concurrent.{ExecutionContext, Future}
 
-object SubcontractorPayment {
-  implicit val format: OFormat[SubcontractorPayment] = Json.format[SubcontractorPayment]
+class FakeFormpRdsReconcileAction extends FormpRdsReconcileAction {
+
+  override protected def filter[A](request: CisIdDataRequest[A]): Future[Option[Result]] =
+    Future.successful(None)
+
+  override protected def executionContext: ExecutionContext = global
 }

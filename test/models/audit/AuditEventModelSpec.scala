@@ -24,25 +24,62 @@ class AuditEventModelSpec extends SpecBase {
 
   "AuthFailureAuditEventModel" - {
     val underTest = AuthFailureAuditEventModel()
+    "must have the correct auditType" in {
+      underTest.auditType mustBe "AuthoriseServiceGuardFailure"
+    }
+    "must have an empty detailJson" in {
+      underTest.detailJson mustBe Json.obj()
+    }
+  }
+
+  "ClientDetailsRetrievedAuditEventModel" - {
+    val underTest = ClientDetailsRetrievedAuditEventModel(
+      agentReference = "ARN123",
+      taxOfficeNumber = "123",
+      taxOfficeReference = "AB456"
+    )
+    "must have the correct auditType" in {
+      underTest.auditType mustBe "ClientDetailsRetrieved"
+    }
     "must serialise correctly" in {
-      Json.toJson(underTest) mustBe Json.obj()
+      underTest.detailJson mustBe Json.obj(
+        "agentReference"     -> "ARN123",
+        "taxOfficeNumber"    -> "123",
+        "taxOfficeReference" -> "AB456"
+      )
     }
   }
 
   "DeleteSubcontractorAuditEventModel" - {
-    val underTest = DeleteSubcontractorAuditEventModel(
-      cisId = "123/AB456",
-      subcontractorName = "Test Subcontractor",
-      subbieResourceRef = 42L
-    )
     "must have the correct auditType" in {
-      underTest.auditType mustBe "deleteSubcontractor"
+      DeleteSubcontractorAuditEventModel(
+        cisId = "123/AB456",
+        subcontractorName = "Test Subcontractor",
+        subbieResourceRef = 42L
+      ).auditType mustBe "DeleteSubcontractor"
     }
-    "must serialise correctly" in {
-      Json.toJson(underTest) mustBe Json.obj(
+    "must serialise correctly without typeOfSubcontractor" in {
+      DeleteSubcontractorAuditEventModel(
+        cisId = "123/AB456",
+        subcontractorName = "Test Subcontractor",
+        subbieResourceRef = 42L
+      ).detailJson mustBe Json.obj(
         "cisId"             -> "123/AB456",
         "subcontractorName" -> "Test Subcontractor",
         "subbieResourceRef" -> 42L
+      )
+    }
+    "must serialise correctly with typeOfSubcontractor" in {
+      DeleteSubcontractorAuditEventModel(
+        cisId = "123/AB456",
+        subcontractorName = "Test Subcontractor",
+        subbieResourceRef = 42L,
+        typeOfSubcontractor = Some("soletrader")
+      ).detailJson mustBe Json.obj(
+        "cisId"               -> "123/AB456",
+        "subcontractorName"   -> "Test Subcontractor",
+        "subbieResourceRef"   -> 42L,
+        "typeOfSubcontractor" -> "soletrader"
       )
     }
   }

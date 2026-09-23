@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package models.history
+package controllers.actions
 
-import play.api.libs.json.{Json, OFormat}
+import models.requests.IdentifierRequest
+import play.api.mvc.{ActionFilter, Call, Result}
 
-case class SubcontractorPayment(
-  name: String,
-  verificationNumber: String,
-  paymentsMade: String,
-  costOfMaterials: String,
-  taxDeducted: String
-)
+import scala.concurrent.{ExecutionContext, Future}
 
-object SubcontractorPayment {
-  implicit val format: OFormat[SubcontractorPayment] = Json.format[SubcontractorPayment]
+class FakeClientListStatusGuard(using ExecutionContext) extends ClientListStatusGuard(null) {
+  private val passThroughFilter = new PassThroughFilter[IdentifierRequest]
+
+  override def checkGroupA[A](request: IdentifierRequest[A]): Future[Option[Result]] = passThroughFilter.filter(request)
+
+  override def groupB(securityCheckCall: Call): ActionFilter[IdentifierRequest] = passThroughFilter
 }

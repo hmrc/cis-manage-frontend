@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package models.history
+package models.agent
 
 import play.api.libs.json.{Json, OFormat}
-
-case class SubcontractorPayment(
-  name: String,
-  verificationNumber: String,
-  paymentsMade: String,
-  costOfMaterials: String,
-  taxDeducted: String
+case class UpdateAgentClientRequest(
+  taxOfficeNumber: String,
+  taxOfficeReference: String,
+  clientRef: String
 )
 
-object SubcontractorPayment {
-  implicit val format: OFormat[SubcontractorPayment] = Json.format[SubcontractorPayment]
+object UpdateAgentClientRequest {
+  given format: OFormat[UpdateAgentClientRequest] = Json.format[UpdateAgentClientRequest]
 }

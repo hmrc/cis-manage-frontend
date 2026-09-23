@@ -26,8 +26,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.*
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.{AuditService, ConstructionIndustrySchemeService}
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -46,7 +44,7 @@ final class MockCisControllerComponents(using ExecutionContext)
       new DataRetrievalActionImpl(sessionRepo),
       new DataRequiredActionImpl(),
       new CisIdRequiredActionImpl(),
-      new HasClientGuard(cisService, sessionRepo, auditService)
+      new FakeHasClientGuard
     ) {
   def setUserAnswers(userAnswersOpt: Option[UserAnswers]): Unit =
     when(sessionRepo.get(any)) thenReturn Future.successful(userAnswersOpt)
@@ -54,12 +52,6 @@ final class MockCisControllerComponents(using ExecutionContext)
 object MockCisControllerComponents extends MockitoSugar {
   private val mcc = stubMessagesControllerComponents()
 
-  private val auditService = mock[AuditService]
-  when(auditService.sendEvent(any)(any, any, any)) thenReturn Future.successful(Success)
-
   private val sessionRepo = mock[SessionRepository]
   when(sessionRepo.set(any)) thenReturn Future.successful(true)
-
-  private val cisService = mock[ConstructionIndustrySchemeService]
-  when(cisService.hasClient(any, any)(any)) thenReturn Future.successful(true)
 }

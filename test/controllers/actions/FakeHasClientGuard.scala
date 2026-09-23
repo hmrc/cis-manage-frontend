@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package models.history
+package controllers.actions
 
-import play.api.libs.json.{Json, OFormat}
+import models.requests.DataRequest
+import play.api.mvc.ActionFilter
 
-case class SubcontractorPayment(
-  name: String,
-  verificationNumber: String,
-  paymentsMade: String,
-  costOfMaterials: String,
-  taxDeducted: String
-)
+import scala.concurrent.ExecutionContext
 
-object SubcontractorPayment {
-  implicit val format: OFormat[SubcontractorPayment] = Json.format[SubcontractorPayment]
+//noinspection ScalaStyle to stop complaint about null arguments. They are never used so this is OK.
+class FakeHasClientGuard(using ExecutionContext) extends HasClientGuard(null, null, null) {
+  private val passThroughFilter = new PassThroughFilter[DataRequest]
+
+  override def forInstanceId(instanceId: String): ActionFilter[DataRequest] = passThroughFilter
+
+  override def currentClient: ActionFilter[DataRequest] = passThroughFilter
 }

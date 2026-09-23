@@ -96,6 +96,7 @@
                 head = Some(
                     Seq(
                         messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.subcontractor"),
+                        messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.verificationNumber"),
                         messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.paymentsMade"),
                         messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.costOfMaterials"),
                         messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.taxDeducted")
@@ -106,6 +107,7 @@
                 rows =  data.subcontractors.map { subcontractor =>
                     Seq(
                         TableRow(Text(subcontractor.name)),
+                        TableRow(Text(subcontractor.verificationNumber)),
                         TableRow(Text(subcontractor.paymentsMade)),
                         TableRow(Text(subcontractor.costOfMaterials)),
                         TableRow(Text(subcontractor.taxDeducted))

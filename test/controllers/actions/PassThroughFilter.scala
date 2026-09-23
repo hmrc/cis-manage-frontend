@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package models.history
+package controllers.actions
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.mvc.{ActionFilter, Result}
 
-case class SubcontractorPayment(
-  name: String,
-  verificationNumber: String,
-  paymentsMade: String,
-  costOfMaterials: String,
-  taxDeducted: String
-)
+import scala.concurrent.{ExecutionContext, Future}
 
-object SubcontractorPayment {
-  implicit val format: OFormat[SubcontractorPayment] = Json.format[SubcontractorPayment]
+final class PassThroughFilter[R[_]](using val executionContext: ExecutionContext) extends ActionFilter[R] {
+  def filter[A](request: R[A]): Future[Option[Result]] = Future.successful(None)
 }
