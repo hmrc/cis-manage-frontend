@@ -189,6 +189,37 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       row.returnType shouldBe ReturnTypeViewModel.Unknown
     }
 
+    "includes monthly returns without a matching submission as not available" in new Setup {
+      val row = singleRow(
+        data(
+          monthlyReturns = Seq(
+            monthlyReturn(id = 21L, taxYear = 2008, taxMonth = 3)
+          ),
+          submissions = Seq.empty
+        )
+      )
+
+      row.status        shouldBe StatusViewModel.Text("history.returnHistory.status.notAvailable")
+      row.dateSubmitted shouldBe ""
+    }
+
+    "buildSingleYearViewModel includes not available returns for the selected tax year" in new Setup {
+      val testData = data(
+        monthlyReturns = Seq(
+          monthlyReturn(id = 21L, taxYear = 2008, taxMonth = 3)
+        ),
+        submissions = Seq.empty
+      )
+
+      val result = service.buildSingleYearViewModel(testData, "2007", instanceId)(Lang("en"))
+
+      result.value.selectedTaxYear                           shouldBe Some("2007")
+      result.value.taxYears.map(t => (t.fromYear, t.toYear)) shouldBe Seq(2007 -> 2008)
+      result.value.taxYears.head.rows.head.status            shouldBe StatusViewModel.Text(
+        "history.returnHistory.status.notAvailable"
+      )
+    }
+
     "returns notAvailable when acceptedTime is missing" in new Setup {
       val row = singleRow(
         data(
@@ -656,6 +687,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       vm.hmrcMark        shouldBe Some("HMRC-123-ABC")
       vm.emailRecipient  shouldBe Some("user@example.com")
       vm.instanceId      shouldBe "INST001"
+      vm.submittedAt     shouldBe None
       vm.items.size      shouldBe 1
 
       val item = vm.items.head
@@ -846,7 +878,8 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
       val out = service.buildSubmittedReturnPrintViewModel(input, Lang("en"))
       out.monthYear mustBe "April 2026"
-      out.submittedDate mustBe "1 April 2026"
+      out.submittedTime mustBe ""
+      out.submittedDate mustBe ""
       out.receiptReferenceNumber mustBe "AAIIGECRQ4QJFCZQ2OHUCFETKFKZOYM5W7RZ5OY"
       out.submissionType mustBe "nil"
       out.contractorName mustBe "PAL 355 Scheme"
@@ -905,7 +938,8 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
       val out = service.buildSubmittedReturnPrintViewModel(input, Lang("en"))
       out.monthYear mustBe "April 2026"
-      out.submittedDate mustBe "1 April 2026"
+      out.submittedTime mustBe ""
+      out.submittedDate mustBe ""
       out.receiptReferenceNumber mustBe ""
       out.submissionType mustBe "standard"
       out.contractorName mustBe "PAL 355 Scheme"

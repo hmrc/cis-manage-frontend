@@ -95,13 +95,8 @@ class PrintSubmissionDetailsViewSpec extends SpecBase {
         messages("history.printSubmissionDetails.submissionDetails.heading")
       )
 
-      doc.select("p.govuk-body").text must include(
-        messages(
-          "history.printSubmissionDetails.submissionDetails.p",
-          submittedTime,
-          submittedDate
-        )
-      )
+      doc.select("p.govuk-body").text must not include submittedTime
+      doc.select("p.govuk-body").text must not include submittedDate
 
       val summaryText: String = doc.select(".govuk-summary-list").text()
       summaryText must include(receiptReferenceNumber)
@@ -256,13 +251,8 @@ class PrintSubmissionDetailsViewSpec extends SpecBase {
         messages("history.printSubmissionDetails.submissionDetails.heading")
       )
 
-      doc.select("p.govuk-body").text must include(
-        messages(
-          "history.printSubmissionDetails.submissionDetails.p",
-          submittedTime,
-          submittedDate
-        )
-      )
+      doc.select("p.govuk-body").text must not include submittedTime
+      doc.select("p.govuk-body").text must not include submittedDate
 
       val summaryText: String = doc.select(".govuk-summary-list").text()
       summaryText must include(messages("history.printSubmissionDetails.submissionDetails.submissionType.nil"))
