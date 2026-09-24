@@ -227,10 +227,10 @@ class SubcontractorsListController @Inject() (
       rows
     } else {
       val lowerCaseSearchTerm =
-        trimmedSearchTerm.toLowerCase(Locale.UK)
+        trimmedSearchTerm.toLowerCase(Locale.ENGLISH)
 
       rows.filter { row =>
-        row.name.toLowerCase(Locale.UK).contains(lowerCaseSearchTerm) ||
+        row.name.toLowerCase(Locale.ENGLISH).contains(lowerCaseSearchTerm) ||
         row.utr.contains(trimmedSearchTerm) ||
         row.verificationNumber.contains(trimmedSearchTerm)
       }
@@ -297,7 +297,7 @@ class SubcontractorsListController @Inject() (
           rows.filterNot(row => isNoNameProvided(row.name))
 
         val sortedNamedRows =
-          namedRows.sortBy(row => row.name.trim.toLowerCase(Locale.UK))
+          namedRows.sortBy(row => row.name.trim.toLowerCase(Locale.ENGLISH))
 
         val orderedNamedRows =
           if (sortOrder == SortOrderDesc) {
