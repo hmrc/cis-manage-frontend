@@ -17,6 +17,7 @@
 package controllers.subcontractors
 
 import base.SpecBase
+import forms.subcontractors.SubcontractorsListFormProvider
 import models.response.{GetSubcontractor, GetSubcontractorListResponse}
 import models.{Mode, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
@@ -26,10 +27,13 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
 import pages.CisIdPage
 import pages.subcontractors.SubcontractorListPage
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.twirl.api.Html
+import viewmodels.govuk.PaginationFluency.PaginationViewModel
+import viewmodels.subcontractors.{SubcontractorsListRow, TaxTreatment}
 import views.html.subcontractors.SubcontractorsListView
 
 import java.time.LocalDateTime
@@ -426,6 +430,293 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
 
         exception.getMessage mustEqual
           "Missing subbieResourceRef for subcontractorId 1"
+      }
+    }
+
+    "date added" - {
+      val dateUnsortedSubcontractors = Seq(
+        GetSubcontractor(
+          subcontractorId = 1L,
+          utr = Some("1234567890"),
+          pageVisited = None,
+          partnerUtr = None,
+          crn = None,
+          firstName = Some("Alan"),
+          nino = None,
+          secondName = None,
+          surname = Some("Smith"),
+          partnershipTradingName = None,
+          tradingName = None,
+          subcontractorType = Some("soleTrader"),
+          addressLine1 = None,
+          addressLine2 = None,
+          addressLine3 = None,
+          addressLine4 = None,
+          country = None,
+          postcode = None,
+          emailAddress = None,
+          phoneNumber = None,
+          mobilePhoneNumber = None,
+          worksReferenceNumber = None,
+          createDate = Some(LocalDateTime.of(2026, 4, 6, 10, 0)),
+          lastUpdate = None,
+          subbieResourceRef = Some(10L),
+          matched = None,
+          autoVerified = None,
+          verified = Some("N"),
+          verificationNumber = None,
+          taxTreatment = Some("Unknown"),
+          verificationDate = None,
+          version = None,
+          updatedTaxTreatment = None,
+          lastMonthlyReturnDate = None,
+          pendingVerifications = None
+        ),
+        GetSubcontractor(
+          subcontractorId = 2L,
+          utr = Some("2224567890"),
+          pageVisited = None,
+          partnerUtr = None,
+          crn = None,
+          firstName = Some("Peter"),
+          nino = None,
+          secondName = None,
+          surname = Some("John"),
+          partnershipTradingName = None,
+          tradingName = None,
+          subcontractorType = Some("soleTrader"),
+          addressLine1 = None,
+          addressLine2 = None,
+          addressLine3 = None,
+          addressLine4 = None,
+          country = None,
+          postcode = None,
+          emailAddress = None,
+          phoneNumber = None,
+          mobilePhoneNumber = None,
+          worksReferenceNumber = None,
+          createDate = Some(LocalDateTime.of(2026, 9, 6, 10, 0)),
+          lastUpdate = None,
+          subbieResourceRef = Some(20L),
+          matched = None,
+          autoVerified = None,
+          verified = Some("N"),
+          verificationNumber = None,
+          taxTreatment = Some("Unknown"),
+          verificationDate = None,
+          version = None,
+          updatedTaxTreatment = None,
+          lastMonthlyReturnDate = None,
+          pendingVerifications = None
+        ),
+        GetSubcontractor(
+          subcontractorId = 3L,
+          utr = Some("9876543210"),
+          pageVisited = None,
+          partnerUtr = None,
+          crn = None,
+          firstName = Some("Brian"),
+          nino = None,
+          secondName = None,
+          surname = Some("Jones"),
+          partnershipTradingName = None,
+          tradingName = None,
+          subcontractorType = Some("soleTrader"),
+          addressLine1 = None,
+          addressLine2 = None,
+          addressLine3 = None,
+          addressLine4 = None,
+          country = None,
+          postcode = None,
+          emailAddress = None,
+          phoneNumber = None,
+          mobilePhoneNumber = None,
+          worksReferenceNumber = None,
+          createDate = Some(LocalDateTime.of(2026, 5, 6, 10, 0)),
+          lastUpdate = None,
+          subbieResourceRef = Some(30L),
+          matched = None,
+          autoVerified = None,
+          verified = Some("N"),
+          verificationNumber = None,
+          taxTreatment = Some("Unknown"),
+          verificationDate = None,
+          version = None,
+          updatedTaxTreatment = None,
+          lastMonthlyReturnDate = None,
+          pendingVerifications = None
+        )
+      )
+
+      val listResponse = GetSubcontractorListResponse(
+        subcontractors = dateUnsortedSubcontractors
+      )
+
+      def userAnswersWithDateUnsortedSubcontractors: UserAnswers =
+        emptyUserAnswers
+          .set(CisIdPage, cisId)
+          .success
+          .value
+          .set(SubcontractorListPage, listResponse)
+          .success
+          .value
+
+      "must sort the subcontractorsList correctly in ascending order when some dateAdded has September" in {
+
+        val formProvider       = new SubcontractorsListFormProvider()
+        val form: Form[String] = formProvider().fill("")
+
+        val rows: Seq[SubcontractorsListRow] = Seq(
+          SubcontractorsListRow(
+            id = "1L",
+            name = "Smith, Alan",
+            utr = "1234567890",
+            verified = false,
+            verificationNumber = "",
+            taxTreatment = TaxTreatment.Unknown,
+            dateAdded = "6 Apr 2026",
+            subbieResourceRef = 10L,
+            amendUrl = "http://localhost:6998/construction-industry-scheme/subcontractor/amend/start/10/standard"
+          ),
+          SubcontractorsListRow(
+            id = "3L",
+            name = "Jones, Brian",
+            utr = "9876543210",
+            verified = false,
+            verificationNumber = "",
+            taxTreatment = TaxTreatment.Unknown,
+            dateAdded = "6 May 2026",
+            subbieResourceRef = 30L,
+            amendUrl = "http://localhost:6998/construction-industry-scheme/subcontractor/amend/start/30/standard"
+          ),
+          SubcontractorsListRow(
+            id = "2L",
+            name = "John, Peter",
+            utr = "2224567890",
+            verified = false,
+            verificationNumber = "",
+            taxTreatment = TaxTreatment.Unknown,
+            dateAdded = "6 Sep 2026",
+            subbieResourceRef = 20L,
+            amendUrl = "http://localhost:6998/construction-industry-scheme/subcontractor/amend/start/20/standard"
+          )
+        )
+
+        val application = applicationBuilder(userAnswers = Some(userAnswersWithDateUnsortedSubcontractors))
+          .build()
+
+        running(application) {
+          val url =
+            routes.SubcontractorsListController
+              .onPageLoad(instanceId, mode)
+              .url
+
+          val request = FakeRequest(GET, s"$url?sortBy=dateAdded&sortOrder=ascending")
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[SubcontractorsListView]
+
+          val paginationViewModel = PaginationViewModel(items = Seq.empty)
+
+          status(result) mustBe OK
+          contentAsString(result) mustEqual
+            view(
+              form,
+              NormalMode,
+              rows,
+              paginationViewModel,
+              1,
+              1,
+              0,
+              3,
+              instanceId,
+              "",
+              "all",
+              "all",
+              "dateAdded",
+              "ascending"
+            )(request, messages(application)).toString
+        }
+      }
+
+      "must must sort the subcontractorsList correctly in descending order when dateAdded has September" in {
+
+        val formProvider       = new SubcontractorsListFormProvider()
+        val form: Form[String] = formProvider().fill("")
+
+        val rows: Seq[SubcontractorsListRow] = Seq(
+          SubcontractorsListRow(
+            id = "2L",
+            name = "John, Peter",
+            utr = "2224567890",
+            verified = false,
+            verificationNumber = "",
+            taxTreatment = TaxTreatment.Unknown,
+            dateAdded = "6 Sep 2026",
+            subbieResourceRef = 20L,
+            amendUrl = "http://localhost:6998/construction-industry-scheme/subcontractor/amend/start/20/standard"
+          ),
+          SubcontractorsListRow(
+            id = "3L",
+            name = "Jones, Brian",
+            utr = "9876543210",
+            verified = false,
+            verificationNumber = "",
+            taxTreatment = TaxTreatment.Unknown,
+            dateAdded = "6 May 2026",
+            subbieResourceRef = 30L,
+            amendUrl = "http://localhost:6998/construction-industry-scheme/subcontractor/amend/start/30/standard"
+          ),
+          SubcontractorsListRow(
+            id = "1L",
+            name = "Smith, Alan",
+            utr = "1234567890",
+            verified = false,
+            verificationNumber = "",
+            taxTreatment = TaxTreatment.Unknown,
+            dateAdded = "6 Apr 2026",
+            subbieResourceRef = 10L,
+            amendUrl = "http://localhost:6998/construction-industry-scheme/subcontractor/amend/start/10/standard"
+          )
+        )
+
+        val application = applicationBuilder(userAnswers = Some(userAnswersWithDateUnsortedSubcontractors))
+          .build()
+
+        running(application) {
+          val url =
+            routes.SubcontractorsListController
+              .onPageLoad(instanceId, mode)
+              .url
+
+          val request = FakeRequest(GET, s"$url?sortBy=dateAdded&sortOrder=descending")
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[SubcontractorsListView]
+
+          val paginationViewModel = PaginationViewModel(items = Seq.empty)
+
+          status(result) mustBe OK
+          contentAsString(result) mustEqual
+            view(
+              form,
+              NormalMode,
+              rows,
+              paginationViewModel,
+              1,
+              1,
+              0,
+              3,
+              instanceId,
+              "",
+              "all",
+              "all",
+              "dateAdded",
+              "descending"
+            )(request, messages(application)).toString
+        }
       }
     }
   }
