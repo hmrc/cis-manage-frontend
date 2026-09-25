@@ -93,7 +93,7 @@ class SubcontractorSubmissionReceiptViewSpec extends SpecBase {
         messages("verify.subcontractorSubmissionReceipt.link1")
       )
 
-      doc.select("p.govuk-body").text must include(messages("verify.subcontractorSubmissionReceipt.link2.prefix"))
+      doc.select("p.govuk-body").text must include(messages("site.backTo"))
       doc.select("a.govuk-link").text must include(messages("verify.subcontractorSubmissionReceipt.link2.link"))
     }
   }

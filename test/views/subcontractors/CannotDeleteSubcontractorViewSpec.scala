@@ -46,7 +46,7 @@ class CannotDeleteSubcontractorViewSpec extends SpecBase {
       doc.text() must include(messages("subcontractors.cannotDeleteSubcontractor.p1"))
       doc.text() must include(messages("subcontractors.cannotDeleteSubcontractor.p2"))
 
-      doc.text()                                must include(messages("subcontractors.cannotDeleteSubcontractor.p3.text"))
+      doc.text()                                must include(messages("site.backTo"))
       doc.getElementsByClass("govuk-link").text must include(
         messages("subcontractors.cannotDeleteSubcontractor.p3.link")
       )
