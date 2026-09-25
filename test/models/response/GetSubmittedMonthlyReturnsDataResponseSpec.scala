@@ -21,7 +21,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
 
-import java.time.Instant
+import java.time.LocalDateTime
 
 class GetSubmittedMonthlyReturnsDataResponseSpec extends AnyWordSpec with Matchers {
 
@@ -43,7 +43,7 @@ class GetSubmittedMonthlyReturnsDataResponseSpec extends AnyWordSpec with Matche
           hmrcMarkGenerated = Some("mark1"),
           hmrcMarkGgis = Some("ggis1"),
           emailRecipient = Some("test@example.com"),
-          acceptedTime = Some(Instant.now())
+          acceptedTime = Some(LocalDateTime.parse("2025-01-01T12:00:00"))
         )
       )
 

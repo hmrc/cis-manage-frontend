@@ -31,7 +31,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpException, UpstreamErrorResponse}
 import viewmodels.{ReturnTypeViewModel, StatusViewModel}
 
-import java.time.Instant
+import java.time.LocalDateTime
 
 class ConstructionIndustrySchemeConnectorSpec
     extends AnyWordSpec
@@ -943,7 +943,7 @@ class ConstructionIndustrySchemeConnectorSpec
             hmrcMarkGenerated = Some("mark1"),
             hmrcMarkGgis = Some("ggis1"),
             emailRecipient = Some("test@example.com"),
-            acceptedTime = Some(Instant.now())
+            acceptedTime = Some(LocalDateTime.parse("2025-01-01T12:00:00"))
           )
         )
       )

@@ -35,7 +35,7 @@ import viewmodels.*
 import views.html.history.SubmittedReturnsView
 import views.html.monthlyreturns.SubmissionSuccessView
 
-import java.time.Instant
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
@@ -90,7 +90,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
         hmrcMarkGenerated = Some("123"),
         hmrcMarkGgis = Some("123"),
         emailRecipient = Some("test@example.com"),
-        acceptedTime = Some(Instant.parse("2024-04-01T12:00:00Z"))
+        acceptedTime = Some(LocalDateTime.parse("2024-04-01T12:00:00"))
       )
     )
   )
