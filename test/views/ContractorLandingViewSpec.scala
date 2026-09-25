@@ -112,6 +112,16 @@ class ContractorLandingViewSpec extends SpecBase {
       links.select("[href=/foo/notices]").size()                                                shouldBe 1
     }
 
+    "render help and guidance before the report technical issue link" in {
+      val doc = render()
+
+      val layoutColumns = doc.select("#main-content > .govuk-grid-row > div")
+      layoutColumns.size()                                                shouldBe 3
+      layoutColumns.get(1).select("aside.app-related-items").size()       shouldBe 1
+      layoutColumns.get(2).select(".hmrc-report-technical-issue").size()  shouldBe 1
+      layoutColumns.get(0).select(".hmrc-report-technical-issue").isEmpty shouldBe true
+    }
+
     "render all landing page cards with correct links" in {
       val doc = render()
 
