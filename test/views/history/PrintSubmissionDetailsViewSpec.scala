@@ -269,6 +269,34 @@ class PrintSubmissionDetailsViewSpec extends SpecBase {
       summaryText must include(contractorName)
       summaryText must include(payeReference)
     }
+
+    "must not render the submission time paragraph when accepted time is not available" in new Setup {
+      val model = SubmittedReturnPrintViewModel(
+        monthYear = "April 2026",
+        submittedTime = "",
+        submittedDate = "",
+        receiptReferenceNumber = "ABC123456789",
+        submissionType = "nil",
+        contractorName = "PAL 355 Scheme",
+        payeReference = "123/AB456",
+        totalPaymentsMade = "£0",
+        totalCostOfMaterials = "£0",
+        totalTaxDeducted = "£0",
+        subcontractors = Seq.empty
+      )
+
+      lazy val html: HtmlFormat.Appendable = view(model, historyUrl)
+
+      val doc: Document = Jsoup.parse(html.toString)
+
+      doc.select("h2").text must include(
+        messages("history.printSubmissionDetails.submissionDetails.heading")
+      )
+
+      doc.select("p.govuk-body").text mustNot include(
+        messages("history.printSubmissionDetails.submissionDetails.p", "", "")
+      )
+    }
   }
 
   trait Setup {

@@ -390,6 +390,7 @@ submissionConfirmation.panel.referenceLabel  =  Your receipt reference number
 submissionConfirmation.details.heading       =  Submission details
 
 submissionConfirmation.submittedOn           =  Submitted on
+submissionConfirmation.submittedOn.value     =  {0} on {1}
 submissionConfirmation.contractorName        =  Contractor name
 submissionConfirmation.payeReference         =  PAYE reference
 submissionConfirmation.returnPeriod          =  Return period ended

@@ -35,10 +35,12 @@
     @h1(messages("history.printSubmissionDetails.heading", data.monthYear))
 
     @h2(messages("history.printSubmissionDetails.submissionDetails.heading"))
-    @paragraph(
-        message = "history.printSubmissionDetails.submissionDetails.p",
-        args    = Seq(data.submittedTime, data.submittedDate)
-    )
+    @if(data.submittedTime.nonEmpty && data.submittedDate.nonEmpty) {
+        @paragraph(
+            message = "history.printSubmissionDetails.submissionDetails.p",
+            args    = Seq(data.submittedTime, data.submittedDate)
+        )
+    }
 
     @govukSummaryList(
         SummaryListViewModel({

@@ -406,6 +406,7 @@ submissionConfirmation.panel.referenceLabel  =  xxxxxxxxxxxxxxxxxxxx
 submissionConfirmation.details.heading       =  xxxxxxxxxxxxxxxxxxxx
 
 submissionConfirmation.submittedOn           =  xxxxxxxxxxxxxxxxxxxx
+submissionConfirmation.submittedOn.value     =  {0} am {1}
 submissionConfirmation.contractorName        =  xxxxxxxxxxxxxxxxxxxx
 submissionConfirmation.payeReference         =  xxxxxxxxxxxxxxxxxxxx
 submissionConfirmation.returnPeriod          =  xxxxxxxxxxxxxxxxxxxx
