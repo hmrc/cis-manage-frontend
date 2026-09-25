@@ -42,7 +42,7 @@ class NoSubcontractorsExistViewSpec extends SpecBase {
       doc.select("a.govuk-link").text must include(messages("subcontractors.noSubcontractorsExist.p2.link"))
       doc.select("p.govuk-body").text must include(messages("subcontractors.noSubcontractorsExist.p2.suffix"))
 
-      doc.select("p.govuk-body").text must include(messages("subcontractors.noSubcontractorsExist.p3.prefix"))
+      doc.select("p.govuk-body").text must include(messages("site.backTo"))
       doc.select("a.govuk-link").text must include(messages("subcontractors.noSubcontractorsExist.p3.link"))
     }
   }
