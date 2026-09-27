@@ -16,14 +16,18 @@
 
 package services
 
-import org.scalatest.matchers.must.Matchers
 import org.scalatest.OptionValues.convertOptionToValuable
+import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import viewmodels.govuk.PaginationFluency._
+import play.api.i18n.Messages
+import play.api.test.FakeRequest
+import play.api.test.Helpers.stubMessagesApi
+import viewmodels.govuk.PaginationFluency.*
 
 class PaginationSubcontractorsListServiceSpec extends AnyWordSpec with Matchers {
 
-  private val service = new PaginationSubcontractorsListService
+  implicit val messages: Messages = stubMessagesApi().preferred(FakeRequest())
+  private val service             = new PaginationSubcontractorsListService
 
   "PaginationSubcontractorsListService" should {
 
@@ -72,6 +76,36 @@ class PaginationSubcontractorsListServiceSpec extends AnyWordSpec with Matchers 
 
       result.pagination.next mustBe defined
       result.pagination.next.value.href must include("page=3")
+    }
+
+    "set accessible label for the previous pagination link" in {
+      val items = (1 to 20).map(_.toString)
+
+      val result =
+        service.paginate(
+          allItems = items,
+          currentPage = 2,
+          recordsPerPage = 8,
+          baseUrl = "/subcontractors/test/your-subcontractors"
+        )
+
+      result.pagination.previous.value.labelText mustBe
+        Some(messages("site.pagination.goToPage", 1))
+    }
+
+    "set accessible label for the next pagination link" in {
+      val items = (1 to 20).map(_.toString)
+
+      val result =
+        service.paginate(
+          allItems = items,
+          currentPage = 2,
+          recordsPerPage = 8,
+          baseUrl = "/subcontractors/test/your-subcontractors"
+        )
+
+      result.pagination.next.value.labelText mustBe
+        Some(messages("site.pagination.goToPage", 3))
     }
 
     "return the final page of items with correct metadata" in {
