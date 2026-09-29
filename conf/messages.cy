@@ -13,8 +13,8 @@ site.startAgain                                         =  Dechrau eto
 site.signIn                                             =  Mewngofnodi
 site.govuk                                              =  GOV.UK
 site.unknown                                            =  Anhysbys
-site.pagination.goToPage                                =  xxxxxxxxxxxxxxxxxxxx
 
+site.pagination.goToPage                                =  xxxxxxxxxxxxxxxxxxxx
 site.pagination.landmark                                =  xxxxxxxxxxxxxxxxxxxx
 site.pagination.previous                                =  xxxxxxxxxxxxxxxxxxxx
 site.pagination.next                                    =  xxxxxxxxxxxxxxxxxxxx
@@ -94,6 +94,7 @@ accessDenied.link                        =  Rhagor o wybodaeth am Gynllun y Diwy
 
 unauthorised.title                       =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
 unauthorised.heading                     =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
+
 unauthorised.guidance.p1                 =  I ddefnyddio’r gwasanaeth hwn, bydd angen i chi wneud y canlynol:
 unauthorised.guidance.org.p1.prefix      =  cofrestru gyda’r
 unauthorised.guidance.org.p1.link        =  Cynllun Diwydiant Adeiladu
@@ -107,7 +108,6 @@ unauthorised.org.heading                 =  Mae’n ddrwg gennym, ond does dim m
 unauthorised.org.guidance.p2.prefix      =  Mae’n rhaid i chi gofrestru’r cyfrif hwn gyda
 unauthorised.org.guidance.p2.link        =  Cynllun y Diwydiant Adeiladu
 unauthorised.org.guidance.p2.suffix      =  cyn y gallwch ddefnyddio’r gwasanaeth hwn.
-
 unauthorised.org.standard.title          =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
 unauthorised.org.standard.heading        =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
 unauthorised.org.standard.p1             =  Dim ond defnyddwyr sydd â chyfrif sefydliad neu asiant sy’n cael defnyddio’r gwasanaeth hwn.

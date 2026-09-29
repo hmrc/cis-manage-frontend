@@ -54,8 +54,8 @@ final case class DeleteSubcontractorAuditEventModel(
 ) extends AuditEventModel {
   override val auditType: String   = "DeleteSubcontractor"
   override val detailJson: JsValue = Json.obj(
-    "cisId"             -> cisId,
-    "subcontractorName" -> subcontractorName,
-    "subbieResourceRef" -> subbieResourceRef
+    "cisId"                    -> cisId,
+    "subcontractorName"        -> subcontractorName,
+    "subcontractorResourceRef" -> subbieResourceRef
   ) ++ typeOfSubcontractor.fold(Json.obj())(t => Json.obj("typeOfSubcontractor" -> t))
 }

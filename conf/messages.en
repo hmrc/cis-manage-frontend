@@ -13,8 +13,8 @@ site.startAgain                                         =  Start again
 site.signIn                                             =  Sign in
 site.govuk                                              =  GOV.UK
 site.unknown                                            =  Unknown
-site.pagination.goToPage                                =  Go to page {0}
 
+site.pagination.goToPage                                =  Go to page {0}
 site.pagination.landmark                                =  Pagination
 site.pagination.previous                                =  Previous
 site.pagination.next                                    =  Next
@@ -94,6 +94,7 @@ accessDenied.link                        =  More information about the Construct
 
 unauthorised.title                       =  Sorry, you are unable to use this service
 unauthorised.heading                     =  Sorry, you are unable to use this service
+
 unauthorised.guidance.p1                 =  To use this service, you will need to:
 unauthorised.guidance.org.p1.prefix      =  register with the
 unauthorised.guidance.org.p1.link        =  Construction Industry Scheme
@@ -107,7 +108,6 @@ unauthorised.org.heading                 =  Sorry, you are unable to use this se
 unauthorised.org.guidance.p2.prefix      =  You need to register this account with the
 unauthorised.org.guidance.p2.link        =  Construction Industry Scheme
 unauthorised.org.guidance.p2.suffix      =  before you can use this service.
-
 unauthorised.org.standard.title          =  Sorry, you are unable to use this service
 unauthorised.org.standard.heading        =  Sorry, you are unable to use this service
 unauthorised.org.standard.p1             =  Only users with an organisation or agent account can use this service.
