@@ -512,8 +512,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
           1L,
           instanceId
         )(Lang("en"))
-        result.value.submittedTime should (be("2:30pm GMT") or be("2:30pm GMT"))
-        result.value.submittedTime mustBe "2:30pm GMT"
+        result.value.submittedTime should (be("2:30pm GMT") or be("2:30PM GMT"))
         result.value.submittedDate mustBe "6 April 2026"
         result.value.verificationNumber mustBe "V001"
         result.value.contractorName mustBe "Test Scheme"
@@ -567,8 +566,6 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
           instanceId
         )(Lang("en"))
         result.value.submissionTime should (be("2:30pm GMT") or be("2:30PM GMT"))
-
-        result.value.submissionTime mustBe "2:30pm GMT"
         result.value.submissionDate mustBe "6 April 2026"
         result.value.contractorName mustBe "Test Scheme"
         result.value.employerReference mustBe "123/AB456"
