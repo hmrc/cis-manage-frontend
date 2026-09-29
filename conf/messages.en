@@ -403,7 +403,7 @@ submissionConfirmation.whatYouCanDo.heading  =  What you can do
 submissionConfirmation.noEmail               =  If you want to provide an email, you need to change your contacts in ‘About your organisation/firm’, under ‘Your HMRC Services’.
 submissionConfirmation.inset                 =  You can save this page or print a copy for your records.
 submissionConfirmation.print                 =  Print this page
-submissionConfirmation.backToManage          =  Back to Manage your CIS return
+submissionConfirmation.backToManage          =  Manage your CIS return
 
 submissionConfirmation.needHelp.heading      =  Need help?
 submissionConfirmation.needHelp.p1           =  For any questions about your return submission, contact the
