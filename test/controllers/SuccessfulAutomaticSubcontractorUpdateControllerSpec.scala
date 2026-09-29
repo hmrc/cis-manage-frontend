@@ -19,6 +19,7 @@ package controllers
 import base.SpecBase
 import controllers.actions.{AuthorizedForSchemeActionProvider, FakeAuthorizedForSchemeAction}
 import models.Scheme
+import models.response.{GetSubcontractor, GetSubcontractorListResponse}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
@@ -26,16 +27,18 @@ import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import services.PrepopService
+import services.{PrepopService, SubcontractorService}
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.SuccessfulAutomaticSubcontractorUpdateViewModel
 import views.html.SuccessfulAutomaticSubcontractorUpdateView
 
+import java.time.LocalDateTime
 import scala.concurrent.{ExecutionContext, Future}
 
 class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
 
   val mockPrepopService: PrepopService                            = mock[PrepopService]
+  val mockSubcontractorService: SubcontractorService              = mock[SubcontractorService]
   val mockSchemeAccessProvider: AuthorizedForSchemeActionProvider = mock[AuthorizedForSchemeActionProvider]
 
   private lazy val view = app.injector.instanceOf[SuccessfulAutomaticSubcontractorUpdateView]
@@ -43,6 +46,7 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
   override def fakeApplication(): Application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
     .overrides(
       bind[PrepopService].toInstance(mockPrepopService),
+      bind[SubcontractorService].toInstance(mockSubcontractorService),
       bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider)
     )
     .build()
@@ -51,13 +55,35 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
       val subcontractorsList: Seq[SuccessfulAutomaticSubcontractorUpdateViewModel] = Seq(
-        SuccessfulAutomaticSubcontractorUpdateViewModel("Alice, A", "1111111111", " ", "01 Jan 2014"),
-        SuccessfulAutomaticSubcontractorUpdateViewModel("Bob, B", "2222222222", " ", "01 Jan 2014"),
-        SuccessfulAutomaticSubcontractorUpdateViewModel("Dave, D", "4444444444", "V1000000009", "07 May 2015"),
-        SuccessfulAutomaticSubcontractorUpdateViewModel("Charles, C", "3333333333", "V1000000009", "01 Jan 2014"),
-        SuccessfulAutomaticSubcontractorUpdateViewModel("Elise, E", "5555555555", "V1000000009", "07 May 2015"),
-        SuccessfulAutomaticSubcontractorUpdateViewModel("Frank, F", "6666666666", "V1000000009", "07 Jan 2018")
+        SuccessfulAutomaticSubcontractorUpdateViewModel("Smith, Alan", "1234567890", "V000001", "6 Apr 2026"),
+        SuccessfulAutomaticSubcontractorUpdateViewModel("Partners Ltd", "3333333333", "", "1 Jan 2014")
       )
+
+      when(mockSubcontractorService.getSubcontractorList(eqTo("900001"))(any[HeaderCarrier]))
+        .thenReturn(
+          Future.successful(
+            GetSubcontractorListResponse(
+              Seq(
+                subcontractor(
+                  subcontractorId = 1L,
+                  utr = Some("1234567890"),
+                  firstName = Some("Alan"),
+                  surname = Some("Smith"),
+                  subcontractorType = Some("soletrader"),
+                  verificationNumber = Some("V000001"),
+                  createDate = Some(LocalDateTime.of(2026, 4, 6, 10, 0))
+                ),
+                subcontractor(
+                  subcontractorId = 2L,
+                  utr = Some("3333333333"),
+                  partnershipTradingName = Some("Partners Ltd"),
+                  subcontractorType = Some("partnership"),
+                  createDate = Some(LocalDateTime.of(2014, 1, 1, 0, 0))
+                )
+              )
+            )
+          )
+        )
 
       val instanceId = "900001"
       val targetKey  = "subcontractors"
@@ -222,4 +248,52 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
       status(result) mustEqual NOT_FOUND
     }
   }
+
+  private def subcontractor(
+    subcontractorId: Long,
+    utr: Option[String] = None,
+    firstName: Option[String] = None,
+    surname: Option[String] = None,
+    partnershipTradingName: Option[String] = None,
+    subcontractorType: Option[String] = None,
+    verificationNumber: Option[String] = None,
+    createDate: Option[LocalDateTime] = None
+  ): GetSubcontractor =
+    GetSubcontractor(
+      subcontractorId = subcontractorId,
+      utr = utr,
+      pageVisited = None,
+      partnerUtr = None,
+      crn = None,
+      firstName = firstName,
+      nino = None,
+      secondName = None,
+      surname = surname,
+      partnershipTradingName = partnershipTradingName,
+      tradingName = None,
+      subcontractorType = subcontractorType,
+      addressLine1 = None,
+      addressLine2 = None,
+      addressLine3 = None,
+      addressLine4 = None,
+      country = None,
+      postcode = None,
+      emailAddress = None,
+      phoneNumber = None,
+      mobilePhoneNumber = None,
+      worksReferenceNumber = None,
+      createDate = createDate,
+      lastUpdate = None,
+      subbieResourceRef = None,
+      matched = None,
+      autoVerified = None,
+      verified = None,
+      verificationNumber = verificationNumber,
+      taxTreatment = None,
+      verificationDate = None,
+      version = None,
+      updatedTaxTreatment = None,
+      lastMonthlyReturnDate = None,
+      pendingVerifications = None
+    )
 }
