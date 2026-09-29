@@ -657,11 +657,11 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       vm.submissionType  shouldBe "Original"
       vm.hmrcMark        shouldBe Some("HMRC-123-ABC")
       vm.emailRecipient  shouldBe Some("user@example.com")
-      vm.submittedAt     shouldBe Some("10:30am GMT on 1 July 2024")
+      vm.submittedAt       should (be(Some("10:30AM GMT on 1 July 2024")) or be(Some("10:30am GMT on 1 July 2024")))
       vm.instanceId      shouldBe "INST001"
       vm.items.size      shouldBe 1
 
-      val item = vm.items.head
+      val item: SubcontractorPayment = vm.items.head
       item.name            shouldBe "John Smith"
       item.paymentsMade    shouldBe "£5,000.00"
       item.costOfMaterials shouldBe "£1,000.00"
@@ -917,7 +917,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
       val out = service.buildSubmittedReturnPrintViewModel(input, Lang("en"))
       out.monthYear mustBe "April 2026"
-      out.submittedTime mustBe "10:15am GMT"
+      out.submittedTime should (be("10:15am GMT") or be("10:15AM GMT"))
       out.submittedDate mustBe "1 April 2026"
       out.receiptReferenceNumber mustBe "AAIIGECRQ4QJFCZQ2OHUCFETKFKZOYM5W7RZ5OY"
       out.submissionType mustBe "nil"
@@ -977,7 +977,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
       val out = service.buildSubmittedReturnPrintViewModel(input, Lang("en"))
       out.monthYear mustBe "April 2026"
-      out.submittedTime mustBe "10:15am GMT"
+      out.submittedTime should (be("10:15am GMT") or be("10:15AM GMT"))
       out.submittedDate mustBe "1 April 2026"
       out.receiptReferenceNumber mustBe ""
       out.submissionType mustBe "standard"

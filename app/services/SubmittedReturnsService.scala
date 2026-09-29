@@ -22,7 +22,6 @@ import models.history.*
 import models.history.AmendmentHandoffData.given
 import models.history.SubmittedReturnsHistorySource.{AllYears, SingleYear}
 import models.response.GetSubmittedMonthlyReturnsDataResponse
-import org.slf4j.LoggerFactory
 import play.api.i18n.{Lang, MessagesApi}
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.*
