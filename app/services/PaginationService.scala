@@ -16,6 +16,7 @@
 
 package services
 
+import play.api.i18n.Messages
 import viewmodels.agent.ClientListViewModel
 import viewmodels.govuk.PaginationFluency.*
 
@@ -46,7 +47,7 @@ class PaginationService @Inject() {
     baseUrl: String,
     sortBy: Option[String] = None,
     sortOrder: Option[String] = None
-  ): ClientListPaginationResult = {
+  )(implicit messages: Messages): ClientListPaginationResult = {
 
     val totalRecords     = allClients.length
     val totalPages       = calculateTotalPages(totalRecords)
@@ -91,7 +92,7 @@ class PaginationService @Inject() {
     baseUrl: String,
     sortBy: Option[String],
     sortOrder: Option[String]
-  ): PaginationViewModel =
+  )(implicit messages: Messages): PaginationViewModel =
     if (totalPages <= 1) {
       PaginationViewModel()
     } else {
@@ -124,11 +125,12 @@ class PaginationService @Inject() {
     baseUrl: String,
     sortBy: Option[String],
     sortOrder: Option[String]
-  ): Option[PaginationLinkViewModel] =
+  )(implicit messages: Messages): Option[PaginationLinkViewModel] =
     if (currentPage > 1) {
       Some(
         PaginationLinkViewModel(buildUrlWithParams(baseUrl, currentPage - 1, sortBy, sortOrder))
           .withText("site.pagination.previous")
+          .withAriaLabel(messages("site.pagination.goToPage", currentPage - 1))
       )
     } else {
       None
@@ -140,15 +142,35 @@ class PaginationService @Inject() {
     baseUrl: String,
     sortBy: Option[String],
     sortOrder: Option[String]
-  ): Option[PaginationLinkViewModel] =
+  )(implicit messages: Messages): Option[PaginationLinkViewModel] =
     if (currentPage < totalPages) {
       Some(
         PaginationLinkViewModel(buildUrlWithParams(baseUrl, currentPage + 1, sortBy, sortOrder))
           .withText("site.pagination.next")
+          .withAriaLabel(messages("site.pagination.goToPage", currentPage + 1))
       )
     } else {
       None
     }
+
+  private def createPageItem(
+    page: Int,
+    currentPage: Int,
+    baseUrl: String,
+    sortBy: Option[String],
+    sortOrder: Option[String]
+  ): PaginationItemViewModel =
+    PaginationItemViewModel(
+      number = page.toString,
+      href = buildUrlWithParams(
+        baseUrl,
+        page,
+        sortBy,
+        sortOrder
+      )
+    )
+      .withVisuallyHiddenText("site.pagination.goToPage")
+      .withCurrent(page == currentPage)
 
   private def generatePageItems(
     currentPage: Int,
@@ -161,29 +183,41 @@ class PaginationService @Inject() {
     val items     = scala.collection.mutable.ListBuffer[PaginationItemViewModel]()
 
     if (pageRange.head > 1) {
-      items += PaginationItemViewModel("1", buildUrlWithParams(baseUrl, 1, sortBy, sortOrder)).withCurrent(
-        1 == currentPage
+      items += createPageItem(
+        page = 1,
+        currentPage = currentPage,
+        baseUrl = baseUrl,
+        sortBy = sortBy,
+        sortOrder = sortOrder
       )
+
       if (pageRange.head > 2) {
         items += PaginationItemViewModel.ellipsis()
       }
     }
 
     pageRange.foreach { page =>
-      items += PaginationItemViewModel(
-        number = page.toString,
-        href = buildUrlWithParams(baseUrl, page, sortBy, sortOrder)
-      ).withCurrent(page == currentPage)
+      items += createPageItem(
+        page = page,
+        currentPage = currentPage,
+        baseUrl = baseUrl,
+        sortBy = sortBy,
+        sortOrder = sortOrder
+      )
     }
 
     if (pageRange.last < totalPages) {
       if (pageRange.last < totalPages - 1) {
         items += PaginationItemViewModel.ellipsis()
       }
-      items += PaginationItemViewModel(totalPages.toString, buildUrlWithParams(baseUrl, totalPages, sortBy, sortOrder))
-        .withCurrent(
-          totalPages == currentPage
-        )
+
+      items += createPageItem(
+        page = totalPages,
+        currentPage = currentPage,
+        baseUrl = baseUrl,
+        sortBy = sortBy,
+        sortOrder = sortOrder
+      )
     }
 
     items.toSeq

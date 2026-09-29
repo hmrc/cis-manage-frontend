@@ -64,9 +64,9 @@ class AuditEventModelSpec extends SpecBase {
         subcontractorName = "Test Subcontractor",
         subbieResourceRef = 42L
       ).detailJson mustBe Json.obj(
-        "cisId"             -> "123/AB456",
-        "subcontractorName" -> "Test Subcontractor",
-        "subbieResourceRef" -> 42L
+        "cisId"                    -> "123/AB456",
+        "subcontractorName"        -> "Test Subcontractor",
+        "subcontractorResourceRef" -> 42L
       )
     }
     "must serialise correctly with typeOfSubcontractor" in {
@@ -76,10 +76,10 @@ class AuditEventModelSpec extends SpecBase {
         subbieResourceRef = 42L,
         typeOfSubcontractor = Some("soletrader")
       ).detailJson mustBe Json.obj(
-        "cisId"               -> "123/AB456",
-        "subcontractorName"   -> "Test Subcontractor",
-        "subbieResourceRef"   -> 42L,
-        "typeOfSubcontractor" -> "soletrader"
+        "cisId"                    -> "123/AB456",
+        "subcontractorName"        -> "Test Subcontractor",
+        "subcontractorResourceRef" -> 42L,
+        "typeOfSubcontractor"      -> "soletrader"
       )
     }
   }

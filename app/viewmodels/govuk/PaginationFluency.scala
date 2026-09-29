@@ -128,7 +128,7 @@ object PaginationFluency {
       PaginationItem(
         number = if (ellipsis) None else Some(number),
         href = if (ellipsis) emptyString else href,
-        visuallyHiddenText = visuallyHiddenText.map(messages(_)),
+        visuallyHiddenText = visuallyHiddenText.map(messages(_, number)),
         current = if (current) Some(true) else None,
         ellipsis = if (ellipsis) Some(true) else None,
         attributes = attributes
@@ -167,12 +167,20 @@ object PaginationFluency {
     def withAttributes(attributes: Map[String, String]): PaginationLinkViewModel =
       copy(attributes = attributes)
 
+    def withAriaLabel(ariaLabel: String): PaginationLinkViewModel =
+      copy(attributes = attributes + ("aria-label" -> ariaLabel))
+
     def asPaginationLink(implicit messages: Messages): PaginationLink =
       PaginationLink(
         href = href,
         text = text.map(messages(_)),
         labelText = labelText.map(messages(_)),
-        attributes = attributes
+        attributes = attributes.map {
+          case ("aria-label", value) =>
+            "aria-label" -> value
+          case other                 =>
+            other
+        }
       )
   }
 }

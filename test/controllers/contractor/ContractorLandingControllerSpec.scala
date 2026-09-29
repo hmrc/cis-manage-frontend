@@ -432,5 +432,159 @@ class ContractorLandingControllerSpec extends SpecBase {
         capturedTargetCall.url mustBe appConfig.contractorDetailsManagementUrl
       }
     }
+
+    "must append target query parameter to contractor details call for manageYourCisReturn" in {
+      val mockPrepopService = mock[PrepopService]
+
+      val scheme = Scheme(
+        schemeId = 123,
+        instanceId = instanceId,
+        utr = Some("1234567890"),
+        name = None,
+        prePopSuccessful = None,
+        subcontractorCounter = Some(1)
+      )
+
+      when(
+        mockPrepopService.prepopulateContractorKnownFacts(
+          any[String],
+          any[String],
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.unit)
+
+      when(
+        mockPrepopService.getScheme(any[String])(any[HeaderCarrier])
+      ).thenReturn(Future.successful(Some(scheme)))
+
+      when(
+        mockPrepopService.determineLandingDestination(
+          any[Call],
+          any[String],
+          any[Scheme],
+          any[Call],
+          any[Call]
+        )
+      ).thenReturn(
+        controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
+      )
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithCisId))
+          .overrides(
+            bind[PrepopService].toInstance(mockPrepopService)
+          )
+          .build()
+
+      running(application) {
+        val appConfig =
+          application.injector.instanceOf[FrontendAppConfig]
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.contractor.routes.ContractorLandingController
+              .onTargetClick("manageYourCisReturn")
+              .url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        val addContractorDetailsCallCaptor =
+          ArgumentCaptor.forClass(classOf[Call])
+
+        verify(mockPrepopService).determineLandingDestination(
+          any[Call],
+          eqTo(instanceId),
+          eqTo(scheme),
+          addContractorDetailsCallCaptor.capture(),
+          any[Call]
+        )
+
+        val capturedCall =
+          addContractorDetailsCallCaptor.getValue
+
+        capturedCall.method mustBe GET
+        capturedCall.url mustBe
+          s"${appConfig.contractorDetailsManagementUrl}?target=manageYourCisReturn"
+      }
+    }
+
+    "must append target query parameter to contractor details call for subcontractors" in {
+      val mockPrepopService = mock[PrepopService]
+
+      val scheme = Scheme(
+        schemeId = 123,
+        instanceId = instanceId,
+        utr = Some("1234567890"),
+        name = None,
+        prePopSuccessful = None,
+        subcontractorCounter = Some(1)
+      )
+
+      when(
+        mockPrepopService.prepopulateContractorKnownFacts(
+          any[String],
+          any[String],
+          any[String]
+        )(any[HeaderCarrier])
+      ).thenReturn(Future.unit)
+
+      when(
+        mockPrepopService.getScheme(any[String])(any[HeaderCarrier])
+      ).thenReturn(Future.successful(Some(scheme)))
+
+      when(
+        mockPrepopService.determineLandingDestination(
+          any[Call],
+          any[String],
+          any[Scheme],
+          any[Call],
+          any[Call]
+        )
+      ).thenReturn(
+        controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId)
+      )
+
+      val application =
+        applicationBuilder(userAnswers = Some(uaWithCisId))
+          .overrides(
+            bind[PrepopService].toInstance(mockPrepopService)
+          )
+          .build()
+
+      running(application) {
+        val appConfig =
+          application.injector.instanceOf[FrontendAppConfig]
+
+        val request =
+          FakeRequest(
+            GET,
+            controllers.contractor.routes.ContractorLandingController
+              .onTargetClick("subcontractors")
+              .url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+
+        val addContractorDetailsCallCaptor =
+          ArgumentCaptor.forClass(classOf[Call])
+
+        verify(mockPrepopService).determineLandingDestination(
+          any[Call],
+          eqTo(instanceId),
+          eqTo(scheme),
+          addContractorDetailsCallCaptor.capture(),
+          any[Call]
+        )
+
+        addContractorDetailsCallCaptor.getValue.url mustBe
+          s"${appConfig.contractorDetailsManagementUrl}?target=subcontractors"
+      }
+    }
   }
 }

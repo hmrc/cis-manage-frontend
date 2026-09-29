@@ -30,7 +30,7 @@
     hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
     alphaBanner: StandardAlphaBanner,
     hmrcStandardPage: HmrcStandardPage,
-    twoThirdsOneThirdMainContent: TwoThirdsOneThirdMainContent,
+    twoThirdsOneThirdLayout: TwoThirdsOneThirdLayout,
     fullWidthPageLayout: FullWidthPageLayout,
     autocompleteCss: HmrcAccessibleAutocompleteCss,
     autocompleteJavascript: HmrcAccessibleAutocompleteJavascript
@@ -39,6 +39,8 @@
 @(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false, sidebar: Option[Html] = None, additionalScripts: Option[Html] = None, additionalCss: Option[Html] = None, useFullWidth: Boolean = false)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
 
 @head = {
+
+<meta name="format-detection" content="telephone=no">
 
     @if(timeout) {
         @hmrcTimeoutDialog(TimeoutDialog(
@@ -64,9 +66,15 @@
         @CSPNonce.attr />
 }
 
+@reportTechnicalIssue = {
+    <div class="govuk-!-margin-top-4">@hmrcReportTechnicalIssueHelper()</div>
+}
+
 @content = {
     @contentBlock
-    <div class="govuk-!-margin-top-4">@hmrcReportTechnicalIssueHelper()</div>
+    @if(sidebar.isEmpty) {
+        @reportTechnicalIssue
+    }
 }
 
 @scripts = {
@@ -83,7 +91,7 @@
             if (useFullWidth) {
                 Some((content: Html) => content)
             } else {
-                sidebar.map(twoThirdsOneThirdMainContent(_))
+                sidebar.map(twoThirdsOneThirdLayout(_, reportTechnicalIssue))
         }
     ),
     serviceURLs = ServiceURLs(
