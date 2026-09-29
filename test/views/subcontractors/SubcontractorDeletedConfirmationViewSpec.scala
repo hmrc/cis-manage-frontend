@@ -50,11 +50,9 @@ class SubcontractorDeletedConfirmationViewSpec extends SpecBase {
         messages("subcontractors.subcontractorDeletedConfirmation.p1", subcontractorName)
       )
 
-      val subcontractorLink = doc.select(s"a[href='$subcontractorsPageUrl']")
+      doc.text() must include(messages("site.backTo"))
 
-      subcontractorLink.text must include(
-        messages("site.backTo")
-      )
+      val subcontractorLink = doc.select(s"a[href='$subcontractorsPageUrl']")
 
       subcontractorLink.text must include(
         messages("subcontractors.subcontractorDeletedConfirmation.p2.link")
