@@ -20,21 +20,19 @@ import models.verify.*
 import models.verify.VerificationTaxYearSelection.TaxYearPeriod
 import models.response.GetSubmittedVerification
 import viewmodels.*
-
 import play.api.i18n.Lang
 import utils.DateTimeFormats
 
-import java.time.format.DateTimeFormatter
 import javax.inject.{Inject, Singleton}
 import models.response.{GetSubmittedSubmission, GetSubmittedVerificationsResponse}
 
-import java.time.{Instant, LocalDate, LocalDateTime, OffsetDateTime, ZoneOffset}
+import java.time.{Instant, LocalDate, LocalDateTime, OffsetDateTime, ZoneId, ZoneOffset}
 import scala.util.Try
 
 @Singleton
 class VerificationHistoryService @Inject() () {
 
-  private val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+  private val GMTTimezone: ZoneId = ZoneId.of("GMT")
 
   def getSubmittedVerificationTaxYears(data: VerificationHistoryData): Seq[TaxYearPeriod] =
     data.verificationRequests
@@ -85,8 +83,8 @@ class VerificationHistoryService @Inject() () {
       .find(_.verificationBatchId == verificationBatchId)
       .map { request =>
         VerificationRequestPageViewModel(
-          submittedTime = request.acceptedDateTime.format(timeFormatter),
-          submittedDate = request.acceptedDateTime.format(DateTimeFormats.dateTimeFormat()),
+          submittedTime = request.acceptedDateTime.atZone(GMTTimezone).format(DateTimeFormats.timeFormat()(lang)),
+          submittedDate = request.acceptedDateTime.format(DateTimeFormats.dateTimeFormat()(lang)),
           verificationNumber = request.verificationNumber,
           contractorName = request.contractorName,
           employerReference = request.employerReference,
@@ -106,8 +104,8 @@ class VerificationHistoryService @Inject() () {
       .find(_.verificationBatchId == verificationBatchId)
       .map { request =>
         SubcontractorSubmissionReceiptViewModel(
-          submissionTime = request.acceptedDateTime.format(timeFormatter),
-          submissionDate = request.acceptedDateTime.format(DateTimeFormats.dateTimeFormat()),
+          submissionTime = request.acceptedDateTime.atZone(GMTTimezone).format(DateTimeFormats.timeFormat()(lang)),
+          submissionDate = request.acceptedDateTime.format(DateTimeFormats.dateTimeFormat()(lang)),
           contractorName = request.contractorName,
           employerReference = request.employerReference,
           receiptReferenceNumber = request.receiptReferenceNumber,

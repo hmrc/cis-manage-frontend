@@ -657,7 +657,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       vm.submissionType  shouldBe "Original"
       vm.hmrcMark        shouldBe Some("HMRC-123-ABC")
       vm.emailRecipient  shouldBe Some("user@example.com")
-      vm.submittedAt     shouldBe Some("10:30am on 1 Jul 2024")
+      vm.submittedAt     shouldBe Some("10:30am GMT on 1 July 2024")
       vm.instanceId      shouldBe "INST001"
       vm.items.size      shouldBe 1
 
@@ -697,8 +697,8 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
       val result = service.getMonthlyReturnComplete("INST001", 2026, 9, "N").futureValue
 
-      result                          shouldBe a[Right[_, _]]
-      result.toOption.get.submittedAt shouldBe Some("2:25pm on 13 Sept 2026")
+      result                              shouldBe a[Right[_, _]]
+      result.toOption.get.submittedAt.value should be("2:25pm GMT on 13 September 2026")
     }
 
     "getMonthlyReturnComplete must use the Welsh connector for the submitted time" in new Setup {
@@ -917,7 +917,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
       val out = service.buildSubmittedReturnPrintViewModel(input, Lang("en"))
       out.monthYear mustBe "April 2026"
-      out.submittedTime mustBe "10:15am"
+      out.submittedTime mustBe "10:15am GMT"
       out.submittedDate mustBe "1 April 2026"
       out.receiptReferenceNumber mustBe "AAIIGECRQ4QJFCZQ2OHUCFETKFKZOYM5W7RZ5OY"
       out.submissionType mustBe "nil"
@@ -977,7 +977,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
       val out = service.buildSubmittedReturnPrintViewModel(input, Lang("en"))
       out.monthYear mustBe "April 2026"
-      out.submittedTime mustBe "10:15am"
+      out.submittedTime mustBe "10:15am GMT"
       out.submittedDate mustBe "1 April 2026"
       out.receiptReferenceNumber mustBe ""
       out.submissionType mustBe "standard"

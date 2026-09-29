@@ -37,7 +37,10 @@
 @layout(pageTitle = titleNoForm(messages("verify.subcontractorSubmissionReceipt.title"))) {
     @h1(messages("verify.subcontractorSubmissionReceipt.heading"))
     @h2(messages("verify.subcontractorSubmissionReceipt.subheading"))
-    @paragraph(messages("verify.subcontractorSubmissionReceipt.p1", viewModel.submissionTime, viewModel.submissionDate))
+
+    @if(viewModel.submissionTime.nonEmpty && viewModel.submissionDate.nonEmpty) {
+        @paragraph(messages("verify.subcontractorSubmissionReceipt.p1", viewModel.submissionTime, viewModel.submissionDate))
+    }
 
     @govukSummaryList(
         SummaryListViewModel(rows = Seq(

@@ -96,6 +96,26 @@ class SubcontractorSubmissionReceiptViewSpec extends SpecBase {
       doc.select("p.govuk-body").text must include(messages("verify.subcontractorSubmissionReceipt.link2.prefix"))
       doc.select("a.govuk-link").text must include(messages("verify.subcontractorSubmissionReceipt.link2.link"))
     }
+
+    "must not render the submission time paragraph when accepted time is not available" in new Setup {
+      val model: SubcontractorSubmissionReceiptViewModel = SubcontractorSubmissionReceiptViewModel(
+        submissionTime = "",
+        submissionDate = "",
+        contractorName = "John Doe",
+        employerReference = "ABC12345",
+        receiptReferenceNumber = "123456",
+        verificationNumber = "V0004528765",
+        cisId = "1"
+      )
+
+      val doc: Document = Jsoup.parse(view(model).toString)
+
+      doc.select("p.govuk-body").text must not include messages(
+        "verify.subcontractorSubmissionReceipt.p1",
+        model.submissionTime,
+        model.submissionDate
+      )
+    }
   }
 
   trait Setup {

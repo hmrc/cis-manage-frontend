@@ -22,6 +22,7 @@ import models.history.*
 import models.history.AmendmentHandoffData.given
 import models.history.SubmittedReturnsHistorySource.{AllYears, SingleYear}
 import models.response.GetSubmittedMonthlyReturnsDataResponse
+import org.slf4j.LoggerFactory
 import play.api.i18n.{Lang, MessagesApi}
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.*
@@ -41,8 +42,7 @@ class SubmittedReturnsService @Inject() (
   messagesApi: MessagesApi
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext) {
 
-  private val GMTTimezone: ZoneId = ZoneId.of("GMT")
-
+  private val GMTTimezone: ZoneId            = ZoneId.of("GMT")
   private val amendmentCutOff: LocalDateTime = LocalDateTime.of(2016, 2, 5, 0, 0)
 
   private def parseAcceptedTime(acceptedTime: String): Option[LocalDateTime] =
@@ -123,10 +123,10 @@ class SubmittedReturnsService @Inject() (
   ): SubmittedReturnPrintViewModel = {
     val langCode = lang.code
 
-    val submittedDateTime = data.submission.acceptedTime.map(_.atZone(GMTTimezone).toLocalDateTime)
+    val submittedDateTime = data.submission.acceptedTime.map(_.atZone(GMTTimezone))
 
     val submittedTime = submittedDateTime
-      .map(_.format(DateTimeFormats.timeFormat()(lang)).toLowerCase)
+      .map(_.format(DateTimeFormats.timeFormat()(lang)))
       .getOrElse("")
 
     val submittedDate = submittedDateTime
@@ -445,8 +445,8 @@ class SubmittedReturnsService @Inject() (
       .flatMap(_.acceptedTime)
       .flatMap(parseAcceptedTime)
       .map { dateTime =>
-        val time = dateTime.format(DateTimeFormats.timeFormat()(lang)).toLowerCase
-        val date = dateTime.toLocalDate.format(DateTimeFormats.shortDateFormat())
+        val time = dateTime.atZone(GMTTimezone).format(DateTimeFormats.timeFormat()(lang))
+        val date = dateTime.toLocalDate.format(DateTimeFormats.dateTimeFormat()(lang))
         messagesApi("submissionConfirmation.submittedOn.value", time, date)(lang)
       }
 
