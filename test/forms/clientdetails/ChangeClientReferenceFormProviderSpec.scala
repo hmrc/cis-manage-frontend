@@ -17,7 +17,6 @@
 package forms.clientdetails
 
 import forms.behaviours.StringFieldBehaviours
-import play.api.data.FormError
 
 class ChangeClientReferenceFormProviderSpec extends StringFieldBehaviours {
 
@@ -30,11 +29,26 @@ class ChangeClientReferenceFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "value"
 
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
+    "must bind an empty value" in {
+      val result = form.bind(Map(fieldName -> ""))
+
+      result.errors mustBe empty
+      result.get mustBe ""
+    }
+
+    "must bind a missing value" in {
+      val result = form.bind(Map.empty)
+
+      result.errors mustBe empty
+      result.get mustBe ""
+    }
+
+    "must bind whitespace as an empty value" in {
+      val result = form.bind(Map(fieldName -> "   "))
+
+      result.errors mustBe empty
+      result.get mustBe ""
+    }
 
     "must bind valid data" in {
       val validChangeClientReferences: Seq[String] = Seq(
