@@ -225,9 +225,9 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, changeClientReferenceRoute)
-            .withFormUrlEncodedBody(("value", ""))
+            .withFormUrlEncodedBody(("value", "InvalidRef!"))
 
-        val boundForm = form.bind(Map("value" -> ""))
+        val boundForm = form.bind(Map("value" -> "InvalidRef!"))
 
         val view = application.injector.instanceOf[ChangeClientReferenceView]
 
