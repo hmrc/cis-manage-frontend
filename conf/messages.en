@@ -184,7 +184,7 @@ returnsLanding.heading                                            =  Manage your
 returnsLanding.fileMonthlyReturn.h3.link                          =  File a monthly return
 returnsLanding.fileMonthlyReturn.p1                               =  File a CIS return for any subcontractors paid in a return period.
 
-returnsLanding.fileNilReturn.h3.link                              =  File a nil return
+returnsLanding.fileNilReturn.h3.link                              =  File nil returns and inactivity requests
 returnsLanding.fileNilReturn.p1                                   =  File a nil return when no payments were made to subcontractors in a return period.
 
 returnsLanding.viewSubmittedReturns.h3.link                       =  View submitted returns
