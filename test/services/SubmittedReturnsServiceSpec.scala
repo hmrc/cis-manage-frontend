@@ -124,18 +124,18 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         )
       )
 
-      row.returnPeriodEnd          shouldBe "Mar 2023"
-      row.returnType               shouldBe ReturnTypeViewModel.Standard
-      row.dateSubmitted            shouldBe "1 Apr 2024"
-      row.monthlyReturn.url        shouldBe controllers.history.routes.PrintSubmissionDetailsController
+      row.returnPeriodEnd                shouldBe "Mar 2023"
+      row.returnType                     shouldBe ReturnTypeViewModel.Standard
+      row.dateSubmitted                  shouldBe "1 Apr 2024"
+      row.monthlyReturn.value.url        shouldBe controllers.history.routes.PrintSubmissionDetailsController
         .onPageLoad(
           monthlyReturn().taxYear,
           monthlyReturn().taxMonth,
           monthlyReturn().amendment
         )
         .url
-      row.monthlyReturn.hiddenText shouldBe "Mar 2023"
-      row.status                   shouldBe StatusViewModel.Link(
+      row.monthlyReturn.value.hiddenText shouldBe "Mar 2023"
+      row.status                         shouldBe StatusViewModel.Link(
         link = LinkViewModel(
           url = amendUrl,
           hiddenText = "Mar 2023"
@@ -156,7 +156,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       result.value.selectedTaxYear                           shouldBe Some("2022")
       result.value.taxYears.map(t => (t.fromYear, t.toYear)) shouldBe Seq(2022 -> 2023)
 
-      result.value.taxYears.head.rows.head.monthlyReturn.url shouldBe
+      result.value.taxYears.head.rows.head.monthlyReturn.value.url shouldBe
         controllers.history.routes.PrintSubmissionDetailsController
           .onPageLoad(
             monthlyReturn().taxYear,
@@ -203,6 +203,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
       row.status        shouldBe StatusViewModel.Text("history.returnHistory.status.notAvailable")
       row.dateSubmitted shouldBe ""
+      row.monthlyReturn shouldBe None
     }
 
     "buildSingleYearViewModel includes not available returns for the selected tax year" in new Setup {
