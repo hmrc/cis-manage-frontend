@@ -154,6 +154,114 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
       redirectLocation(result).value mustEqual "/there-is-a-problem"
     }
 
+    "must fall back to crn or nino and show a name when trading name is missing" in {
+      val subcontractorsList: Seq[SuccessfulAutomaticSubcontractorUpdateViewModel] = Seq(
+        SuccessfulAutomaticSubcontractorUpdateViewModel("Acme Ltd", "12345678", "", "6 Apr 2026"),
+        SuccessfulAutomaticSubcontractorUpdateViewModel("Smith, Alan", "AB123456C", "", "6 Apr 2026"),
+        SuccessfulAutomaticSubcontractorUpdateViewModel("No name provided", "", "", "6 Apr 2026")
+      )
+
+      when(mockSubcontractorService.getSubcontractorList(eqTo("900001"))(any[HeaderCarrier]))
+        .thenReturn(
+          Future.successful(
+            GetSubcontractorListResponse(
+              Seq(
+                subcontractor(
+                  subcontractorId = 1L,
+                  crn = Some("12345678"),
+                  tradingName = Some("Acme Ltd"),
+                  subcontractorType = Some("company"),
+                  createDate = Some(LocalDateTime.of(2026, 4, 6, 10, 0))
+                ),
+                subcontractor(
+                  subcontractorId = 2L,
+                  nino = Some("AB123456C"),
+                  firstName = Some("Alan"),
+                  surname = Some("Smith"),
+                  subcontractorType = Some("soletrader"),
+                  createDate = Some(LocalDateTime.of(2026, 4, 6, 10, 0))
+                ),
+                subcontractor(
+                  subcontractorId = 3L,
+                  subcontractorType = Some("trust"),
+                  createDate = Some(LocalDateTime.of(2026, 4, 6, 10, 0))
+                )
+              )
+            )
+          )
+        )
+
+      val instanceId = "900001"
+      val targetKey  = "subcontractors"
+
+      val request = FakeRequest(
+        GET,
+        routes.SuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId, targetKey).url
+      )
+
+      when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
+        Future.successful(
+          Some(
+            Scheme(
+              schemeId = 1,
+              instanceId = instanceId,
+              utr = Some("ABC123"),
+              name = Some("John"),
+              prePopSuccessful = Some("Y"),
+              subcontractorCounter = Some(1)
+            )
+          )
+        )
+      )
+
+      when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
+        .thenReturn(new FakeAuthorizedForSchemeAction)
+
+      val result = route(app, request).value
+
+      status(result) mustEqual OK
+      contentAsString(result) mustEqual view(subcontractorsList, instanceId, targetKey)(
+        request,
+        messages(app)
+      ).toString
+    }
+
+    "must redirect to journey recovery when the subcontractor list cannot be loaded" in {
+      val instanceId = "900001"
+      val targetKey  = "subcontractors"
+
+      val request = FakeRequest(
+        GET,
+        routes.SuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId, targetKey).url
+      )
+
+      when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
+        Future.successful(
+          Some(
+            Scheme(
+              schemeId = 1,
+              instanceId = instanceId,
+              utr = Some("ABC123"),
+              name = Some("John"),
+              prePopSuccessful = Some("Y"),
+              subcontractorCounter = Some(1)
+            )
+          )
+        )
+      )
+
+      when(mockSubcontractorService.getSubcontractorList(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("list failed")))
+
+      when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
+        .thenReturn(new FakeAuthorizedForSchemeAction)
+
+      val result = route(app, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual "/there-is-a-problem"
+    }
+
     "must redirect to system error if there is no scheme" in {
       val instanceId = "900001"
       val targetKey  = "subcontractors"
@@ -252,8 +360,11 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
   private def subcontractor(
     subcontractorId: Long,
     utr: Option[String] = None,
+    crn: Option[String] = None,
+    nino: Option[String] = None,
     firstName: Option[String] = None,
     surname: Option[String] = None,
+    tradingName: Option[String] = None,
     partnershipTradingName: Option[String] = None,
     subcontractorType: Option[String] = None,
     verificationNumber: Option[String] = None,
@@ -264,13 +375,13 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
       utr = utr,
       pageVisited = None,
       partnerUtr = None,
-      crn = None,
+      crn = crn,
       firstName = firstName,
-      nino = None,
+      nino = nino,
       secondName = None,
       surname = surname,
       partnershipTradingName = partnershipTradingName,
-      tradingName = None,
+      tradingName = tradingName,
       subcontractorType = subcontractorType,
       addressLine1 = None,
       addressLine2 = None,

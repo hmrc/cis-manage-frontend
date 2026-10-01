@@ -20,8 +20,9 @@ import config.FrontendAppConfig
 import models.Target
 import models.Target.*
 import models.response.GetSubcontractor
+import play.api.Logging
 import play.api.i18n.{I18nSupport, Lang, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, RequestHeader}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
@@ -48,7 +49,8 @@ class SuccessfulAutomaticSubcontractorUpdateController @Inject() (
   appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(instanceId: String, targetKey: String): Action[AnyContent] =
     (identify
@@ -57,16 +59,21 @@ class SuccessfulAutomaticSubcontractorUpdateController @Inject() (
       andThen requireSchemeAccess(instanceId)
       andThen hasClientGuard.forInstanceId(instanceId)).async { implicit request =>
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-      implicit val lang: Lang        = messagesApi.preferred(request).lang
       service.getScheme(instanceId).flatMap {
         case None                                                  =>
           Future.successful(Redirect(routes.SystemErrorController.onPageLoad()))
         case Some(scheme) if scheme.prePopSuccessful.contains("N") =>
           Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
         case _                                                     =>
-          subcontractorService.getSubcontractorList(instanceId).map { response =>
-            Ok(view(response.subcontractors.map(toViewModel), instanceId, targetKey))
-          }
+          subcontractorService
+            .getSubcontractorList(instanceId)
+            .map { response =>
+              Ok(view(response.subcontractors.map(toViewModel), instanceId, targetKey))
+            }
+            .recover { case ex =>
+              logger.error(s"Failed to retrieve subcontractor list for instanceId $instanceId", ex)
+              Redirect(routes.JourneyRecoveryController.onPageLoad())
+            }
       }
     }
 
@@ -88,13 +95,21 @@ class SuccessfulAutomaticSubcontractorUpdateController @Inject() (
 
   private def toViewModel(
     subcontractor: GetSubcontractor
-  )(implicit lang: Lang): SuccessfulAutomaticSubcontractorUpdateViewModel =
+  )(implicit request: RequestHeader): SuccessfulAutomaticSubcontractorUpdateViewModel = {
+    val preferredMessages   = messagesApi.preferred(request)
+    implicit val lang: Lang = preferredMessages.lang
     SuccessfulAutomaticSubcontractorUpdateViewModel(
-      name = subcontractor.displayName.getOrElse(""),
-      uniqueReferenceNumber = subcontractor.utr.getOrElse(""),
+      name = firstNonBlank(subcontractor.displayName).getOrElse(
+        preferredMessages("subcontractors.subcontractorsList.noNameProvided")
+      ),
+      uniqueReferenceNumber = firstNonBlank(subcontractor.utr, subcontractor.crn, subcontractor.nino).getOrElse(""),
       verificationNumber = subcontractor.verificationNumber.getOrElse(""),
       dateAdded = subcontractor.createDate
         .map(_.format(DateTimeFormats.shortDateFormat()))
         .getOrElse("")
     )
+  }
+
+  private def firstNonBlank(values: Option[String]*): Option[String] =
+    values.collectFirst { case Some(value) if value.trim.nonEmpty => value.trim }
 }
