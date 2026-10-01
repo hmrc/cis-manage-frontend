@@ -214,17 +214,19 @@ class SubmittedReturnsService @Inject() (
       returnPeriodEnd = periodEndText,
       returnType = returnType,
       dateSubmitted = dateSubmittedText,
-      monthlyReturn = LinkViewModel(
-        url = controllers.history.routes.PrintSubmissionDetailsController
-          .onPageLoad(
-            monthlyReturn.taxYear,
-            monthlyReturn.taxMonth,
-            monthlyReturn.amendment,
-            source.queryValue
-          )
-          .url,
-        hiddenText = periodEndText
-      ),
+      monthlyReturn = submissionOpt.map { _ =>
+        LinkViewModel(
+          url = controllers.history.routes.PrintSubmissionDetailsController
+            .onPageLoad(
+              monthlyReturn.taxYear,
+              monthlyReturn.taxMonth,
+              monthlyReturn.amendment,
+              source.queryValue
+            )
+            .url,
+          hiddenText = periodEndText
+        )
+      },
       submissionReceipt =
         buildSubmissionReceipt(submissionOpt, periodEndText, monthlyReturn.taxYear, monthlyReturn.taxMonth),
       status = buildStatus(monthlyReturn, submissionOpt, amendUrl, instanceId)

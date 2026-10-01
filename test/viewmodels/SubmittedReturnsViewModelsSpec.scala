@@ -33,7 +33,7 @@ class SubmittedReturnsViewModelsSpec extends AnyWordSpec with Matchers {
         returnPeriodEnd = "31 March 2024",
         returnType = ReturnTypeViewModel.Nil,
         dateSubmitted = "1 April 2024",
-        monthlyReturn = monthlyReturnLink,
+        monthlyReturn = Some(monthlyReturnLink),
         submissionReceipt = StatusViewModel.Text("site.view"),
         status = StatusViewModel.Text("history.returnHistory.status.amend")
       )
@@ -71,7 +71,7 @@ class SubmittedReturnsViewModelsSpec extends AnyWordSpec with Matchers {
         returnPeriodEnd = "30 April 2024",
         returnType = ReturnTypeViewModel.Standard,
         dateSubmitted = "2 May 2024",
-        monthlyReturn = monthlyReturnLink,
+        monthlyReturn = Some(monthlyReturnLink),
         submissionReceipt = StatusViewModel.Link(
           link = receiptLink,
           textKey = "site.view",
@@ -93,9 +93,11 @@ class SubmittedReturnsViewModelsSpec extends AnyWordSpec with Matchers {
         returnPeriodEnd = "31 May 2024",
         returnType = ReturnTypeViewModel.Unknown,
         dateSubmitted = "1 June 2024",
-        monthlyReturn = LinkViewModel(
-          url = "/return/3",
-          hiddenText = "May 2024"
+        monthlyReturn = Some(
+          LinkViewModel(
+            url = "/return/3",
+            hiddenText = "May 2024"
+          )
         ),
         submissionReceipt = StatusViewModel.Text("site.view"),
         status = StatusViewModel.Text("UNKNOWN_STATUS")

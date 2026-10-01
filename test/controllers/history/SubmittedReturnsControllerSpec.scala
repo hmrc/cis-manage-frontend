@@ -52,7 +52,7 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
             returnPeriodEnd = "Mar 2024",
             returnType = ReturnTypeViewModel.Nil,
             dateSubmitted = "1 Apr 2024",
-            monthlyReturn = LinkViewModel("/return/1", "Mar 2024"),
+            monthlyReturn = Some(LinkViewModel("/return/1", "Mar 2024")),
             submissionReceipt = StatusViewModel.Text("site.view"),
             status = StatusViewModel.Text("history.returnHistory.status.amend")
           )
