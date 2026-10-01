@@ -39,7 +39,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel, ReturnTypeViewModel, StatusViewModel}
 import viewmodels.agent.AgentLandingViewModel
 
-import java.time.{Instant, LocalDateTime}
+import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Failure
@@ -1002,7 +1002,7 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
           hmrcMarkGenerated = Some("mark1"),
           hmrcMarkGgis = Some("ggis1"),
           emailRecipient = Some("test@example.com"),
-          acceptedTime = Some(Instant.now())
+          acceptedTime = Some(LocalDateTime.parse("2025-01-01T12:00:00"))
         )
       )
       when(connector.getSubmittedMonthlyReturnsData(eqTo(expectedRequest))(any[HeaderCarrier]))

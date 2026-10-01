@@ -29,7 +29,7 @@ import services.{ManageService, SubmittedReturnsService}
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.history.PrintSubmissionDetailsView
 
-import java.time.Instant
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
@@ -59,7 +59,7 @@ class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
           hmrcMarkGenerated = Some("mark1"),
           hmrcMarkGgis = Some("ggis1"),
           emailRecipient = Some("test@example.com"),
-          acceptedTime = Some(Instant.now())
+          acceptedTime = Some(LocalDateTime.parse("2025-01-01T12:00:00"))
         )
       )
 
@@ -131,7 +131,7 @@ class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
           hmrcMarkGenerated = Some("mark1"),
           hmrcMarkGgis = Some("ggis1"),
           emailRecipient = Some("test@example.com"),
-          acceptedTime = Some(Instant.now())
+          acceptedTime = Some(LocalDateTime.parse("2025-01-01T12:00:00"))
         )
       )
 

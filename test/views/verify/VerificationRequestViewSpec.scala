@@ -47,6 +47,11 @@ class VerificationRequestViewSpec extends SpecBase {
     subcontractorsToVerify = Seq.empty
   )
 
+  private val viewModelNoSubmitted = viewModel.copy(
+    submittedTime = "",
+    submittedDate = ""
+  )
+
   "VerificationRequestView" - {
 
     "render the page with expected title" in {
@@ -72,6 +77,12 @@ class VerificationRequestViewSpec extends SpecBase {
       val doc = render(viewModel)
 
       doc.text() should include("Submitted at 14:30 on 06 February 2027")
+    }
+
+    "not render the submitted at paragraph when submitted time and date are empty" in {
+      val doc = render(viewModelNoSubmitted)
+
+      doc.text() should not include "Submitted at"
     }
 
     "render the verification number in the summary list" in {
