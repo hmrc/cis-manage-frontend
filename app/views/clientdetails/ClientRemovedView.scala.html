@@ -23,7 +23,8 @@
     govukButton: GovukButton,
     paragraph: Paragraph,
     link: Link,
-    h2: H2
+    h2: H2,
+    appConfig: config.FrontendAppConfig
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -45,7 +46,7 @@
 
     @link(
         linkTextKey = "clientdetails.clientRemoved.survey.link",
-        linkUrl = "#",
+        linkUrl = appConfig.cisFeedbackSurveyUrl,
         suffixTextKey = messages("clientdetails.clientRemoved.survey.suffix")
     )
 
