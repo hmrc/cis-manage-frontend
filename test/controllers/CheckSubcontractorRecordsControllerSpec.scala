@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.*
 import models.Scheme
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
@@ -30,7 +29,7 @@ import services.PrepopService
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.CheckSubcontractorRecordsView
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class CheckSubcontractorRecordsControllerSpec extends SpecBase {
 

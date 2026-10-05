@@ -17,7 +17,6 @@
 package controllers.clientdetails
 
 import base.SpecBase
-import controllers.actions.*
 import controllers.routes
 import forms.clientdetails.RemoveClientYesNoFormProvider
 import models.agent.ClientListFormData
@@ -69,8 +68,8 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
   private lazy val removeClientRoute =
     controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(uniqueId, NormalMode).url
 
-  private val mockManageService        = mock[ManageService]
-  private val mockSessionRepository    = mock[SessionRepository]
+  private val mockManageService     = mock[ManageService]
+  private val mockSessionRepository = mock[SessionRepository]
 
   private val okResponse = CisTaxpayer(
     uniqueId = "CIS-123",
@@ -275,8 +274,6 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
-      mockGuards()
-
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {

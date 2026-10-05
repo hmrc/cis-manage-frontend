@@ -17,8 +17,6 @@
 package controllers.clientdetails
 
 import base.SpecBase
-import controllers.actions.*
-import models.requests.{DataRequest, IdentifierRequest}
 import models.{CisTaxpayer, CisTaxpayerSearchResult, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any

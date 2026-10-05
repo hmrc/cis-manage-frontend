@@ -17,7 +17,6 @@
 package controllers.notices
 
 import base.SpecBase
-import controllers.actions.*
 import models.UserAnswers
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{CisIdPage, ContractorNamePage}

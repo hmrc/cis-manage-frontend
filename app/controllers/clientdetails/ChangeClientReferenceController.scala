@@ -46,7 +46,7 @@ class ChangeClientReferenceController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: ChangeClientReferenceView
 )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 

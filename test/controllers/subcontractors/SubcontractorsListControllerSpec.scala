@@ -17,8 +17,6 @@
 package controllers.subcontractors
 
 import base.SpecBase
-import controllers.actions.*
-import models.requests.DataRequest
 import forms.subcontractors.SubcontractorsListFormProvider
 import models.response.{GetSubcontractor, GetSubcontractorListResponse}
 import models.{NormalMode, UserAnswers}
@@ -612,6 +610,8 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
         running(application) {
+          val instanceId = "900001"
+
           val url =
             routes.SubcontractorsListController
               .onPageLoad(instanceId, mode)
@@ -691,6 +691,9 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
         running(application) {
+
+          val instanceId = "900001"
+
           val url =
             routes.SubcontractorsListController
               .onPageLoad(instanceId, mode)

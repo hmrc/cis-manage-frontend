@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.*
 import models.Scheme
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
@@ -53,7 +52,7 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
       val request = FakeRequest(
         GET,
         routes.RetrievingSubcontractorsController
-            .onPageLoad(instanceId, targetKey)
+          .onPageLoad(instanceId, targetKey)
           .url
       )
 
@@ -72,12 +71,12 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
       val request = FakeRequest(
         GET,
         routes.RetrievingSubcontractorsController
-            .start(instanceId, targetKey)
+          .start(instanceId, targetKey)
           .url
       )
 
       when(
-          mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
+        mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
           any[HeaderCarrier]
         )
       )
@@ -110,12 +109,12 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
       val request = FakeRequest(
         GET,
         routes.RetrievingSubcontractorsController
-            .start(instanceId, targetKey)
+          .start(instanceId, targetKey)
           .url
       )
 
       when(
-          mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
+        mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
           any[HeaderCarrier]
         )
       )
@@ -148,12 +147,12 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
       val request = FakeRequest(
         GET,
         routes.RetrievingSubcontractorsController
-            .start(instanceId, targetKey)
+          .start(instanceId, targetKey)
           .url
       )
 
       when(
-          mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
+        mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
           any[HeaderCarrier]
         )
       )
@@ -186,12 +185,12 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
       val request = FakeRequest(
         GET,
         routes.RetrievingSubcontractorsController
-            .start(instanceId, targetKey)
+          .start(instanceId, targetKey)
           .url
       )
 
       when(
-          mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
+        mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
           any[HeaderCarrier]
         )
       )
@@ -224,12 +223,12 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
       val request = FakeRequest(
         GET,
         routes.RetrievingSubcontractorsController
-            .start(instanceId, targetKey)
+          .start(instanceId, targetKey)
           .url
       )
 
       when(
-          mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
+        mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
           any[HeaderCarrier]
         )
       )
@@ -251,12 +250,12 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
       val request = FakeRequest(
         GET,
         routes.RetrievingSubcontractorsController
-            .start(instanceId, targetKey)
+          .start(instanceId, targetKey)
           .url
       )
 
       when(
-          mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
+        mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
           any[HeaderCarrier]
         )
       )

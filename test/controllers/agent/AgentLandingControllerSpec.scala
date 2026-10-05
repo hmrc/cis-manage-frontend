@@ -17,7 +17,6 @@
 package controllers.agent
 
 import base.SpecBase
-import controllers.actions.*
 import models.audit.ClientDetailsRetrievedAuditEventModel
 import models.{CisTaxpayerSearchResult, Scheme, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}

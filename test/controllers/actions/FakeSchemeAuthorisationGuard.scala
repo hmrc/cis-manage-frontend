@@ -18,14 +18,19 @@ package controllers.actions
 
 import models.requests.DataRequest
 import play.api.mvc.ActionFilter
-
 import scala.concurrent.ExecutionContext
 
-//noinspection ScalaStyle to stop complaint about null arguments. They are never used so this is OK.
-class FakeHasClientGuard(using ExecutionContext) extends HasClientGuard(null, null, null) {
-  private val passThroughFilter = new PassThroughFilter[DataRequest]
+class FakeSchemeAuthorisationGuard(using ExecutionContext) extends SchemeAuthorisationGuard(null, null, null) {
 
-  override def forInstanceId(instanceId: String): ActionFilter[DataRequest] = passThroughFilter
+  private val passThroughFilter =
+    new PassThroughFilter[DataRequest]
 
-  override def currentClient: ActionFilter[DataRequest] = passThroughFilter
+  override def forInstanceId(instanceId: String): ActionFilter[DataRequest] =
+    passThroughFilter
+
+  override def validateCachedInstanceId(instanceId: String): ActionFilter[DataRequest] =
+    passThroughFilter
+
+  override def currentClient: ActionFilter[DataRequest] =
+    passThroughFilter
 }

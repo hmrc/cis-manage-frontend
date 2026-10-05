@@ -17,7 +17,6 @@
 package controllers.clientdetails
 
 import base.SpecBase
-import controllers.actions.*
 import controllers.routes
 import forms.clientdetails.ChangeClientReferenceFormProvider
 import models.{CisTaxpayerSearchResult, NormalMode, UserAnswers}
