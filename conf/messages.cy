@@ -184,7 +184,7 @@ returnsLanding.heading                                            =  Rheoli’ch
 returnsLanding.fileMonthlyReturn.h3.link                          =  Cyflwyno datganiad misol
 returnsLanding.fileMonthlyReturn.p1                               =  xxxxxxxxxxxxxxxxxxxx
 
-returnsLanding.fileNilReturn.h3.link                              =  Cyflwyno datganiad ’dim’
+returnsLanding.fileNilReturn.h3.link                              =  xxxxxxxxxxxxxxxxxxxx
 returnsLanding.fileNilReturn.p1                                   =  xxxxxxxxxxxxxxxxxxxx
 
 returnsLanding.viewSubmittedReturns.h3.link                       =  Gweld datganiad a gyflwynwyd
