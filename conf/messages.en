@@ -190,8 +190,8 @@ returnsLanding.fileNilReturn.p1                                   =  File a nil 
 returnsLanding.viewSubmittedReturns.h3.link                       =  View submitted returns
 returnsLanding.viewSubmittedReturns.p1                            =  View submitted monthly or nil returns.
 
-returnsLanding.incompleteReturns.h3.link                          =  Incomplete returns
-returnsLanding.incompleteReturns.p1                               =  Submit a return currently in progress, or resubmit a return not initially accepted.
+returnsLanding.incompleteReturns.h3.link                          =  Incomplete and unsuccessful returns
+returnsLanding.incompleteReturns.p1                               =  Manage any returns currently in progress and those where the initial submission was unsuccessful.
 
 returnsLanding.aside.h2                                           =  Help and guidance
 returnsLanding.aside.link1                                        =  Construction Industry Scheme: A guide (CIS 340)
@@ -413,8 +413,8 @@ submissionConfirmation.needHelp.link         =  Construction Industry Scheme gen
 submissionConfirmation.returnType.monthly    =  Monthly
 submissionConfirmation.returnType.nil        =  Nil
 
-incompleteReturns.title                      =  Incomplete returns
-incompleteReturns.heading                    =  Incomplete returns
+incompleteReturns.title                      =  Incomplete and unsuccessful returns
+incompleteReturns.heading                    =  Incomplete and unsuccessful returns
 
 incompleteReturns.table.returnPeriodEnd      =  Return period ended
 incompleteReturns.table.returnType           =  Type

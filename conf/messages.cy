@@ -190,8 +190,8 @@ returnsLanding.fileNilReturn.p1                                   =  xxxxxxxxxxx
 returnsLanding.viewSubmittedReturns.h3.link                       =  Gweld datganiad a gyflwynwyd
 returnsLanding.viewSubmittedReturns.p1                            =  Gweld datganiadau misol neu ddatganiadau ‘dim’ a gyflwynwyd.
 
-returnsLanding.incompleteReturns.h3.link                          =  Datganiadau anghyflawn
-returnsLanding.incompleteReturns.p1                               =  Cyflwyno datganiad sydd ar y gweill ar hyn o bryd, neu ailgyflwyno datganiad na chafodd ei dderbyn i ddechrau.
+returnsLanding.incompleteReturns.h3.link                          =  xxxxxxxxxxxxxxxxxxxx
+returnsLanding.incompleteReturns.p1                               =  xxxxxxxxxxxxxxxxxxxx
 
 returnsLanding.aside.h2                                           =  Help ac arweiniad
 returnsLanding.aside.link1                                        =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
@@ -381,8 +381,8 @@ successfulNoRecordsFound.p2                                   =  Gallwch
 successfulNoRecordsFound.p2.link                              =  ychwanegu is-gontractwr
 
 # Returns & Submissions
-incompleteReturns.title                      =  Datganiadau anghyflawn
-incompleteReturns.heading                    =  Datganiadau anghyflawn neu aflwyddiannus
+incompleteReturns.title                      =  xxxxxxxxxxxxxxxxxxxx
+incompleteReturns.heading                    =  xxxxxxxxxxxxxxxxxxxx
 
 incompleteReturns.table.returnPeriodEnd      =  Cyfnod y datganiad wedi dod i ben
 incompleteReturns.table.returnType           =  Math
