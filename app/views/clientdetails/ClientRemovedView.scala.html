@@ -28,7 +28,7 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("clientdetails.clientRemoved.title")), showBackLink = false, showSignOut = false) {
+@layout(pageTitle = titleNoForm(messages("clientdetails.clientRemoved.title")), showBackLink = false, showSignOut = true) {
 
     @govukPanel(Panel(
         title = Text(messages("clientdetails.clientRemoved.heading"))
