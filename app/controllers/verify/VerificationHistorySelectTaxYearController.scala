@@ -19,7 +19,7 @@ package controllers.verify
 import controllers.{CisController, CisControllerComponents}
 import forms.verify.TaxYearFormProvider
 import models.verify.VerificationTaxYearSelection
-import models.verify.VerificationTaxYearSelection.{AllTaxYears, TaxYear}
+import models.verify.VerificationTaxYearSelection.TaxYear
 import play.api.mvc.{Action, AnyContent}
 import services.{VerificationHistoryService, VerificationService}
 import views.html.verify.{NoVerificationHistoryView, VerificationHistorySelectTaxYearView}
