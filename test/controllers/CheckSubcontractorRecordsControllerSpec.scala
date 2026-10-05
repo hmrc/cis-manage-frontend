@@ -19,17 +19,16 @@ package controllers
 import base.SpecBase
 import controllers.actions.*
 import models.Scheme
-import models.requests.DataRequest
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
-import play.api.mvc.{ActionFilter, Result}
+import play.api.Application
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.PrepopService
-import views.html.CheckSubcontractorRecordsView
-import play.api.inject.bind
 import uk.gov.hmrc.http.HeaderCarrier
+import views.html.CheckSubcontractorRecordsView
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,212 +37,147 @@ class CheckSubcontractorRecordsControllerSpec extends SpecBase {
   val mockPrepopService: PrepopService =
     mock[PrepopService]
 
-  val mockSchemeAuthorisationGuard: SchemeAuthorisationGuard =
-    mock[SchemeAuthorisationGuard]
+  private lazy val view = app.injector.instanceOf[CheckSubcontractorRecordsView]
 
-  private val passThroughSchemeAuthorisationGuard =
-    new ActionFilter[DataRequest] {
-      override protected def executionContext: ExecutionContext                         =
-        ExecutionContext.global
-      override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
-        Future.successful(None)
-    }
-
-  when(
-    mockSchemeAuthorisationGuard.forInstanceId(any[String])
-  ).thenReturn(passThroughSchemeAuthorisationGuard)
-
-  when(
-    mockSchemeAuthorisationGuard.validateCachedInstanceId(any[String])
-  ).thenReturn(passThroughSchemeAuthorisationGuard)
+  override def fakeApplication(): Application =
+    applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      .overrides(
+        bind[PrepopService].toInstance(mockPrepopService)
+      )
+      .build()
 
   "CheckSubcontractorRecords Controller" - {
 
     "must return OK and the correct view for a GET" in {
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[PrepopService].toInstance(mockPrepopService),
-            bind[SchemeAuthorisationGuard]
-              .toInstance(mockSchemeAuthorisationGuard)
-          )
-          .build()
-
       val instanceId = "900001"
       val targetKey  = "subcontractors"
 
-      running(application) {
+      val request =
+        FakeRequest(
+          GET,
+          routes.CheckSubcontractorRecordsController
+            .onPageLoad(instanceId, targetKey)
+            .url
+        )
 
-        when(
-          mockPrepopService
-            .getScheme(eqTo(instanceId))(any[HeaderCarrier])
-        ).thenReturn(
-          Future.successful(
-            Some(
-              Scheme(
-                schemeId = 1,
-                instanceId = instanceId,
-                utr = Some("ABC123"),
-                name = Some("John"),
-                prePopSuccessful = Some("N"),
-                subcontractorCounter = Some(1)
-              )
+      when(
+        mockPrepopService
+          .getScheme(eqTo(instanceId))(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful(
+          Some(
+            Scheme(
+              schemeId = 1,
+              instanceId = instanceId,
+              utr = Some("ABC123"),
+              name = Some("John"),
+              prePopSuccessful = Some("N"),
+              subcontractorCounter = Some(1)
             )
           )
         )
+      )
 
-        val request =
-          FakeRequest(
-            GET,
-            routes.CheckSubcontractorRecordsController
-              .onPageLoad(instanceId, targetKey)
-              .url
-          )
+      val result =
+        route(app, request).value
 
-        val result =
-          route(application, request).value
+      status(result) mustEqual OK
 
-        val view =
-          application.injector
-            .instanceOf[CheckSubcontractorRecordsView]
-
-        status(result) mustEqual OK
-
-        contentAsString(result) mustEqual
-          view(instanceId, targetKey)(
-            request,
-            messages(application)
-          ).toString
-      }
+      contentAsString(result) mustEqual
+        view(instanceId, targetKey)(
+          request,
+          messages(app)
+        ).toString
     }
 
     "must redirect to journey recovery if prepopSuccessful is 'Y'" in {
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[PrepopService].toInstance(mockPrepopService),
-            bind[SchemeAuthorisationGuard]
-              .toInstance(mockSchemeAuthorisationGuard)
-          )
-          .build()
-
       val instanceId = "900001"
       val targetKey  = "subcontractors"
 
-      running(application) {
+      val request =
+        FakeRequest(
+          GET,
+          routes.CheckSubcontractorRecordsController
+            .onPageLoad(instanceId, targetKey)
+            .url
+        )
 
-        when(
-          mockPrepopService
-            .getScheme(eqTo(instanceId))(any[HeaderCarrier])
-        ).thenReturn(
-          Future.successful(
-            Some(
-              Scheme(
-                schemeId = 1,
-                instanceId = instanceId,
-                utr = Some("ABC123"),
-                name = Some("John"),
-                prePopSuccessful = Some("Y"),
-                subcontractorCounter = Some(1)
-              )
+      when(
+        mockPrepopService
+          .getScheme(eqTo(instanceId))(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful(
+          Some(
+            Scheme(
+              schemeId = 1,
+              instanceId = instanceId,
+              utr = Some("ABC123"),
+              name = Some("John"),
+              prePopSuccessful = Some("Y"),
+              subcontractorCounter = Some(1)
             )
           )
         )
+      )
 
-        val request =
-          FakeRequest(
-            GET,
-            routes.CheckSubcontractorRecordsController
-              .onPageLoad(instanceId, targetKey)
-              .url
-          )
+      val result =
+        route(app, request).value
 
-        val result =
-          route(application, request).value
+      status(result) mustEqual SEE_OTHER
 
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual
-          "/there-is-a-problem"
-      }
+      redirectLocation(result).value mustEqual
+        "/there-is-a-problem"
     }
 
     "must redirect to system error if there is no scheme" in {
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[PrepopService].toInstance(mockPrepopService),
-            bind[SchemeAuthorisationGuard]
-              .toInstance(mockSchemeAuthorisationGuard)
-          )
-          .build()
-
       val instanceId = "900001"
       val targetKey  = "subcontractors"
 
-      running(application) {
-
-        when(
-          mockPrepopService
-            .getScheme(eqTo(instanceId))(any[HeaderCarrier])
-        ).thenReturn(
-          Future.successful(None)
+      val request =
+        FakeRequest(
+          GET,
+          routes.CheckSubcontractorRecordsController
+            .onPageLoad(instanceId, targetKey)
+            .url
         )
 
-        val request =
-          FakeRequest(
-            GET,
-            routes.CheckSubcontractorRecordsController
-              .onPageLoad(instanceId, targetKey)
-              .url
-          )
+      when(
+        mockPrepopService
+          .getScheme(eqTo(instanceId))(any[HeaderCarrier])
+      ).thenReturn(
+        Future.successful(None)
+      )
 
-        val result =
-          route(application, request).value
+      val result =
+        route(app, request).value
 
-        status(result) mustEqual SEE_OTHER
+      status(result) mustEqual SEE_OTHER
 
-        redirectLocation(result).value mustEqual
-          "/system-error/there-is-a-problem"
-      }
+      redirectLocation(result).value mustEqual
+        "/system-error/there-is-a-problem"
     }
 
     "must redirect to RetrievingSubcontractorsController on submit" in {
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[SchemeAuthorisationGuard]
-              .toInstance(mockSchemeAuthorisationGuard)
-          )
-          .build()
-
       val instanceId = "900001"
       val targetKey  = "subcontractors"
 
-      running(application) {
-
-        val request =
-          FakeRequest(
-            POST,
-            routes.CheckSubcontractorRecordsController
-              .onSubmit(instanceId, targetKey)
-              .url
-          )
-
-        val result =
-          route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual
-          routes.RetrievingSubcontractorsController
-            .onPageLoad(instanceId, targetKey)
+      val request =
+        FakeRequest(
+          POST,
+          routes.CheckSubcontractorRecordsController
+            .onSubmit(instanceId, targetKey)
             .url
-      }
+        )
+
+      val result =
+        route(app, request).value
+
+      status(result) mustEqual SEE_OTHER
+
+      redirectLocation(result).value mustEqual
+        routes.RetrievingSubcontractorsController
+          .onPageLoad(instanceId, targetKey)
+          .url
     }
   }
 }

@@ -19,12 +19,10 @@ package controllers
 import base.SpecBase
 import controllers.actions.*
 import models.Scheme
-import models.requests.DataRequest
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject.bind
-import play.api.mvc.{ActionFilter, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.PrepopService
@@ -36,17 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class SuccessfulNoRecordsFoundControllerSpec extends SpecBase {
 
   val mockPrepopService: PrepopService                       = mock[PrepopService]
-  val mockSchemeAuthorisationGuard: SchemeAuthorisationGuard = mock[SchemeAuthorisationGuard]
-
-  private val passThroughFilter =
-    new ActionFilter[DataRequest] {
-      override protected def executionContext: ExecutionContext                         = ExecutionContext.global
-      override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
-        Future.successful(None)
-    }
-
-  when(mockSchemeAuthorisationGuard.forInstanceId(any[String])).thenReturn(passThroughFilter)
-  when(mockSchemeAuthorisationGuard.validateCachedInstanceId(any[String])).thenReturn(passThroughFilter)
+  val mockSchemeAccessProvider: AuthorizedForSchemeActionProvider = mock[AuthorizedForSchemeActionProvider]
 
   "SuccessfulNoRecordsFound Controller" - {
 
@@ -55,7 +43,7 @@ class SuccessfulNoRecordsFoundControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService),
-          bind[SchemeAuthorisationGuard].toInstance(mockSchemeAuthorisationGuard)
+          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider)
         )
         .build()
 
@@ -94,7 +82,7 @@ class SuccessfulNoRecordsFoundControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService),
-          bind[SchemeAuthorisationGuard].toInstance(mockSchemeAuthorisationGuard)
+          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider)
         )
         .build()
 
@@ -132,7 +120,7 @@ class SuccessfulNoRecordsFoundControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService),
-          bind[SchemeAuthorisationGuard].toInstance(mockSchemeAuthorisationGuard)
+          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider)
         )
         .build()
 

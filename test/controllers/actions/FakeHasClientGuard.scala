@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package forms.clientdetails
+package controllers.actions
 
-import forms.Validation._
-import forms.mappings.Mappings
-import play.api.data.Form
+import models.requests.DataRequest
+import play.api.mvc.ActionFilter
 
-import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
-class ChangeClientReferenceFormProvider @Inject() extends Mappings {
+//noinspection ScalaStyle to stop complaint about null arguments. They are never used so this is OK.
+class FakeHasClientGuard(using ExecutionContext) extends HasClientGuard(null, null, null) {
+  private val passThroughFilter = new PassThroughFilter[DataRequest]
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> optionalText
-        .verifying(
-          regexp(changeClientReferencePattern.toString(), "clientdetails.changeClientReference.error.invalidCharacters")
-        )
-    )
+  override def forInstanceId(instanceId: String): ActionFilter[DataRequest] = passThroughFilter
+
+  override def currentClient: ActionFilter[DataRequest] = passThroughFilter
 }

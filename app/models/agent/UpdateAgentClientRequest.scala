@@ -14,21 +14,15 @@
  * limitations under the License.
  */
 
-package forms.clientdetails
+package models.agent
 
-import forms.Validation._
-import forms.mappings.Mappings
-import play.api.data.Form
+import play.api.libs.json.{Json, OFormat}
+case class UpdateAgentClientRequest(
+  taxOfficeNumber: String,
+  taxOfficeReference: String,
+  clientRef: String
+)
 
-import javax.inject.Inject
-
-class ChangeClientReferenceFormProvider @Inject() extends Mappings {
-
-  def apply(): Form[String] =
-    Form(
-      "value" -> optionalText
-        .verifying(
-          regexp(changeClientReferencePattern.toString(), "clientdetails.changeClientReference.error.invalidCharacters")
-        )
-    )
+object UpdateAgentClientRequest {
+  given format: OFormat[UpdateAgentClientRequest] = Json.format[UpdateAgentClientRequest]
 }

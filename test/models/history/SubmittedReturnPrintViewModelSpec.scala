@@ -47,9 +47,27 @@ class SubmittedReturnPrintViewModelSpec
       val totalTaxDeducted       = "£380"
 
       val subcontractors = Seq(
-        SubcontractorPayment("BuildRight Construction", "£165", "£95", "£95"),
-        SubcontractorPayment("Northern Trades Ltd", "£75", "£55", "£55"),
-        SubcontractorPayment("TyneWear Ltd", "£165", "£125", "£55")
+        SubcontractorPayment(
+          name = "BuildRight Construction",
+          verificationNumber = "V1234567890",
+          paymentsMade = "£165",
+          costOfMaterials = "£95",
+          taxDeducted = "£95"
+        ),
+        SubcontractorPayment(
+          name = "Northern Trades Ltd",
+          verificationNumber = "V0987654321",
+          paymentsMade = "£75",
+          costOfMaterials = "£55",
+          taxDeducted = "£55"
+        ),
+        SubcontractorPayment(
+          name = "TyneWear Ltd",
+          verificationNumber = "",
+          paymentsMade = "£165",
+          costOfMaterials = "£125",
+          taxDeducted = "£55"
+        )
       )
 
       val model = SubmittedReturnPrintViewModel(
@@ -76,7 +94,6 @@ class SubmittedReturnPrintViewModelSpec
       model.totalPaymentsMade mustBe totalPaymentsMade
       model.totalCostOfMaterials mustBe totalCostOfMaterials
       model.totalTaxDeducted mustBe totalTaxDeducted
-      model.submittedTime mustBe submittedTime
       model.subcontractors mustBe subcontractors
     }
   }

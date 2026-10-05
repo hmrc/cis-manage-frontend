@@ -42,8 +42,20 @@ class SubmissionSuccessViewSpec extends SpecBase {
     emailRecipient = Some("user@example.com"),
     instanceId = "INST001",
     items = Seq(
-      SubcontractorPayment("John Smith", "5000.00", "1000.00", "800.00"),
-      SubcontractorPayment("Jane Doe", "3000.00", "500.00", "500.00")
+      SubcontractorPayment(
+        name = "John Smith",
+        verificationNumber = "V1234567890",
+        paymentsMade = "5000.00",
+        costOfMaterials = "1000.00",
+        taxDeducted = "800.00"
+      ),
+      SubcontractorPayment(
+        name = "Jane Doe",
+        verificationNumber = "",
+        paymentsMade = "3000.00",
+        costOfMaterials = "500.00",
+        taxDeducted = "500.00"
+      )
     )
   )
 
@@ -60,7 +72,13 @@ class SubmissionSuccessViewSpec extends SpecBase {
     emailRecipient = None,
     instanceId = "INST001",
     items = Seq(
-      SubcontractorPayment("John Smith", "5000.00", "1000.00", "800.00")
+      SubcontractorPayment(
+        name = "John Smith",
+        verificationNumber = "V1234567890",
+        paymentsMade = "5000.00",
+        costOfMaterials = "1000.00",
+        taxDeducted = "800.00"
+      )
     )
   )
 

@@ -25,7 +25,9 @@ import play.api.i18n.Lang
 
 import java.time.LocalDate
 import models.response.*
+import org.scalatest.matchers.should.Matchers.should
 import viewmodels.SubcontractorRowViewModel
+
 import java.time.LocalDateTime
 
 class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with OptionValues {
@@ -510,8 +512,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
           1L,
           instanceId
         )(Lang("en"))
-
-        result.value.submittedTime mustBe "14:30"
+        result.value.submittedTime mustBe "14:30 GMT"
         result.value.submittedDate mustBe "6 April 2026"
         result.value.verificationNumber mustBe "V001"
         result.value.contractorName mustBe "Test Scheme"
@@ -564,8 +565,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
           1L,
           instanceId
         )(Lang("en"))
-
-        result.value.submissionTime mustBe "14:30"
+        result.value.submissionTime mustBe "14:30 GMT"
         result.value.submissionDate mustBe "6 April 2026"
         result.value.contractorName mustBe "Test Scheme"
         result.value.employerReference mustBe "123/AB456"

@@ -102,12 +102,12 @@ class SubcontractorsListController @Inject() (
   private val dateFormatters: Seq[DateTimeFormatter] =
     Seq(
       DateTimeFormatter.ISO_LOCAL_DATE,
-      DateTimeFormatter.ofPattern("d MMM yyyy", Locale.UK),
-      DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK),
+      DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH),
+      DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.ENGLISH),
       DateTimeFormatter.ofPattern("d MMM yyyy", Locale.forLanguageTag("cy")),
       DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("cy")),
-      DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.UK),
-      DateTimeFormatter.ofPattern("d/M/yyyy", Locale.UK)
+      DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH),
+      DateTimeFormatter.ofPattern("d/M/yyyy", Locale.ENGLISH)
     )
 
   private def parseDateAdded(value: String): LocalDate =
@@ -227,10 +227,10 @@ class SubcontractorsListController @Inject() (
       rows
     } else {
       val lowerCaseSearchTerm =
-        trimmedSearchTerm.toLowerCase(Locale.UK)
+        trimmedSearchTerm.toLowerCase(Locale.ENGLISH)
 
       rows.filter { row =>
-        row.name.toLowerCase(Locale.UK).contains(lowerCaseSearchTerm) ||
+        row.name.toLowerCase(Locale.ENGLISH).contains(lowerCaseSearchTerm) ||
         row.utr.contains(trimmedSearchTerm) ||
         row.verificationNumber.contains(trimmedSearchTerm)
       }
@@ -297,7 +297,7 @@ class SubcontractorsListController @Inject() (
           rows.filterNot(row => isNoNameProvided(row.name))
 
         val sortedNamedRows =
-          namedRows.sortBy(row => row.name.trim.toLowerCase(Locale.UK))
+          namedRows.sortBy(row => row.name.trim.toLowerCase(Locale.ENGLISH))
 
         val orderedNamedRows =
           if (sortOrder == SortOrderDesc) {

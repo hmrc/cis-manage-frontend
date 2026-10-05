@@ -19,6 +19,7 @@ package controllers.subcontractors
 import base.SpecBase
 import controllers.actions.*
 import models.requests.DataRequest
+import forms.subcontractors.SubcontractorsListFormProvider
 import models.response.{GetSubcontractor, GetSubcontractorListResponse}
 import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
@@ -28,30 +29,21 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
 import pages.CisIdPage
 import pages.subcontractors.SubcontractorListPage
+import play.api.data.Form
 import play.api.inject.bind
-import play.api.mvc.{ActionFilter, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.twirl.api.Html
+import viewmodels.govuk.PaginationFluency.PaginationViewModel
+import viewmodels.subcontractors.{SubcontractorsListRow, TaxTreatment}
 import views.html.subcontractors.SubcontractorsListView
 
 import java.time.LocalDateTime
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
 
   implicit val ec: ExecutionContext = ExecutionContext.global
-
-  private val schemeAuthorisationGuard = mock[SchemeAuthorisationGuard]
-
-  private val passThroughFilter =
-    new ActionFilter[DataRequest] {
-      override protected def executionContext: ExecutionContext                         = ec
-      override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
-        Future.successful(None)
-    }
-
-  when(schemeAuthorisationGuard.forInstanceId(any[String])).thenReturn(passThroughFilter)
 
   private def stubView(mockView: SubcontractorsListView): Unit =
     when(
@@ -174,20 +166,14 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
   "SubcontractorsListController" - {
 
     "must return OK and display the subcontractors list view with default filters" in {
-      val mockView =
-        mock[SubcontractorsListView]
+      val mockView = mock[SubcontractorsListView]
 
       stubView(mockView)
 
-      val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubcontractors),
-          additionalBindings = Seq(
-            bind[SchemeAuthorisationGuard].toInstance(schemeAuthorisationGuard)
-          )
-        ).overrides(
-          bind[SubcontractorsListView].toInstance(mockView)
-        ).build()
+      val application = applicationBuilder(
+        userAnswers = Some(userAnswersWithSubcontractors),
+        additionalBindings = Seq(bind[SubcontractorsListView] toInstance mockView)
+      ).build()
 
       running(application) {
         val request =
@@ -221,20 +207,15 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return OK and display the subcontractors list view with search and filters applied" in {
-      val mockView =
-        mock[SubcontractorsListView]
+      val mockView = mock[SubcontractorsListView]
 
       stubView(mockView)
 
-      val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubcontractors),
-          additionalBindings = Seq(
-            bind[SchemeAuthorisationGuard].toInstance(schemeAuthorisationGuard)
-          )
-        ).overrides(
-          bind[SubcontractorsListView].toInstance(mockView)
-        ).build()
+      val application = applicationBuilder(
+        userAnswers = Some(userAnswersWithSubcontractors),
+        additionalBindings = Seq(bind[SubcontractorsListView] toInstance mockView)
+      ).build()
+
       running(application) {
         val url =
           routes.SubcontractorsListController
@@ -272,13 +253,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the selected page with filters preserved when pagination is submitted" in {
-      val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubcontractors),
-          additionalBindings = Seq(
-            bind[SchemeAuthorisationGuard].toInstance(schemeAuthorisationGuard)
-          )
-        ).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithSubcontractors)).build()
 
       running(application) {
         val request =
@@ -314,13 +289,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to page 1 when gotoPage is not submitted" in {
-      val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithSubcontractors),
-          additionalBindings = Seq(
-            bind[SchemeAuthorisationGuard].toInstance(schemeAuthorisationGuard)
-          )
-        ).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithSubcontractors)).build()
 
       running(application) {
         val request =
@@ -355,10 +324,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a GET when subcontractor list data is missing" in {
-      val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithMatchingCisId)
-        ).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =
@@ -413,10 +379,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswers)
-        ).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request =
@@ -454,10 +417,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswers)
-        ).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request =
@@ -476,6 +436,293 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
 
         exception.getMessage mustEqual
           "Missing subbieResourceRef for subcontractorId 1"
+      }
+    }
+
+    "date added" - {
+      val dateUnsortedSubcontractors = Seq(
+        GetSubcontractor(
+          subcontractorId = 1L,
+          utr = Some("1234567890"),
+          pageVisited = None,
+          partnerUtr = None,
+          crn = None,
+          firstName = Some("Alan"),
+          nino = None,
+          secondName = None,
+          surname = Some("Smith"),
+          partnershipTradingName = None,
+          tradingName = None,
+          subcontractorType = Some("soleTrader"),
+          addressLine1 = None,
+          addressLine2 = None,
+          addressLine3 = None,
+          addressLine4 = None,
+          country = None,
+          postcode = None,
+          emailAddress = None,
+          phoneNumber = None,
+          mobilePhoneNumber = None,
+          worksReferenceNumber = None,
+          createDate = Some(LocalDateTime.of(2026, 4, 6, 10, 0)),
+          lastUpdate = None,
+          subbieResourceRef = Some(10L),
+          matched = None,
+          autoVerified = None,
+          verified = Some("N"),
+          verificationNumber = None,
+          taxTreatment = Some("Unknown"),
+          verificationDate = None,
+          version = None,
+          updatedTaxTreatment = None,
+          lastMonthlyReturnDate = None,
+          pendingVerifications = None
+        ),
+        GetSubcontractor(
+          subcontractorId = 2L,
+          utr = Some("2224567890"),
+          pageVisited = None,
+          partnerUtr = None,
+          crn = None,
+          firstName = Some("Peter"),
+          nino = None,
+          secondName = None,
+          surname = Some("John"),
+          partnershipTradingName = None,
+          tradingName = None,
+          subcontractorType = Some("soleTrader"),
+          addressLine1 = None,
+          addressLine2 = None,
+          addressLine3 = None,
+          addressLine4 = None,
+          country = None,
+          postcode = None,
+          emailAddress = None,
+          phoneNumber = None,
+          mobilePhoneNumber = None,
+          worksReferenceNumber = None,
+          createDate = Some(LocalDateTime.of(2026, 9, 6, 10, 0)),
+          lastUpdate = None,
+          subbieResourceRef = Some(20L),
+          matched = None,
+          autoVerified = None,
+          verified = Some("N"),
+          verificationNumber = None,
+          taxTreatment = Some("Unknown"),
+          verificationDate = None,
+          version = None,
+          updatedTaxTreatment = None,
+          lastMonthlyReturnDate = None,
+          pendingVerifications = None
+        ),
+        GetSubcontractor(
+          subcontractorId = 3L,
+          utr = Some("9876543210"),
+          pageVisited = None,
+          partnerUtr = None,
+          crn = None,
+          firstName = Some("Brian"),
+          nino = None,
+          secondName = None,
+          surname = Some("Jones"),
+          partnershipTradingName = None,
+          tradingName = None,
+          subcontractorType = Some("soleTrader"),
+          addressLine1 = None,
+          addressLine2 = None,
+          addressLine3 = None,
+          addressLine4 = None,
+          country = None,
+          postcode = None,
+          emailAddress = None,
+          phoneNumber = None,
+          mobilePhoneNumber = None,
+          worksReferenceNumber = None,
+          createDate = Some(LocalDateTime.of(2026, 5, 6, 10, 0)),
+          lastUpdate = None,
+          subbieResourceRef = Some(30L),
+          matched = None,
+          autoVerified = None,
+          verified = Some("N"),
+          verificationNumber = None,
+          taxTreatment = Some("Unknown"),
+          verificationDate = None,
+          version = None,
+          updatedTaxTreatment = None,
+          lastMonthlyReturnDate = None,
+          pendingVerifications = None
+        )
+      )
+
+      val listResponse = GetSubcontractorListResponse(
+        subcontractors = dateUnsortedSubcontractors
+      )
+
+      def userAnswersWithDateUnsortedSubcontractors: UserAnswers =
+        emptyUserAnswers
+          .set(CisIdPage, cisId)
+          .success
+          .value
+          .set(SubcontractorListPage, listResponse)
+          .success
+          .value
+
+      "must sort the subcontractorsList correctly in ascending order when some dateAdded has September" in {
+
+        val formProvider       = new SubcontractorsListFormProvider()
+        val form: Form[String] = formProvider().fill("")
+
+        val rows: Seq[SubcontractorsListRow] = Seq(
+          SubcontractorsListRow(
+            id = "1L",
+            name = "Smith, Alan",
+            utr = "1234567890",
+            verified = false,
+            verificationNumber = "",
+            taxTreatment = TaxTreatment.Unknown,
+            dateAdded = "6 Apr 2026",
+            subbieResourceRef = 10L,
+            amendUrl = "http://localhost:6998/construction-industry-scheme/subcontractor/amend/start/10/standard"
+          ),
+          SubcontractorsListRow(
+            id = "3L",
+            name = "Jones, Brian",
+            utr = "9876543210",
+            verified = false,
+            verificationNumber = "",
+            taxTreatment = TaxTreatment.Unknown,
+            dateAdded = "6 May 2026",
+            subbieResourceRef = 30L,
+            amendUrl = "http://localhost:6998/construction-industry-scheme/subcontractor/amend/start/30/standard"
+          ),
+          SubcontractorsListRow(
+            id = "2L",
+            name = "John, Peter",
+            utr = "2224567890",
+            verified = false,
+            verificationNumber = "",
+            taxTreatment = TaxTreatment.Unknown,
+            dateAdded = "6 Sep 2026",
+            subbieResourceRef = 20L,
+            amendUrl = "http://localhost:6998/construction-industry-scheme/subcontractor/amend/start/20/standard"
+          )
+        )
+
+        val application = applicationBuilder(userAnswers = Some(userAnswersWithDateUnsortedSubcontractors))
+          .build()
+
+        running(application) {
+          val url =
+            routes.SubcontractorsListController
+              .onPageLoad(instanceId, mode)
+              .url
+
+          val request = FakeRequest(GET, s"$url?sortBy=dateAdded&sortOrder=ascending")
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[SubcontractorsListView]
+
+          val paginationViewModel = PaginationViewModel(items = Seq.empty)
+
+          status(result) mustBe OK
+          contentAsString(result) mustEqual
+            view(
+              form,
+              NormalMode,
+              rows,
+              paginationViewModel,
+              1,
+              1,
+              0,
+              3,
+              instanceId,
+              "",
+              "all",
+              "all",
+              "dateAdded",
+              "ascending"
+            )(request, messages(application)).toString
+        }
+      }
+
+      "must must sort the subcontractorsList correctly in descending order when dateAdded has September" in {
+
+        val formProvider       = new SubcontractorsListFormProvider()
+        val form: Form[String] = formProvider().fill("")
+
+        val rows: Seq[SubcontractorsListRow] = Seq(
+          SubcontractorsListRow(
+            id = "2L",
+            name = "John, Peter",
+            utr = "2224567890",
+            verified = false,
+            verificationNumber = "",
+            taxTreatment = TaxTreatment.Unknown,
+            dateAdded = "6 Sep 2026",
+            subbieResourceRef = 20L,
+            amendUrl = "http://localhost:6998/construction-industry-scheme/subcontractor/amend/start/20/standard"
+          ),
+          SubcontractorsListRow(
+            id = "3L",
+            name = "Jones, Brian",
+            utr = "9876543210",
+            verified = false,
+            verificationNumber = "",
+            taxTreatment = TaxTreatment.Unknown,
+            dateAdded = "6 May 2026",
+            subbieResourceRef = 30L,
+            amendUrl = "http://localhost:6998/construction-industry-scheme/subcontractor/amend/start/30/standard"
+          ),
+          SubcontractorsListRow(
+            id = "1L",
+            name = "Smith, Alan",
+            utr = "1234567890",
+            verified = false,
+            verificationNumber = "",
+            taxTreatment = TaxTreatment.Unknown,
+            dateAdded = "6 Apr 2026",
+            subbieResourceRef = 10L,
+            amendUrl = "http://localhost:6998/construction-industry-scheme/subcontractor/amend/start/10/standard"
+          )
+        )
+
+        val application = applicationBuilder(userAnswers = Some(userAnswersWithDateUnsortedSubcontractors))
+          .build()
+
+        running(application) {
+          val url =
+            routes.SubcontractorsListController
+              .onPageLoad(instanceId, mode)
+              .url
+
+          val request = FakeRequest(GET, s"$url?sortBy=dateAdded&sortOrder=descending")
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[SubcontractorsListView]
+
+          val paginationViewModel = PaginationViewModel(items = Seq.empty)
+
+          status(result) mustBe OK
+          contentAsString(result) mustEqual
+            view(
+              form,
+              NormalMode,
+              rows,
+              paginationViewModel,
+              1,
+              1,
+              0,
+              3,
+              instanceId,
+              "",
+              "all",
+              "all",
+              "dateAdded",
+              "descending"
+            )(request, messages(application)).toString
+        }
       }
     }
   }

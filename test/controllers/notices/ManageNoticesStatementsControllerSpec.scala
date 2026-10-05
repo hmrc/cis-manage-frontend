@@ -19,34 +19,18 @@ package controllers.notices
 import base.SpecBase
 import controllers.actions.*
 import models.UserAnswers
-import models.requests.DataRequest
-import org.mockito.Mockito.when
-import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{CisIdPage, ContractorNamePage}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import play.api.mvc.{ActionFilter, Result}
-import play.api.inject.bind
-
-import scala.concurrent.{ExecutionContext, Future}
 import viewmodels.notices.{ManageNoticesStatementsPageViewModel, ManageNoticesStatementsRowViewModel}
 import views.html.notices.ManageNoticesStatementsView
+
+import scala.concurrent.ExecutionContext
 
 class ManageNoticesStatementsControllerSpec extends SpecBase with MockitoSugar {
 
   implicit val ec: ExecutionContext = ExecutionContext.global
-
-  private val schemeAuthorisationGuard = mock[SchemeAuthorisationGuard]
-
-  private val passThroughFilter =
-    new ActionFilter[DataRequest] {
-      override protected def executionContext: ExecutionContext                         = ec
-      override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
-        Future.successful(None)
-    }
-
-  when(schemeAuthorisationGuard.forInstanceId(any[String])).thenReturn(passThroughFilter)
 
   "ManageNoticesStatements Controller" - {
 
@@ -59,10 +43,7 @@ class ManageNoticesStatementsControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val application = applicationBuilder(
-        userAnswers = Some(userAnswers),
-        additionalBindings = Seq(bind[SchemeAuthorisationGuard].toInstance(schemeAuthorisationGuard))
-      ).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.ManageNoticesStatementsController.onPageLoad(instanceId).url)
@@ -117,10 +98,7 @@ class ManageNoticesStatementsControllerSpec extends SpecBase with MockitoSugar {
           .success
           .value
 
-      val application = applicationBuilder(
-        userAnswers = Some(userAnswers),
-        additionalBindings = Seq(bind[SchemeAuthorisationGuard].toInstance(schemeAuthorisationGuard))
-      ).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.ManageNoticesStatementsController.onPageLoad(instanceId).url)

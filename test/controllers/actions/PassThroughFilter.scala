@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package forms.clientdetails
+package controllers.actions
 
-import forms.Validation._
-import forms.mappings.Mappings
-import play.api.data.Form
+import play.api.mvc.{ActionFilter, Result}
 
-import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
-class ChangeClientReferenceFormProvider @Inject() extends Mappings {
-
-  def apply(): Form[String] =
-    Form(
-      "value" -> optionalText
-        .verifying(
-          regexp(changeClientReferencePattern.toString(), "clientdetails.changeClientReference.error.invalidCharacters")
-        )
-    )
+final class PassThroughFilter[R[_]](using val executionContext: ExecutionContext) extends ActionFilter[R] {
+  def filter[A](request: R[A]): Future[Option[Result]] = Future.successful(None)
 }

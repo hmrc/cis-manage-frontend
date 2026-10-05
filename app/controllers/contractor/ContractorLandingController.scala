@@ -131,7 +131,7 @@ class ContractorLandingController @Inject() (
     employerRef: EmployerReference,
     systemErrorRedirect: Result
   )(implicit hc: HeaderCarrier): Future[Result] = {
-    val manageContractorDetails = Call(GET, appConfig.contractorDetailsManagementUrl)
+    val manageContractorDetails = contractorDetailsManagementCall(targetKey)
 
     val checkSubcontractorRecordsCall =
       controllers.routes.CheckSubcontractorRecordsController.onPageLoad(
@@ -179,6 +179,17 @@ class ContractorLandingController @Inject() (
       case Notices                 => controllers.notices.routes.ManageNoticesStatementsController.onPageLoad(instanceId)
       case Subcontractor           => controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId)
       case ManageContractorDetails => Call(GET, appConfig.contractorDetailsManagementUrl)
+    }
+
+  private def contractorDetailsManagementCall(targetKey: String): Call =
+    targetKey match {
+      case "manageYourCisReturn" | "subcontractors" =>
+        Call(
+          GET,
+          s"${appConfig.contractorDetailsManagementUrl}?target=$targetKey"
+        )
+      case _                                        =>
+        Call(GET, appConfig.contractorDetailsManagementUrl)
     }
 }
 

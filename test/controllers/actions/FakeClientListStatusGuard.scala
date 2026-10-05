@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package forms.clientdetails
+package controllers.actions
 
-import forms.Validation._
-import forms.mappings.Mappings
-import play.api.data.Form
+import models.requests.IdentifierRequest
+import play.api.mvc.{ActionFilter, Call, Result}
 
-import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
-class ChangeClientReferenceFormProvider @Inject() extends Mappings {
+class FakeClientListStatusGuard(using ExecutionContext) extends ClientListStatusGuard(null) {
+  private val passThroughFilter = new PassThroughFilter[IdentifierRequest]
 
-  def apply(): Form[String] =
-    Form(
-      "value" -> optionalText
-        .verifying(
-          regexp(changeClientReferencePattern.toString(), "clientdetails.changeClientReference.error.invalidCharacters")
-        )
-    )
+  override def checkGroupA[A](request: IdentifierRequest[A]): Future[Option[Result]] = passThroughFilter.filter(request)
+
+  override def groupB(securityCheckCall: Call): ActionFilter[IdentifierRequest] = passThroughFilter
 }

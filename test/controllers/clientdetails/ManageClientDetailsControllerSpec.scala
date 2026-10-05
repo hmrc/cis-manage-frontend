@@ -26,7 +26,7 @@ import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{AgentClientsPage, CisIdPage}
 import play.api.inject.bind
-import play.api.mvc.{ActionFilter, Call, Result}
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -39,29 +39,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   implicit val ec: ExecutionContext = ExecutionContext.global
-
-  private val clientListStatusGuard    = mock[ClientListStatusGuard]
-  private val schemeAuthorisationGuard = mock[SchemeAuthorisationGuard]
-
-  private val passThroughIdentifierFilter =
-    new ActionFilter[IdentifierRequest] {
-      override protected def executionContext: ExecutionContext = ec
-
-      override protected def filter[A](
-        request: IdentifierRequest[A]
-      ): Future[Option[Result]] =
-        Future.successful(None)
-    }
-
-  private val passThroughDataFilter =
-    new ActionFilter[DataRequest] {
-      override protected def executionContext: ExecutionContext = ec
-
-      override protected def filter[A](
-        request: DataRequest[A]
-      ): Future[Option[Result]] =
-        Future.successful(None)
-    }
 
   val employerRef = "123456"
 
@@ -105,13 +82,6 @@ class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
   "ManageClientDetails Controller" - {
 
     "must return OK and the correct view for a GET" in {
-
-      when(clientListStatusGuard.groupB(any()))
-        .thenReturn(passThroughIdentifierFilter)
-
-      when(schemeAuthorisationGuard.currentClient)
-        .thenReturn(passThroughDataFilter)
-
       val mockSessionRepository = mock[SessionRepository]
       val mockManageService     = mock[ManageService]
 
@@ -136,8 +106,6 @@ class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
           isAgent = true
         )
           .overrides(
-            bind[ClientListStatusGuard].toInstance(clientListStatusGuard),
-            bind[SchemeAuthorisationGuard].toInstance(schemeAuthorisationGuard),
             bind[ManageService].toInstance(mockManageService),
             bind[SessionRepository].toInstance(mockSessionRepository),
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute))

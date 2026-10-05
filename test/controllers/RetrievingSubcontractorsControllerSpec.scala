@@ -19,326 +19,255 @@ package controllers
 import base.SpecBase
 import controllers.actions.*
 import models.Scheme
-import models.requests.DataRequest
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
+import play.api.Application
 import play.api.inject.bind
-import play.api.mvc.{ActionFilter, Result}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.PrepopService
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.RetrievingSubcontractorsView
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
-  val mockPrepopService: PrepopService                       = mock[PrepopService]
-  val mockSchemeAuthorisationGuard: SchemeAuthorisationGuard = mock[SchemeAuthorisationGuard]
-
-  val passThroughSchemeAuthorisationGuard: ActionFilter[DataRequest] = new ActionFilter[DataRequest] {
-    override protected def executionContext: ExecutionContext                         = ExecutionContext.global
-    override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
-      Future.successful(None)
-  }
-
-  when(mockSchemeAuthorisationGuard.forInstanceId(any[String])).thenReturn(passThroughSchemeAuthorisationGuard)
-
-  private def applicationBuilderWithSchemeAuthorisationGuard =
-    applicationBuilder(
-      userAnswers = Some(emptyUserAnswers),
-      additionalBindings = Seq(
-        bind[SchemeAuthorisationGuard].toInstance(mockSchemeAuthorisationGuard)
-      )
-    )
+  val mockPrepopService: PrepopService = mock[PrepopService]
 
   val taxOfficeNumber: String    = "101"
   val taxOfficeReference: String = "AB0001"
   val instanceId: String         = "900001"
   val targetKey: String          = "subcontractors"
 
+  override def fakeApplication(): Application =
+    applicationBuilder(
+      userAnswers = Some(emptyUserAnswers),
+      additionalBindings = Seq(bind[PrepopService] toInstance mockPrepopService)
+    ).build()
+
   "RetrievingSubcontractors Controller" - {
 
     "must return OK and the correct view for a GET" in {
-
-      val application = applicationBuilderWithSchemeAuthorisationGuard.build()
-
-      running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.RetrievingSubcontractorsController
+      val request = FakeRequest(
+        GET,
+        routes.RetrievingSubcontractorsController
             .onPageLoad(instanceId, targetKey)
-            .url
-        )
+          .url
+      )
 
-        val result = route(application, request).value
+      val result = route(app, request).value
 
-        val view = application.injector.instanceOf[RetrievingSubcontractorsView]
+      val view = app.injector.instanceOf[RetrievingSubcontractorsView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(
-          request,
-          messages(application)
-        ).toString
-      }
+      status(result) mustEqual OK
+      contentAsString(result) mustEqual view()(
+        request,
+        messages(app)
+      ).toString
     }
 
     "start must redirect to SuccessfulAutomaticSubcontractorUpdateController when scheme has prePopSuccessful 'Y' and subcontractors" in {
-
-      val application = applicationBuilderWithSchemeAuthorisationGuard
-        .overrides(
-          bind[PrepopService].toInstance(mockPrepopService)
-        )
-        .build()
-
-      running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.RetrievingSubcontractorsController
+      val request = FakeRequest(
+        GET,
+        routes.RetrievingSubcontractorsController
             .start(instanceId, targetKey)
-            .url
-        )
+          .url
+      )
 
-        when(
+      when(
           mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
-            any[HeaderCarrier]
-          )
+          any[HeaderCarrier]
         )
-          .thenReturn(Future.successful(true))
+      )
+        .thenReturn(Future.successful(true))
 
-        when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
-          Future.successful(
-            Some(
-              Scheme(
-                schemeId = 1,
-                instanceId = instanceId,
-                utr = Some("ABC123"),
-                name = Some("John"),
-                prePopSuccessful = Some("Y"),
-                subcontractorCounter = Some(5)
-              )
+      when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
+        Future.successful(
+          Some(
+            Scheme(
+              schemeId = 1,
+              instanceId = instanceId,
+              utr = Some("ABC123"),
+              name = Some("John"),
+              prePopSuccessful = Some("Y"),
+              subcontractorCounter = Some(5)
             )
           )
         )
+      )
 
-        val result = route(application, request).value
+      val result = route(app, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.SuccessfulAutomaticSubcontractorUpdateController
-          .onPageLoad(instanceId, targetKey)
-          .url
-      }
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.SuccessfulAutomaticSubcontractorUpdateController
+        .onPageLoad(instanceId, targetKey)
+        .url
     }
 
     "start must redirect to SuccessfulNoRecordsFoundController when scheme has prePopSuccessful 'Y' and no subcontractors" in {
-
-      val application = applicationBuilderWithSchemeAuthorisationGuard
-        .overrides(
-          bind[PrepopService].toInstance(mockPrepopService)
-        )
-        .build()
-
-      running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.RetrievingSubcontractorsController
+      val request = FakeRequest(
+        GET,
+        routes.RetrievingSubcontractorsController
             .start(instanceId, targetKey)
-            .url
-        )
+          .url
+      )
 
-        when(
+      when(
           mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
-            any[HeaderCarrier]
-          )
+          any[HeaderCarrier]
         )
-          .thenReturn(Future.successful(true))
+      )
+        .thenReturn(Future.successful(true))
 
-        when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
-          Future.successful(
-            Some(
-              Scheme(
-                schemeId = 1,
-                instanceId = instanceId,
-                utr = Some("ABC123"),
-                name = Some("John"),
-                prePopSuccessful = Some("Y"),
-                subcontractorCounter = Some(0)
-              )
+      when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
+        Future.successful(
+          Some(
+            Scheme(
+              schemeId = 1,
+              instanceId = instanceId,
+              utr = Some("ABC123"),
+              name = Some("John"),
+              prePopSuccessful = Some("Y"),
+              subcontractorCounter = Some(0)
             )
           )
         )
+      )
 
-        val result = route(application, request).value
+      val result = route(app, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.SuccessfulNoRecordsFoundController
-          .onPageLoad(instanceId, targetKey)
-          .url
-      }
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.SuccessfulNoRecordsFoundController
+        .onPageLoad(instanceId, targetKey)
+        .url
     }
 
     "start must redirect to UnsuccessfulAutomaticSubcontractorUpdateController when scheme has prePopSuccessful 'N'" in {
-
-      val application = applicationBuilderWithSchemeAuthorisationGuard
-        .overrides(
-          bind[PrepopService].toInstance(mockPrepopService)
-        )
-        .build()
-
-      running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.RetrievingSubcontractorsController
+      val request = FakeRequest(
+        GET,
+        routes.RetrievingSubcontractorsController
             .start(instanceId, targetKey)
-            .url
-        )
+          .url
+      )
 
-        when(
+      when(
           mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
-            any[HeaderCarrier]
-          )
+          any[HeaderCarrier]
         )
-          .thenReturn(Future.successful(true))
+      )
+        .thenReturn(Future.successful(true))
 
-        when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
-          Future.successful(
-            Some(
-              Scheme(
-                schemeId = 1,
-                instanceId = instanceId,
-                utr = Some("ABC123"),
-                name = Some("John"),
-                prePopSuccessful = Some("N"),
-                subcontractorCounter = Some(1)
-              )
+      when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
+        Future.successful(
+          Some(
+            Scheme(
+              schemeId = 1,
+              instanceId = instanceId,
+              utr = Some("ABC123"),
+              name = Some("John"),
+              prePopSuccessful = Some("N"),
+              subcontractorCounter = Some(1)
             )
           )
         )
+      )
 
-        val result = route(application, request).value
+      val result = route(app, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.UnsuccessfulAutomaticSubcontractorUpdateController
-          .onPageLoad(instanceId)
-          .url
-      }
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.UnsuccessfulAutomaticSubcontractorUpdateController
+        .onPageLoad(instanceId)
+        .url
     }
 
     "start must redirect to UnsuccessfulAutomaticSubcontractorUpdateController when scheme has no prePopSuccessful value" in {
-
-      val application = applicationBuilderWithSchemeAuthorisationGuard
-        .overrides(
-          bind[PrepopService].toInstance(mockPrepopService)
-        )
-        .build()
-
-      running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.RetrievingSubcontractorsController
+      val request = FakeRequest(
+        GET,
+        routes.RetrievingSubcontractorsController
             .start(instanceId, targetKey)
-            .url
-        )
+          .url
+      )
 
-        when(
+      when(
           mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
-            any[HeaderCarrier]
-          )
+          any[HeaderCarrier]
         )
-          .thenReturn(Future.successful(true))
+      )
+        .thenReturn(Future.successful(true))
 
-        when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
-          Future.successful(
-            Some(
-              Scheme(
-                schemeId = 1,
-                instanceId = instanceId,
-                utr = Some("ABC123"),
-                name = Some("John"),
-                prePopSuccessful = None,
-                subcontractorCounter = Some(1)
-              )
+      when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
+        Future.successful(
+          Some(
+            Scheme(
+              schemeId = 1,
+              instanceId = instanceId,
+              utr = Some("ABC123"),
+              name = Some("John"),
+              prePopSuccessful = None,
+              subcontractorCounter = Some(1)
             )
           )
         )
+      )
 
-        val result = route(application, request).value
+      val result = route(app, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.UnsuccessfulAutomaticSubcontractorUpdateController
-          .onPageLoad(instanceId)
-          .url
-      }
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.UnsuccessfulAutomaticSubcontractorUpdateController
+        .onPageLoad(instanceId)
+        .url
     }
 
     "start must redirect to UnsuccessfulAutomaticSubcontractorUpdateController when there is no scheme" in {
-
-      val application = applicationBuilderWithSchemeAuthorisationGuard
-        .overrides(
-          bind[PrepopService].toInstance(mockPrepopService)
-        )
-        .build()
-
-      running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.RetrievingSubcontractorsController
+      val request = FakeRequest(
+        GET,
+        routes.RetrievingSubcontractorsController
             .start(instanceId, targetKey)
-            .url
-        )
-
-        when(
-          mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
-            any[HeaderCarrier]
-          )
-        )
-          .thenReturn(Future.successful(true))
-
-        when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
-          Future.successful(None)
-        )
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.UnsuccessfulAutomaticSubcontractorUpdateController
-          .onPageLoad(instanceId)
           .url
-      }
+      )
+
+      when(
+          mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
+          any[HeaderCarrier]
+        )
+      )
+        .thenReturn(Future.successful(true))
+
+      when(mockPrepopService.getScheme(eqTo(instanceId))(any[HeaderCarrier])).thenReturn(
+        Future.successful(None)
+      )
+
+      val result = route(app, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.UnsuccessfulAutomaticSubcontractorUpdateController
+        .onPageLoad(instanceId)
+        .url
     }
 
     "start must redirect to UnsuccessfulAutomaticSubcontractorUpdateController when prepopulate fails" in {
-
-      val application = applicationBuilderWithSchemeAuthorisationGuard
-        .overrides(
-          bind[PrepopService].toInstance(mockPrepopService)
-        )
-        .build()
-
-      running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.RetrievingSubcontractorsController
+      val request = FakeRequest(
+        GET,
+        routes.RetrievingSubcontractorsController
             .start(instanceId, targetKey)
-            .url
-        )
-
-        when(
-          mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
-            any[HeaderCarrier]
-          )
-        )
-          .thenReturn(Future.successful(false))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.UnsuccessfulAutomaticSubcontractorUpdateController
-          .onPageLoad(instanceId)
           .url
-      }
+      )
+
+      when(
+          mockPrepopService.prepopulate(any[String], any[String], eqTo(instanceId))(
+          any[HeaderCarrier]
+        )
+      )
+        .thenReturn(Future.successful(false))
+
+      val result = route(app, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.UnsuccessfulAutomaticSubcontractorUpdateController
+        .onPageLoad(instanceId)
+        .url
     }
   }
 }

@@ -35,10 +35,12 @@
     @h1(messages("history.printSubmissionDetails.heading", data.monthYear))
 
     @h2(messages("history.printSubmissionDetails.submissionDetails.heading"))
-    @paragraph(
-        message = "history.printSubmissionDetails.submissionDetails.p",
-        args    = Seq(data.submittedTime, data.submittedDate)
-    )
+    @if(data.submittedTime.nonEmpty && data.submittedDate.nonEmpty) {
+        @paragraph(
+            message = "history.printSubmissionDetails.submissionDetails.p",
+            args    = Seq(data.submittedTime, data.submittedDate)
+        )
+    }
 
     @govukSummaryList(
         SummaryListViewModel({
@@ -96,6 +98,7 @@
                 head = Some(
                     Seq(
                         messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.subcontractor"),
+                        messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.verificationNumber"),
                         messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.paymentsMade"),
                         messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.costOfMaterials"),
                         messages("history.printSubmissionDetails.paymentsMadeToSubcontractors.taxDeducted")
@@ -106,6 +109,7 @@
                 rows =  data.subcontractors.map { subcontractor =>
                     Seq(
                         TableRow(Text(subcontractor.name)),
+                        TableRow(Text(subcontractor.verificationNumber)),
                         TableRow(Text(subcontractor.paymentsMade)),
                         TableRow(Text(subcontractor.costOfMaterials)),
                         TableRow(Text(subcontractor.taxDeducted))

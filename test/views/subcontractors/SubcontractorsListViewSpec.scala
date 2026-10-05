@@ -57,6 +57,7 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       val doc: Document = Jsoup.parse(html.body)
 
       doc.title must include(messages("subcontractors.subcontractorsList.title"))
+      doc.title must include(messages("site.pagination.pageTitle", 1, 2))
 
       doc.select("h1").text mustBe messages("subcontractors.subcontractorsList.heading")
 
@@ -235,6 +236,59 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       val doc = Jsoup.parse(html.body)
 
       doc.select(".govuk-pagination").size() mustBe 1
+    }
+
+    "must include the current page number in the title when there are multiple pages" in new Setup {
+
+      val html =
+        view(
+          form,
+          mode,
+          rows,
+          pagination,
+          page = 4,
+          totalPages = 7,
+          startIndex = 31,
+          totalCount = 70,
+          instanceId = instanceId,
+          searchTerm = "",
+          verificationStatus = "all",
+          taxTreatment = "all",
+          sortBy = "name",
+          sortOrder = "ascending"
+        )
+
+      val doc = Jsoup.parse(html.body)
+
+      doc.title mustBe
+        s"${messages("subcontractors.subcontractorsList.title")} ${messages("site.pagination.pageTitle", 4, 7)} - ${messages("service.name")} - ${messages("site.govuk")}"
+    }
+
+    "must not include a page number in the title when there is only one page" in new Setup {
+
+      val html =
+        view(
+          form,
+          mode,
+          rows,
+          PaginationViewModel(),
+          page = 1,
+          totalPages = 1,
+          startIndex = 1,
+          totalCount = rows.size,
+          instanceId = instanceId,
+          searchTerm = "",
+          verificationStatus = "all",
+          taxTreatment = "all",
+          sortBy = "name",
+          sortOrder = "ascending"
+        )
+
+      val doc = Jsoup.parse(html.body)
+
+      doc.title mustBe
+        s"${messages("subcontractors.subcontractorsList.title")} - ${messages("service.name")} - ${messages("site.govuk")}"
+      doc.title must not include messages("site.pagination.pageTitle", 1, 1)
     }
 
     "must render error summary when form has errors" in new Setup {
