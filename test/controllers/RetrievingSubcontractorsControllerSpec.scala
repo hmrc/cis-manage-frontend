@@ -34,11 +34,8 @@ import scala.concurrent.Future
 class RetrievingSubcontractorsControllerSpec extends SpecBase {
 
   val mockPrepopService: PrepopService = mock[PrepopService]
-
-  val taxOfficeNumber: String    = "101"
-  val taxOfficeReference: String = "AB0001"
-  val instanceId: String         = "900001"
-  val targetKey: String          = "subcontractors"
+  val instanceId: String               = "900001"
+  val targetKey: String                = "subcontractors"
 
   override def fakeApplication(): Application =
     applicationBuilder(
@@ -267,6 +264,28 @@ class RetrievingSubcontractorsControllerSpec extends SpecBase {
       redirectLocation(result).value mustEqual routes.UnsuccessfulAutomaticSubcontractorUpdateController
         .onPageLoad(instanceId)
         .url
+    }
+
+    "start must redirect to SystemErrorController when agent has no matching client" in {
+      val agentApp = applicationBuilder(
+        userAnswers = Some(emptyUserAnswers),
+        additionalBindings = Seq(bind[PrepopService] toInstance mockPrepopService),
+        isAgent = true
+      ).build()
+
+      running(agentApp) {
+        val request = FakeRequest(
+          GET,
+          routes.RetrievingSubcontractorsController
+            .start(instanceId, targetKey)
+            .url
+        )
+
+        val result = route(agentApp, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.SystemErrorController.onPageLoad().url
+      }
     }
   }
 }
