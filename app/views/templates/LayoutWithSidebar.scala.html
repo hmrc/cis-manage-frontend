@@ -39,7 +39,8 @@
   showSignOut: Boolean = true,
   showHmrcBanner: Boolean = false,
   beforeContent: Option[Html] = None,
-  sidebar: Option[Html] = None
+  sidebar: Option[Html] = None,
+  showUrBanner: Boolean = false,
 )(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
 
 @head = {
@@ -84,8 +85,9 @@
   ),
 
   banners = Banners(
-  displayHmrcBanner = showHmrcBanner,
-  phaseBanner = Some(betaBanner(appConfig.feedbackUrl))
+      displayHmrcBanner = showHmrcBanner,
+      phaseBanner = Some(betaBanner(appConfig.feedbackUrl)),
+      userResearchBanner = if(showUrBanner) Some(UserResearchBanner(url = appConfig.userResearchUrl)) else None
   ),
 
   isWelshTranslationAvailable = appConfig.languageTranslationEnabled,
