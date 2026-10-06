@@ -36,7 +36,7 @@ class NoVerificationHistoryViewSpec extends SpecBase {
       doc.select("h1").text                     must include(messages("verify.noVerificationHistory.heading"))
       doc.select("p").text                      must include(messages("verify.noVerificationHistory.p1"))
       doc.select("p").text                      must include(messages("verify.noVerificationHistory.p2"))
-      doc.select("p").text                      must include(messages("verify.noVerificationHistory.backTo"))
+      doc.select("p").text                      must include(messages("site.backTo"))
       doc.getElementsByClass("govuk-link").text must include(
         messages("verify.noVerificationHistory.manageYourSubcontractors.link")
       )
