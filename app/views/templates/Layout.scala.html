@@ -36,7 +36,18 @@
     autocompleteJavascript: HmrcAccessibleAutocompleteJavascript
 )
 
-@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false, sidebar: Option[Html] = None, additionalScripts: Option[Html] = None, additionalCss: Option[Html] = None, useFullWidth: Boolean = false)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
+@(
+    pageTitle: String, 
+    showBackLink: Boolean = true,
+    timeout: Boolean = true, 
+    showSignOut: Boolean = true,
+    showHmrcBanner: Boolean = false,
+    sidebar: Option[Html] = None, 
+    additionalScripts: Option[Html] = None,
+    additionalCss: Option[Html] = None, 
+    useFullWidth: Boolean = false,
+    showUrBanner: Boolean = false,
+)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
 
 @head = {
 
@@ -100,7 +111,8 @@
     ),
     banners = Banners(
         displayHmrcBanner = showHmrcBanner,
-        phaseBanner = Some(betaBanner(appConfig.feedbackUrl))
+        phaseBanner = Some(betaBanner(appConfig.feedbackUrl)),
+        userResearchBanner = if(showUrBanner) Some(UserResearchBanner(url = appConfig.userResearchUrl)) else None
     ),
     isWelshTranslationAvailable = appConfig.languageTranslationEnabled,
     backLink = if (showBackLink) Some(BackLink.mimicsBrowserBackButtonViaJavaScript) else None
