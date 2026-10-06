@@ -20,7 +20,6 @@ import base.SpecBase
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 
-import java.time.Instant
 import models.MonthlyReturnItem
 import models.history.*
 import models.history.SubmittedReturnsHistorySource.SingleYear
@@ -31,16 +30,19 @@ import org.scalatest.matchers.should.Matchers.*
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.HeaderCarrier
-import play.api.i18n.Lang
+import play.api.i18n.{Lang, MessagesApi}
 import viewmodels.*
 import viewmodels.StatusViewModel.Text
 
+import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
   private val instanceId = "1"
+
+  private val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
 
   private val amendUrl = "/history/amend/2023/3"
 
@@ -75,7 +77,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
   private def submission(
     submissionId: Long = 11L,
     activeObjectId: Option[Long] = Some(1L),
-    acceptedTime: Option[Instant] = Some(Instant.parse("2024-04-01T10:15:30Z"))
+    acceptedTime: Option[LocalDateTime] = Some(LocalDateTime.parse("2024-04-01T10:15:30"))
   ): SubmittedSubmissionData =
     SubmittedSubmissionData(
       submissionId = submissionId,
@@ -106,7 +108,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
 
     implicit val appConfig: FrontendAppConfig = mockAppConfig
 
-    val service: SubmittedReturnsService = new SubmittedReturnsService(mockConnector)
+    val service: SubmittedReturnsService = new SubmittedReturnsService(mockConnector, messagesApi)
 
     def singleRow(testData: SubmittedReturnsData): SubmittedReturnsRowViewModel =
       service.buildAllYearsViewModel(testData, instanceId)(Lang("en")).value.taxYears.head.rows.head
@@ -216,7 +218,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         )
       )
 
-      row.status shouldBe StatusViewModel.Text("history.returnHistory.status.awaitingConfirmation")
+      row.status shouldBe StatusViewModel.AwaitingConfirmation
     }
 
     "returns notAvailable for SUBMITTED before amendment cutoff" in new Setup {
@@ -229,7 +231,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
             submission(
               submissionId = 15L,
               activeObjectId = Some(5L),
-              acceptedTime = Some(Instant.parse("2013-01-01T00:00:00Z"))
+              acceptedTime = Some(LocalDateTime.parse("2013-01-01T00:00:00"))
             )
           )
         )
@@ -321,7 +323,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         )
       )
 
-      row.status shouldBe StatusViewModel.Text("history.returnHistory.status.awaitingConfirmation")
+      row.status shouldBe StatusViewModel.AwaitingConfirmation
     }
 
     "returns amend for superseded return with amendment status SUBMITTED" in new Setup {
@@ -453,7 +455,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         submissions = Seq(
           submission(
             activeObjectId = Some(1L),
-            acceptedTime = Some(Instant.parse("2024-04-01T10:15:30Z"))
+            acceptedTime = Some(LocalDateTime.parse("2024-04-01T10:15:30"))
           )
         )
       )
@@ -464,7 +466,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         "taxMonth"           -> 3,
         "contractorName"     -> "Test Scheme",
         "originalReturnType" -> "MonthlyStandardReturn",
-        "acceptedTime"       -> "2024-04-01T10:15:30Z"
+        "acceptedTime"       -> "2024-04-01T10:15:30"
       )
 
       when(
@@ -655,14 +657,48 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       vm.submissionType  shouldBe "Original"
       vm.hmrcMark        shouldBe Some("HMRC-123-ABC")
       vm.emailRecipient  shouldBe Some("user@example.com")
+      vm.submittedAt     shouldBe Some("10:30 GMT on 1 July 2024")
       vm.instanceId      shouldBe "INST001"
       vm.items.size      shouldBe 1
 
-      val item = vm.items.head
+      val item: SubcontractorPayment = vm.items.head
       item.name            shouldBe "John Smith"
       item.paymentsMade    shouldBe "£5,000.00"
       item.costOfMaterials shouldBe "£1,000.00"
       item.taxDeducted     shouldBe "£800.00"
+    }
+
+    "getMonthlyReturnComplete must display the submitted time truncated to the minute without rounding" in new Setup {
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+      implicit val lang: Lang        = Lang("en")
+
+      val response = MonthlyReturnCompleteResponse(
+        scheme = Seq(CompleteSchemeData(1, "INST001", "123P", "123", "ABC456", None, Some("Test Contractor"), None)),
+        monthlyReturn =
+          Seq(CompleteMonthlyReturnData(100L, 2026, 9, Some("N"), None, None, Some("SUBMITTED"), None, None, None)),
+        subcontractors = Seq.empty,
+        monthlyReturnItems = Seq.empty,
+        submission = Seq(
+          CompleteSubmissionData(
+            400L,
+            "Original",
+            Some(100L),
+            Some("SUBMITTED"),
+            Some("HMRC-123-ABC"),
+            Some("HMRC-123-ABC"),
+            None,
+            Some("2026-09-13T14:25:57")
+          )
+        )
+      )
+
+      when(mockConnector.getMonthlyReturnComplete("INST001", 2026, 9, "N"))
+        .thenReturn(Future.successful(response))
+
+      val result = service.getMonthlyReturnComplete("INST001", 2026, 9, "N").futureValue
+
+      result                              shouldBe a[Right[_, _]]
+      result.toOption.get.submittedAt.value should be("14:25 GMT on 13 September 2026")
     }
 
     "getMonthlyReturnComplete must identify nil returns correctly" in new Setup {
@@ -840,12 +876,13 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
           hmrcMarkGenerated = Some("mark1"),
           hmrcMarkGgis = Some("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"),
           emailRecipient = Some("test@example.com"),
-          acceptedTime = Some(Instant.parse("2026-04-01T10:15:30Z"))
+          acceptedTime = Some(LocalDateTime.parse("2026-04-01T10:15:30"))
         )
       )
 
       val out = service.buildSubmittedReturnPrintViewModel(input, Lang("en"))
       out.monthYear mustBe "April 2026"
+      out.submittedTime mustBe "10:15 GMT"
       out.submittedDate mustBe "1 April 2026"
       out.receiptReferenceNumber mustBe "AAIIGECRQ4QJFCZQ2OHUCFETKFKZOYM5W7RZ5OY"
       out.submissionType mustBe "nil"
@@ -875,7 +912,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
             unmatchedTaxRateIndicator = None,
             subcontractorId = None,
             subcontractorName = Some("Contractor 01"),
-            verificationNumber = None,
+            verificationNumber = Some("V1234567890"),
             itemResourceReference = None
           ),
           MonthlyReturnItem(
@@ -899,12 +936,13 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
           hmrcMarkGenerated = Some("mark1"),
           hmrcMarkGgis = None,
           emailRecipient = Some("test@example.com"),
-          acceptedTime = Some(Instant.parse("2026-04-01T10:15:30Z"))
+          acceptedTime = Some(LocalDateTime.parse("2026-04-01T10:15:30"))
         )
       )
 
       val out = service.buildSubmittedReturnPrintViewModel(input, Lang("en"))
       out.monthYear mustBe "April 2026"
+      out.submittedTime mustBe "10:15 GMT"
       out.submittedDate mustBe "1 April 2026"
       out.receiptReferenceNumber mustBe ""
       out.submissionType mustBe "standard"
@@ -914,8 +952,8 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       out.totalCostOfMaterials mustBe "£30,000.00"
       out.totalTaxDeducted mustBe "£30,000.00"
       out.subcontractors mustBe Seq(
-        SubcontractorPayment("Contractor 01", "£10,000.00", "£10,000.00", "£10,000.00"),
-        SubcontractorPayment("Contractor 02", "£20,000.00", "£20,000.00", "£20,000.00")
+        SubcontractorPayment("Contractor 01", "V1234567890", "£10,000.00", "£10,000.00", "£10,000.00"),
+        SubcontractorPayment("Contractor 02", "", "£20,000.00", "£20,000.00", "£20,000.00")
       )
 
     }

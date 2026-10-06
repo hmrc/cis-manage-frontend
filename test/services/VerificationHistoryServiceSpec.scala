@@ -25,7 +25,9 @@ import play.api.i18n.Lang
 
 import java.time.LocalDate
 import models.response.*
+import org.scalatest.matchers.should.Matchers.should
 import viewmodels.SubcontractorRowViewModel
+
 import java.time.LocalDateTime
 
 class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with OptionValues {
@@ -237,7 +239,8 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
     "buildSingleYearViewModel" - {
 
       "must return a view model filtered to the selected tax year" in {
-        val result = service.buildSingleYearViewModel(data, "2026", instanceId)(Lang("en"))
+        val givenTaxYear = 2026
+        val result       = service.buildSingleYearViewModel(data, givenTaxYear, instanceId)(Lang("en"))
 
         result mustBe defined
 
@@ -245,18 +248,13 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
         vm.selectedTaxYear mustBe Some("2026")
         vm.instanceId mustBe instanceId
         vm.taxYears.size mustBe 1
-        vm.taxYears.head.fromYear mustBe 2026
+        vm.taxYears.head.fromYear mustBe givenTaxYear
         vm.taxYears.head.rows.size mustBe 2
       }
 
-      "must return None for an invalid (non-numeric) tax year" in {
-        val result = service.buildSingleYearViewModel(data, "invalid", instanceId)(Lang("en"))
-
-        result mustBe None
-      }
-
       "must return None for a year with no data" in {
-        val result = service.buildSingleYearViewModel(data, "2020", instanceId)(Lang("en"))
+        val emptyTaxYear = 2020
+        val result       = service.buildSingleYearViewModel(data, emptyTaxYear, instanceId)(Lang("en"))
 
         result mustBe None
       }
@@ -514,8 +512,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
           1L,
           instanceId
         )(Lang("en"))
-
-        result.value.submittedTime mustBe "14:30"
+        result.value.submittedTime mustBe "14:30 GMT"
         result.value.submittedDate mustBe "6 April 2026"
         result.value.verificationNumber mustBe "V001"
         result.value.contractorName mustBe "Test Scheme"
@@ -568,8 +565,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
           1L,
           instanceId
         )(Lang("en"))
-
-        result.value.submissionTime mustBe "14:30"
+        result.value.submissionTime mustBe "14:30 GMT"
         result.value.submissionDate mustBe "6 April 2026"
         result.value.contractorName mustBe "Test Scheme"
         result.value.employerReference mustBe "123/AB456"

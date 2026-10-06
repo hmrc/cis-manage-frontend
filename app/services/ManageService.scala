@@ -19,7 +19,7 @@ package services
 import config.FrontendAppConfig
 import connectors.ConstructionIndustrySchemeConnector
 import models.*
-import models.agent.AgentClientData
+import models.agent.{AgentClientData, UpdateAgentClientRequest}
 import models.history.SubmittedReturnsData
 import models.verify.VerificationRequestDetailData
 import models.requests.*
@@ -267,6 +267,15 @@ class ManageService @Inject() (
       GetSubmittedMonthlyReturnsDataRequest(instanceId, taxYear, taxMonth, amendment)
     )
 
+  def removeClient(uniqueId: String, ua: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] =
+    ua.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId)) match {
+      case Some(client) =>
+        cisConnector.removeClient(RemoveAgentClientRequest(client.taxOfficeNumber, client.taxOfficeRef))
+      case _            =>
+        logger.error(s"[removeClient] missing AgentClientsPage in user answers")
+        Future.failed(new RuntimeException("Missing AgentClientsPage in user answers"))
+    }
+
   private def buildReturnPeriodEnd(taxMonth: Int, taxYear: Int)(implicit lang: Lang): String =
     YearMonth.of(taxYear, taxMonth).format(DateTimeFormats.monthYearFormat())
 
@@ -285,7 +294,7 @@ class ManageService @Inject() (
     val isAmendment = row.amendment.exists(_.equals("Y"))
 
     row.status match {
-      case "In progress" =>
+      case StatusViewModel.InProgress =>
         Seq(
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.continue",
@@ -313,7 +322,7 @@ class ManageService @Inject() (
           )
         )
 
-      case "Awaiting confirmation" =>
+      case StatusViewModel.AwaitingConfirmation =>
         Seq(
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.view",
@@ -322,7 +331,7 @@ class ManageService @Inject() (
           )
         )
 
-      case "Unsuccessful" =>
+      case StatusViewModel.Unsuccessful =>
         Seq(
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.view",
@@ -335,4 +344,19 @@ class ManageService @Inject() (
         Seq.empty
     }
   }
+
+  def updateClient(uniqueId: String, ua: UserAnswers, clientRef: String)(implicit hc: HeaderCarrier): Future[Unit] =
+    ua.get(AgentClientsPage) match {
+      case None          =>
+        logger.error(s"[updateClient] AgentClientsPage not found in user answers")
+        Future.failed(new RuntimeException("AgentClientsPage not found in user answers"))
+      case Some(clients) =>
+        clients.find(_.uniqueId == uniqueId) match {
+          case Some(client) =>
+            cisConnector.updateClient(UpdateAgentClientRequest(client.taxOfficeNumber, client.taxOfficeRef, clientRef))
+          case None         =>
+            logger.error(s"[updateClient] no client found with uniqueId $uniqueId in AgentClientsPage")
+            Future.failed(new RuntimeException(s"No client found with uniqueId $uniqueId in AgentClientsPage"))
+        }
+    }
 }

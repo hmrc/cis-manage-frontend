@@ -22,7 +22,7 @@ import models.history.*
 import models.history.AmendmentHandoffData.given
 import models.history.SubmittedReturnsHistorySource.{AllYears, SingleYear}
 import models.response.GetSubmittedMonthlyReturnsDataResponse
-import play.api.i18n.Lang
+import play.api.i18n.{Lang, MessagesApi}
 import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.*
 import utils.{DateTimeFormats, IrMarkReferenceGenerator, Utils}
@@ -30,19 +30,22 @@ import viewmodels.StatusViewModel.Text
 import play.api.libs.json.Json
 
 import java.time.*
-import java.time.format.{DateTimeFormatter, TextStyle}
+import java.time.format.TextStyle
 import java.util.Locale
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SubmittedReturnsService @Inject() (
-  connector: ConstructionIndustrySchemeConnector
+  connector: ConstructionIndustrySchemeConnector,
+  messagesApi: MessagesApi
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext) {
 
-  private val ukTimezone: ZoneId                      = ZoneId.of("Europe/London")
-  private val amendmentCutOffInstant: Instant         = ZonedDateTime.of(2016, 2, 5, 0, 0, 0, 0, ZoneOffset.UTC).toInstant
-  private val displayTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("h:mma", Locale.UK)
+  private val GMTTimezone: ZoneId            = ZoneId.of("GMT")
+  private val amendmentCutOff: LocalDateTime = LocalDateTime.of(2016, 2, 5, 0, 0)
+
+  private def parseAcceptedTime(acceptedTime: String): Option[LocalDateTime] =
+    scala.util.Try(LocalDateTime.parse(acceptedTime.take(19))).toOption
 
   def buildAllYearsViewModel(data: SubmittedReturnsData, instanceId: String)(implicit
     lang: Lang
@@ -119,13 +122,13 @@ class SubmittedReturnsService @Inject() (
   ): SubmittedReturnPrintViewModel = {
     val langCode = lang.code
 
-    val submittedTime = data.submission.acceptedTime
-      .map(_.atZone(ukTimezone))
-      .map(_.format(DateTimeFormats.timeFormat()(lang)).toLowerCase)
+    val submittedDateTime = data.submission.acceptedTime.map(_.atZone(GMTTimezone))
+
+    val submittedTime = submittedDateTime
+      .map(_.format(DateTimeFormats.timeFormat()(lang)))
       .getOrElse("")
 
-    val submittedDate = data.submission.acceptedTime
-      .map(_.atZone(ukTimezone))
+    val submittedDate = submittedDateTime
       .map(_.format(DateTimeFormats.dateTimeFormat()(lang)))
       .getOrElse("")
 
@@ -146,10 +149,11 @@ class SubmittedReturnsService @Inject() (
     val subcontractors       =
       data.monthlyReturnItems.map { item =>
         SubcontractorPayment(
-          item.subcontractorName.getOrElse(""),
-          Utils.formatCurrency(Utils.toBigDecimal(item.totalPayments)),
-          Utils.formatCurrency(Utils.toBigDecimal(item.costOfMaterials)),
-          Utils.formatCurrency(Utils.toBigDecimal(item.totalDeducted))
+          name = item.subcontractorName.getOrElse(""),
+          verificationNumber = item.verificationNumber.getOrElse(""),
+          paymentsMade = Utils.formatCurrency(Utils.toBigDecimal(item.totalPayments)),
+          costOfMaterials = Utils.formatCurrency(Utils.toBigDecimal(item.costOfMaterials)),
+          taxDeducted = Utils.formatCurrency(Utils.toBigDecimal(item.totalDeducted))
         )
       }
 
@@ -259,9 +263,7 @@ class SubmittedReturnsService @Inject() (
   private def buildDateSubmittedText(submissionOpt: Option[SubmittedSubmissionData])(implicit lang: Lang): String =
     submissionOpt
       .flatMap(_.acceptedTime)
-      .map { instant =>
-        instant.atZone(ukTimezone).toLocalDate.format(DateTimeFormats.shortDateFormat())
-      }
+      .map(_.atZone(GMTTimezone).toLocalDate.format(DateTimeFormats.shortDateFormat()))
       .getOrElse("")
 
   private def buildSubmissionReceipt(
@@ -301,7 +303,7 @@ class SubmittedReturnsService @Inject() (
     amendUrl: String,
     instanceId: String
   )(implicit lang: Lang): StatusViewModel = {
-    val acceptedTimeOpt = submissionOpt.flatMap(_.acceptedTime)
+    val acceptedTimeOpt = submissionOpt.flatMap(_.acceptedTime).map(_.atZone(GMTTimezone).toLocalDateTime)
 
     acceptedTimeOpt match {
       case None =>
@@ -312,7 +314,7 @@ class SubmittedReturnsService @Inject() (
           case "SUBMITTED" =>
             if (isSuperseded(monthlyReturn)) {
               buildAmendmentStatus(monthlyReturn, amendUrl, instanceId)
-            } else if (!acceptedTime.isBefore(amendmentCutOffInstant)) {
+            } else if (!acceptedTime.isBefore(amendmentCutOff)) {
               StatusViewModel.Link(
                 link = LinkViewModel(
                   url = amendUrl,
@@ -326,7 +328,7 @@ class SubmittedReturnsService @Inject() (
             }
 
           case "SUBMITTED_NO_RECEIPT" =>
-            StatusViewModel.Text("history.returnHistory.status.awaitingConfirmation")
+            StatusViewModel.AwaitingConfirmation
 
           case _ =>
             StatusViewModel.Text("")
@@ -355,7 +357,7 @@ class SubmittedReturnsService @Inject() (
           hiddenTextKey = "history.returnHistory.hidden.status.inProgress"
         )
       case Some("PENDING") | Some("ACCEPTED") | Some("SUBMITTED_NO_RECEIPT") =>
-        StatusViewModel.Text("history.returnHistory.status.awaitingConfirmation")
+        StatusViewModel.AwaitingConfirmation
       case Some("SUBMITTED")                                                 =>
         StatusViewModel.Link(
           link = LinkViewModel(
@@ -440,21 +442,20 @@ class SubmittedReturnsService @Inject() (
 
     val submittedAt = submission
       .flatMap(_.acceptedTime)
-      .flatMap { ts =>
-        scala.util.Try {
-          val dateTime = LocalDateTime.parse(ts.take(19)).atZone(ukTimezone)
-          val time     = dateTime.format(displayTimeFormatter)
-          val date     = dateTime.toLocalDate.format(DateTimeFormats.shortDateFormat())
-          s"$time on $date"
-        }.toOption
+      .flatMap(parseAcceptedTime)
+      .map { dateTime =>
+        val time = dateTime.atZone(GMTTimezone).format(DateTimeFormats.timeFormat()(lang))
+        val date = dateTime.toLocalDate.format(DateTimeFormats.dateTimeFormat()(lang))
+        messagesApi("submissionConfirmation.submittedOn.value", time, date)(lang)
       }
 
     val items = response.monthlyReturnItems.map { item =>
       SubcontractorPayment(
-        item.subcontractorName.getOrElse(""),
-        Utils.formatCurrency(Utils.toBigDecimal(item.totalPayments)),
-        Utils.formatCurrency(Utils.toBigDecimal(item.costOfMaterials)),
-        Utils.formatCurrency(Utils.toBigDecimal(item.totalDeducted))
+        name = item.subcontractorName.getOrElse(""),
+        verificationNumber = item.verificationNumber.getOrElse(""),
+        paymentsMade = Utils.formatCurrency(Utils.toBigDecimal(item.totalPayments)),
+        costOfMaterials = Utils.formatCurrency(Utils.toBigDecimal(item.costOfMaterials)),
+        taxDeducted = Utils.formatCurrency(Utils.toBigDecimal(item.totalDeducted))
       )
     }
 

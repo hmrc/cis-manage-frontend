@@ -35,7 +35,7 @@ class JourneyRecoveryControllerSpec extends SpecBase {
   "JourneyRecovery Controller" - {
 
     Seq(
-      ("AGENT", true, applicationConfig.constructionIndustryAgentAccountUrl + "1"),
+      ("AGENT",        true,  applicationConfig.constructionIndustryAgentAccountUrl + "1"),
       ("ORGANISATION", false, applicationConfig.constructionIndustryOrgAccountUrl)
     ).foreach { case (accountTypeSTR, isAgent, cisAccountUrl) =>
       s"when accountType is '$accountTypeSTR'" - {

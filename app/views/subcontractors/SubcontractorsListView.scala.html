@@ -73,7 +73,7 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
     }
 
 
-@layout(pageTitle = title(form, messages("subcontractors.subcontractorsList.title")),
+@layout(pageTitle = title(form, withPagination(messages("subcontractors.subcontractorsList.title"), page, totalPages)),
         additionalCss = Some(css),
         additionalScripts = Some(scripts)
 ) {
@@ -336,7 +336,7 @@ searchTerm: String, verificationStatus: String, taxTreatment: String, sortBy: St
 
         @link(
         linkUrl = controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId).url,
-        prefixTextKey = "subcontractors.subcontractorsList.backTo",
+        prefixTextKey = "site.backTo",
         linkTextKey = "subcontractors.subcontractorsList.manage",
         hasFullStop = true
         )

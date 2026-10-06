@@ -51,6 +51,6 @@ class ChangeClientReferenceViewSpec extends SpecBase {
       play.api.i18n.Lang.defaultLang,
       app.injector.instanceOf[play.api.i18n.MessagesApi]
     )
-    val html: HtmlFormat.Appendable               = view(form, NormalMode)
+    val html: HtmlFormat.Appendable               = view(form, uniqueId = "123456", NormalMode)
   }
 }

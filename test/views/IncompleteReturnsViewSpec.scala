@@ -24,7 +24,7 @@ import play.api.test.FakeRequest
 import play.api.i18n.*
 import play.twirl.api.HtmlFormat
 import play.api.mvc.Request
-import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel}
+import viewmodels.{ActionLinkViewModel, IncompleteReturnsRowViewModel, ReturnTypeViewModel, StatusViewModel}
 import views.html.IncompleteReturnsView
 
 class IncompleteReturnsViewSpec extends SpecBase {
@@ -36,7 +36,6 @@ class IncompleteReturnsViewSpec extends SpecBase {
 
       doc.title             must include(msgs("incompleteReturns.title"))
       doc.select("h1").text must include(msgs("incompleteReturns.heading"))
-      doc.text              must include(msgs("incompleteReturns.message"))
 
       doc.select("th").text must include(msgs("incompleteReturns.table.returnPeriodEnd"))
       doc.select("th").text must include(msgs("incompleteReturns.table.returnType"))
@@ -65,9 +64,9 @@ class IncompleteReturnsViewSpec extends SpecBase {
     val viewModel: Seq[IncompleteReturnsRowViewModel] = Seq(
       IncompleteReturnsRowViewModel(
         returnPeriodEnd = "Jan 2025",
-        returnType = "Nil",
+        returnType = ReturnTypeViewModel.Nil,
         lastUpdate = "01 Jan 2025",
-        status = "In progress",
+        status = StatusViewModel.InProgress,
         action = Seq(
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.continue",

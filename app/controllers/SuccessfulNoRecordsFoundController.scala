@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import models.Target
 import models.Target.*
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -37,7 +38,8 @@ class SuccessfulNoRecordsFoundController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: SuccessfulNoRecordsFoundView,
   requireSchemeAccess: AuthorizedForSchemeActionProvider,
-  service: PrepopService
+  service: PrepopService,
+  appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -68,8 +70,9 @@ class SuccessfulNoRecordsFoundController @Inject() (
 
   private def targetCall(target: Target, instanceId: String): Call =
     target match {
-      case Returns       => controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
-      case Notices       => controllers.routes.JourneyRecoveryController.onPageLoad()
-      case Subcontractor => controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId)
+      case Returns                 => controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
+      case Notices                 => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case Subcontractor           => controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId)
+      case ManageContractorDetails => Call("GET", appConfig.contractorDetailsManagementUrl)
     }
 }

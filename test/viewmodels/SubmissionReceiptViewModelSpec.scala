@@ -38,7 +38,13 @@ class SubmissionReceiptViewModelSpec extends AnyWordSpec with Matchers {
         emailRecipient = Some("user@example.com"),
         instanceId = "INST001",
         items = Seq(
-          SubcontractorPayment("John Smith", "5000.00", "1000.00", "800.00")
+          SubcontractorPayment(
+            name = "John Smith",
+            verificationNumber = "V1234567890",
+            paymentsMade = "5000.00",
+            costOfMaterials = "1000.00",
+            taxDeducted = "800.00"
+          )
         )
       )
 

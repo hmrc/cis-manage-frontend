@@ -17,11 +17,11 @@
 package models.verify
 
 import play.api.libs.json.*
-import models.verify.VerificationTaxYearSelection.TaxYear
 
-sealed trait VerificationTaxYearSelection
+sealed trait VerificationTaxYearSelection(val toPath: String)
 
 object VerificationTaxYearSelection {
+  private val pattern = "(\\d+)-to-(\\d+)".r
 
   case class TaxYearPeriod(startYear: Int) {
     val endYear: Int = startYear + 1
@@ -29,13 +29,13 @@ object VerificationTaxYearSelection {
     override def toString: String = s"$startYear to $endYear"
   }
 
-  case class TaxYear(startYear: Int) extends VerificationTaxYearSelection {
+  case class TaxYear(startYear: Int) extends VerificationTaxYearSelection(toPath = s"$startYear-to-${startYear + 1}") {
     val period: TaxYearPeriod = TaxYearPeriod(startYear)
 
     override def toString: String = period.toString
   }
 
-  case object AllTaxYears extends VerificationTaxYearSelection {
+  case object AllTaxYears extends VerificationTaxYearSelection(toPath = "all") {
     override def toString: String = "all"
   }
 
@@ -44,6 +44,15 @@ object VerificationTaxYearSelection {
       case "all" => AllTaxYears
       case _     => TaxYear(value.toInt)
     }
+
+  def fromPath(path: String): Option[VerificationTaxYearSelection] =
+    if path equalsIgnoreCase "all" then Some(AllTaxYears)
+    else
+      for
+        Seq(start, end) <- pattern.unapplySeq(path)
+        startYear       <- start.toIntOption
+        endYear         <- end.toIntOption if startYear + 1 == endYear
+      yield TaxYear(startYear)
 
   given OFormat[TaxYearPeriod] = Json.format[TaxYearPeriod]
 

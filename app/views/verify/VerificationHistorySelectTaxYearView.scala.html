@@ -26,7 +26,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, taxYears: Seq[TaxYearPeriod])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], taxYears: Seq[TaxYearPeriod])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("verify.verificationHistorySelectTaxYear.title"))) {
 

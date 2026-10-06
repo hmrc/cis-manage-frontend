@@ -38,6 +38,7 @@ class GetSubcontractorListController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   requireCisId: CisIdRequiredAction,
+  reconcileFormpRds: FormpRdsReconcileAction,
   sessionRepository: SessionRepository,
   subcontractorService: SubcontractorService,
   val controllerComponents: MessagesControllerComponents
@@ -47,41 +48,42 @@ class GetSubcontractorListController @Inject() (
     with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
+    (identify andThen getData andThen requireData andThen requireCisId andThen reconcileFormpRds).async {
+      implicit request =>
 
-      implicit val hc: HeaderCarrier =
-        HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+        implicit val hc: HeaderCarrier =
+          HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-      subcontractorService
-        .getSubcontractorList(request.cisId)
-        .flatMap { response =>
-          request.userAnswers.set(SubcontractorListPage, response) match {
-            case Success(updatedAnswers) =>
-              sessionRepository.set(updatedAnswers).map { _ =>
-                if (response.subcontractors.isEmpty) {
-                  Redirect(
-                    routes.NoSubcontractorsExistController.onPageLoad()
-                  )
-                } else {
-                  Redirect(
-                    routes.SubcontractorsListController.onPageLoad(
-                      request.cisId,
-                      NormalMode
+        subcontractorService
+          .getSubcontractorList(request.cisId)
+          .flatMap { response =>
+            request.userAnswers.set(SubcontractorListPage, response) match {
+              case Success(updatedAnswers) =>
+                sessionRepository.set(updatedAnswers).map { _ =>
+                  if (response.subcontractors.isEmpty) {
+                    Redirect(
+                      routes.NoSubcontractorsExistController.onPageLoad()
                     )
-                  )
+                  } else {
+                    Redirect(
+                      routes.SubcontractorsListController.onPageLoad(
+                        request.cisId,
+                        NormalMode
+                      )
+                    )
+                  }
                 }
-              }
 
-            case Failure(e) =>
-              logger.error(s"Failed to store subcontractor list in session for cisId ${request.cisId}", e)
-              Future.successful(
-                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-              )
+              case Failure(e) =>
+                logger.error(s"Failed to store subcontractor list in session for cisId ${request.cisId}", e)
+                Future.successful(
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                )
+            }
           }
-        }
-        .recover { case e =>
-          logger.error(s"Failed to retrieve subcontractor list for cisId ${request.cisId}", e)
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
+          .recover { case e =>
+            logger.error(s"Failed to retrieve subcontractor list for cisId ${request.cisId}", e)
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
     }
 }

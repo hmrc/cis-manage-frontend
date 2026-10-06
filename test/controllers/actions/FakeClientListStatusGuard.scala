@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package pages.verify
+package controllers.actions
 
-import models.verify.VerificationHistoryData
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import models.requests.IdentifierRequest
+import play.api.mvc.{ActionFilter, Call, Result}
 
-case object VerificationHistoryDataPage extends QuestionPage[VerificationHistoryData] {
-  override def path: JsPath = JsPath \ "verificationHistoryData"
+import scala.concurrent.{ExecutionContext, Future}
 
-  override def toString: String = "verificationHistoryData"
+class FakeClientListStatusGuard(using ExecutionContext) extends ClientListStatusGuard(null) {
+  private val passThroughFilter = new PassThroughFilter[IdentifierRequest]
+
+  override def checkGroupA[A](request: IdentifierRequest[A]): Future[Option[Result]] = passThroughFilter.filter(request)
+
+  override def groupB(securityCheckCall: Call): ActionFilter[IdentifierRequest] = passThroughFilter
 }

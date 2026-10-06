@@ -139,6 +139,8 @@ class ClientListSearchController @Inject() (
       implicit val hc: HeaderCarrier =
         HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
+      val currentPage = request.getQueryString("page").flatMap(_.toIntOption).getOrElse(1)
+
       manageService
         .resolveAndStoreAgentClients(request.userAnswers)
         .flatMap { case (cisClients, uaWithClients) =>
@@ -146,7 +148,7 @@ class ClientListSearchController @Inject() (
 
           val paginationResult = paginationService.paginateClientList(
             allClients = allClientsVm,
-            currentPage = 1,
+            currentPage = currentPage,
             baseUrl = routes.ClientListSearchController.onPageLoad().url,
             sortBy = None,
             sortOrder = None
@@ -164,7 +166,9 @@ class ClientListSearchController @Inject() (
                       paginationResult.paginatedData,
                       paginationResult.paginationViewModel,
                       None,
-                      None
+                      None,
+                      paginationResult.currentPage,
+                      paginationResult.totalPages
                     )
                   )
                 ),
@@ -248,7 +252,9 @@ class ClientListSearchController @Inject() (
         paginationResult.paginatedData,
         paginationResult.paginationViewModel,
         sortBy,
-        sortOrder
+        sortOrder,
+        paginationResult.currentPage,
+        paginationResult.totalPages
       )
     )
 

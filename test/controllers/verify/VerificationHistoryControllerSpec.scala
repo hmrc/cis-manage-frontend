@@ -16,32 +16,23 @@
 
 package controllers.verify
 
-import base.SpecBase
-import models.UserAnswers
-import models.verify.{VerificationHistoryData, VerificationRequestData}
-import models.verify.VerificationTaxYearSelection.TaxYear
-import org.mockito.ArgumentMatchers.any
+import base.UnitSpec
+import models.verify.VerificationTaxYearSelection.{AllTaxYears, TaxYear}
+import models.verify.{VerificationHistoryData, VerificationRequestData, VerificationTaxYearSelection}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{verify as mockVerify, verifyNoMoreInteractions, when}
 import play.api.i18n.Lang
-import org.mockito.Mockito.{verify as mockVerify, verifyNoInteractions, when}
-import org.scalatestplus.mockito.MockitoSugar
-import pages.CisIdPage
-import pages.verify.{VerificationHistoryDataPage, VerificationHistorySelectTaxYearPage}
-import play.api.Application
-import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import models.response.GetSubmittedVerificationsResponse
 import services.{VerificationHistoryService, VerificationService}
-import uk.gov.hmrc.http.HeaderCarrier
 import viewmodels.*
-import views.html.verify.VerificationHistoryView
+import views.html.verify.{NoVerificationHistoryView, VerificationHistoryView}
 
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
-
-  private val cisId = "900063"
+class VerificationHistoryControllerSpec extends UnitSpec {
+  import play.twirl.api.Html
 
   private def verificationRequestData(
     verificationNumber: String,
@@ -80,14 +71,6 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
     instanceId = cisId
   )
 
-  private val submittedVerificationsResponse = GetSubmittedVerificationsResponse(
-    scheme = Seq.empty,
-    subcontractors = Seq.empty,
-    verificationBatches = Seq.empty,
-    verifications = Seq.empty,
-    submissions = Seq.empty
-  )
-
   private val verificationHistoryData = VerificationHistoryData(
     verificationRequests = Seq(
       verificationRequestData("V0004528765", LocalDate.of(2026, 4, 6), 2026)
@@ -95,292 +78,147 @@ class VerificationHistoryControllerSpec extends SpecBase with MockitoSugar {
   )
 
   trait Setup {
-
     val mockVerificationHistoryService: VerificationHistoryService = mock[VerificationHistoryService]
     val mockVerificationService: VerificationService               = mock[VerificationService]
 
-    def application(userAnswers: UserAnswers): Application =
-      applicationBuilder(userAnswers = Some(userAnswers))
-        .overrides(
-          bind[VerificationHistoryService].toInstance(mockVerificationHistoryService),
-          bind[VerificationService].toInstance(mockVerificationService)
-        )
-        .build()
-
-    def userAnswersWithCisId: UserAnswers =
-      emptyUserAnswers
-        .set(CisIdPage, cisId)
-        .success
-        .value
-
-    def userAnswersWithCisIdAndTaxYearSelection: UserAnswers =
-      userAnswersWithCisId
-        .set(VerificationHistorySelectTaxYearPage, TaxYear(2026))
-        .success
-        .value
-
-    def userAnswersWithVerificationHistoryData: UserAnswers =
-      userAnswersWithCisIdAndTaxYearSelection
-        .set(VerificationHistoryDataPage, verificationHistoryData)
-        .success
-        .value
-
-    def mockVerificationServiceReturnsData(): Unit = {
-      when(
-        mockVerificationService.getSubmittedVerifications(
-          any[String]
-        )(any[HeaderCarrier])
-      ).thenReturn(Future.successful(submittedVerificationsResponse))
-
-      when(
-        mockVerificationHistoryService.toVerificationHistoryData(
-          submittedVerificationsResponse
-        )
-      ).thenReturn(verificationHistoryData)
-    }
+    def mockVerificationServiceReturnsData(): Unit =
+      when(mockVerificationService.getSubmittedVerifications(any)(any)) thenReturn
+        Future.successful(verificationHistoryData)
 
     def mockVerificationServiceFails(): Unit =
-      when(
-        mockVerificationService.getSubmittedVerifications(
-          any[String]
-        )(any[HeaderCarrier])
-      ).thenReturn(Future.failed(new RuntimeException("boom")))
+      when(mockVerificationService.getSubmittedVerifications(any)(any)) thenReturn
+        Future.failed(new RuntimeException("boom"))
 
     def mockSingleYearViewModelReturns(model: Option[VerificationHistoryPageViewModel]): Unit =
-      when(
-        mockVerificationHistoryService.buildSingleYearViewModel(
-          any[VerificationHistoryData],
-          any[String],
-          any[String]
-        )(any[Lang]())
-      ).thenReturn(model)
+      when(mockVerificationHistoryService.buildSingleYearViewModel(any, any, any)(any[Lang]())) thenReturn model
 
     def mockAllYearsViewModelReturns(model: Option[VerificationHistoryPageViewModel]): Unit =
-      when(
-        mockVerificationHistoryService.buildAllYearsViewModel(
-          any[VerificationHistoryData],
-          any[String]
-        )(any[Lang]())
-      ).thenReturn(model)
+      when(mockVerificationHistoryService.buildAllYearsViewModel(any, any)(any)) thenReturn model
 
-    def unauthorisedUrl: String =
-      controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad().url
+    val stubHistoryView: VerificationHistoryView = mock[VerificationHistoryView]
+    val stubHistoryContent                       = "Here is your Verification History"
+    when(stubHistoryView.apply(any)(any, any)) thenReturn Html(stubHistoryContent)
 
-    def journeyRecoveryUrl: String =
-      controllers.routes.JourneyRecoveryController.onPageLoad().url
+    val stubNoHistoryView: NoVerificationHistoryView = mock[NoVerificationHistoryView]
+    val stubNoHistoryContent                         = "No Verification History found"
+    when(stubNoHistoryView.apply(any)(any, any)) thenReturn Html(stubNoHistoryContent)
+
+    val controllerUnderTest = new VerificationHistoryController(
+      mockControllerComponents,
+      stubHistoryView,
+      stubNoHistoryView,
+      stubNotFoundView,
+      mockVerificationHistoryService,
+      mockVerificationService
+    )
   }
 
-  "VerificationHistoryController" - {
+  "onPageLoad must" - {
+    "return 200 OK and" - {
+      "show history page when CIS ID is present, a single tax year is selected, and view model is non-empty" in new Setup {
+        mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
+        mockVerificationServiceReturnsData()
+        mockSingleYearViewModelReturns(Some(viewModel))
 
-    "onPageLoadSingleYear must return OK using VerificationHistoryDataPage when present" in new Setup {
-      val userAnswers = userAnswersWithVerificationHistoryData
-
-      when(mockVerificationHistoryService.buildSingleYearViewModel(verificationHistoryData, "2026", cisId)(Lang("en")))
-        .thenReturn(Some(viewModel))
-
-      val app = application(userAnswers)
-
-      running(app) {
-        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadSingleYear().url)
-        val result  = route(app, request).value
-        val view    = app.injector.instanceOf[VerificationHistoryView]
+        val givenTaxYear   = TaxYear(2026)
+        private val result = controllerUnderTest.onPageLoad(givenTaxYear.toPath)(FakeRequest())
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
+        contentAsString(result) mustEqual stubHistoryContent
 
-        mockVerify(mockVerificationHistoryService).buildSingleYearViewModel(verificationHistoryData, "2026", cisId)(
-          Lang("en")
+        mockVerify(mockVerificationService).getSubmittedVerifications(eqTo(cisId))(any)
+        mockVerify(mockVerificationHistoryService)
+          .buildSingleYearViewModel(eqTo(verificationHistoryData), eqTo(givenTaxYear.startYear), eqTo(cisId))(any)
+        verifyNoMoreInteractions(mockVerificationService, mockVerificationHistoryService)
+      }
+
+      "show history page when CIS ID is present, all tax years are selected, and view model is non-empty" in new Setup {
+        mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
+
+        mockVerificationServiceReturnsData()
+        mockAllYearsViewModelReturns(Some(viewModel))
+
+        private val result = controllerUnderTest.onPageLoad(AllTaxYears.toPath)(FakeRequest())
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual stubHistoryContent
+
+        mockVerify(mockVerificationService).getSubmittedVerifications(eqTo(cisId))(any)
+        mockVerify(mockVerificationHistoryService).buildAllYearsViewModel(eqTo(verificationHistoryData), eqTo(cisId))(
+          any
         )
-        verifyNoInteractions(mockVerificationService)
+        verifyNoMoreInteractions(mockVerificationService, mockVerificationHistoryService)
       }
-    }
 
-    "onPageLoadAllYears must return OK using VerificationHistoryDataPage when present" in new Setup {
-      val userAnswers = userAnswersWithVerificationHistoryData
+      "and show no history page when CIS ID is present, all tax years are selected, but view model is empty" in new Setup {
+        mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
+        mockVerificationServiceReturnsData()
+        mockAllYearsViewModelReturns(None)
 
-      when(mockVerificationHistoryService.buildAllYearsViewModel(verificationHistoryData, cisId)(Lang("en")))
-        .thenReturn(Some(viewModel))
-
-      val app = application(userAnswers)
-
-      running(app) {
-        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadAllYears().url)
-        val result  = route(app, request).value
-        val view    = app.injector.instanceOf[VerificationHistoryView]
+        private val result = controllerUnderTest.onPageLoad(AllTaxYears.toPath)(FakeRequest())
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(viewModel)(request, messages(app)).toString
+        contentAsString(result) mustEqual stubNoHistoryContent
 
-        mockVerify(mockVerificationHistoryService).buildAllYearsViewModel(verificationHistoryData, cisId)(Lang("en"))
-        verifyNoInteractions(mockVerificationService)
-      }
-    }
-
-    "onPageLoadSingleYear must retrieve and convert submitted verifications when VerificationHistoryDataPage is missing" in new Setup {
-      val userAnswers = userAnswersWithCisIdAndTaxYearSelection
-
-      mockVerificationServiceReturnsData()
-      mockSingleYearViewModelReturns(Some(viewModel))
-
-      val app = application(userAnswers)
-
-      running(app) {
-        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadSingleYear().url)
-        val result  = route(app, request).value
-
-        status(result) mustEqual OK
-
-        mockVerify(mockVerificationService)
-          .getSubmittedVerifications(any[String])(any[HeaderCarrier])
-
-        mockVerify(mockVerificationHistoryService)
-          .toVerificationHistoryData(submittedVerificationsResponse)
-        mockVerify(mockVerificationHistoryService)
-          .buildSingleYearViewModel(any[VerificationHistoryData], any[String], any[String])(any[Lang]())
-      }
-    }
-
-    "onPageLoadAllYears must retrieve and convert submitted verifications when VerificationHistoryDataPage is missing" in new Setup {
-      val userAnswers = userAnswersWithCisId
-
-      mockVerificationServiceReturnsData()
-      mockAllYearsViewModelReturns(Some(viewModel))
-
-      val app = application(userAnswers)
-
-      running(app) {
-        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadAllYears().url)
-        val result  = route(app, request).value
-
-        status(result) mustEqual OK
-
-        mockVerify(mockVerificationService)
-          .getSubmittedVerifications(any[String])(any[HeaderCarrier])
-
-        mockVerify(mockVerificationHistoryService)
-          .toVerificationHistoryData(submittedVerificationsResponse)
-        mockVerify(mockVerificationHistoryService).buildAllYearsViewModel(any[VerificationHistoryData], any[String])(
-          any[Lang]()
+        mockVerify(mockVerificationService).getSubmittedVerifications(eqTo(cisId))(any)
+        mockVerify(mockVerificationHistoryService).buildAllYearsViewModel(eqTo(verificationHistoryData), eqTo(cisId))(
+          any
         )
+        verifyNoMoreInteractions(mockVerificationService, mockVerificationHistoryService)
       }
     }
 
-    "onPageLoadSingleYear must redirect when CisIdPage is missing" in new Setup {
-      val app = application(emptyUserAnswers)
+    "return 303 SEE_OTHER when" - {
+      "CisIdPage is missing and redirect to unauthorised page" in new Setup {
+        mockControllerComponents.setUserAnswers(Some(emptyUserAnswers))
 
-      running(app) {
-        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadSingleYear().url)
-        val result  = route(app, request).value
+        private val result = controllerUnderTest.onPageLoad(TaxYear(2026).toPath)(FakeRequest())
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual unauthorisedUrl
+        verifyNoMoreInteractions(mockVerificationService, mockVerificationHistoryService)
       }
-    }
 
-    "onPageLoadAllYears must redirect when CisIdPage is missing" in new Setup {
-      val app = application(emptyUserAnswers)
+      "resolveVerificationHistoryData fails and redirect to journey recovery" in new Setup {
+        mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
+        mockVerificationServiceFails()
 
-      running(app) {
-        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadAllYears().url)
-        val result  = route(app, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual unauthorisedUrl
-      }
-    }
-
-    "onPageLoadSingleYear must redirect to JourneyRecovery when buildSingleYearViewModel returns None" in new Setup {
-      val userAnswers = userAnswersWithVerificationHistoryData
-
-      when(mockVerificationHistoryService.buildSingleYearViewModel(verificationHistoryData, "2026", cisId)(Lang("en")))
-        .thenReturn(None)
-
-      val app = application(userAnswers)
-
-      running(app) {
-        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadSingleYear().url)
-        val result  = route(app, request).value
+        private val result = controllerUnderTest.onPageLoad(TaxYear(2026).toPath)(FakeRequest())
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual journeyRecoveryUrl
 
-        mockVerify(mockVerificationHistoryService).buildSingleYearViewModel(verificationHistoryData, "2026", cisId)(
-          Lang("en")
-        )
+        mockVerify(mockVerificationService).getSubmittedVerifications(eqTo(cisId))(any)
+        verifyNoMoreInteractions(mockVerificationService, mockVerificationHistoryService)
       }
     }
 
-    "onPageLoadAllYears must redirect to JourneyRecovery when buildAllYearsViewModel returns None" in new Setup {
-      val userAnswers = userAnswersWithVerificationHistoryData
+    "return 404 NOT_FOUND when" - {
+      "tax year selection is invalid" in new Setup {
+        mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
 
-      when(mockVerificationHistoryService.buildAllYearsViewModel(verificationHistoryData, cisId)(Lang("en")))
-        .thenReturn(None)
+        private val result = controllerUnderTest.onPageLoad("invalid-tax-year-selection")(FakeRequest())
 
-      val app = application(userAnswers)
-
-      running(app) {
-        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadAllYears().url)
-        val result  = route(app, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual journeyRecoveryUrl
-
-        mockVerify(mockVerificationHistoryService).buildAllYearsViewModel(verificationHistoryData, cisId)(Lang("en"))
+        status(result) mustEqual NOT_FOUND
+        contentAsString(result) mustEqual stubNotFoundContent
+        verifyNoMoreInteractions(mockVerificationService, mockVerificationHistoryService)
       }
-    }
 
-    "onPageLoadSingleYear must redirect to JourneyRecovery when tax year selection is missing from session" in new Setup {
-      val userAnswers = userAnswersWithCisId
+      "single tax year selection is valid but no history exists for that year" in new Setup {
+        mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
+        mockVerificationServiceReturnsData()
+        mockSingleYearViewModelReturns(None)
 
-      val app = application(userAnswers)
+        val givenTaxYear   = TaxYear(2026)
+        private val result = controllerUnderTest.onPageLoad(givenTaxYear.toPath)(FakeRequest())
 
-      running(app) {
-        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadSingleYear().url)
-        val result  = route(app, request).value
+        status(result) mustEqual NOT_FOUND
+        contentAsString(result) mustEqual stubNotFoundContent
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual journeyRecoveryUrl
-
-        verifyNoInteractions(mockVerificationService)
-        verifyNoInteractions(mockVerificationHistoryService)
-      }
-    }
-
-    "onPageLoadSingleYear must redirect to JourneyRecovery when resolveVerificationHistoryData fails" in new Setup {
-      val userAnswers = userAnswersWithCisIdAndTaxYearSelection
-
-      mockVerificationServiceFails()
-
-      val app = application(userAnswers)
-
-      running(app) {
-        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadSingleYear().url)
-        val result  = route(app, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual journeyRecoveryUrl
-
-        mockVerify(mockVerificationService)
-          .getSubmittedVerifications(any[String])(any[HeaderCarrier])
-      }
-    }
-
-    "onPageLoadAllYears must redirect to JourneyRecovery when resolveVerificationHistoryData fails" in new Setup {
-      val userAnswers = userAnswersWithCisId
-
-      mockVerificationServiceFails()
-
-      val app = application(userAnswers)
-
-      running(app) {
-        val request = FakeRequest(GET, routes.VerificationHistoryController.onPageLoadAllYears().url)
-        val result  = route(app, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual journeyRecoveryUrl
-
-        mockVerify(mockVerificationService)
-          .getSubmittedVerifications(any[String])(any[HeaderCarrier])
+        mockVerify(mockVerificationService).getSubmittedVerifications(eqTo(cisId))(any)
+        mockVerify(mockVerificationHistoryService)
+          .buildSingleYearViewModel(eqTo(verificationHistoryData), eqTo(givenTaxYear.startYear), eqTo(cisId))(any)
+        verifyNoMoreInteractions(mockVerificationService, mockVerificationHistoryService)
       }
     }
   }

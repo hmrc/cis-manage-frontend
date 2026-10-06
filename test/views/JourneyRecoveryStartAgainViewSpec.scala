@@ -28,7 +28,7 @@ class JourneyRecoveryStartAgainViewSpec extends SpecBase with Matchers {
   "JourneyRecoveryStartAgainView" - {
 
     Seq(
-      ("AGENT", applicationConfig.constructionIndustryAgentAccountUrl + "1"),
+      ("AGENT",        applicationConfig.constructionIndustryAgentAccountUrl + "1"),
       ("ORGANISATION", applicationConfig.constructionIndustryOrgAccountUrl)
     ).foreach { case (accountTypeSTR, cisAccountURL) =>
       s"when accountType is '$accountTypeSTR'" - {
@@ -45,7 +45,7 @@ class JourneyRecoveryStartAgainViewSpec extends SpecBase with Matchers {
           doc.getElementsByClass("govuk-link").text must include(
             messages("journeyRecovery.startAgain.guidance.contactHMRC.link")
           )
-          doc.select("p").text                      must include(messages("journeyRecovery.startAgain.guidance.cisAccount.prefix"))
+          doc.select("p").text                      must include(messages("site.backTo"))
           doc.getElementsByClass("govuk-link").text must include(
             messages("journeyRecovery.startAgain.guidance.cisAccount.link")
           )

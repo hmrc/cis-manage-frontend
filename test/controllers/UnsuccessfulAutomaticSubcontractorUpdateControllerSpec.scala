@@ -17,16 +17,14 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.{AuthorizedForSchemeActionProvider, FakeAuthorizedForSchemeAction, HasClientGuard}
+import controllers.actions.{AuthorizedForSchemeActionProvider, FakeAuthorizedForSchemeAction}
 import models.Scheme
-import models.requests.DataRequest
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject.bind
-import play.api.mvc.{ActionFilter, Result}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.PrepopService
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.UnsuccessfulAutomaticSubcontractorUpdateView
@@ -37,16 +35,6 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
 
   val mockPrepopService: PrepopService                            = mock[PrepopService]
   val mockSchemeAccessProvider: AuthorizedForSchemeActionProvider = mock[AuthorizedForSchemeActionProvider]
-  val hasClientGuard: HasClientGuard                              = mock[HasClientGuard]
-
-  private val passThroughFilter =
-    new ActionFilter[DataRequest] {
-      override protected def executionContext: ExecutionContext                         = ExecutionContext.global
-      override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
-        Future.successful(None)
-    }
-
-  when(hasClientGuard.forInstanceId(any[String])).thenReturn(passThroughFilter)
 
   "UnsuccessfulAutomaticSubcontractorUpdate Controller" - {
 
@@ -55,8 +43,7 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService),
-          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider),
-          bind[HasClientGuard].toInstance(hasClientGuard)
+          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider)
         )
         .build()
 
@@ -100,8 +87,7 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService),
-          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider),
-          bind[HasClientGuard].toInstance(hasClientGuard)
+          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider)
         )
         .build()
 
@@ -144,8 +130,7 @@ class UnsuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(
           bind[PrepopService].toInstance(mockPrepopService),
-          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider),
-          bind[HasClientGuard].toInstance(hasClientGuard)
+          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider)
         )
         .build()
 

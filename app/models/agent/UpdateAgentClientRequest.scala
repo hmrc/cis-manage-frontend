@@ -14,24 +14,15 @@
  * limitations under the License.
  */
 
-package pages.verify
+package models.agent
 
-import base.SpecBase
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Json, OFormat}
+case class UpdateAgentClientRequest(
+  taxOfficeNumber: String,
+  taxOfficeReference: String,
+  clientRef: String
+)
 
-class VerificationHistoryDataPageSpec extends SpecBase {
-
-  "VerificationHistoryDataPage" - {
-
-    "must have the correct path" in {
-      VerificationHistoryDataPage.path mustBe (
-        JsPath \ "verificationHistoryData"
-      )
-    }
-
-    "must have the correct toString value" in {
-      VerificationHistoryDataPage.toString mustBe
-        "verificationHistoryData"
-    }
-  }
+object UpdateAgentClientRequest {
+  given format: OFormat[UpdateAgentClientRequest] = Json.format[UpdateAgentClientRequest]
 }

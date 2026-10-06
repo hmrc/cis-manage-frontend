@@ -20,8 +20,7 @@
 @this(
     layout: templates.Layout,
     link: Link,
-    paragraph: Paragraph,
-    heading: H1,
+    heading: H1
 )
 
 
@@ -29,12 +28,10 @@
 
 @layout(
     pageTitle = titleNoForm(messages("unauthorised.org.title")),
-    showBackLink = false,
-    timeout = false
+    showBackLink = false
 ) {
 
-    @heading(messages("unauthorised.org.heading"), classes = "govuk-heading-xl")
-    @paragraph(messages("unauthorised.org.p1"), extraClasses = "govuk-!-margin-bottom-5")
+    @heading("unauthorised.org.heading", classes = "govuk-heading-xl")
     @link(
         linkTextKey = "unauthorised.org.guidance.p2.link",
         linkUrl = appConfig.govUkCISGuidanceUrl,

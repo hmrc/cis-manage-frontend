@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,3 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package controllers.actions
+
+import models.requests.CisIdDataRequest
+import play.api.mvc.*
+
+import scala.concurrent.ExecutionContext.global
+import scala.concurrent.{ExecutionContext, Future}
+
+class FakeFormpRdsReconcileAction extends FormpRdsReconcileAction {
+
+  override protected def filter[A](request: CisIdDataRequest[A]): Future[Option[Result]] =
+    Future.successful(None)
+
+  override protected def executionContext: ExecutionContext = global
+}

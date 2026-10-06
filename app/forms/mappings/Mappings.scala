@@ -74,4 +74,6 @@ trait Mappings extends Formatters with Constraints {
   ): FieldMapping[ClientListFormData] =
     of(clientListSearchFormatter(requiredKey, args))
 
+  protected def optionalText: FieldMapping[String] =
+    of(optionalStringFormatter)
 }

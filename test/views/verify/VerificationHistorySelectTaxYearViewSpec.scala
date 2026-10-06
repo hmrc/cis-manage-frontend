@@ -17,21 +17,21 @@
 package views.verify
 
 import base.SpecBase
-import forms.verify.VerificationHistorySelectTaxYearFormProvider
-import models.Mode
+import forms.verify.TaxYearFormProvider
+import models.verify.VerificationTaxYearSelection
+import models.verify.VerificationTaxYearSelection.TaxYearPeriod
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import play.api.Application
 import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.Request
-import models.NormalMode
-import models.verify.VerificationTaxYearSelection.TaxYearPeriod
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import views.html.verify.VerificationHistorySelectTaxYearView
 
 class VerificationHistorySelectTaxYearViewSpec extends SpecBase {
+
+  private val view = app.injector.instanceOf[VerificationHistorySelectTaxYearView]
 
   "VerificationHistorySelectTaxYearView" - {
 
@@ -51,7 +51,9 @@ class VerificationHistorySelectTaxYearViewSpec extends SpecBase {
 
       taxYears.zipWithIndex.foreach { case (year, index) =>
         doc.select(s"input[type=radio][value='${year.startYear}']").size() mustBe 1
-        doc.select(s"label[for=value_$index]").text() must include(year.toString)
+        doc.select(s"label[for=value_$index]").text() must include(
+          s"${year.startYear} to ${year.startYear + 1}"
+        )
       }
     }
 
@@ -64,14 +66,16 @@ class VerificationHistorySelectTaxYearViewSpec extends SpecBase {
       val labels =
         doc.select("label").eachText().toArray.toList
 
-      labels must contain("View all tax years")
+      labels must contain(
+        messages("verify.verificationHistorySelectTaxYear.viewAll")
+      )
     }
 
     "must show error summary when form has errors" in new Setup {
 
       val errorForm = form.bind(Map("value" -> ""))
 
-      val errorHtml = view(errorForm, mode, taxYears)
+      val errorHtml = view(errorForm, taxYears)
       val doc       = Jsoup.parse(errorHtml.toString)
 
       doc.select(".govuk-error-summary").size() mustBe 1
@@ -79,19 +83,11 @@ class VerificationHistorySelectTaxYearViewSpec extends SpecBase {
   }
 
   trait Setup {
-
-    val app: Application = applicationBuilder().build()
-
-    val view: VerificationHistorySelectTaxYearView =
-      app.injector.instanceOf[VerificationHistorySelectTaxYearView]
-
     val taxYears: Seq[TaxYearPeriod] =
       Seq(TaxYearPeriod(2021), TaxYearPeriod(2022), TaxYearPeriod(2023))
 
-    val formProvider       = new VerificationHistorySelectTaxYearFormProvider()
-    val form: Form[String] = formProvider(taxYears.map(_.startYear.toString))
-
-    val mode: Mode = NormalMode
+    val formProvider                             = new TaxYearFormProvider()
+    val form: Form[VerificationTaxYearSelection] = formProvider(taxYears)
 
     implicit val request: Request[_] = FakeRequest()
 
@@ -101,7 +97,6 @@ class VerificationHistorySelectTaxYearViewSpec extends SpecBase {
         app.injector.instanceOf[MessagesApi]
       )
 
-    val html: HtmlFormat.Appendable =
-      view(form, mode, taxYears)
+    val html: HtmlFormat.Appendable = view(form, taxYears)
   }
 }

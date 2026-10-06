@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package pages.verify
+package controllers.actions
 
-import models.verify.VerificationTaxYearSelection
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.mvc.{ActionFilter, Result}
 
-case object VerificationHistorySelectTaxYearPage extends QuestionPage[VerificationTaxYearSelection] {
+import scala.concurrent.{ExecutionContext, Future}
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "verificationHistorySelectTaxYear"
+final class PassThroughFilter[R[_]](using val executionContext: ExecutionContext) extends ActionFilter[R] {
+  def filter[A](request: R[A]): Future[Option[Result]] = Future.successful(None)
 }

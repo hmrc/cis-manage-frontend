@@ -16,62 +16,30 @@
 
 package controllers
 
-import base.SpecBase
-import config.FrontendAppConfig
-import controllers.actions.HasClientGuard
-import models.requests.DataRequest
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import org.scalatestplus.mockito.MockitoSugar
-import play.api.inject.bind
-import play.api.mvc.{ActionFilter, Result}
+import base.UnitSpec
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.SubcontractorsLandingPageView
-import scala.concurrent.{ExecutionContext, Future}
 
-class SubcontractorsLandingPageControllerSpec extends SpecBase with MockitoSugar {
-  private val instanceId = "CIS-123"
+class SubcontractorsLandingPageControllerSpec extends UnitSpec {
+  import org.mockito.ArgumentMatchers.any
+  import org.mockito.Mockito.when
+  import play.twirl.api.Html
 
-  implicit val ec: ExecutionContext = ExecutionContext.global
+  private val stubView    = mock[SubcontractorsLandingPageView]
+  private val stubContent = "Subcontractors Landing Page"
+  when(stubView.apply()(any, any)) thenReturn Html(stubContent)
 
-  private val hasClientGuard = mock[HasClientGuard]
-
-  private val passThroughFilter =
-    new ActionFilter[DataRequest] {
-      override protected def executionContext: ExecutionContext                         = ec
-      override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
-        Future.successful(None)
-    }
-
-  when(hasClientGuard.forInstanceId(any[String])).thenReturn(passThroughFilter)
+  private val controllerUnderTest = new SubcontractorsLandingPageController(mockControllerComponents, stubView)
 
   "SubcontractorsLandingPageController" - {
 
     "must return OK and the correct view for a GET" in {
+      mockControllerComponents.setUserAnswers(Some(emptyUserAnswers))
+      val result = controllerUnderTest.onPageLoad(cisId)(FakeRequest())
 
-      val application = applicationBuilder(
-        userAnswers = Some(emptyUserAnswers),
-        additionalBindings = Seq(bind[HasClientGuard].toInstance(hasClientGuard))
-      ).build()
-
-      running(application) {
-        val request = FakeRequest(
-          GET,
-          routes.SubcontractorsLandingPageController.onPageLoad(instanceId).url
-        )
-        val result  = route(application, request).value
-
-        val view = application.injector.instanceOf[SubcontractorsLandingPageView]
-
-        status(result) mustBe OK
-
-        implicit val appConfig: FrontendAppConfig =
-          application.injector.instanceOf[FrontendAppConfig]
-
-        contentAsString(result) mustEqual
-          view()(request, appConfig, messages(application)).toString
-      }
+      status(result) mustBe OK
+      contentAsString(result) mustEqual stubContent
     }
   }
 }

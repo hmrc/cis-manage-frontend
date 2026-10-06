@@ -25,7 +25,7 @@ object DateTimeFormats {
 
   private val dateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
-  private val timeFormatter = DateTimeFormatter.ofPattern("h:mma")
+  private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm z")
 
   private val localisedDateTimeFormatters = Map(
     "en" -> dateTimeFormatter,
@@ -43,7 +43,7 @@ object DateTimeFormats {
   private val shortDateFormatter = DateTimeFormatter.ofPattern("d MMM yyyy")
 
   private val localisedShortDateFormatters = Map(
-    "en" -> shortDateFormatter,
+    "en" -> shortDateFormatter.withLocale(Locale.ENGLISH),
     "cy" -> shortDateFormatter.withLocale(Locale.forLanguageTag("cy"))
   )
 

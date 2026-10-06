@@ -30,7 +30,7 @@ import controllers.clientdetails.routes
 class ChangeClientReferenceSummarySpec extends AnyFreeSpec with Matchers {
 
   implicit val messages: Messages = stubMessages()
-
+  val uniqueId                    = "123456"
   "ChangeClientReferenceSummary.row" - {
 
     "must return a Summary List Row when the answer exists" in {
@@ -40,7 +40,7 @@ class ChangeClientReferenceSummarySpec extends AnyFreeSpec with Matchers {
           .success
           .value
 
-      val maybeRow = ChangeClientReferenceSummary.row(answers)
+      val maybeRow = ChangeClientReferenceSummary.row(answers, uniqueId)
       maybeRow shouldBe defined
 
       val row = maybeRow.value
@@ -56,7 +56,7 @@ class ChangeClientReferenceSummarySpec extends AnyFreeSpec with Matchers {
 
       val changeAction       = actions.head
       val expectedChangeText = messages("site.change")
-      val expectedHref       = routes.ChangeClientReferenceController.onPageLoad(CheckMode).url
+      val expectedHref       = routes.ChangeClientReferenceController.onPageLoad(uniqueId, CheckMode).url
       val expectedHiddenText = messages("clientdetails.changeClientReference.change.hidden")
 
       changeAction.content.asHtml.toString    should include(expectedChangeText)
@@ -66,7 +66,7 @@ class ChangeClientReferenceSummarySpec extends AnyFreeSpec with Matchers {
 
     "must return None when the answer does not exist" in {
       val answers = UserAnswers("test-id")
-      ChangeClientReferenceSummary.row(answers) shouldBe None
+      ChangeClientReferenceSummary.row(answers, uniqueId) shouldBe None
     }
   }
 }

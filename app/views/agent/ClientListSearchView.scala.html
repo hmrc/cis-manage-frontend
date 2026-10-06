@@ -46,7 +46,7 @@
     appConfig: FrontendAppConfig
 )
 
-@(form: Form[_], searchByOptions: Seq[SearchByList], clientList: Seq[ClientListViewModel], paginationViewModel: PaginationViewModel = PaginationViewModel(), sortBy: Option[String] = None, sortOrder: Option[String] = None)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], searchByOptions: Seq[SearchByList], clientList: Seq[ClientListViewModel], paginationViewModel: PaginationViewModel = PaginationViewModel(), sortBy: Option[String] = None, sortOrder: Option[String] = None, currentPage: Int = 1, totalPages: Int = 1)(implicit request: Request[_], messages: Messages)
 
 @scripts = {
     <script src='@controllers.routes.Assets.versioned("javascripts/jquery-3.6.3.min.js")' @{CSPNonce.attr}></script>
@@ -77,7 +77,7 @@
         <a href="@link.href" class="govuk-link">
             @link.text
             <span class="govuk-visually-hidden">
-                @{messages("agent.clientListSearch.td.clientName.hidden", link.text)}
+                @{messages("agent.clientListSearch.td.clientName.hidden")}
             </span>
         </a>
     }
@@ -88,7 +88,7 @@
         <a href="@link.href" class="govuk-link">
             @link.text
             <span class="govuk-visually-hidden">
-                @{messages("agent.clientListSearch.td.actions.remove.hidden", agentClient.clientName)}
+                @agentClient.clientName
             </span>
         </a>
     }
@@ -102,7 +102,7 @@
     }
 }
 
-@layout(pageTitle = title(form, messages("agent.clientListSearch.title")),
+@layout(pageTitle = title(form, withPagination(messages("agent.clientListSearch.title"), currentPage, totalPages)),
 additionalScripts = Some(scripts),
 additionalCss = Some(css)) {
 

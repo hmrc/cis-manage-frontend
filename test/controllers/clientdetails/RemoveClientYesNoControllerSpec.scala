@@ -17,19 +17,19 @@
 package controllers.clientdetails
 
 import base.SpecBase
-import controllers.actions.{ClientListStatusGuard, HasClientGuard}
 import controllers.routes
 import forms.clientdetails.RemoveClientYesNoFormProvider
-import models.requests.{DataRequest, IdentifierRequest}
+import models.agent.ClientListFormData
 import models.{CisTaxpayer, CisTaxpayerSearchResult, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.clientdetails.RemoveClientYesNoPage
-import pages.AgentClientsPage
+import pages.{AgentClientsPage, ClientListSearchPage}
+import play.api.data.Form
 import play.api.inject.bind
-import play.api.mvc.{ActionFilter, Call, Result}
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -47,8 +47,8 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new RemoveClientYesNoFormProvider()
-  val form         = formProvider()
+  val formProvider        = new RemoveClientYesNoFormProvider()
+  val form: Form[Boolean] = formProvider()
 
   val employerRef = "123456"
   val uniqueId    = "123"
@@ -65,35 +65,11 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
       )
     )
 
-  lazy val removeClientRoute =
-    controllers.clientdetails.routes.RemoveClientYesNoController
-      .onPageLoad(uniqueId, NormalMode)
-      .url
+  private lazy val removeClientRoute =
+    controllers.clientdetails.routes.RemoveClientYesNoController.onPageLoad(uniqueId, NormalMode).url
 
-  private val clientListStatusGuard = mock[ClientListStatusGuard]
-  private val hasClientGuard        = mock[HasClientGuard]
   private val mockManageService     = mock[ManageService]
   private val mockSessionRepository = mock[SessionRepository]
-
-  private val passThroughIdentifierFilter =
-    new ActionFilter[IdentifierRequest] {
-      override protected def executionContext: ExecutionContext = ec
-
-      override protected def filter[A](
-        request: IdentifierRequest[A]
-      ): Future[Option[Result]] =
-        Future.successful(None)
-    }
-
-  private val passThroughDataFilter =
-    new ActionFilter[DataRequest] {
-      override protected def executionContext: ExecutionContext = ec
-
-      override protected def filter[A](
-        request: DataRequest[A]
-      ): Future[Option[Result]] =
-        Future.successful(None)
-    }
 
   private val okResponse = CisTaxpayer(
     uniqueId = "CIS-123",
@@ -114,14 +90,6 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
     enrolledSig = None
   )
 
-  private def mockGuards(): Unit = {
-    when(clientListStatusGuard.groupB(any[Call]))
-      .thenReturn(passThroughIdentifierFilter)
-
-    when(hasClientGuard.forInstanceId(any[String]))
-      .thenReturn(passThroughDataFilter)
-  }
-
   private def mockClientLookup(): Unit =
     when(
       mockManageService.getClientByEmployerReference(any, any)(using any[HeaderCarrier])
@@ -136,15 +104,11 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
   "RemoveClient Controller" - {
 
     "must return OK and the correct view for a GET" in {
-
-      mockGuards()
       mockClientLookup()
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswersWithClient))
           .overrides(
-            bind[ClientListStatusGuard].toInstance(clientListStatusGuard),
-            bind[HasClientGuard].toInstance(hasClientGuard),
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[ManageService].toInstance(mockManageService)
           )
@@ -171,8 +135,6 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      mockGuards()
       mockClientLookup()
 
       val userAnswers = UserAnswers(userAnswersId)
@@ -186,8 +148,6 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
-            bind[ClientListStatusGuard].toInstance(clientListStatusGuard),
-            bind[HasClientGuard].toInstance(hasClientGuard),
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[ManageService].toInstance(mockManageService)
           )
@@ -218,6 +178,25 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
 
       mockClientLookup()
 
+      val cisClients: List[CisTaxpayerSearchResult] = List(
+        CisTaxpayerSearchResult(
+          uniqueId = "UID-001",
+          taxOfficeNumber = "123",
+          taxOfficeRef = "AB45678",
+          agentOwnRef = Some("ABC-001"),
+          schemeName = Some("ABC Construction Ltd"),
+          utr = Some("1234567890")
+        ),
+        CisTaxpayerSearchResult(
+          uniqueId = "UID-002",
+          taxOfficeNumber = "789",
+          taxOfficeRef = "EF23456",
+          agentOwnRef = Some("ABC-002"),
+          schemeName = Some("ABC Property Services"),
+          utr = Some("1234567890")
+        )
+      )
+
       val userAnswers = UserAnswers(userAnswersId)
         .set(RemoveClientYesNoPage, true)
         .success
@@ -225,9 +204,17 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
         .set(AgentClientsPage, client)
         .success
         .value
+        .set(ClientListSearchPage, ClientListFormData("CN", "ABC"))
+        .success
+        .value
 
-      when(mockSessionRepository.set(any()))
-        .thenReturn(Future.successful(true))
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+      when(mockManageService.removeClient(any[String], any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(()))
+
+      when(mockManageService.resolveAndStoreAgentClients(any[UserAnswers])(using any[HeaderCarrier]))
+        .thenReturn(Future.successful((cisClients, userAnswers)))
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
@@ -287,17 +274,7 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      mockGuards()
-
-      val application =
-        applicationBuilder(
-          userAnswers = None,
-          additionalBindings = Seq(
-            bind[ClientListStatusGuard].toInstance(clientListStatusGuard),
-            bind[HasClientGuard].toInstance(hasClientGuard)
-          )
-        ).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request = FakeRequest(GET, removeClientRoute)
@@ -323,6 +300,40 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to System Error for a POST if api failed" in {
+
+      mockClientLookup()
+
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(AgentClientsPage, client)
+        .success
+        .value
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockManageService.removeClient(any[String], any[UserAnswers])(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[ManageService].toInstance(mockManageService)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, removeClientRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.SystemErrorController.onPageLoad().url
       }
     }
   }

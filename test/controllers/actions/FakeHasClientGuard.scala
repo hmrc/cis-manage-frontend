@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package pages.verify
+package controllers.actions
 
-import base.SpecBase
-import play.api.libs.json.JsPath
+import models.requests.DataRequest
+import play.api.mvc.ActionFilter
 
-class VerificationHistorySelectTaxYearPageSpec extends SpecBase {
+import scala.concurrent.ExecutionContext
 
-  "VerificationHistorySelectTaxYearPage" - {
+//noinspection ScalaStyle to stop complaint about null arguments. They are never used so this is OK.
+class FakeHasClientGuard(using ExecutionContext) extends HasClientGuard(null, null, null) {
+  private val passThroughFilter = new PassThroughFilter[DataRequest]
 
-    "must have the correct path" in {
-      VerificationHistorySelectTaxYearPage.path mustBe (
-        JsPath \ "verificationHistorySelectTaxYear"
-      )
-    }
+  override def forInstanceId(instanceId: String): ActionFilter[DataRequest] = passThroughFilter
 
-    "must have the correct toString value" in {
-      VerificationHistorySelectTaxYearPage.toString mustBe
-        "verificationHistorySelectTaxYear"
-    }
-  }
+  override def currentClient: ActionFilter[DataRequest] = passThroughFilter
 }

@@ -64,6 +64,13 @@ class LayoutWithSidebarSpec extends SpecBase {
       oneThird                                      should not be null
       oneThird.selectFirst("p.govuk-body").text() shouldBe "Sidebar block"
 
+      val layoutColumns = doc.select("#main-content > .govuk-grid-row > div")
+      layoutColumns.size()                                                shouldBe 3
+      layoutColumns.get(0).text()                                           should include("Main block")
+      layoutColumns.get(0).select(".hmrc-report-technical-issue").isEmpty shouldBe true
+      layoutColumns.get(1).text()                                           should include("Sidebar block")
+      layoutColumns.get(2).select(".hmrc-report-technical-issue").size()  shouldBe 1
+
       val keepAliveUrl = controllers.routes.KeepAliveController.keepAlive().url
       val signOutUrl   = controllers.auth.routes.AuthController.signOut().url
       doc.outerHtml() should include(keepAliveUrl)

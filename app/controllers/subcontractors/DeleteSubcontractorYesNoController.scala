@@ -125,11 +125,13 @@ class DeleteSubcontractorYesNoController @Inject() (
                 .fold(
                   Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
                 ) { journeyData =>
-                  val subcontractorName = request.userAnswers
+                  val foundSubcontractor  = request.userAnswers
                     .get(SubcontractorListPage)
                     .flatMap(_.subcontractors.find(_.subbieResourceRef.contains(verificationNumber)))
+                  val subcontractorName   = foundSubcontractor
                     .flatMap(_.displayName)
                     .getOrElse(journeyData.subcontractorName)
+                  val typeOfSubcontractor = foundSubcontractor.flatMap(_.normalisedType)
                   subcontractorService
                     .deleteSubcontractor(request.cisId, verificationNumber)
                     .flatMap { _ =>
@@ -137,7 +139,8 @@ class DeleteSubcontractorYesNoController @Inject() (
                         DeleteSubcontractorAuditEventModel(
                           cisId = request.cisId,
                           subcontractorName = subcontractorName,
-                          subbieResourceRef = verificationNumber
+                          subbieResourceRef = verificationNumber,
+                          typeOfSubcontractor = typeOfSubcontractor
                         )
                       )
                       cleanupUserAnswers(subcontractorName)

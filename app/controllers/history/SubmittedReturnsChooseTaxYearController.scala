@@ -41,6 +41,7 @@ class SubmittedReturnsChooseTaxYearController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   requireCisId: CisIdRequiredAction,
+  reconcileFormpRds: FormpRdsReconcileAction,
   formProvider: SubmittedReturnsChooseTaxYearFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: SubmittedReturnsChooseTaxYearView,
@@ -49,36 +50,37 @@ class SubmittedReturnsChooseTaxYearController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData andThen requireCisId).async {
-    implicit request =>
-      manageService
-        .getSubmittedTaxYears(request.cisId)
-        .map {
-          case Nil =>
-            Redirect(controllers.history.routes.NoReturnsSubmittedController.onPageLoad())
+  def onPageLoad(): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen requireCisId andThen reconcileFormpRds).async {
+      implicit request =>
+        manageService
+          .getSubmittedTaxYears(request.cisId)
+          .map {
+            case Nil =>
+              Redirect(controllers.history.routes.NoReturnsSubmittedController.onPageLoad())
 
-          case Seq((start, _)) =>
-            Redirect(controllers.history.routes.SubmittedReturnsController.onPageLoadSingleYear(start.toString))
+            case Seq((start, _)) =>
+              Redirect(controllers.history.routes.SubmittedReturnsController.onPageLoadSingleYear(start.toString))
 
-          case taxYears =>
-            val taxYearStrings = taxYears.map((start, end) => s"$start to $end")
+            case taxYears =>
+              val taxYearStrings = taxYears.map((start, end) => s"$start to $end")
 
-            val form = formProvider(taxYearStrings)
+              val form = formProvider(taxYearStrings)
 
-            val preparedForm = request.userAnswers.get(SubmittedReturnsChooseTaxYearPage) match {
-              case None        => form
-              case Some(value) => form.fill(value.toString)
-            }
+              val preparedForm = request.userAnswers.get(SubmittedReturnsChooseTaxYearPage) match {
+                case None        => form
+                case Some(value) => form.fill(value.toString)
+              }
 
-            Ok(view(preparedForm, taxYearStrings))
-        }
-        .recover { err =>
-          logger.info(
-            "[SubmittedReturnsChooseTaxYearController] Error trying to retrieve submitted tax years"
-          )
-          Redirect(controllers.routes.SystemErrorController.onPageLoad())
-        }
-  }
+              Ok(view(preparedForm, taxYearStrings))
+          }
+          .recover { err =>
+            logger.info(
+              "[SubmittedReturnsChooseTaxYearController] Error trying to retrieve submitted tax years"
+            )
+            Redirect(controllers.routes.SystemErrorController.onPageLoad())
+          }
+    }
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData andThen requireCisId).async {
     implicit request =>

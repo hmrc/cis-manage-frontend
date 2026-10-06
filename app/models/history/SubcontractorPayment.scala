@@ -20,6 +20,7 @@ import play.api.libs.json.{Json, OFormat}
 
 case class SubcontractorPayment(
   name: String,
+  verificationNumber: String,
   paymentsMade: String,
   costOfMaterials: String,
   taxDeducted: String

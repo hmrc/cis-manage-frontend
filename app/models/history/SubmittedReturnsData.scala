@@ -16,9 +16,9 @@
 
 package models.history
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Format, JsError, JsString, JsSuccess, Json, OFormat, Reads, Writes}
 
-import java.time.Instant
+import java.time.LocalDateTime
 
 case class SubmittedReturnsData(
   scheme: SubmittedSchemeData,
@@ -64,9 +64,22 @@ case class SubmittedSubmissionData(
   hmrcMarkGenerated: Option[String],
   hmrcMarkGgis: Option[String],
   emailRecipient: Option[String],
-  acceptedTime: Option[Instant]
+  acceptedTime: Option[LocalDateTime]
 )
 
 object SubmittedSubmissionData {
+
+  private given Format[LocalDateTime] = Format(
+    Reads {
+      case JsString(value) =>
+        scala.util.Try(LocalDateTime.parse(value.take(19))) match {
+          case scala.util.Success(dateTime) => JsSuccess(dateTime)
+          case scala.util.Failure(_)        => JsError("error.expected.localdatetime")
+        }
+      case _               => JsError("error.expected.jsstring")
+    },
+    Writes(dateTime => JsString(dateTime.toString))
+  )
+
   given format: OFormat[SubmittedSubmissionData] = Json.format[SubmittedSubmissionData]
 }

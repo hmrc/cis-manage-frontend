@@ -72,6 +72,17 @@ class IntroductionViewSpec extends SpecBase {
       doc.getElementsByClass("govuk-link").text must include(messages("introduction.sidebar.link3"))
       doc.getElementsByClass("govuk-link").text must include(messages("introduction.sidebar.link4"))
     }
+
+    "must render related content before the report technical issue link" in new Setup {
+      val html: HtmlFormat.Appendable = view()
+      val doc: Document               = Jsoup.parse(html.body)
+
+      val layoutColumns = doc.select("#main-content > .govuk-grid-row > div")
+      layoutColumns.size mustBe 3
+      layoutColumns.get(1).select("aside.app-related-items").size mustBe 1
+      layoutColumns.get(2).select(".hmrc-report-technical-issue").size mustBe 1
+      layoutColumns.get(0).select(".hmrc-report-technical-issue").size mustBe 0
+    }
   }
 
   trait Setup {

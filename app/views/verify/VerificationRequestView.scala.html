@@ -36,11 +36,12 @@
             @h1("verify.verificationRequest.heading")
 
             @h2("verify.verificationRequest.submissionDetails.heading")
-
-            @paragraph(
-                message = "verify.verificationRequest.submittedAt",
-                args = Seq(viewModel.submittedTime, viewModel.submittedDate)
-            )
+            @if(viewModel.submittedTime.nonEmpty && viewModel.submittedDate.nonEmpty) {
+                @paragraph(
+                    message = "verify.verificationRequest.submittedAt",
+                    args = Seq(viewModel.submittedTime, viewModel.submittedDate)
+                )
+            }
 
             @govukSummaryList(
                 SummaryList(
@@ -79,7 +80,7 @@
 
             @link(
                 linkTextKey = "verify.verificationRequest.manageLink",
-                prefixTextKey = "verify.verificationRequest.backTo",
+                prefixTextKey = "site.backTo",
                 linkUrl = viewModel.manageSubcontractorsUrl,
                 hasFullStop = true
             )

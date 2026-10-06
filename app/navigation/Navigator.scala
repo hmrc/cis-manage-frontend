@@ -17,17 +17,20 @@
 package navigation
 
 import javax.inject.{Inject, Singleton}
-
 import play.api.mvc.Call
 import controllers.routes
-import pages._
-import models._
+import pages.*
+import models.*
+import pages.clientdetails.{ChangeClientReferencePage, RemoveClientYesNoPage}
 
 @Singleton
 class Navigator @Inject() () {
 
-  private val normalRoutes: Page => UserAnswers => Call = { case _ =>
-    _ => routes.IndexController.onPageLoad()
+  private val normalRoutes: Page => UserAnswers => Call = {
+    case RemoveClientYesNoPage     => userAnswers => navigatorFromRemoveClientYesNoPage(userAnswers)
+    case ChangeClientReferencePage =>
+      _ => controllers.clientdetails.routes.ClientRefUpdateConfirmationController.onPageLoad()
+    case _                         => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = { case _ =>
@@ -40,4 +43,15 @@ class Navigator @Inject() () {
     case CheckMode  =>
       checkRouteMap(page)(userAnswers)
   }
+
+  private def navigatorFromRemoveClientYesNoPage(userAnswers: UserAnswers): Call =
+    userAnswers.get(RemoveClientYesNoPage) match {
+      case Some(true)  => controllers.clientdetails.routes.ClientRemovedController.onPageLoad()
+      case Some(false) =>
+        userAnswers.get(CisIdPage) match {
+          case Some(cisId) => controllers.agent.routes.AgentLandingController.onPageLoad(cisId)
+          case _           => controllers.agent.routes.ClientListSearchController.onPageLoad()
+        }
+      case _           => controllers.routes.JourneyRecoveryController.onPageLoad()
+    }
 }
