@@ -93,7 +93,7 @@ class SubcontractorsListViewSpec extends SpecBase with Matchers {
       backLink.size() mustBe 1
       backLink.text() mustBe messages("subcontractors.subcontractorsList.manage")
 
-      doc.body().text() must include(messages("subcontractors.subcontractorsList.backTo"))
+      doc.body().text() must include(messages("site.backTo"))
     }
 
     "must render showing results text when pagination exists" in new Setup {

@@ -2,6 +2,7 @@
 service.name                                            =  Cynllun y Diwydiant Adeiladu
 
 site.back                                               =  Yn ôl
+site.backTo                                             =  Yn ôl i
 site.remove                                             =  Dileu
 site.change                                             =  Newid
 site.no                                                 =  Na
@@ -64,7 +65,6 @@ journeyRecovery.startAgain.guidance.p1                  =  Rhowch gynnig arall a
 journeyRecovery.startAgain.guidance.p2                  =  Nid yw’r wybodaeth sydd wedi cael ei rhoi gennych wedi cael ei chadw. Pan fydd y gwasanaeth ar gael, bydd yn rhaid i chi ddechrau eto.
 journeyRecovery.startAgain.guidance.contactHMRC.link    =  Cysylltwch â CThEF
 journeyRecovery.startAgain.guidance.contactHMRC.suffix  =  i gael rhagor o help.
-journeyRecovery.startAgain.guidance.cisAccount.prefix   =  Yn ôl i
 journeyRecovery.startAgain.guidance.cisAccount.link     =  Rheoli’ch cyfrif CIS
 
 signedOut.title                                         =  xxxxxxxxxxxxxxxxxxxx
@@ -184,14 +184,14 @@ returnsLanding.heading                                            =  Rheoli’ch
 returnsLanding.fileMonthlyReturn.h3.link                          =  Cyflwyno datganiad misol
 returnsLanding.fileMonthlyReturn.p1                               =  xxxxxxxxxxxxxxxxxxxx
 
-returnsLanding.fileNilReturn.h3.link                              =  Cyflwyno datganiad ’dim’
+returnsLanding.fileNilReturn.h3.link                              =  xxxxxxxxxxxxxxxxxxxx
 returnsLanding.fileNilReturn.p1                                   =  xxxxxxxxxxxxxxxxxxxx
 
 returnsLanding.viewSubmittedReturns.h3.link                       =  Gweld datganiad a gyflwynwyd
 returnsLanding.viewSubmittedReturns.p1                            =  Gweld datganiadau misol neu ddatganiadau ‘dim’ a gyflwynwyd.
 
-returnsLanding.incompleteReturns.h3.link                          =  Datganiadau anghyflawn
-returnsLanding.incompleteReturns.p1                               =  Cyflwyno datganiad sydd ar y gweill ar hyn o bryd, neu ailgyflwyno datganiad na chafodd ei dderbyn i ddechrau.
+returnsLanding.incompleteReturns.h3.link                          =  xxxxxxxxxxxxxxxxxxxx
+returnsLanding.incompleteReturns.p1                               =  xxxxxxxxxxxxxxxxxxxx
 
 returnsLanding.aside.h2                                           =  Help ac arweiniad
 returnsLanding.aside.link1                                        =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
@@ -381,8 +381,8 @@ successfulNoRecordsFound.p2                                   =  Gallwch
 successfulNoRecordsFound.p2.link                              =  ychwanegu is-gontractwr
 
 # Returns & Submissions
-incompleteReturns.title                      =  Datganiadau anghyflawn
-incompleteReturns.heading                    =  Datganiadau anghyflawn neu aflwyddiannus
+incompleteReturns.title                      =  xxxxxxxxxxxxxxxxxxxx
+incompleteReturns.heading                    =  xxxxxxxxxxxxxxxxxxxx
 
 incompleteReturns.table.returnPeriodEnd      =  Cyfnod y datganiad wedi dod i ben
 incompleteReturns.table.returnType           =  Math
@@ -598,7 +598,6 @@ verify.verificationHistory.table.verificationNumber          =  Rhif dilysu
 verify.verificationHistory.table.dateSubmitted               =  Dyddiad cyflwyno
 verify.verificationHistory.table.verificationRequest         =  Cais dilysu
 verify.verificationHistory.table.submissionReceipt           =  Derbynneb am gyflwyno
-verify.verificationHistory.backToManagePrefix                =  Yn ôl i
 verify.verificationHistory.backToManage                      =  Rheoli’ch is-gontractwyr
 verify.verificationHistory.hidden.verificationRequest        =  Cais dilysu gyfer {0}
 verify.verificationHistory.hidden.submissionReceipt          =  Derbynneb am gyflwyno gyfer {0}
@@ -619,7 +618,6 @@ verify.verificationRequest.subcontractorsToReverify.heading  =  Is-gontractwyr i
 verify.verificationRequest.table.name                        =  Enw
 verify.verificationRequest.table.verificationNumber          =  Rhif dilysu
 verify.verificationRequest.printThisRequest                  =  Argraffu’r cais hwn
-verify.verificationRequest.backTo                            =  Yn ôl i
 verify.verificationRequest.manageLink                        =  Rheoli’ch is-gontractwyr
 
 verify.subcontractorSubmissionReceipt.title                  =  Derbynneb am gyflwyno
@@ -629,7 +627,6 @@ verify.subcontractorSubmissionReceipt.p1                     =  Cyflwynwyd am {0
 verify.subcontractorSubmissionReceipt.p2                     =  Mae’ch cais dilysu wedi’i gyflwyno i CThEF yn llwyddiannus.
 verify.subcontractorSubmissionReceipt.p3                     =  Cadwch y dderbynneb hon ar gyfer eich cofnodion.
 verify.subcontractorSubmissionReceipt.link1                  =  Argraffu’r dderbynneb hon
-verify.subcontractorSubmissionReceipt.link2.prefix           =  Yn ôl i
 verify.subcontractorSubmissionReceipt.link2.link             =  Rheoli’ch is-gontractwyr
 verify.subcontractorSubmissionReceipt.summaryList.key1       =  Enw’r contractwr
 verify.subcontractorSubmissionReceipt.summaryList.key2       =  Cyfeirnod y Cyflogwr
@@ -640,7 +637,6 @@ verify.noVerificationHistory.title                           =  Dim hanes dilysu
 verify.noVerificationHistory.heading                         =  Hanes dilysu
 verify.noVerificationHistory.p1                              =  Nid oes unrhyw geisiadau dilysu i’w dangos ar hyn o bryd.
 verify.noVerificationHistory.p2                              =  Unwaith y byddwch wedi creu a chyflwyno un, gallwch argraffu neu lawrlwytho copi ohono oddi yma.
-verify.noVerificationHistory.backTo                          =  Yn ôl i
 verify.noVerificationHistory.manageYourSubcontractors.link   =  Rheoli’ch is-gontractwyr
 
 # Client Details
@@ -651,13 +647,11 @@ subcontractors.deleteSubcontractorYesNo.error.required                   =  Dewi
 subcontractors.cannotDeleteSubcontractor.heading                         =  Ni allwch ddileu {0}
 subcontractors.cannotDeleteSubcontractor.p1                              =  Ar hyn o bryd, mae’r is-gontractwr hwn yn rhan o ddatganiad misol, neu gais i ddilysu, sydd ar y gweill.
 subcontractors.cannotDeleteSubcontractor.p2                              =  Rhaid i chi aros nes bod y datganiad misol, neu’r cais i ddilysu, hwnnw wedi’i gwblhau cyn y gallwch ei ddileu.
-subcontractors.cannotDeleteSubcontractor.p3.text                         =  Yn ôl i
 subcontractors.cannotDeleteSubcontractor.p3.link                         =  Eich is-gontractwyr
 
 subcontractors.subcontractorDeletedConfirmation.title                    =  Is-gontractwr wedi’i ddileu
 subcontractors.subcontractorDeletedConfirmation.heading                  =  Is-gontractwr wedi’i ddileu
 subcontractors.subcontractorDeletedConfirmation.p1                       =  Rydych chi wedi dileu {0} o’ch rhestr o is-gontractwyr.
-subcontractors.subcontractorDeletedConfirmation.p2.text                  =  Yn ôl i
 subcontractors.subcontractorDeletedConfirmation.p2.link                  =  Eich is-gontractwyr
 subcontractors.subcontractorDeletedConfirmation.h2                       =  Cyn i chi fynd
 subcontractors.subcontractorDeletedConfirmation.p3                       =  Mae’ch adborth yn ein helpu i wella ein gwasanaeth.
@@ -685,7 +679,6 @@ subcontractors.subcontractorsList.verificationNumber                     =  Rhif
 subcontractors.subcontractorsList.taxTreatment                           =  Triniaeth o ran treth
 subcontractors.subcontractorsList.dateAdded                              =  Dyddiad yr ychwanegwyd
 subcontractors.subcontractorsList.action                                 =  Camau
-subcontractors.subcontractorsList.backTo                                 =  Yn ôl i
 subcontractors.subcontractorsList.manage                                 =  Rheoli’ch is-gontractwyr
 subcontractors.subcontractorsList.searchAndFilter                        =  Chwilio a hidlo
 subcontractors.subcontractorsList.clearFilters                           =  Clirio
@@ -696,7 +689,6 @@ subcontractors.noSubcontractorsExist.p1                                  =  Does
 subcontractors.noSubcontractorsExist.p2.prefix                           =  Bydd angen i chi
 subcontractors.noSubcontractorsExist.p2.link                             =  ychwanegu is-gontractwyr yn gyntaf
 subcontractors.noSubcontractorsExist.p2.suffix                           =  cyn y gallwch greu cais i ddilysu neu ddatganiad misol.
-subcontractors.noSubcontractorsExist.p3.prefix                           =  Yn ôl i
 subcontractors.noSubcontractorsExist.p3.link                             =  Rheoli’ch is-gontractwyr
 
 clientdetails.manageClientDetails.title                                  =  Manylion y cleient

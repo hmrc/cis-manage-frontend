@@ -206,6 +206,8 @@ class VerificationHistoryViewSpec extends SpecBase {
     "render the back to manage subcontractors link" in {
       val doc = render(singleYearViewModel())
 
+      doc.text() should include("Back to")
+
       val manageLink = doc.select("a:contains(Manage your subcontractors)")
       manageLink should not be empty
     }

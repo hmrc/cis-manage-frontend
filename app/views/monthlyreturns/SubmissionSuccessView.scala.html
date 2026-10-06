@@ -103,7 +103,9 @@
 
     @link(
         linkTextKey = "submissionConfirmation.backToManage",
-        linkUrl = controllers.routes.ReturnsLandingController.onPageLoad(viewModel.instanceId).url
+        linkUrl = controllers.routes.ReturnsLandingController.onPageLoad(viewModel.instanceId).url,
+        prefixTextKey = "site.backTo",
+        hasFullStop = true
     )
 
     @h2(messages("submissionConfirmation.needHelp.heading"))
