@@ -103,15 +103,12 @@ class VerificationHistoryService @Inject() () {
     data.verificationRequests
       .find(_.verificationBatchId == verificationBatchId)
       .map { request =>
-
-        val receiptReferenceNumberBase64 = IrMarkReferenceGenerator.fromBase64(request.receiptReferenceNumber)
-
         SubcontractorSubmissionReceiptViewModel(
           submissionTime = request.acceptedDateTime.atZone(GMTTimezone).format(DateTimeFormats.timeFormat()(lang)),
           submissionDate = request.acceptedDateTime.format(DateTimeFormats.dateTimeFormat()(lang)),
           contractorName = request.contractorName,
           employerReference = request.employerReference,
-          receiptReferenceNumber = receiptReferenceNumberBase64,
+          receiptReferenceNumber = IrMarkReferenceGenerator.fromBase64(request.receiptReferenceNumber),
           verificationNumber = request.verificationNumber,
           cisId = instanceId
         )
