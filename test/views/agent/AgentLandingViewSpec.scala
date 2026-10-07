@@ -127,7 +127,7 @@ class AgentLandingViewSpec extends SpecBase {
     "render back to your clients link" in {
       val (doc, _) = render()
 
-      doc.select("p").text() should include(messages(app).apply("site.backTo"))
+      doc.select("p").text()           should include(messages(app).apply("site.backTo"))
       doc.select(".govuk-link").text() should include(messages(app).apply("agent.landing.yourClients.link"))
     }
 
