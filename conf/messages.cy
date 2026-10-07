@@ -234,14 +234,15 @@ agent.landing.card.removeClient.title                  =  Dileu cleient
 agent.landing.card.removeClient.p                      =  Dileu cleient nad ydych yn ei reoli mwyach.
 agent.landing.card.noticesAndStatements.title          =  Hysbysiadau a datganiadau
 agent.landing.card.noticesAndStatements.p              =  Gweld hysbysiad gan CThEF, rhybuddion am gosb, a datganiadau cadarnhau.
+agent.landing.yourClients.link                         =  xxxxxxxxxxxxxxxxxxxx
 agent.landing.help.link1                               =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
 agent.landing.help.link2                               =  Talu TWE y cyflogwr
 agent.landing.help.link3                               =  Cosbau am ddatganiadau hwyr (CIS) CC/FS18b
 agent.landing.agentName.noName                         =  xxxxxxxxxxxxxxxxxxxx
 agent.landing.schemeName.key.notProvided               =  xxxxxxxxxxxxxxxxxxxx
 
-agent.clientListSearch.title                           =  Dewiswch gleient er mwyn cyflwyno datganiad CIS
-agent.clientListSearch.heading                         =  Cyflwyno datganiad CIS misol
+agent.clientListSearch.title                           =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.heading                         =  xxxxxxxxxxxxxxxxxxxx
 agent.clientListSearch.p1                              =  Mae tri dull posibl o chwilio am ddatganiad CIS misol, a’i gyflwyno.
 agent.clientListSearch.searchBy.label                  =  Drwy ba ddull yr hoffech chwilio?
 agent.clientListSearch.searchBy.placeholder            =  Dewiswch opsiwn

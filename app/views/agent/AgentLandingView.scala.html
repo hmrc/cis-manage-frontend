@@ -28,7 +28,8 @@
     govukSummaryList: GovukSummaryList,
     twoColumnGrid: TwoColumnGrid,
     oneColumnGrid: OneColumnGrid,
-    ptaCard: PtaCard
+    ptaCard: PtaCard,
+    link: Link
 )
 
 @(uniqueId: String,
@@ -123,6 +124,14 @@
             content = Html(messages("agent.landing.card.noticesAndStatements.p")),
             id = Some("notices-and-statements")
         )
+    )
+
+    @link(
+        linkTextKey = "agent.landing.yourClients.link",
+        linkUrl = controllers.agent.routes.ClientListSearchController.onPageLoad().url,
+        hasFullStop = true,
+        prefixTextKey = "site.backTo",
+        extraClasses = "back-to-your-client-list"
     )
 }
 
