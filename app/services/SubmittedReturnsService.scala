@@ -122,7 +122,7 @@ class SubmittedReturnsService @Inject() (
   ): SubmittedReturnPrintViewModel = {
     val langCode = lang.code
 
-    val submittedDateTime = data.submission.acceptedTime.map(_.atZone(GMTTimezone))
+    val submittedDateTime = data.submission.flatMap(_.acceptedTime).map(_.atZone(GMTTimezone))
 
     val submittedTime = submittedDateTime
       .map(_.format(DateTimeFormats.timeFormat()(lang)))
@@ -132,7 +132,8 @@ class SubmittedReturnsService @Inject() (
       .map(_.format(DateTimeFormats.dateTimeFormat()(lang)))
       .getOrElse("")
 
-    val receiptReferenceNumber = data.submission.hmrcMarkGgis.map(IrMarkReferenceGenerator.fromBase64).getOrElse("")
+    val receiptReferenceNumber =
+      data.submission.flatMap(_.hmrcMarkGgis).map(IrMarkReferenceGenerator.fromBase64).getOrElse("")
 
     val totalPaymentsMade    =
       Utils.formatCurrency(
@@ -228,19 +229,17 @@ class SubmittedReturnsService @Inject() (
       returnPeriodEnd = periodEndText,
       returnType = returnType,
       dateSubmitted = dateSubmittedText,
-      monthlyReturn = submissionOpt.map { _ =>
-        LinkViewModel(
-          url = controllers.history.routes.PrintSubmissionDetailsController
-            .onPageLoad(
-              monthlyReturn.taxYear,
-              monthlyReturn.taxMonth,
-              monthlyReturn.amendment,
-              source.queryValue
-            )
-            .url,
-          hiddenText = periodEndText
-        )
-      },
+      monthlyReturn = LinkViewModel(
+        url = controllers.history.routes.PrintSubmissionDetailsController
+          .onPageLoad(
+            monthlyReturn.taxYear,
+            monthlyReturn.taxMonth,
+            monthlyReturn.amendment,
+            source.queryValue
+          )
+          .url,
+        hiddenText = periodEndText
+      ),
       submissionReceipt =
         buildSubmissionReceipt(submissionOpt, periodEndText, monthlyReturn.taxYear, monthlyReturn.taxMonth),
       status = buildStatus(monthlyReturn, submissionOpt, amendUrl, instanceId)

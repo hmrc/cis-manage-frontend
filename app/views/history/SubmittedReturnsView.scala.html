@@ -76,19 +76,14 @@
 }
 
 @renderMonthlyReturn(row: SubmittedReturnsRowViewModel) = @{
-    row.monthlyReturn match {
-        case Some(monthlyReturnLink) =>
-            Html(
-                link(
-                    linkTextKey = "site.view",
-                    linkUrl = monthlyReturnLink.url,
-                    paragraphWrapped = false,
-                    visuallyHiddenText = Some(messages("history.returnHistory.hidden.monthlyReturn", monthlyReturnLink.hiddenText))
-                ).body
-            )
-        case None =>
-            Html("")
-    }
+    Html(
+        link(
+            linkTextKey = "site.view",
+            linkUrl = row.monthlyReturn.url,
+            paragraphWrapped = false,
+            visuallyHiddenText = Some(messages("history.returnHistory.hidden.monthlyReturn", row.monthlyReturn.hiddenText))
+        ).body
+    )
 }
 
 @layout(

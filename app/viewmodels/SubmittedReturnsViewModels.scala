@@ -34,7 +34,7 @@ case class SubmittedReturnsRowViewModel(
   returnPeriodEnd: String,
   returnType: ReturnTypeViewModel,
   dateSubmitted: String,
-  monthlyReturn: Option[LinkViewModel],
+  monthlyReturn: LinkViewModel,
   submissionReceipt: StatusViewModel,
   status: StatusViewModel
 )

@@ -38,11 +38,9 @@ class SubmittedReturnsViewSpec extends SpecBase {
             returnPeriodEnd = "Mar 2024",
             returnType = ReturnTypeViewModel.Standard,
             dateSubmitted = "1 Apr 2024",
-            monthlyReturn = Some(
-              LinkViewModel(
-                url = "/return/1",
-                hiddenText = "Mar 2024"
-              )
+            monthlyReturn = LinkViewModel(
+              url = "/return/1",
+              hiddenText = "Mar 2024"
             ),
             submissionReceipt = StatusViewModel.Text("site.view"),
             status = StatusViewModel.Text("history.returnHistory.status.amend")
@@ -121,18 +119,6 @@ class SubmittedReturnsViewSpec extends SpecBase {
       mobile.select(".govuk-summary-list").size()        shouldBe 1
       mobile.select("a[href=/return/1]").text()            should include(messages(app)("site.view"))
       mobile.select("a[href=/receipt/1]").text().isEmpty shouldBe true
-    }
-
-    "does not render a monthly return view link when there is no matching submission" in {
-      val viewModel = populatedViewModel.copy(
-        taxYears = populatedViewModel.taxYears.map { taxYear =>
-          taxYear.copy(rows = taxYear.rows.map(_.copy(monthlyReturn = None)))
-        }
-      )
-
-      val doc = render(viewModel)
-
-      doc.select("a[href=/return/1]").isEmpty shouldBe true
     }
 
     "does not render an empty-state message when there are no submitted returns" in {

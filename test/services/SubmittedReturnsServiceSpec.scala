@@ -124,18 +124,18 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         )
       )
 
-      row.returnPeriodEnd                shouldBe "Mar 2023"
-      row.returnType                     shouldBe ReturnTypeViewModel.Standard
-      row.dateSubmitted                  shouldBe "1 Apr 2024"
-      row.monthlyReturn.value.url        shouldBe controllers.history.routes.PrintSubmissionDetailsController
+      row.returnPeriodEnd          shouldBe "Mar 2023"
+      row.returnType               shouldBe ReturnTypeViewModel.Standard
+      row.dateSubmitted            shouldBe "1 Apr 2024"
+      row.monthlyReturn.url        shouldBe controllers.history.routes.PrintSubmissionDetailsController
         .onPageLoad(
           monthlyReturn().taxYear,
           monthlyReturn().taxMonth,
           monthlyReturn().amendment
         )
         .url
-      row.monthlyReturn.value.hiddenText shouldBe "Mar 2023"
-      row.status                         shouldBe StatusViewModel.Link(
+      row.monthlyReturn.hiddenText shouldBe "Mar 2023"
+      row.status                   shouldBe StatusViewModel.Link(
         link = LinkViewModel(
           url = amendUrl,
           hiddenText = "Mar 2023"
@@ -156,7 +156,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       result.value.selectedTaxYear                           shouldBe Some("2022")
       result.value.taxYears.map(t => (t.fromYear, t.toYear)) shouldBe Seq(2022 -> 2023)
 
-      result.value.taxYears.head.rows.head.monthlyReturn.value.url shouldBe
+      result.value.taxYears.head.rows.head.monthlyReturn.url shouldBe
         controllers.history.routes.PrintSubmissionDetailsController
           .onPageLoad(
             monthlyReturn().taxYear,
@@ -201,9 +201,12 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         )
       )
 
-      row.status        shouldBe StatusViewModel.Text("history.returnHistory.status.notAvailable")
-      row.dateSubmitted shouldBe ""
-      row.monthlyReturn shouldBe None
+      row.status                   shouldBe StatusViewModel.Text("history.returnHistory.status.notAvailable")
+      row.dateSubmitted            shouldBe ""
+      row.monthlyReturn.url        shouldBe controllers.history.routes.PrintSubmissionDetailsController
+        .onPageLoad(2008, 3, monthlyReturn().amendment)
+        .url
+      row.monthlyReturn.hiddenText shouldBe "Mar 2008"
     }
 
     "buildSingleYearViewModel includes not available returns for the selected tax year" in new Setup {
@@ -900,15 +903,17 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         taxMonth = 4,
         nilReturnIndicator = "Y",
         monthlyReturnItems = Seq.empty,
-        submission = SubmittedSubmissionData(
-          submissionId = 10L,
-          submissionType = Some("Original"),
-          activeObjectId = Some(20L),
-          status = "Accepted",
-          hmrcMarkGenerated = Some("mark1"),
-          hmrcMarkGgis = Some("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"),
-          emailRecipient = Some("test@example.com"),
-          acceptedTime = Some(LocalDateTime.parse("2026-04-01T10:15:30"))
+        submission = Some(
+          SubmittedSubmissionData(
+            submissionId = 10L,
+            submissionType = Some("Original"),
+            activeObjectId = Some(20L),
+            status = "Accepted",
+            hmrcMarkGenerated = Some("mark1"),
+            hmrcMarkGgis = Some("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"),
+            emailRecipient = Some("test@example.com"),
+            acceptedTime = Some(LocalDateTime.parse("2026-04-01T10:15:30"))
+          )
         )
       )
 
@@ -925,6 +930,28 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       out.totalTaxDeducted mustBe "£0.00"
       out.subcontractors mustBe Seq.empty
 
+    }
+
+    "SubmittedReturnPrintViewModel should return correct data when there is no submission" in new Setup {
+      val input = GetSubmittedMonthlyReturnsDataResponse(
+        scheme = SubmittedSchemeData("PAL 355 Scheme", "163", "AB0063"),
+        monthlyReturnId = 3000L,
+        taxYear = 2017,
+        taxMonth = 1,
+        nilReturnIndicator = "Y",
+        monthlyReturnItems = Seq.empty,
+        submission = None
+      )
+
+      val out = service.buildSubmittedReturnPrintViewModel(input, Lang("en"))
+      out.monthYear mustBe "January 2017"
+      out.submittedTime mustBe ""
+      out.submittedDate mustBe ""
+      out.receiptReferenceNumber mustBe ""
+      out.submissionType mustBe "nil"
+      out.contractorName mustBe "PAL 355 Scheme"
+      out.payeReference mustBe "163/AB0063"
+      out.subcontractors mustBe Seq.empty
     }
 
     "SubmittedReturnPrintViewModel should return correct data with payment details" in new Setup {
@@ -960,15 +987,17 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
             itemResourceReference = None
           )
         ),
-        submission = SubmittedSubmissionData(
-          submissionId = 10L,
-          submissionType = Some("Original"),
-          activeObjectId = Some(20L),
-          status = "Accepted",
-          hmrcMarkGenerated = Some("mark1"),
-          hmrcMarkGgis = None,
-          emailRecipient = Some("test@example.com"),
-          acceptedTime = Some(LocalDateTime.parse("2026-04-01T10:15:30"))
+        submission = Some(
+          SubmittedSubmissionData(
+            submissionId = 10L,
+            submissionType = Some("Original"),
+            activeObjectId = Some(20L),
+            status = "Accepted",
+            hmrcMarkGenerated = Some("mark1"),
+            hmrcMarkGgis = None,
+            emailRecipient = Some("test@example.com"),
+            acceptedTime = Some(LocalDateTime.parse("2026-04-01T10:15:30"))
+          )
         )
       )
 
