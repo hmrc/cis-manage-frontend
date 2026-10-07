@@ -243,7 +243,7 @@ agent.landing.schemeName.key.notProvided               =  xxxxxxxxxxxxxxxxxxxx
 
 agent.clientListSearch.title                           =  xxxxxxxxxxxxxxxxxxxx
 agent.clientListSearch.heading                         =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.p1                              =  Mae tri dull posibl o chwilio am ddatganiad CIS misol, a’i gyflwyno.
+agent.clientListSearch.p1                              =  xxxxxxxxxxxxxxxxxxxx
 agent.clientListSearch.searchBy.label                  =  Drwy ba ddull yr hoffech chwilio?
 agent.clientListSearch.searchBy.placeholder            =  Dewiswch opsiwn
 agent.clientListSearch.searchFilter.label              =  Nodwch eich chwiliad
