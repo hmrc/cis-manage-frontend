@@ -44,7 +44,7 @@ final class MockCisControllerComponents(using ExecutionContext)
       new DataRetrievalActionImpl(sessionRepo),
       new DataRequiredActionImpl(),
       new CisIdRequiredActionImpl(),
-      new FakeHasClientGuard
+      new FakeSchemeAuthorisationGuard
     ) {
   def setUserAnswers(userAnswersOpt: Option[UserAnswers]): Unit =
     when(sessionRepo.get(any)) thenReturn Future.successful(userAnswersOpt)

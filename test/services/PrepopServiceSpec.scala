@@ -177,7 +177,7 @@ class PrepopServiceSpec extends AnyWordSpec with Matchers with MockitoSugar with
     val targetCall: Call                    = controllers.routes.ReturnsLandingController.onPageLoad("CIS-123")
     val manageContractorDetails             = Call(GET, mockAppConfig.contractorDetailsManagementUrl)
     val checkSubcontractorRecordsCall: Call =
-      controllers.routes.CheckSubcontractorRecordsController.onPageLoad("163", "AB0063", "CIS-123", "returnDue")
+      controllers.routes.CheckSubcontractorRecordsController.onPageLoad("CIS-123", "returnDue")
 
     "return targetCall when prePopSuccessful is Y" in {
       val scheme = Scheme(1, "CIS-123", None, None, Some("Y"), None)

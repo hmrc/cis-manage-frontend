@@ -27,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ClientListCheckEnforcer @Inject() (
   policyResolver: ClientListCheckPolicyResolver,
   clientListStatusGuard: ClientListStatusGuard,
-  hasClientGuard: HasClientGuard
+  schemeAuthorisationGuard: SchemeAuthorisationGuard
 )(using ec: ExecutionContext) {
 
   def apply[A](request: IdentifierRequest[A])(block: IdentifierRequest[A] => Future[Result]): Future[Result] =
@@ -40,7 +40,7 @@ class ClientListCheckEnforcer @Inject() (
               Future.successful(result)
 
             case None if policyResolver.shouldRunCentralHasClient(request) =>
-              hasClientGuard.check(request).flatMap {
+              schemeAuthorisationGuard.checkCurrentAgentClient(request).flatMap {
                 case Some(result) =>
                   Future.successful(result)
                 case None         =>

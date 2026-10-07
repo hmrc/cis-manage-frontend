@@ -30,12 +30,10 @@ class CheckSubcontractorRecordsViewSpec extends SpecBase {
 
     "must render the page with the correct heading, paragraphs and button" in new Setup {
 
-      val taxOfficeNumber    = "101"
-      val taxOfficeReference = "AB0001"
-      val instanceId         = "900001"
-      val targetKey          = "subcontractors"
+      val instanceId = "900001"
+      val targetKey  = "subcontractors"
 
-      val html: HtmlFormat.Appendable = view(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
+      val html: HtmlFormat.Appendable = view(instanceId, targetKey)
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.title                                   must include(messages("checkSubcontractorRecords.title"))

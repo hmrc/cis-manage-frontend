@@ -30,7 +30,6 @@ import services.{ManageService, PrepopService}
 import uk.gov.hmrc.http.HttpVerbs.GET
 import uk.gov.hmrc.http.{HeaderCarrier, HttpVerbs, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import viewmodels.contractor.ContractorLandingViewModel
 import views.html.contractor.ContractorLandingView
 
@@ -86,9 +85,6 @@ class ContractorLandingController @Inject() (
 
   def onTargetClick(targetKey: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      implicit val hc: HeaderCarrier =
-        HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
       val systemErrorRedirect     = Redirect(controllers.routes.SystemErrorController.onPageLoad())
       val unauthorizedOrgRedirect = Redirect(controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad())
 
@@ -139,8 +135,6 @@ class ContractorLandingController @Inject() (
 
     val checkSubcontractorRecordsCall =
       controllers.routes.CheckSubcontractorRecordsController.onPageLoad(
-        employerRef.taxOfficeNumber,
-        employerRef.taxOfficeReference,
         instanceId,
         targetKey
       )

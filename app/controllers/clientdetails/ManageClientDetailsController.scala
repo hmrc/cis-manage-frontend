@@ -39,7 +39,7 @@ class ManageClientDetailsController @Inject() (
   requireData: DataRequiredAction,
   clientListStatusGuard: ClientListStatusGuard,
   clientListCheckNavigator: ClientListCheckNavigator,
-  hasClientGuard: HasClientGuard,
+  schemeAuthorisationGuard: SchemeAuthorisationGuard,
   val controllerComponents: MessagesControllerComponents,
   manageService: ManageService,
   sessionRepository: SessionRepository,
@@ -53,7 +53,7 @@ class ManageClientDetailsController @Inject() (
       andThen clientListStatusGuard.groupB(clientListCheckNavigator.manageClientDetails)
       andThen getData
       andThen requireData
-      andThen hasClientGuard.currentClient).async { implicit request =>
+      andThen schemeAuthorisationGuard.currentClient).async { implicit request =>
       request.userAnswers.get(CisIdPage) match {
         case Some(instanceId) =>
           request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == instanceId)) match {

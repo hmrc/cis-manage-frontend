@@ -23,9 +23,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.api.Logging
 import repositories.SessionRepository
 import services.SubcontractorService
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import models.NormalMode
 
 import javax.inject.Inject
@@ -50,10 +48,6 @@ class GetSubcontractorListController @Inject() (
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId andThen reconcileFormpRds).async {
       implicit request =>
-
-        implicit val hc: HeaderCarrier =
-          HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
         subcontractorService
           .getSubcontractorList(request.cisId)
           .flatMap { response =>

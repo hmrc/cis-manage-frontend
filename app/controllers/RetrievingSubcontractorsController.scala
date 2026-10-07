@@ -19,11 +19,13 @@ package controllers
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.PrepopService
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.RetrievingSubcontractorsView
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, HasClientGuard, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, SchemeAuthorisationGuard}
+import models.EmployerReference
+import models.requests.DataRequest
+import pages.AgentClientsPage
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -32,7 +34,7 @@ class RetrievingSubcontractorsController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  hasClientGuard: HasClientGuard,
+  schemeAuthorisationGuard: SchemeAuthorisationGuard,
   val controllerComponents: MessagesControllerComponents,
   view: RetrievingSubcontractorsView,
   prepopService: PrepopService
@@ -41,63 +43,84 @@ class RetrievingSubcontractorsController @Inject() (
     with I18nSupport {
 
   def onPageLoad(
-    taxOfficeNumber: String,
-    taxOfficeReference: String,
     instanceId: String,
     targetKey: String
   ): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen hasClientGuard.forInstanceId(instanceId)) {
+    (identify andThen getData andThen requireData andThen schemeAuthorisationGuard.forInstanceId(instanceId)) {
       implicit request =>
         Ok(view())
           .withHeaders(
-            "Refresh" -> s"0; url=${controllers.routes.RetrievingSubcontractorsController.start(taxOfficeNumber, taxOfficeReference, instanceId, targetKey).url}"
+            "Refresh" -> s"0; url=${controllers.routes.RetrievingSubcontractorsController.start(instanceId, targetKey).url}"
           )
     }
 
   def start(
-    taxOfficeNumber: String,
-    taxOfficeReference: String,
     instanceId: String,
     targetKey: String
   ): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen hasClientGuard.forInstanceId(instanceId)).async {
+    (identify andThen getData andThen requireData andThen schemeAuthorisationGuard.forInstanceId(instanceId)).async {
       implicit request =>
-        implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-        for {
-          prepopOk  <- prepopService.prepopulate(taxOfficeNumber, taxOfficeReference, instanceId)
-          schemeOpt <- if (prepopOk) prepopService.getScheme(instanceId) else Future.successful(None)
-          result    <- schemeOpt match {
-                         case None =>
-                           Future.successful(
-                             Redirect(routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId))
-                           )
+        resolveEmployerReference(request, instanceId) match {
 
-                         case Some(scheme) =>
-                           scheme.prePopSuccessful match {
-                             case Some("Y") if scheme.subcontractorCounter.exists(_ > 0) =>
-                               Future.successful(
-                                 Redirect(
-                                   routes.SuccessfulAutomaticSubcontractorUpdateController
-                                     .onPageLoad(instanceId, targetKey)
-                                 )
-                               )
+          case None =>
+            Future.successful(
+              Redirect(routes.SystemErrorController.onPageLoad())
+            )
 
-                             case Some("Y") =>
-                               Future.successful(
-                                 Redirect(routes.SuccessfulNoRecordsFoundController.onPageLoad(instanceId, targetKey))
-                               )
-
-                             case Some("N") =>
+          case Some(EmployerReference(taxOfficeNumber, taxOfficeReference)) =>
+            for {
+              prepopOk  <- prepopService.prepopulate(taxOfficeNumber, taxOfficeReference, instanceId)
+              schemeOpt <- if (prepopOk) prepopService.getScheme(instanceId) else Future.successful(None)
+              result    <- schemeOpt match {
+                             case None =>
                                Future.successful(
                                  Redirect(routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId))
                                )
 
-                             case _ =>
-                               Future.successful(
-                                 Redirect(routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId))
-                               )
+                             case Some(scheme) =>
+                               scheme.prePopSuccessful match {
+                                 case Some("Y") if scheme.subcontractorCounter.exists(_ > 0) =>
+                                   Future.successful(
+                                     Redirect(
+                                       routes.SuccessfulAutomaticSubcontractorUpdateController
+                                         .onPageLoad(instanceId, targetKey)
+                                     )
+                                   )
+
+                                 case Some("Y") =>
+                                   Future.successful(
+                                     Redirect(routes.SuccessfulNoRecordsFoundController.onPageLoad(instanceId, targetKey))
+                                   )
+
+                                 case Some("N") =>
+                                   Future.successful(
+                                     Redirect(
+                                       routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId)
+                                     )
+                                   )
+
+                                 case _ =>
+                                   Future.successful(
+                                     Redirect(
+                                       routes.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId)
+                                     )
+                                   )
+                               }
                            }
-                       }
-        } yield result
+            } yield result
+        }
     }
+
+  private def resolveEmployerReference[A](
+    request: DataRequest[A],
+    instanceId: String
+  ): Option[EmployerReference] =
+    if request.isAgent then
+      AgentClientsPage
+        .findClient(request.userAnswers, instanceId)
+        .map { client =>
+          EmployerReference(client.taxOfficeNumber, client.taxOfficeRef)
+        }
+    else request.employerReference
+
 }

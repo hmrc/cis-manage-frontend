@@ -72,7 +72,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
       val application =
-        applicationBuilder(userAnswers = Some(userAnswersWithClient))
+        applicationBuilder(userAnswers = Some(userAnswersWithClient), isAgent = true)
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[ManageService].toInstance(mockManageService)
@@ -95,7 +95,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
       val userAnswers = UserAnswers(userAnswersId).set(ChangeClientReferencePage, "answer").success.value
 
       val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
+        applicationBuilder(userAnswers = Some(userAnswers), isAgent = true)
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[ManageService].toInstance(mockManageService)
@@ -151,7 +151,8 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[ManageService].toInstance(mockManageService),
             bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          ),
+          isAgent = true
         ).build()
 
       running(application) {
@@ -202,7 +203,8 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[ManageService].toInstance(mockManageService),
             bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          ),
+          isAgent = true
         ).build()
 
       running(application) {
@@ -239,7 +241,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None, isAgent = true).build()
 
       running(application) {
         val request = FakeRequest(GET, changeClientReferenceRoute)
@@ -252,7 +254,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to system error controller for a POST if no existing data is found" in {
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = None, isAgent = true).build()
 
       running(application) {
         val request =

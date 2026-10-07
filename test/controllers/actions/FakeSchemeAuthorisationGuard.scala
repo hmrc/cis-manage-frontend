@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,20 @@
 package controllers.actions
 
 import models.requests.DataRequest
-import play.api.mvc.*
+import play.api.mvc.ActionFilter
+import scala.concurrent.ExecutionContext
 
-import scala.concurrent.ExecutionContext.global
-import scala.concurrent.{ExecutionContext, Future}
+class FakeSchemeAuthorisationGuard(using ExecutionContext) extends SchemeAuthorisationGuard(null, null, null) {
 
-class FakeAuthorizedForSchemeAction extends AuthorizedForSchemeAction {
+  private val passThroughFilter =
+    new PassThroughFilter[DataRequest]
 
-  override def refine[A](request: DataRequest[A]): Future[Either[Result, DataRequest[A]]] =
-    Future.successful(Right(request))
+  override def forInstanceId(instanceId: String): ActionFilter[DataRequest] =
+    passThroughFilter
 
-  override protected def executionContext: ExecutionContext = global
+  override def validateCachedInstanceId(instanceId: String): ActionFilter[DataRequest] =
+    passThroughFilter
+
+  override def currentClient: ActionFilter[DataRequest] =
+    passThroughFilter
 }

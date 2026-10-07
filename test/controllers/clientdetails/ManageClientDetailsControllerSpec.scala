@@ -99,7 +99,10 @@ class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
         .thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
+        applicationBuilder(
+          userAnswers = Some(userAnswers),
+          isAgent = true
+        )
           .overrides(
             bind[ManageService].toInstance(mockManageService),
             bind[SessionRepository].toInstance(mockSessionRepository),

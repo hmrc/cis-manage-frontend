@@ -32,15 +32,15 @@ class ClientListCheckEnforcerSpec extends SpecBase with MockitoSugar {
 
   private given ExecutionContext = ExecutionContext.global
 
-  private val policyResolver        = mock[ClientListCheckPolicyResolver]
-  private val clientListStatusGuard = mock[ClientListStatusGuard]
-  private val hasClientGuard        = mock[HasClientGuard]
+  private val policyResolver           = mock[ClientListCheckPolicyResolver]
+  private val clientListStatusGuard    = mock[ClientListStatusGuard]
+  private val schemeAuthorisationGuard = mock[SchemeAuthorisationGuard]
 
   private val enforcer =
     new ClientListCheckEnforcer(
       policyResolver,
       clientListStatusGuard,
-      hasClientGuard
+      schemeAuthorisationGuard
     )
 
   private def request(isAgent: Boolean): IdentifierRequest[AnyContent] =
@@ -64,7 +64,7 @@ class ClientListCheckEnforcerSpec extends SpecBase with MockitoSugar {
 
       verifyNoInteractions(policyResolver)
       verifyNoInteractions(clientListStatusGuard)
-      verifyNoInteractions(hasClientGuard)
+      verifyNoInteractions(schemeAuthorisationGuard)
     }
 
     "must bypass checks for GroupB or Exempt" in {
@@ -72,7 +72,7 @@ class ClientListCheckEnforcerSpec extends SpecBase with MockitoSugar {
         ClientListCheckPolicy.GroupB,
         ClientListCheckPolicy.Exempt
       ).foreach { policy =>
-        reset(policyResolver, clientListStatusGuard, hasClientGuard)
+        reset(policyResolver, clientListStatusGuard, schemeAuthorisationGuard)
 
         val req = request(isAgent = true)
 
@@ -85,7 +85,7 @@ class ClientListCheckEnforcerSpec extends SpecBase with MockitoSugar {
         result.header.status mustBe OK
 
         verifyNoInteractions(clientListStatusGuard)
-        verifyNoInteractions(hasClientGuard)
+        verifyNoInteractions(schemeAuthorisationGuard)
       }
     }
 
@@ -103,7 +103,7 @@ class ClientListCheckEnforcerSpec extends SpecBase with MockitoSugar {
 
       result.header.status mustBe BAD_REQUEST
 
-      verifyNoInteractions(hasClientGuard)
+      verifyNoInteractions(schemeAuthorisationGuard)
     }
 
     "must continue without F7 when central hasClient is not required" in {
@@ -123,7 +123,7 @@ class ClientListCheckEnforcerSpec extends SpecBase with MockitoSugar {
 
       result.header.status mustBe OK
 
-      verifyNoInteractions(hasClientGuard)
+      verifyNoInteractions(schemeAuthorisationGuard)
     }
 
     "must return the F7 result when central hasClient blocks" in {
@@ -138,7 +138,7 @@ class ClientListCheckEnforcerSpec extends SpecBase with MockitoSugar {
       when(policyResolver.shouldRunCentralHasClient(req))
         .thenReturn(true)
 
-      when(hasClientGuard.check(req))
+      when(schemeAuthorisationGuard.checkCurrentAgentClient(req))
         .thenReturn(Future.successful(Some(Forbidden)))
 
       val result =
@@ -159,7 +159,7 @@ class ClientListCheckEnforcerSpec extends SpecBase with MockitoSugar {
       when(policyResolver.shouldRunCentralHasClient(req))
         .thenReturn(true)
 
-      when(hasClientGuard.check(req))
+      when(schemeAuthorisationGuard.checkCurrentAgentClient(req))
         .thenReturn(Future.successful(None))
 
       val result =

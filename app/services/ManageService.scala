@@ -70,6 +70,15 @@ class ManageService @Inject() (
         }
     }
 
+  def refreshAndStoreAgentClients(
+    userAnswers: UserAnswers
+  )(using HeaderCarrier): Future[(List[CisTaxpayerSearchResult], UserAnswers)] =
+    for {
+      clients        <- cisConnector.getAllClients
+      updatedAnswers <- Future.fromTry(userAnswers.set(AgentClientsPage, clients))
+      _              <- sessionRepository.set(updatedAnswers)
+    } yield (clients, updatedAnswers)
+
   def resolveAndStoreAgentClients(
     userAnswers: UserAnswers
   )(using HeaderCarrier): Future[(List[CisTaxpayerSearchResult], UserAnswers)] =
@@ -77,11 +86,7 @@ class ManageService @Inject() (
       case Some(clientList) => Future.successful((clientList, userAnswers))
       case None             =>
         logger.info("[resolveAndStoreAgentClients] cache-miss: fetching agent clients from backend")
-        for {
-          clients        <- cisConnector.getAllClients
-          updatedAnswers <- Future.fromTry(userAnswers.set(AgentClientsPage, clients))
-          _              <- sessionRepository.set(updatedAnswers)
-        } yield (clients, updatedAnswers)
+        refreshAndStoreAgentClients(userAnswers)
     }
 
   def getAgentLandingData(

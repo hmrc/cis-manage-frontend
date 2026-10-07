@@ -33,7 +33,7 @@ class ManageNoticesStatementsController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  hasClientGuard: HasClientGuard,
+  schemeAuthorisationGuard: SchemeAuthorisationGuard,
   val controllerComponents: MessagesControllerComponents,
   view: ManageNoticesStatementsView
 )(implicit appConfig: FrontendAppConfig)
@@ -42,7 +42,7 @@ class ManageNoticesStatementsController @Inject() (
     with Logging {
 
   def onPageLoad(instanceId: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen hasClientGuard.forInstanceId(instanceId)) {
+    (identify andThen getData andThen requireData andThen schemeAuthorisationGuard.forInstanceId(instanceId)) {
       implicit request =>
         implicit val messages: Messages = messagesApi.preferred(request)
 

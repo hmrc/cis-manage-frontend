@@ -73,6 +73,7 @@ GET   /agent/manage-construction-industry-scheme-account/:uniqueId/target/:targe
 
 GET   /agent/file-monthly-cis-returns           controllers.agent.ClientListSearchController.onPageLoad()
 POST  /agent/file-monthly-cis-returns           controllers.agent.ClientListSearchController.onSubmit()
+GET   /agent/file-monthly-cis-returns/start     controllers.agent.ClientListSearchController.start()
 GET   /agent/file-monthly-cis-returns/clear     controllers.agent.ClientListSearchController.clearFilter()
 GET   /agent/file-monthly-cis-returns/download  controllers.agent.ClientListSearchController.downloadClientList()
 
@@ -85,11 +86,11 @@ GET  /sign-into-cis          controllers.IntroductionController.onPageLoad()
 GET  /sign-into-cis-routing  controllers.IntroductionController.affinityGroupRouting()
 
 # Subcontractors
-GET   /your-subcontractors/:taxOfficeNumber/:taxOfficeReference/:instanceId/:targetKey              controllers.RetrievingSubcontractorsController.onPageLoad(taxOfficeNumber: String, taxOfficeReference: String, instanceId: String, targetKey: String)
-GET   /your-subcontractors/start/:taxOfficeNumber/:taxOfficeReference/:instanceId/:targetKey/start  controllers.RetrievingSubcontractorsController.start(taxOfficeNumber: String, taxOfficeReference: String, instanceId: String, targetKey: String)
+GET   /your-subcontractors/:instanceId/:targetKey              controllers.RetrievingSubcontractorsController.onPageLoad(instanceId: String, targetKey: String)
+GET   /your-subcontractors/start/:instanceId/:targetKey/start  controllers.RetrievingSubcontractorsController.start(instanceId: String, targetKey: String)
 
-GET   /check-subcontractor-records/:taxOfficeNumber/:taxOfficeReference/:instanceId/:targetKey  controllers.CheckSubcontractorRecordsController.onPageLoad(taxOfficeNumber: String, taxOfficeReference: String, instanceId: String, targetKey: String)
-POST  /check-subcontractor-records/:taxOfficeNumber/:taxOfficeReference/:instanceId/:targetKey  controllers.CheckSubcontractorRecordsController.onSubmit(taxOfficeNumber: String, taxOfficeReference: String, instanceId: String, targetKey: String)
+GET   /check-subcontractor-records/:instanceId/:targetKey  controllers.CheckSubcontractorRecordsController.onPageLoad(instanceId: String, targetKey: String)
+POST  /check-subcontractor-records/:instanceId/:targetKey  controllers.CheckSubcontractorRecordsController.onSubmit(instanceId: String, targetKey: String)
 
 GET   /automatic-subcontractor-update-unsuccessful/:instanceId  controllers.UnsuccessfulAutomaticSubcontractorUpdateController.onPageLoad(instanceId: String)
 POST  /automatic-subcontractor-update-unsuccessful/:instanceId  controllers.UnsuccessfulAutomaticSubcontractorUpdateController.onSubmit(instanceId: String)
