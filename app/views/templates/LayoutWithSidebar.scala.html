@@ -87,7 +87,7 @@
   banners = Banners(
       displayHmrcBanner = showHmrcBanner,
       phaseBanner = Some(betaBanner(appConfig.feedbackUrl)),
-      userResearchBanner = if(showUrBanner) Some(UserResearchBanner(url = appConfig.userResearchUrl)) else None
+      userResearchBanner = if(appConfig.showUserResearchBannerEnabled && showUrBanner) Some(UserResearchBanner(url = appConfig.userResearchUrl)) else None
   ),
 
   isWelshTranslationAvailable = appConfig.languageTranslationEnabled,
