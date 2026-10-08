@@ -56,7 +56,8 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
     "must return OK and the correct view for a GET" in {
       val subcontractorsList: Seq[SuccessfulAutomaticSubcontractorUpdateViewModel] = Seq(
         SuccessfulAutomaticSubcontractorUpdateViewModel("Smith, Alan", "1234567890", "V000001", "6 Apr 2026"),
-        SuccessfulAutomaticSubcontractorUpdateViewModel("Partners Ltd", "3333333333", "", "1 Jan 2014")
+        SuccessfulAutomaticSubcontractorUpdateViewModel("Partners Ltd", "3333333333", "", "1 Jan 2014"),
+        SuccessfulAutomaticSubcontractorUpdateViewModel("Trust Name", "4444444444", "", "6 Apr 2026")
       )
 
       when(mockSubcontractorService.getSubcontractorList(eqTo("900001"))(any[HeaderCarrier]))
@@ -79,6 +80,14 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
                   partnershipTradingName = Some("Partners Ltd"),
                   subcontractorType = Some("partnership"),
                   createDate = Some(LocalDateTime.of(2014, 1, 1, 0, 0))
+                ),
+                subcontractor(
+                  subcontractorId = 3L,
+                  utr = Some("4444444444"),
+                  tradingName = Some("Trust Name"),
+                  subcontractorType = Some("trust"),
+                  verificationNumber = Some("null"),
+                  createDate = Some(LocalDateTime.of(2026, 4, 6, 10, 0))
                 )
               )
             )

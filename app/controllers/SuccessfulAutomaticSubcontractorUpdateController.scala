@@ -103,12 +103,18 @@ class SuccessfulAutomaticSubcontractorUpdateController @Inject() (
         preferredMessages("subcontractors.subcontractorsList.noNameProvided")
       ),
       uniqueReferenceNumber = firstNonBlank(subcontractor.utr, subcontractor.crn, subcontractor.nino).getOrElse(""),
-      verificationNumber = subcontractor.verificationNumber.getOrElse(""),
+      verificationNumber = displayedVerificationNumber(subcontractor.verificationNumber),
       dateAdded = subcontractor.createDate
         .map(_.format(DateTimeFormats.shortDateFormat()))
         .getOrElse("")
     )
   }
+
+  private def displayedVerificationNumber(verificationNumber: Option[String]): String =
+    verificationNumber
+      .map(_.trim)
+      .filter(value => value.nonEmpty && !value.equalsIgnoreCase("null"))
+      .getOrElse("")
 
   private def firstNonBlank(values: Option[String]*): Option[String] =
     values.collectFirst { case Some(value) if value.trim.nonEmpty => value.trim }
