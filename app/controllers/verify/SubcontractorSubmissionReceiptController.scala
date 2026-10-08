@@ -17,6 +17,7 @@
 package controllers.verify
 
 import controllers.{CisController, CisControllerComponents}
+import play.api.Logging
 import play.api.mvc.{Action, AnyContent}
 import services.{VerificationHistoryService, VerificationService}
 import views.html.verify.SubcontractorSubmissionReceiptView
@@ -30,7 +31,8 @@ class SubcontractorSubmissionReceiptController @Inject() (
   verificationHistoryService: VerificationHistoryService,
   verificationService: VerificationService
 )(implicit ec: ExecutionContext)
-    extends CisController {
+    extends CisController
+    with Logging {
 
   def onPageLoad(verificationBatchId: Long): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
@@ -39,10 +41,18 @@ class SubcontractorSubmissionReceiptController @Inject() (
         .map { data =>
           verificationHistoryService.buildSubmissionReceiptViewModel(data, verificationBatchId, request.cisId) match {
             case Some(vm) => Ok(view(vm))
-            case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            case None     =>
+              logger.error(
+                s"[SubcontractorSubmissionReceiptController][onPageLoad] - receipt not found verificationBatchId=$verificationBatchId"
+              )
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
         }
-        .recover { case _ =>
+        .recover { case ex =>
+          logger.error(
+            s"[SubcontractorSubmissionReceiptController][onPageLoad] - failed to retrieve receipt verificationBatchId=$verificationBatchId",
+            ex
+          )
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }

@@ -73,6 +73,7 @@ class ContractorLandingController @Inject() (
           }
           .recover {
             case e: UpstreamErrorResponse if e.statusCode == NOT_FOUND =>
+              logger.error("[ContractorLandingController][onPageLoad] - cisId lookup returned NOT_FOUND", e)
               Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
             case exception                                             =>
               logger.error(

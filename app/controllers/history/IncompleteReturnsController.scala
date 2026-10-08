@@ -72,7 +72,11 @@ class IncompleteReturnsController @Inject() (
                               )
             _              <- sessionRepository.set(updatedAnswers)
           } yield Redirect(resolveDeleteRoute(record))
-        case _                 => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+        case _                 =>
+          logger.error(
+            s"[IncompleteReturnsController][onDeleteRedirect] - Record is non-deletable for monthlyReturnId=$monthlyReturnId"
+          )
+          Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
     }
 
@@ -105,7 +109,7 @@ class IncompleteReturnsController @Inject() (
       case (ReturnTypeViewModel.Standard, Some("N")) =>
         controllers.delete.routes.DeleteMonthlyReturnController.onPageLoad()
       case _                                         =>
-        logger.warn(
+        logger.error(
           s"[IncompleteReturnsController] No delete route mapping for monthlyReturnId=${record.monthlyReturnId}"
         )
         controllers.routes.JourneyRecoveryController.onPageLoad()

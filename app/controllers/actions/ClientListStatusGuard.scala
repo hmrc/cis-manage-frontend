@@ -56,6 +56,7 @@ class ClientListStatusGuard @Inject() (
           case ClientListStatus.InProgress                                 =>
             Some(Redirect(securityCheckCall))
           case ClientListStatus.Failed | ClientListStatus.InitiateDownload =>
+            logger.error("[ClientListStatusGuard][groupB] - client list status Failed or InitiateDownload")
             Some(systemError)
         }
     }

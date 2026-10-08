@@ -62,10 +62,18 @@ class SubmittedReturnsController @Inject() (
         .map { data =>
           submittedReturnsService.buildSingleYearViewModel(data, taxYear, request.cisId) match {
             case Some(vm) => Ok(view(vm))
-            case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            case None     =>
+              logger.error(
+                s"[SubmittedReturnsController][onPageLoadSingleYear] - no view model built for taxYear=$taxYear"
+              )
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
         }
-        .recover { case _ =>
+        .recover { case ex =>
+          logger.error(
+            s"[SubmittedReturnsController][onPageLoadSingleYear] - failed to load submitted returns for taxYear=$taxYear",
+            ex
+          )
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }
@@ -80,10 +88,13 @@ class SubmittedReturnsController @Inject() (
         .map { data =>
           submittedReturnsService.buildAllYearsViewModel(data, request.cisId) match {
             case Some(vm) => Ok(view(vm))
-            case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            case None     =>
+              logger.error("[SubmittedReturnsController][onPageLoadAllYears] - no view model built for all years")
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
         }
-        .recover { case _ =>
+        .recover { case ex =>
+          logger.error("[SubmittedReturnsController][onPageLoadAllYears] - failed to load submitted returns", ex)
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }
@@ -154,6 +165,9 @@ class SubmittedReturnsController @Inject() (
             case Some(data) if data.amendmentStatus.exists(Set("STARTED", "VALIDATED")) =>
               Redirect("#") // TODO
             case _                                                                      =>
+              logger.error(
+                s"[SubmittedReturnsController][onInProgressRedirect] - no in-progress return found for monthlyReturnId=$monthlyReturnId"
+              )
               Redirect(routes.JourneyRecoveryController.onPageLoad())
           }
         }

@@ -56,7 +56,11 @@ class VerificationHistoryController @Inject() (
                     case Some(vm) if vm.taxYears.nonEmpty => Ok(view(vm))
                     case _                                => NotFound(notFoundView())
             }
-            .recover { _ =>
+            .recover { ex =>
+              logger.error(
+                "[VerificationHistoryController][onPageLoad] - failed to retrieve submitted verifications",
+                ex
+              )
               Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
             }
         case None            => Future.successful(NotFound(notFoundView()))
