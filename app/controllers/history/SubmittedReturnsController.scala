@@ -24,13 +24,14 @@ import models.requests.CisIdDataRequest
 import pages.history.SubmittedReturnsDataPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Lang, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{ManageService, SubmittedReturnsService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.history.SubmittedReturnsView
 import views.html.monthlyreturns.SubmissionSuccessView
+import viewmodels.SubmittedReturnsPageViewModel
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -60,10 +61,7 @@ class SubmittedReturnsController @Inject() (
 
       resolveSubmittedReturnsData
         .map { data =>
-          submittedReturnsService.buildSingleYearViewModel(data, taxYear, request.cisId) match {
-            case Some(vm) => Ok(view(vm))
-            case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          }
+          submittedReturnsResult(submittedReturnsService.buildSingleYearViewModel(data, taxYear, request.cisId))
         }
         .recover { case _ =>
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
@@ -78,14 +76,23 @@ class SubmittedReturnsController @Inject() (
 
       resolveSubmittedReturnsData
         .map { data =>
-          submittedReturnsService.buildAllYearsViewModel(data, request.cisId) match {
-            case Some(vm) => Ok(view(vm))
-            case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          }
+          submittedReturnsResult(submittedReturnsService.buildAllYearsViewModel(data, request.cisId))
         }
         .recover { case _ =>
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
+    }
+
+  private def submittedReturnsResult(viewModel: Option[SubmittedReturnsPageViewModel])(implicit
+    request: CisIdDataRequest[AnyContent]
+  ): Result =
+    viewModel match {
+      case Some(vm) if vm.taxYears.isEmpty =>
+        Redirect(controllers.history.routes.NoReturnsSubmittedController.onPageLoad())
+      case Some(vm)                        =>
+        Ok(view(vm))
+      case None                            =>
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
 
   private def resolveSubmittedReturnsData(implicit

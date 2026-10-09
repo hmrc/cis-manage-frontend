@@ -27,7 +27,7 @@ case class GetSubmittedMonthlyReturnsDataResponse(
   taxMonth: Int,
   nilReturnIndicator: String,
   monthlyReturnItems: Seq[MonthlyReturnItem],
-  submission: SubmittedSubmissionData
+  submission: Option[SubmittedSubmissionData]
 )
 
 object GetSubmittedMonthlyReturnsDataResponse:
