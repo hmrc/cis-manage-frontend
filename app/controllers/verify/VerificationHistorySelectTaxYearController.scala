@@ -20,6 +20,7 @@ import controllers.{CisController, CisControllerComponents}
 import forms.verify.TaxYearFormProvider
 import models.verify.VerificationTaxYearSelection
 import models.verify.VerificationTaxYearSelection.TaxYear
+import play.api.Logging
 import play.api.mvc.{Action, AnyContent}
 import services.{VerificationHistoryService, VerificationService}
 import views.html.verify.{NoVerificationHistoryView, VerificationHistorySelectTaxYearView}
@@ -35,7 +36,8 @@ class VerificationHistorySelectTaxYearController @Inject() (
   view: VerificationHistorySelectTaxYearView,
   noHistoryView: NoVerificationHistoryView
 )(implicit ec: ExecutionContext)
-    extends CisController {
+    extends CisController
+    with Logging {
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
@@ -56,7 +58,13 @@ class VerificationHistorySelectTaxYearController @Inject() (
               case None       =>
                 Ok(noHistoryView(request.cisId))
         }
-        .recover(_ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        .recover { ex =>
+          logger.error(
+            "[VerificationHistorySelectTaxYearController][onPageLoad] - failed to retrieve submitted verifications",
+            ex
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
     }
 
   def onSubmit(): Action[AnyContent] =

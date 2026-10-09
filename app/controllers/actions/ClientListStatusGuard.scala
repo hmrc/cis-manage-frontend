@@ -51,11 +51,12 @@ class ClientListStatusGuard @Inject() (
 
       override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] =
         check(request) {
-          case ClientListStatus.Succeeded                                  =>
+          case ClientListStatus.Succeeded                                             =>
             None
-          case ClientListStatus.InProgress                                 =>
+          case ClientListStatus.InProgress                                            =>
             Some(Redirect(securityCheckCall))
-          case ClientListStatus.Failed | ClientListStatus.InitiateDownload =>
+          case status @ (ClientListStatus.Failed | ClientListStatus.InitiateDownload) =>
+            logger.error(s"[ClientListStatusGuard][groupB] - unexpected client list status=$status")
             Some(systemError)
         }
     }

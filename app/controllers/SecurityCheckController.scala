@@ -87,24 +87,32 @@ class SecurityCheckController @Inject() (
       returnCall(returnTo, instanceId, mode) match {
 
         case None =>
+          logger.warn(s"[SecurityCheckController][pollClientListCheck] - Invalid client list return target=$returnTo")
           Future.successful(systemError)
 
         case Some(successfulCall) =>
           val nextRetry = retryCount + 1
-          if nextRetry > MaxRetries then Future.successful(systemError)
-          else
+          if nextRetry > MaxRetries then {
+            logger.error(
+              s"[SecurityCheckController][pollClientListCheck] - max retries exceeded retryCount=$retryCount"
+            )
+            Future.successful(systemError)
+          } else
             cisService.getClientListStatus
               .map {
-                case ClientListStatus.Succeeded                                  =>
+                case ClientListStatus.Succeeded                                             =>
                   Redirect(successfulCall)
-                case ClientListStatus.InProgress                                 =>
+                case ClientListStatus.InProgress                                            =>
                   refreshResult(
                     returnTo = returnTo,
                     instanceId = instanceId,
                     mode = mode,
                     retryCount = nextRetry
                   )
-                case ClientListStatus.Failed | ClientListStatus.InitiateDownload =>
+                case status @ (ClientListStatus.Failed | ClientListStatus.InitiateDownload) =>
+                  logger.error(
+                    s"[SecurityCheckController][pollClientListCheck] - unexpected client list status=$status"
+                  )
                   systemError
               }
               .recover { case NonFatal(e) =>

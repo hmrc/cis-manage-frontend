@@ -63,7 +63,11 @@ class SubmittedReturnsController @Inject() (
         .map { data =>
           submittedReturnsResult(submittedReturnsService.buildSingleYearViewModel(data, taxYear, request.cisId))
         }
-        .recover { case _ =>
+        .recover { case ex =>
+          logger.error(
+            s"[SubmittedReturnsController][onPageLoadSingleYear] - failed to load submitted returns for taxYear=$taxYear",
+            ex
+          )
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }
@@ -78,7 +82,8 @@ class SubmittedReturnsController @Inject() (
         .map { data =>
           submittedReturnsResult(submittedReturnsService.buildAllYearsViewModel(data, request.cisId))
         }
-        .recover { case _ =>
+        .recover { case ex =>
+          logger.error("[SubmittedReturnsController][onPageLoadAllYears] - failed to load submitted returns", ex)
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }
@@ -160,7 +165,17 @@ class SubmittedReturnsController @Inject() (
           response.monthlyReturns.find(_.monthlyReturnId == monthlyReturnId) match {
             case Some(data) if data.amendmentStatus.exists(Set("STARTED", "VALIDATED")) =>
               Redirect("#") // TODO
-            case _                                                                      =>
+            case Some(data)                                                             =>
+              logger.error(
+                s"[SubmittedReturnsController][onInProgressRedirect] - " +
+                  s"unexpected amendment status=${data.amendmentStatus.getOrElse("missing")} " +
+                  s"for monthlyReturnId=$monthlyReturnId"
+              )
+              Redirect(routes.JourneyRecoveryController.onPageLoad())
+            case None                                                                   =>
+              logger.error(
+                s"[SubmittedReturnsController][onInProgressRedirect] - no in-progress return found for monthlyReturnId=$monthlyReturnId"
+              )
               Redirect(routes.JourneyRecoveryController.onPageLoad())
           }
         }

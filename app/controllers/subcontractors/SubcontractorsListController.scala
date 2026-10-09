@@ -24,6 +24,7 @@ import models.{Mode, UserAnswers}
 import pages.subcontractors.SubcontractorListPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Lang, MessagesApi}
+import play.api.Logging
 import utils.DateTimeFormats
 import play.api.mvc.*
 import services.PaginationSubcontractorsListService
@@ -53,7 +54,8 @@ class SubcontractorsListController @Inject() (
   view: SubcontractorsListView,
   config: FrontendAppConfig
 ) extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   val form: Form[String] = formProvider()
 
@@ -535,6 +537,7 @@ class SubcontractorsListController @Inject() (
           Redirect(routes.NoSubcontractorsExistController.onPageLoad())
 
         case None =>
+          logger.error("[SubcontractorsListController][onPageLoad] - SubcontractorListPage missing from userAnswers")
           Redirect(
             controllers.routes.JourneyRecoveryController.onPageLoad()
           )
@@ -579,6 +582,7 @@ class SubcontractorsListController @Inject() (
             )
 
         case None =>
+          logger.error("[SubcontractorsListController][onSubmit] - SubcontractorListPage missing from userAnswers")
           Redirect(
             controllers.routes.JourneyRecoveryController.onPageLoad()
           )

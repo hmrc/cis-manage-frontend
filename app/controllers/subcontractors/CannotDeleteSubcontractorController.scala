@@ -19,6 +19,7 @@ package controllers.subcontractors
 import controllers.actions.*
 import models.NormalMode
 import pages.subcontractors.DeleteSubcontractorJourneyPage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -35,16 +36,23 @@ class CannotDeleteSubcontractorController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: CannotDeleteSubcontractorView
 ) extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId) { implicit request =>
       request.userAnswers
         .get(DeleteSubcontractorJourneyPage)
         .fold {
+          logger.error(
+            "[CannotDeleteSubcontractorController][onPageLoad] - DeleteSubcontractorJourneyPage missing from userAnswers"
+          )
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         } { journeyData =>
           if (journeyData.subcontractorCanBeDeleted) {
+            logger.error(
+              "[CannotDeleteSubcontractorController][onPageLoad] - subcontractor is deletable but cannot-delete page reached"
+            )
             Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           } else {
 

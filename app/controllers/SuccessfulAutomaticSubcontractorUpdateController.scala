@@ -61,8 +61,14 @@ class SuccessfulAutomaticSubcontractorUpdateController @Inject() (
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
       service.getScheme(instanceId).flatMap {
         case None                                                  =>
+          logger.error(
+            s"[SuccessfulAutomaticSubcontractorUpdateController][onPageLoad] - no scheme found for instanceId=$instanceId"
+          )
           Future.successful(Redirect(routes.SystemErrorController.onPageLoad()))
         case Some(scheme) if scheme.prePopSuccessful.contains("N") =>
+          logger.error(
+            s"[SuccessfulAutomaticSubcontractorUpdateController][onPageLoad] - prepop not successful for instanceId=$instanceId"
+          )
           Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
         case _                                                     =>
           subcontractorService

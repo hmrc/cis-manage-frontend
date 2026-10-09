@@ -41,10 +41,18 @@ class VerificationRequestController @Inject() (
         .map { data =>
           verificationHistoryService.buildVerificationRequestViewModel(data, verificationBatchId, request.cisId) match {
             case Some(vm) => Ok(view(vm))
-            case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            case None     =>
+              logger.error(
+                s"[VerificationRequestController][onPageLoad] - batch not found verificationBatchId=$verificationBatchId"
+              )
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
         }
-        .recover { case _ =>
+        .recover { case ex =>
+          logger.error(
+            s"[VerificationRequestController][onPageLoad] - failed to retrieve verification batch verificationBatchId=$verificationBatchId",
+            ex
+          )
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }
