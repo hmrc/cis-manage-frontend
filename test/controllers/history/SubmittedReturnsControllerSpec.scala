@@ -244,6 +244,9 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
     def unauthorisedUrl: String =
       controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad().url
 
+    def noReturnsSubmittedUrl: String =
+      controllers.history.routes.NoReturnsSubmittedController.onPageLoad().url
+
     def journeyRecoveryUrl: String =
       controllers.routes.JourneyRecoveryController.onPageLoad().url
   }
@@ -357,6 +360,40 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual unauthorisedUrl
+      }
+    }
+
+    "onPageLoadSingleYear must redirect to NoReturnsSubmitted when the view model has no tax years" in new Setup {
+      val userAnswers    = userAnswersWithSubmittedReturnsData
+      val emptyViewModel = viewModel.copy(taxYears = Seq.empty)
+
+      mockSingleYearViewModelReturns(Some(emptyViewModel))
+
+      val app = application(userAnswers)
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadSingleYear("2007").url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual noReturnsSubmittedUrl
+      }
+    }
+
+    "onPageLoadAllYears must redirect to NoReturnsSubmitted when the view model has no tax years" in new Setup {
+      val userAnswers    = userAnswersWithSubmittedReturnsData
+      val emptyViewModel = viewModel.copy(taxYears = Seq.empty)
+
+      mockAllYearsViewModelReturns(Some(emptyViewModel))
+
+      val app = application(userAnswers)
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.onPageLoadAllYears().url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual noReturnsSubmittedUrl
       }
     }
 

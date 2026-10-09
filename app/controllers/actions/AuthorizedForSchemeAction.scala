@@ -44,7 +44,12 @@ class AuthorizedForSchemeActionProvider {
         if (authorized) {
           Future.successful(Right(request))
         } else {
-          Future.successful(Left(Redirect(controllers.routes.UnauthorisedController.onPageLoad())))
+          Future.successful(
+            Left(
+              Redirect(controllers.routes.UnauthorisedController.onPageLoad())
+                .addingToSession("userId" -> request.userId)(request)
+            )
+          )
         }
       }
 
@@ -73,7 +78,12 @@ class AuthorizedForSchemeActionProvider {
         if (authorized) {
           Future.successful(Right(request))
         } else {
-          Future.successful(Left(Redirect(controllers.routes.UnauthorisedController.onPageLoad())))
+          Future.successful(
+            Left(
+              Redirect(controllers.routes.UnauthorisedController.onPageLoad())
+                .addingToSession("userId" -> request.userId)(request)
+            )
+          )
         }
       }
 

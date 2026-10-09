@@ -63,14 +63,19 @@ class AgentIdentifierAction @Inject() (
           logger.info("AgentIdentifierAction - Organisation login attempt")
           Future.successful(
             Redirect(controllers.routes.UnauthorisedController.onPageLoad())
+              .addingToSession("userId" -> internalId)(request)
           )
-        case Some(_) ~ _ ~ Some(Organisation) ~ Some(Assistant) ~ _ ~ _                               =>
+        case Some(internalId) ~ _ ~ Some(Organisation) ~ Some(Assistant) ~ _ ~ _                      =>
           logger.info("AgentIdentifierAction - Organisation: Assistant login attempt")
-          Future.successful(Redirect(controllers.routes.UnauthorisedWrongRoleController.onPageLoad()))
-        case Some(_) ~ _ ~ Some(Individual) ~ _ ~ _ ~ _                                               =>
+          Future.successful(
+            Redirect(controllers.routes.UnauthorisedWrongRoleController.onPageLoad())
+              .addingToSession("userId" -> internalId)(request)
+          )
+        case Some(internalId) ~ _ ~ Some(Individual) ~ _ ~ _ ~ _                                      =>
           logger.info("AgentIdentifierAction - Individual login attempt")
           Future.successful(
             Redirect(controllers.routes.UnauthorisedIndividualAffinityController.onPageLoad())
+              .addingToSession("userId" -> internalId)(request)
           )
         case Some(internalId) ~ Enrolments(enrolments) ~ Some(Agent) ~ _ ~ agentCodeOpt ~ itmpNameOpt =>
           hasCisAgentEnrolment(enrolments)
@@ -87,6 +92,7 @@ class AgentIdentifierAction @Inject() (
             .getOrElse(
               Future.successful(
                 Redirect(controllers.routes.UnauthorisedAgentAffinityController.onPageLoad())
+                  .addingToSession("userId" -> internalId)(request)
               )
             )
         case _                                                                                        =>

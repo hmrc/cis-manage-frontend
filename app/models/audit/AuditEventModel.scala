@@ -28,9 +28,19 @@ trait AuditEventModel {
     ExtendedDataEvent(auditSource = auditSource, auditType = auditType, detail = detailJson)
 }
 
-final case class AuthFailureAuditEventModel() extends AuditEventModel {
+final case class AuthFailureAuditEventModel(
+  agentUserId: String,
+  taxOfficeNumber: String,
+  taxOfficeReference: String,
+  clientUniqueId: String
+) extends AuditEventModel {
   override val auditType: String   = "AuthoriseServiceGuardFailure"
-  override val detailJson: JsValue = Json.obj()
+  override val detailJson: JsValue = Json.obj(
+    "agentUserId"        -> agentUserId,
+    "taxOfficeNumber"    -> taxOfficeNumber,
+    "taxOfficeReference" -> taxOfficeReference,
+    "clientUniqueId"     -> clientUniqueId
+  )
 }
 
 final case class ClientDetailsRetrievedAuditEventModel(

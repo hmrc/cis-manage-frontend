@@ -19,16 +19,21 @@ package controllers
 import config.FrontendAppConfig
 import models.Target
 import models.Target.*
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import models.response.GetSubcontractor
+import play.api.Logging
+import play.api.i18n.{I18nSupport, Lang, MessagesApi}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, RequestHeader}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import utils.DateTimeFormats
 import viewmodels.SuccessfulAutomaticSubcontractorUpdateViewModel
 import views.html.SuccessfulAutomaticSubcontractorUpdateView
 import controllers.actions.{AuthorizedForSchemeActionProvider, DataRequiredAction, DataRetrievalAction, HasClientGuard, IdentifierAction}
-import services.PrepopService
+import services.{PrepopService, SubcontractorService}
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class SuccessfulAutomaticSubcontractorUpdateController @Inject() (
   override val messagesApi: MessagesApi,
@@ -40,10 +45,12 @@ class SuccessfulAutomaticSubcontractorUpdateController @Inject() (
   view: SuccessfulAutomaticSubcontractorUpdateView,
   requireSchemeAccess: AuthorizedForSchemeActionProvider,
   service: PrepopService,
+  subcontractorService: SubcontractorService,
   appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(instanceId: String, targetKey: String): Action[AnyContent] =
     (identify
@@ -51,14 +58,22 @@ class SuccessfulAutomaticSubcontractorUpdateController @Inject() (
       andThen requireData
       andThen requireSchemeAccess(instanceId)
       andThen hasClientGuard.forInstanceId(instanceId)).async { implicit request =>
-      service.getScheme(instanceId).map {
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+      service.getScheme(instanceId).flatMap {
         case None                                                  =>
-          Redirect(routes.SystemErrorController.onPageLoad())
+          Future.successful(Redirect(routes.SystemErrorController.onPageLoad()))
         case Some(scheme) if scheme.prePopSuccessful.contains("N") =>
-          Redirect(routes.JourneyRecoveryController.onPageLoad())
+          Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
         case _                                                     =>
-          val subcontractorsList: Seq[SuccessfulAutomaticSubcontractorUpdateViewModel] = getSubcontractorsList
-          Ok(view(subcontractorsList, instanceId, targetKey))
+          subcontractorService
+            .getSubcontractorList(instanceId)
+            .map { response =>
+              Ok(view(response.subcontractors.map(toViewModel), instanceId, targetKey))
+            }
+            .recover { case ex =>
+              logger.error(s"Failed to retrieve subcontractor list for instanceId $instanceId", ex)
+              Redirect(routes.JourneyRecoveryController.onPageLoad())
+            }
       }
     }
 
@@ -78,13 +93,29 @@ class SuccessfulAutomaticSubcontractorUpdateController @Inject() (
       case ManageContractorDetails => Call("GET", appConfig.contractorDetailsManagementUrl)
     }
 
-  private def getSubcontractorsList: Seq[SuccessfulAutomaticSubcontractorUpdateViewModel] =
-    Seq(
-      SuccessfulAutomaticSubcontractorUpdateViewModel("Alice, A", "1111111111", " ", "01 Jan 2014"),
-      SuccessfulAutomaticSubcontractorUpdateViewModel("Bob, B", "2222222222", " ", "01 Jan 2014"),
-      SuccessfulAutomaticSubcontractorUpdateViewModel("Dave, D", "4444444444", "V1000000009", "07 May 2015"),
-      SuccessfulAutomaticSubcontractorUpdateViewModel("Charles, C", "3333333333", "V1000000009", "01 Jan 2014"),
-      SuccessfulAutomaticSubcontractorUpdateViewModel("Elise, E", "5555555555", "V1000000009", "07 May 2015"),
-      SuccessfulAutomaticSubcontractorUpdateViewModel("Frank, F", "6666666666", "V1000000009", "07 Jan 2018")
+  private def toViewModel(
+    subcontractor: GetSubcontractor
+  )(implicit request: RequestHeader): SuccessfulAutomaticSubcontractorUpdateViewModel = {
+    val preferredMessages   = messagesApi.preferred(request)
+    implicit val lang: Lang = preferredMessages.lang
+    SuccessfulAutomaticSubcontractorUpdateViewModel(
+      name = firstNonBlank(subcontractor.displayName).getOrElse(
+        preferredMessages("subcontractors.subcontractorsList.noNameProvided")
+      ),
+      uniqueReferenceNumber = firstNonBlank(subcontractor.utr, subcontractor.crn, subcontractor.nino).getOrElse(""),
+      verificationNumber = displayedVerificationNumber(subcontractor.verificationNumber),
+      dateAdded = subcontractor.createDate
+        .map(_.format(DateTimeFormats.shortDateFormat()))
+        .getOrElse("")
     )
+  }
+
+  private def displayedVerificationNumber(verificationNumber: Option[String]): String =
+    verificationNumber
+      .map(_.trim)
+      .filter(value => value.nonEmpty && !value.equalsIgnoreCase("null"))
+      .getOrElse("")
+
+  private def firstNonBlank(values: Option[String]*): Option[String] =
+    values.collectFirst { case Some(value) if value.trim.nonEmpty => value.trim }
 }

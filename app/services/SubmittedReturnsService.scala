@@ -122,7 +122,7 @@ class SubmittedReturnsService @Inject() (
   ): SubmittedReturnPrintViewModel = {
     val langCode = lang.code
 
-    val submittedDateTime = data.submission.acceptedTime.map(_.atZone(GMTTimezone))
+    val submittedDateTime = data.submission.flatMap(_.acceptedTime).map(_.atZone(GMTTimezone))
 
     val submittedTime = submittedDateTime
       .map(_.format(DateTimeFormats.timeFormat()(lang)))
@@ -132,7 +132,8 @@ class SubmittedReturnsService @Inject() (
       .map(_.format(DateTimeFormats.dateTimeFormat()(lang)))
       .getOrElse("")
 
-    val receiptReferenceNumber = data.submission.hmrcMarkGgis.map(IrMarkReferenceGenerator.fromBase64).getOrElse("")
+    val receiptReferenceNumber =
+      data.submission.flatMap(_.hmrcMarkGgis).map(IrMarkReferenceGenerator.fromBase64).getOrElse("")
 
     val totalPaymentsMade    =
       Utils.formatCurrency(
@@ -184,13 +185,10 @@ class SubmittedReturnsService @Inject() (
     val rowsWithTaxYear =
       data.monthlyReturns
         .sortBy(mr => (mr.taxYear, mr.taxMonth))(Ordering.Tuple2(Ordering.Int, Ordering.Int).reverse)
-        .flatMap { monthlyReturn =>
-          data.submissions
-            .find(_.activeObjectId.contains(monthlyReturn.monthlyReturnId))
-            .map { submission =>
-              val fromYear = taxYearFromYear(monthlyReturn)
-              fromYear -> toRowViewModel(monthlyReturn, Some(submission), source, instanceId)
-            }
+        .map { monthlyReturn =>
+          val submissionOpt = data.submissions.find(_.activeObjectId.contains(monthlyReturn.monthlyReturnId))
+          val fromYear      = taxYearFromYear(monthlyReturn)
+          fromYear -> toRowViewModel(monthlyReturn, submissionOpt, source, instanceId)
         }
 
     rowsWithTaxYear

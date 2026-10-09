@@ -413,7 +413,9 @@ submissionConfirmation.panel.referenceLabel  =  xxxxxxxxxxxxxxxxxxxx
 submissionConfirmation.details.heading       =  xxxxxxxxxxxxxxxxxxxx
 
 submissionConfirmation.submittedOn           =  xxxxxxxxxxxxxxxxxxxx
+
 submissionConfirmation.submittedOn.value     =  {0} am {1}
+
 submissionConfirmation.contractorName        =  xxxxxxxxxxxxxxxxxxxx
 submissionConfirmation.payeReference         =  xxxxxxxxxxxxxxxxxxxx
 submissionConfirmation.returnPeriod          =  xxxxxxxxxxxxxxxxxxxx
@@ -470,7 +472,6 @@ history.returnHistory.allYears.heading                                          
 history.returnHistory.singleYear.title                                          =  Hanes datganiadau misol ar gyfer blwyddyn dreth {0} i {1}
 history.returnHistory.singleYear.heading                                        =  Hanes datganiadau misol ar gyfer blwyddyn dreth {0} i {1}
 history.returnHistory.caption                                                   =  Datganiadau a gyflwynwyd
-history.returnHistory.noSubmittedReturns                                        =  Nid ydych wedi cyflwyno unrhyw ddatganiad misol.
 history.returnHistory.taxYear.caption                                           =  Blwyddyn dreth {0} i {1}
 history.returnHistory.table.returnPeriodEnd                                     =  Cyfnod dod i ben y datganiad
 history.returnHistory.table.returnType                                          =  Math
