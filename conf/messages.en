@@ -317,73 +317,73 @@ agentLostAccess.title                                  =  agentLostAccess
 agentLostAccess.heading                                =  agentLostAccess
 
 # Subcontractors
-retrievingSubcontractors.title                                =  Your subcontractors
-retrievingSubcontractors.heading                              =  Your subcontractors
-retrievingSubcontractors.p1                                   =  We are locating your subcontractor records.
-retrievingSubcontractors.p2                                   =  This should only take a few moments.
+retrievingSubcontractors.title                                          =  Your subcontractors
+retrievingSubcontractors.heading                                        =  Your subcontractors
+retrievingSubcontractors.p1                                             =  We are locating your subcontractor records.
+retrievingSubcontractors.p2                                             =  This should only take a few moments.
 
-retrievingSubcontractors.p3.bold                              =  Do not refresh this page or use the back button.
+retrievingSubcontractors.p3.bold                                        =  Do not refresh this page or use the back button.
 
-checkSubcontractorRecords.title                               =  Check subcontractor records
-checkSubcontractorRecords.heading                             =  Check subcontractor records
-checkSubcontractorRecords.p1                                  =  We will now check if there are any subcontractor records you have recently paid/verified.
-checkSubcontractorRecords.p2                                  =  Any record we find will be automatically added to your subcontractor list, which will be available to view.
+checkSubcontractorRecords.title                                         =  Check subcontractor records
+checkSubcontractorRecords.heading                                       =  Check subcontractor records
+checkSubcontractorRecords.p1                                            =  We will now check if there are any subcontractor records you have recently paid/verified.
+checkSubcontractorRecords.p2                                            =  Any record we find will be automatically added to your subcontractor list, which will be available to view.
 
-unsuccessfulAutomaticSubcontractorUpdate.title                =  Unsuccessful automatic subcontractor update
-unsuccessfulAutomaticSubcontractorUpdate.heading              =  Unsuccessful automatic subcontractor update
-unsuccessfulAutomaticSubcontractorUpdate.p1                   =  CIS Online will check this again the next time you enter the application.
-unsuccessfulAutomaticSubcontractorUpdate.p2                   =  You can also add subcontractor details, but you must complete your contractor details first.
+unsuccessfulAutomaticSubcontractorUpdate.title                          =  Unsuccessful automatic subcontractor update
+unsuccessfulAutomaticSubcontractorUpdate.heading                        =  Unsuccessful automatic subcontractor update
+unsuccessfulAutomaticSubcontractorUpdate.p1                             =  CIS Online will check this again the next time you enter the application.
+unsuccessfulAutomaticSubcontractorUpdate.p2                             =  You can also add subcontractor details, but you must complete your contractor details first.
 
-successfulAutomaticSubcontractorUpdate.title                  =  Successful automatic subcontractor update
-successfulAutomaticSubcontractorUpdate.heading                =  Successful automatic subcontractor update
-successfulAutomaticSubcontractorUpdate.p1                     =  The subcontractors below have been added to your subcontractor list.
+successfulAutomaticSubcontractorUpdate.title                            =  Successful automatic subcontractor update
+successfulAutomaticSubcontractorUpdate.heading                          =  Successful automatic subcontractor update
+successfulAutomaticSubcontractorUpdate.p1                               =  The subcontractors below have been added to your subcontractor list.
 
-successfulAutomaticSubcontractorUpdate.th.name                =  Name
-successfulAutomaticSubcontractorUpdate.th.uniqueTaxReference  =  Unique Tax Reference
-successfulAutomaticSubcontractorUpdate.th.verificationNumber  =  Verification number
-successfulAutomaticSubcontractorUpdate.th.dateAdded           =  Date added
+successfulAutomaticSubcontractorUpdate.th.name                          =  Name
+successfulAutomaticSubcontractorUpdate.th.uniqueTaxReference            =  Unique Tax Reference
+successfulAutomaticSubcontractorUpdate.th.verificationNumber            =  Verification number
+successfulAutomaticSubcontractorUpdate.th.dateAdded                     =  Date added
 
-successfulNoRecordsFound.title                                =  Successful automatic subcontractor update
-successfulNoRecordsFound.heading                              =  Successful automatic subcontractor update
-successfulNoRecordsFound.p1                                   =  No subcontractor records were found.
-successfulNoRecordsFound.p2                                   =  You can
+successfulNoRecordsFound.title                                          =  Successful automatic subcontractor update
+successfulNoRecordsFound.heading                                        =  Successful automatic subcontractor update
+successfulNoRecordsFound.p1                                             =  No subcontractor records were found.
+successfulNoRecordsFound.p2                                             =  You can
 
-successfulNoRecordsFound.p2.link                              =  add a subcontractor
+successfulNoRecordsFound.p2.link                                        =  add a subcontractor
 
-subcontractorsLandingPage.title                               =  Manage your subcontractors
-subcontractorsLandingPage.heading                             =  Manage your subcontractors
-subcontractorsLandingPage.p1                                  =  Subcontractors must be verified before you can include them on a monthly return. This will ensure that deductions are made at the correct rate.
+subcontractorsLandingPage.title                                         =  Manage your subcontractors
+subcontractorsLandingPage.heading                                       =  Manage your subcontractors
+subcontractorsLandingPage.p1                                            =  Subcontractors must be verified before you can include them on a monthly return. This will ensure that deductions are made at the correct rate.
 
-subcontractorsLandingPage.hint.prefix                         =  You will need to use
-subcontractorsLandingPage.hint.link                           =  commercial software
-subcontractorsLandingPage.hint.suffix                         =  to submit any verification requests that include more than 50 subcontractors.
+subcontractorsLandingPage.hint.prefix                                   =  You will need to use
+subcontractorsLandingPage.hint.link                                     =  commercial software
+subcontractorsLandingPage.hint.suffix                                   =  to submit any verification requests that include more than 50 subcontractors.
 
-subcontractorsLandingPage.addSubcontractors                   =  Add new subcontractors
+subcontractorsLandingPage.addSubcontractors                             =  Add new subcontractors
 
-subcontractorsLandingPage.addSubcontractors.p1                =  Create records for any new subcontractors who you want to pay.
+subcontractorsLandingPage.addSubcontractors.p1                          =  Create records for any new subcontractors who you want to pay.
 
-subcontractorsLandingPage.verifySubcontractors                =  Verify your subcontractors
+subcontractorsLandingPage.verifySubcontractors                          =  Verify your subcontractors
 
-subcontractorsLandingPage.verifySubcontractors.p1             =  Make sure your subcontractors are given the correct tax treatment.
+subcontractorsLandingPage.verifySubcontractors.p1                       =  Make sure your subcontractors are given the correct tax treatment.
 
-subcontractorsLandingPage.viewSubcontractors                  =  View your subcontractors
+subcontractorsLandingPage.viewSubcontractors                            =  View your subcontractors
 
-subcontractorsLandingPage.viewSubcontractors.p1               =  Edit the details of any subcontractor in your list.
+subcontractorsLandingPage.viewSubcontractors.p1                         =  Edit the details of any subcontractor in your list.
 
-subcontractorsLandingPage.viewVerificationHistory             =  Review your verification history
+subcontractorsLandingPage.viewVerificationHistory                       =  Review your verification history
 
-subcontractorsLandingPage.viewVerificationHistory.p1          =  Download or print copies of all verification requests you’ve submitted.
+subcontractorsLandingPage.viewVerificationHistory.p1                    =  Download or print copies of all verification requests you’ve submitted.
 
-subcontractorsLandingPage.checkResults                        =  Check your results
+subcontractorsLandingPage.checkResults                                  =  Check your results
 
-subcontractorsLandingPage.checkResults.p1                     =  View the outcome of your latest verification request.
+subcontractorsLandingPage.checkResults.p1                               =  View the outcome of your latest verification request.
 
-subcontractorsLandingPage.manageConstructionIndustrySchemeAccount.link   =  Manage Construction Industry Scheme account
+subcontractorsLandingPage.manageConstructionIndustrySchemeAccount.link  =  Manage Construction Industry Scheme account
 
-subcontractorsLandingPage.aside.h2                            =  Help and guidance
-subcontractorsLandingPage.aside.link1                         =  Construction Industry Scheme: A guide for contractors and subcontractors
-subcontractorsLandingPage.aside.link2                         =  Email updates, videos and webinars about the Construction Industry Scheme
-subcontractorsLandingPage.aside.link3                         =  More information about construction and property management
+subcontractorsLandingPage.aside.h2                                      =  Help and guidance
+subcontractorsLandingPage.aside.link1                                   =  Construction Industry Scheme: A guide for contractors and subcontractors
+subcontractorsLandingPage.aside.link2                                   =  Email updates, videos and webinars about the Construction Industry Scheme
+subcontractorsLandingPage.aside.link3                                   =  More information about construction and property management
 
 # Returns & Submissions
 addContractorDetails.title                   =  Add contractor details
