@@ -124,6 +124,13 @@ class AgentLandingViewSpec extends SpecBase {
       doc.text() should include(messages(app).apply("agent.landing.card.noticesAndStatements.p"))
     }
 
+    "render back to your clients link" in {
+      val (doc, _) = render()
+
+      doc.select("p").text()           should include(messages(app).apply("site.backTo"))
+      doc.select(".govuk-link").text() should include(messages(app).apply("agent.landing.yourClients.link"))
+    }
+
     "link the contractor details card to the agent target click" in {
       val (doc, _) = render()
 

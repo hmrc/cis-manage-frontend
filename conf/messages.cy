@@ -193,6 +193,8 @@ returnsLanding.viewSubmittedReturns.p1                            =  Gweld datga
 returnsLanding.incompleteReturns.h3.link                          =  xxxxxxxxxxxxxxxxxxxx
 returnsLanding.incompleteReturns.p1                               =  xxxxxxxxxxxxxxxxxxxx
 
+returnsLanding.manageConstructionIndustrySchemeAccount.link       = xxxxxxxxxxxxxxxxxxxx
+
 returnsLanding.aside.h2                                           =  Help ac arweiniad
 returnsLanding.aside.link1                                        =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
 returnsLanding.aside.link2                                        =  Dod o hyd i gyflenwyr meddalwedd ar gyfer Cynllun y Diwydiant Adeiladu (CIS) - GOV.UK
@@ -234,15 +236,16 @@ agent.landing.card.removeClient.title                  =  Dileu cleient
 agent.landing.card.removeClient.p                      =  Dileu cleient nad ydych yn ei reoli mwyach.
 agent.landing.card.noticesAndStatements.title          =  Hysbysiadau a datganiadau
 agent.landing.card.noticesAndStatements.p              =  Gweld hysbysiad gan CThEF, rhybuddion am gosb, a datganiadau cadarnhau.
+agent.landing.yourClients.link                         =  xxxxxxxxxxxxxxxxxxxx
 agent.landing.help.link1                               =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
 agent.landing.help.link2                               =  Talu TWE y cyflogwr
 agent.landing.help.link3                               =  Cosbau am ddatganiadau hwyr (CIS) CC/FS18b
 agent.landing.agentName.noName                         =  xxxxxxxxxxxxxxxxxxxx
 agent.landing.schemeName.key.notProvided               =  xxxxxxxxxxxxxxxxxxxx
 
-agent.clientListSearch.title                           =  Dewiswch gleient er mwyn cyflwyno datganiad CIS
-agent.clientListSearch.heading                         =  Cyflwyno datganiad CIS misol
-agent.clientListSearch.p1                              =  Mae tri dull posibl o chwilio am ddatganiad CIS misol, a’i gyflwyno.
+agent.clientListSearch.title                           =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.heading                         =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.p1                              =  xxxxxxxxxxxxxxxxxxxx
 agent.clientListSearch.searchBy.label                  =  Drwy ba ddull yr hoffech chwilio?
 agent.clientListSearch.searchBy.placeholder            =  Dewiswch opsiwn
 agent.clientListSearch.searchFilter.label              =  Nodwch eich chwiliad
@@ -341,6 +344,7 @@ subcontractorsLandingPage.viewVerificationHistory.p1          =  Lawrlwytho neu 
 subcontractorsLandingPage.checkResults                        =  Gwirio eich canlyniadau
 
 subcontractorsLandingPage.checkResults.p1                     =  Gweld canlyniad eich cais diweddaraf am ddilysiad.
+subcontractorsLandingPage.manageConstructionIndustrySchemeAccount.link = xxxxxxxxxxxxxxxxxxxx
 
 subcontractorsLandingPage.aside.h2                            =  Help ac arweiniad
 subcontractorsLandingPage.aside.link1                         =  Cynllun y Diwydiant Adeiladu: Canllaw ar gyfer contractwyr ac is-gontractwyr

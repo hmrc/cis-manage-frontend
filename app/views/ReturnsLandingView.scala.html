@@ -28,10 +28,11 @@
     aside: Aside,
     nav: Nav,
     caption: Caption,
-    ptaCard: PtaCard
+    ptaCard: PtaCard,
+    link: Link
 )
 
-@(contractorName: String, standardReturnLink: String, nilReturnLink: String, returnToHomeLink: String)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
+@(contractorName: String, standardReturnLink: String, nilReturnLink: String, returnToHomeLink: String, cisAccountUrl: String)(implicit request: Request[_], config: FrontendAppConfig, messages: Messages)
 
 @sidebar = {
     @aside("returnsLanding.aside.h2", nav(Seq(
@@ -74,5 +75,12 @@
             content = Html(messages("returnsLanding.incompleteReturns.p1")),
             id = Some("incomplete-returns")
         )
+    )
+
+    @link(
+        linkTextKey = "returnsLanding.manageConstructionIndustrySchemeAccount.link",
+        linkUrl = cisAccountUrl,
+        hasFullStop = true,
+        prefixTextKey = "site.backTo"
     )
 }

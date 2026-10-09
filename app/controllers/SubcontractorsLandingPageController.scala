@@ -16,6 +16,8 @@
 
 package controllers
 
+import config.FrontendAppConfig
+import pages.CisIdPage
 import play.api.mvc.{Action, AnyContent}
 import views.html.SubcontractorsLandingPageView
 
@@ -24,13 +26,26 @@ import javax.inject.Inject
 class SubcontractorsLandingPageController @Inject() (
   val controllerComponents: CisControllerComponents,
   view: SubcontractorsLandingPageView
-) extends CisController {
+)(implicit appConfig: FrontendAppConfig)
+    extends CisController {
 
   def onPageLoad(instanceId: String): Action[AnyContent] =
     (identify
       andThen getData
       andThen requireData
       andThen hasClientGuard.forInstanceId(instanceId)) { implicit request =>
-      Ok(view())
+
+      val cisAccountUrl =
+        if (!request.isAgent) {
+          appConfig.constructionIndustryOrgAccountUrl
+        } else {
+          request.userAnswers
+            .get(CisIdPage)
+            .fold(appConfig.constructionIndustryAgentAccountUrl)(cisId =>
+              s"${appConfig.constructionIndustryAgentAccountUrl}$cisId"
+            )
+        }
+
+      Ok(view(cisAccountUrl))
     }
 }
