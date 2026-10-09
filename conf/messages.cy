@@ -193,7 +193,7 @@ returnsLanding.viewSubmittedReturns.p1                            =  Gweld datga
 returnsLanding.incompleteReturns.h3.link                          =  xxxxxxxxxxxxxxxxxxxx
 returnsLanding.incompleteReturns.p1                               =  xxxxxxxxxxxxxxxxxxxx
 
-returnsLanding.manageConstructionIndustrySchemeAccount.link       = xxxxxxxxxxxxxxxxxxxx
+returnsLanding.manageConstructionIndustrySchemeAccount.link       =  xxxxxxxxxxxxxxxxxxxx
 
 returnsLanding.aside.h2                                           =  Help ac arweiniad
 returnsLanding.aside.link1                                        =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
@@ -317,72 +317,73 @@ agent.retrievingClient.inset.p4                        =  Mae’r gwasanaeth hwn
 agent.retrievingClient.inset.link                      =  Dewch o hyd i feddalwedd fasnachol ar gyfer datganiadau CIS
 
 # Subcontractors
-subcontractorsLandingPage.title                               =  Rheoli’ch is-gontractwyr
-subcontractorsLandingPage.heading                             =  Rheoli’ch is-gontractwyr
-subcontractorsLandingPage.p1                                  =  Mae’n rhaid i is-gontractwyr fod wedi’u dilysu cyn y cewch eu cynnwys mewn datganiad misol. Bydd hyn yn sicrhau bod didyniadau yn cael eu gwneud ar y gyfradd gywir.
+subcontractorsLandingPage.title                                         =  Rheoli’ch is-gontractwyr
+subcontractorsLandingPage.heading                                       =  Rheoli’ch is-gontractwyr
+subcontractorsLandingPage.p1                                            =  Mae’n rhaid i is-gontractwyr fod wedi’u dilysu cyn y cewch eu cynnwys mewn datganiad misol. Bydd hyn yn sicrhau bod didyniadau yn cael eu gwneud ar y gyfradd gywir.
 
-subcontractorsLandingPage.hint.prefix                         =  Bydd angen i chi ddefnyddio meddalwedd
-subcontractorsLandingPage.hint.link                           =  fasnachol
-subcontractorsLandingPage.hint.suffix                         =  er mwyn cyflwyno unrhyw geisiadau am ddilysiad sy’n cynnwys mwy na 50 o is-gontractwyr.
+subcontractorsLandingPage.hint.prefix                                   =  Bydd angen i chi ddefnyddio meddalwedd
+subcontractorsLandingPage.hint.link                                     =  fasnachol
+subcontractorsLandingPage.hint.suffix                                   =  er mwyn cyflwyno unrhyw geisiadau am ddilysiad sy’n cynnwys mwy na 50 o is-gontractwyr.
 
-subcontractorsLandingPage.addSubcontractors                   =  Ychwanegu is-gontractwr newydd
+subcontractorsLandingPage.addSubcontractors                             =  Ychwanegu is-gontractwr newydd
 
-subcontractorsLandingPage.addSubcontractors.p1                =  Creu cofnodion ar gyfer unrhyw is-gontractwyr newydd yr ydych am eu talu.
+subcontractorsLandingPage.addSubcontractors.p1                          =  Creu cofnodion ar gyfer unrhyw is-gontractwyr newydd yr ydych am eu talu.
 
-subcontractorsLandingPage.verifySubcontractors                =  Dilysu’ch is-gontractwyr
+subcontractorsLandingPage.verifySubcontractors                          =  Dilysu’ch is-gontractwyr
 
-subcontractorsLandingPage.verifySubcontractors.p1             =  Sicrhewch bod eich is-gontractwyr yn cael y triniaeth cywir o ran treth.
+subcontractorsLandingPage.verifySubcontractors.p1                       =  Sicrhewch bod eich is-gontractwyr yn cael y triniaeth cywir o ran treth.
 
-subcontractorsLandingPage.viewSubcontractors                  =  Gweld eich is-gontractwyr
+subcontractorsLandingPage.viewSubcontractors                            =  Gweld eich is-gontractwyr
 
-subcontractorsLandingPage.viewSubcontractors.p1               =  Diwygio’r manylion ynghylch unrhyw is-gontractwr yn eich rhestr.
+subcontractorsLandingPage.viewSubcontractors.p1                         =  Diwygio’r manylion ynghylch unrhyw is-gontractwr yn eich rhestr.
 
-subcontractorsLandingPage.viewVerificationHistory             =  Adolygu eich hanes dilysu
+subcontractorsLandingPage.viewVerificationHistory                       =  Adolygu eich hanes dilysu
 
-subcontractorsLandingPage.viewVerificationHistory.p1          =  Lawrlwytho neu argraffu copïau o’r holl geisiadau am ddilysiad rydych wedi’u cyflwyno.
+subcontractorsLandingPage.viewVerificationHistory.p1                    =  Lawrlwytho neu argraffu copïau o’r holl geisiadau am ddilysiad rydych wedi’u cyflwyno.
 
-subcontractorsLandingPage.checkResults                        =  Gwirio eich canlyniadau
+subcontractorsLandingPage.checkResults                                  =  Gwirio eich canlyniadau
 
-subcontractorsLandingPage.checkResults.p1                     =  Gweld canlyniad eich cais diweddaraf am ddilysiad.
-subcontractorsLandingPage.manageConstructionIndustrySchemeAccount.link = xxxxxxxxxxxxxxxxxxxx
+subcontractorsLandingPage.checkResults.p1                               =  Gweld canlyniad eich cais diweddaraf am ddilysiad.
 
-subcontractorsLandingPage.aside.h2                            =  Help ac arweiniad
-subcontractorsLandingPage.aside.link1                         =  Cynllun y Diwydiant Adeiladu: Canllaw ar gyfer contractwyr ac is-gontractwyr
-subcontractorsLandingPage.aside.link2                         =  Diweddariadau dros e-bost, fideos a gweminarau ynghylch Cynllun y Diwydiant Adeiladu
-subcontractorsLandingPage.aside.link3                         =  Rhagor o wybodaeth ynghylch rheoli eiddo ac adeiladu
+subcontractorsLandingPage.manageConstructionIndustrySchemeAccount.link  =  xxxxxxxxxxxxxxxxxxxx
 
-retrievingSubcontractors.title                                =  Eich is-gontractwyr
-retrievingSubcontractors.heading                              =  Eich is-gontractwyr
-retrievingSubcontractors.p1                                   =  Rydym yn chwilio am gofnodion o’ch is-gontractwyr.
-retrievingSubcontractors.p2                                   =  Dim ond ychydig eiliadau y dylai hyn ei gymryd.
+subcontractorsLandingPage.aside.h2                                      =  Help ac arweiniad
+subcontractorsLandingPage.aside.link1                                   =  Cynllun y Diwydiant Adeiladu: Canllaw ar gyfer contractwyr ac is-gontractwyr
+subcontractorsLandingPage.aside.link2                                   =  Diweddariadau dros e-bost, fideos a gweminarau ynghylch Cynllun y Diwydiant Adeiladu
+subcontractorsLandingPage.aside.link3                                   =  Rhagor o wybodaeth ynghylch rheoli eiddo ac adeiladu
 
-retrievingSubcontractors.p3.bold                              =  Peidiwch ag adfywio’r dudalen hon na defnyddio’r botwm i fynd yn ôl.
+retrievingSubcontractors.title                                          =  Eich is-gontractwyr
+retrievingSubcontractors.heading                                        =  Eich is-gontractwyr
+retrievingSubcontractors.p1                                             =  Rydym yn chwilio am gofnodion o’ch is-gontractwyr.
+retrievingSubcontractors.p2                                             =  Dim ond ychydig eiliadau y dylai hyn ei gymryd.
 
-checkSubcontractorRecords.title                               =  Gwirio cofnodion is-gontractwr
-checkSubcontractorRecords.heading                             =  Gwirio cofnodion is-gontractwr
-checkSubcontractorRecords.p1                                  =  Byddwn nawr yn mynd ati i wirio a ydych wedi talu/dilysu unrhyw gofnodion is-gontractwyr yn ddiweddar.
-checkSubcontractorRecords.p2                                  =  Byddwn yn ychwanegu unrhyw gofnodion o’r fath at eich rhestr o is-gontractwyr, a bydd modd i chi fwrw golwg dros y rhestr hon.
+retrievingSubcontractors.p3.bold                                        =  Peidiwch ag adfywio’r dudalen hon na defnyddio’r botwm i fynd yn ôl.
 
-unsuccessfulAutomaticSubcontractorUpdate.title                =  Wedi methu â diweddaru manylion yr is-gontractwr yn awtomatig
-unsuccessfulAutomaticSubcontractorUpdate.heading              =  Wedi methu â diweddaru manylion yr is-gontractwr yn awtomatig
-unsuccessfulAutomaticSubcontractorUpdate.p1                   =  Bydd gwasanaeth ar-lein Cynllun y Diwydiant Adeiladu yn gwirio hyn eto y tro nesaf y byddwch yn nodi’r cais.
-unsuccessfulAutomaticSubcontractorUpdate.p2                   =  Gallwch hefyd ychwanegu manylion is-gontractwr, ond mae’n rhaid i chi nodi manylion eich contractwr yn gyntaf.
+checkSubcontractorRecords.title                                         =  Gwirio cofnodion is-gontractwr
+checkSubcontractorRecords.heading                                       =  Gwirio cofnodion is-gontractwr
+checkSubcontractorRecords.p1                                            =  Byddwn nawr yn mynd ati i wirio a ydych wedi talu/dilysu unrhyw gofnodion is-gontractwyr yn ddiweddar.
+checkSubcontractorRecords.p2                                            =  Byddwn yn ychwanegu unrhyw gofnodion o’r fath at eich rhestr o is-gontractwyr, a bydd modd i chi fwrw golwg dros y rhestr hon.
 
-successfulAutomaticSubcontractorUpdate.title                  =  Wedi llwyddo i ddiweddaru manylion yr is-gontractwr yn awtomatig
-successfulAutomaticSubcontractorUpdate.heading                =  Wedi llwyddo i ddiweddaru manylion yr is-gontractwr yn awtomatig
-successfulAutomaticSubcontractorUpdate.p1                     =  Mae’r is-gontractwyr isod wedi’u hychwanegu at eich rhestr o is-gontractwyr.
+unsuccessfulAutomaticSubcontractorUpdate.title                          =  Wedi methu â diweddaru manylion yr is-gontractwr yn awtomatig
+unsuccessfulAutomaticSubcontractorUpdate.heading                        =  Wedi methu â diweddaru manylion yr is-gontractwr yn awtomatig
+unsuccessfulAutomaticSubcontractorUpdate.p1                             =  Bydd gwasanaeth ar-lein Cynllun y Diwydiant Adeiladu yn gwirio hyn eto y tro nesaf y byddwch yn nodi’r cais.
+unsuccessfulAutomaticSubcontractorUpdate.p2                             =  Gallwch hefyd ychwanegu manylion is-gontractwr, ond mae’n rhaid i chi nodi manylion eich contractwr yn gyntaf.
 
-successfulAutomaticSubcontractorUpdate.th.name                =  Enw
-successfulAutomaticSubcontractorUpdate.th.uniqueTaxReference  =  Cyfeirnod Unigryw y Trethdalwr
-successfulAutomaticSubcontractorUpdate.th.verificationNumber  =  Rhif dilysu
-successfulAutomaticSubcontractorUpdate.th.dateAdded           =  Dyddiad yr ychwanegiad
+successfulAutomaticSubcontractorUpdate.title                            =  Wedi llwyddo i ddiweddaru manylion yr is-gontractwr yn awtomatig
+successfulAutomaticSubcontractorUpdate.heading                          =  Wedi llwyddo i ddiweddaru manylion yr is-gontractwr yn awtomatig
+successfulAutomaticSubcontractorUpdate.p1                               =  Mae’r is-gontractwyr isod wedi’u hychwanegu at eich rhestr o is-gontractwyr.
 
-successfulNoRecordsFound.title                                =  Wedi llwyddo i ddiweddaru manylion yr is-gontractwr yn awtomatig
-successfulNoRecordsFound.heading                              =  Wedi llwyddo i ddiweddaru manylion yr is-gontractwr yn awtomatig
-successfulNoRecordsFound.p1                                   =  Doedd dim modd dod o hyd i gofnodion am unrhyw is-gontractwyr.
-successfulNoRecordsFound.p2                                   =  Gallwch
+successfulAutomaticSubcontractorUpdate.th.name                          =  Enw
+successfulAutomaticSubcontractorUpdate.th.uniqueTaxReference            =  Cyfeirnod Unigryw y Trethdalwr
+successfulAutomaticSubcontractorUpdate.th.verificationNumber            =  Rhif dilysu
+successfulAutomaticSubcontractorUpdate.th.dateAdded                     =  Dyddiad yr ychwanegiad
 
-successfulNoRecordsFound.p2.link                              =  ychwanegu is-gontractwr
+successfulNoRecordsFound.title                                          =  Wedi llwyddo i ddiweddaru manylion yr is-gontractwr yn awtomatig
+successfulNoRecordsFound.heading                                        =  Wedi llwyddo i ddiweddaru manylion yr is-gontractwr yn awtomatig
+successfulNoRecordsFound.p1                                             =  Doedd dim modd dod o hyd i gofnodion am unrhyw is-gontractwyr.
+successfulNoRecordsFound.p2                                             =  Gallwch
+
+successfulNoRecordsFound.p2.link                                        =  ychwanegu is-gontractwr
 
 # Returns & Submissions
 incompleteReturns.title                      =  xxxxxxxxxxxxxxxxxxxx

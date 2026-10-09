@@ -99,7 +99,7 @@ class FrontendAppConfigSpec extends SpecBase {
 
   "exitSurveyUrl" - {
     "must be built from feedback-frontend service base URL" in new Setup {
-      appConfig.exitSurveyUrl mustBe "http://localhost:9514/feedback/cis-manage-frontend"
+      appConfig.exitSurveyUrl mustBe "http://localhost:9514/feedback/construction-industry-scheme"
     }
   }
 
