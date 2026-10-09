@@ -51,15 +51,17 @@ class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
         taxMonth = 4,
         nilReturnIndicator = "Y",
         monthlyReturnItems = Seq.empty,
-        submission = SubmittedSubmissionData(
-          submissionId = 10L,
-          submissionType = Some("MONTHLY_RETURN"),
-          activeObjectId = Some(20L),
-          status = "SUBMITTED",
-          hmrcMarkGenerated = Some("mark1"),
-          hmrcMarkGgis = Some("ggis1"),
-          emailRecipient = Some("test@example.com"),
-          acceptedTime = Some(LocalDateTime.parse("2025-01-01T12:00:00"))
+        submission = Some(
+          SubmittedSubmissionData(
+            submissionId = 10L,
+            submissionType = Some("MONTHLY_RETURN"),
+            activeObjectId = Some(20L),
+            status = "SUBMITTED",
+            hmrcMarkGenerated = Some("mark1"),
+            hmrcMarkGgis = Some("ggis1"),
+            emailRecipient = Some("test@example.com"),
+            acceptedTime = Some(LocalDateTime.parse("2025-01-01T12:00:00"))
+          )
         )
       )
 
@@ -123,15 +125,17 @@ class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
         taxMonth = 4,
         nilReturnIndicator = "Y",
         monthlyReturnItems = Seq.empty,
-        submission = SubmittedSubmissionData(
-          submissionId = 10L,
-          submissionType = Some("MONTHLY_RETURN"),
-          activeObjectId = Some(20L),
-          status = "SUBMITTED",
-          hmrcMarkGenerated = Some("mark1"),
-          hmrcMarkGgis = Some("ggis1"),
-          emailRecipient = Some("test@example.com"),
-          acceptedTime = Some(LocalDateTime.parse("2025-01-01T12:00:00"))
+        submission = Some(
+          SubmittedSubmissionData(
+            submissionId = 10L,
+            submissionType = Some("MONTHLY_RETURN"),
+            activeObjectId = Some(20L),
+            status = "SUBMITTED",
+            hmrcMarkGenerated = Some("mark1"),
+            hmrcMarkGgis = Some("ggis1"),
+            emailRecipient = Some("test@example.com"),
+            acceptedTime = Some(LocalDateTime.parse("2025-01-01T12:00:00"))
+          )
         )
       )
 
@@ -177,6 +181,63 @@ class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(model, historyUrl)(request, messages(application)).toString
+      }
+    }
+
+    "must return OK when the monthly return has no submission" in {
+
+      val mockManageService       = mock[ManageService]
+      val submittedReturnsService = mock[SubmittedReturnsService]
+
+      val mockResponse = GetSubmittedMonthlyReturnsDataResponse(
+        scheme = SubmittedSchemeData("Scheme Name", "163", "AB0063"),
+        monthlyReturnId = 3000L,
+        taxYear = 2026,
+        taxMonth = 4,
+        nilReturnIndicator = "Y",
+        monthlyReturnItems = Seq.empty,
+        submission = None
+      )
+
+      val model = SubmittedReturnPrintViewModel(
+        monthYear = "April 2026",
+        submittedTime = "",
+        submittedDate = "",
+        receiptReferenceNumber = "",
+        submissionType = "nil",
+        contractorName = "Scheme Name",
+        payeReference = "163/AB0063",
+        totalPaymentsMade = "£0.00",
+        totalCostOfMaterials = "£0.00",
+        totalTaxDeducted = "£0.00",
+        subcontractors = Seq.empty
+      )
+
+      when(
+        mockManageService.getSubmittedMonthlyReturnsData(eqTo("1"), eqTo(2026), eqTo(4), eqTo("N"))(any[HeaderCarrier])
+      )
+        .thenReturn(Future.successful(mockResponse))
+
+      when(submittedReturnsService.buildSubmittedReturnPrintViewModel(any(), any()))
+        .thenReturn(model)
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+        .overrides(
+          bind[ManageService].toInstance(mockManageService),
+          bind[SubmittedReturnsService].toInstance(submittedReturnsService)
+        )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, printSubmissionDetailsRoute)
+        val result  = route(application, request).value
+        val view    = application.injector.instanceOf[PrintSubmissionDetailsView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(
+          model,
+          controllers.history.routes.SubmittedReturnsController.onPageLoadAllYears().url
+        )(request, messages(application)).toString
       }
     }
 
