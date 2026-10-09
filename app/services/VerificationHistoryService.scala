@@ -21,7 +21,7 @@ import models.verify.VerificationTaxYearSelection.TaxYearPeriod
 import models.response.GetSubmittedVerification
 import viewmodels.*
 import play.api.i18n.Lang
-import utils.DateTimeFormats
+import utils.{DateTimeFormats, IrMarkReferenceGenerator}
 
 import javax.inject.{Inject, Singleton}
 import models.response.{GetSubmittedSubmission, GetSubmittedVerificationsResponse}
@@ -108,7 +108,7 @@ class VerificationHistoryService @Inject() () {
           submissionDate = request.acceptedDateTime.format(DateTimeFormats.dateTimeFormat()(lang)),
           contractorName = request.contractorName,
           employerReference = request.employerReference,
-          receiptReferenceNumber = request.receiptReferenceNumber,
+          receiptReferenceNumber = IrMarkReferenceGenerator.fromBase64(request.receiptReferenceNumber),
           verificationNumber = request.verificationNumber,
           cisId = instanceId
         )
