@@ -19,7 +19,6 @@ package controllers
 import config.FrontendAppConfig
 import models.Target
 import models.Target.*
-import play.api.Logging
 import models.response.GetSubcontractor
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Lang, MessagesApi}

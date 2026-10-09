@@ -165,7 +165,14 @@ class SubmittedReturnsController @Inject() (
           response.monthlyReturns.find(_.monthlyReturnId == monthlyReturnId) match {
             case Some(data) if data.amendmentStatus.exists(Set("STARTED", "VALIDATED")) =>
               Redirect("#") // TODO
-            case _                                                                      =>
+            case Some(data)                                                             =>
+              logger.error(
+                s"[SubmittedReturnsController][onInProgressRedirect] - " +
+                  s"unexpected amendment status=${data.amendmentStatus.getOrElse("missing")} " +
+                  s"for monthlyReturnId=$monthlyReturnId"
+              )
+              Redirect(routes.JourneyRecoveryController.onPageLoad())
+            case None                                                                   =>
               logger.error(
                 s"[SubmittedReturnsController][onInProgressRedirect] - no in-progress return found for monthlyReturnId=$monthlyReturnId"
               )

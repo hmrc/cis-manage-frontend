@@ -100,18 +100,18 @@ class SecurityCheckController @Inject() (
           } else
             cisService.getClientListStatus
               .map {
-                case ClientListStatus.Succeeded                                  =>
+                case ClientListStatus.Succeeded                                             =>
                   Redirect(successfulCall)
-                case ClientListStatus.InProgress                                 =>
+                case ClientListStatus.InProgress                                            =>
                   refreshResult(
                     returnTo = returnTo,
                     instanceId = instanceId,
                     mode = mode,
                     retryCount = nextRetry
                   )
-                case ClientListStatus.Failed | ClientListStatus.InitiateDownload =>
+                case status @ (ClientListStatus.Failed | ClientListStatus.InitiateDownload) =>
                   logger.error(
-                    "[SecurityCheckController][pollClientListCheck] - client list status Failed or InitiateDownload"
+                    s"[SecurityCheckController][pollClientListCheck] - unexpected client list status=$status"
                   )
                   systemError
               }
