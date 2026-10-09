@@ -48,7 +48,12 @@ class FormpRdsReconcileActionImpl @Inject() (
         logger.warn(
           s"[FormpRdsReconcileAction] Missing tax office details for cisId=${request.cisId}; cannot run FORMP-RDS comparison"
         )
-        Future.successful(Some(Redirect(controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad())))
+        Future.successful(
+          Some(
+            Redirect(controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad())
+              .addingToSession("userId" -> request.userId)(request)
+          )
+        )
 
       case Some((taxOfficeNumber, taxOfficeReference)) =>
         prepopService
@@ -59,7 +64,10 @@ class FormpRdsReconcileActionImpl @Inject() (
               logger.warn(
                 s"[FormpRdsReconcileAction] Contractor data missing for cisId=${request.cisId} (status=${u.statusCode})"
               )
-              Some(Redirect(controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad()))
+              Some(
+                Redirect(controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad())
+                  .addingToSession("userId" -> request.userId)(request)
+              )
 
             case NonFatal(e) =>
               logger.error(s"[FormpRdsReconcileAction] FORMP-RDS comparison failed for cisId=${request.cisId}", e)

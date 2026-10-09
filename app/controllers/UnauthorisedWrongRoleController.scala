@@ -35,7 +35,14 @@ class UnauthorisedWrongRoleController @Inject() (
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
-    auditService.sendEvent(AuthFailureAuditEventModel())
+    auditService.sendEvent(
+      AuthFailureAuditEventModel(
+        agentUserId = request.session.get("userId").getOrElse(""),
+        taxOfficeNumber = "",
+        taxOfficeReference = "",
+        clientUniqueId = ""
+      )
+    )
     Ok(view())
   }
 }
