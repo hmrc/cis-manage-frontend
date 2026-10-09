@@ -193,6 +193,8 @@ returnsLanding.viewSubmittedReturns.p1                            =  Gweld datga
 returnsLanding.incompleteReturns.h3.link                          =  xxxxxxxxxxxxxxxxxxxx
 returnsLanding.incompleteReturns.p1                               =  xxxxxxxxxxxxxxxxxxxx
 
+returnsLanding.manageConstructionIndustrySchemeAccount.link       = xxxxxxxxxxxxxxxxxxxx
+
 returnsLanding.aside.h2                                           =  Help ac arweiniad
 returnsLanding.aside.link1                                        =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
 returnsLanding.aside.link2                                        =  Dod o hyd i gyflenwyr meddalwedd ar gyfer Cynllun y Diwydiant Adeiladu (CIS) - GOV.UK
@@ -342,6 +344,7 @@ subcontractorsLandingPage.viewVerificationHistory.p1          =  Lawrlwytho neu 
 subcontractorsLandingPage.checkResults                        =  Gwirio eich canlyniadau
 
 subcontractorsLandingPage.checkResults.p1                     =  Gweld canlyniad eich cais diweddaraf am ddilysiad.
+subcontractorsLandingPage.manageConstructionIndustrySchemeAccount.link = xxxxxxxxxxxxxxxxxxxx
 
 subcontractorsLandingPage.aside.h2                            =  Help ac arweiniad
 subcontractorsLandingPage.aside.link1                         =  Cynllun y Diwydiant Adeiladu: Canllaw ar gyfer contractwyr ac is-gontractwyr

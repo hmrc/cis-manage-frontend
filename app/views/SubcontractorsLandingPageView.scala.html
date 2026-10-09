@@ -31,7 +31,7 @@
     ptaCard: PtaCard
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(cisAccountUrl: String)(implicit request: Request[_], messages: Messages)
 
 @sidebar = {
     @aside("contractorLanding.sidebar.title", nav(Seq(
@@ -97,5 +97,12 @@
             content = Html(messages("subcontractorsLandingPage.checkResults.p1")),
             id = Some("check-results")
         )
+    )
+
+    @link(
+        linkTextKey = "subcontractorsLandingPage.manageConstructionIndustrySchemeAccount.link",
+        linkUrl = cisAccountUrl,
+        hasFullStop = true,
+        prefixTextKey = "site.backTo"
     )
 }

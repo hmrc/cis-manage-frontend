@@ -193,6 +193,8 @@ returnsLanding.viewSubmittedReturns.p1                            =  View submit
 returnsLanding.incompleteReturns.h3.link                          =  Incomplete and unsuccessful returns
 returnsLanding.incompleteReturns.p1                               =  Manage any returns currently in progress and those where the initial submission was unsuccessful.
 
+returnsLanding.manageConstructionIndustrySchemeAccount.link       =  Manage Construction Industry Scheme account
+
 returnsLanding.aside.h2                                           =  Help and guidance
 returnsLanding.aside.link1                                        =  Construction Industry Scheme: A guide (CIS 340)
 returnsLanding.aside.link2                                        =  Find software suppliers for the Construction Industry Scheme (CIS) - GOV.UK
@@ -375,6 +377,8 @@ subcontractorsLandingPage.viewVerificationHistory.p1          =  Download or pri
 subcontractorsLandingPage.checkResults                        =  Check your results
 
 subcontractorsLandingPage.checkResults.p1                     =  View the outcome of your latest verification request.
+
+subcontractorsLandingPage.manageConstructionIndustrySchemeAccount.link   =  Manage Construction Industry Scheme account
 
 subcontractorsLandingPage.aside.h2                            =  Help and guidance
 subcontractorsLandingPage.aside.link1                         =  Construction Industry Scheme: A guide for contractors and subcontractors

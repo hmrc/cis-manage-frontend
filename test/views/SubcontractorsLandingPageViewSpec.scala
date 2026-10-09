@@ -30,7 +30,8 @@ class SubcontractorsLandingPageViewSpec extends SpecBase {
   "SubcontractorsLandingPageView" - {
 
     "must render the correct title, heading, paragraphs and links" in new Setup {
-      val html: HtmlFormat.Appendable = view()
+      val cisAccountUrl               = "/manage-example"
+      val html: HtmlFormat.Appendable = view(cisAccountUrl)
       val doc: Document               = Jsoup.parse(html.body)
 
       doc.title                                 must include(messages("subcontractorsLandingPage.title"))
