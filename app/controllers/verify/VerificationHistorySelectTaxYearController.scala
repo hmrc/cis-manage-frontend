@@ -42,7 +42,7 @@ class VerificationHistorySelectTaxYearController @Inject() (
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
       verificationService
-        .getSubmittedVerifications(request.cisId)
+        .refreshSubmittedVerifications(request.cisId)
         .map { history =>
           val taxYears = verificationHistoryService.getSubmittedVerificationTaxYears(history)
 

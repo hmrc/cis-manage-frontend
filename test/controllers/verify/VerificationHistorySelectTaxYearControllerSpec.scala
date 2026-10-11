@@ -72,6 +72,8 @@ class VerificationHistorySelectTaxYearControllerSpec extends UnitSpec with Befor
   when(mockView(any, any)(any, any)) thenReturn Html(givenViewContent)
   when(mockNoHistoryView(any)(any, any)) thenReturn Html(givenViewContent)
 
+  when(mockVerificationService.refreshSubmittedVerifications(any)(any)) thenReturn
+    Future.successful(verificationHistoryData)
   when(mockVerificationService.getSubmittedVerifications(any)(any)) thenReturn
     Future.successful(verificationHistoryData)
   when(mockVerificationHistoryService.toVerificationHistoryData(any)) thenReturn verificationHistoryData
@@ -97,7 +99,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends UnitSpec with Befor
       redirectLocation(result) mustBe empty
       contentAsString(result) mustBe givenViewContent
 
-      verify(mockVerificationService).getSubmittedVerifications(eqTo(cisId))(any)
+      verify(mockVerificationService).refreshSubmittedVerifications(eqTo(cisId))(any)
       verify(mockVerificationHistoryService).getSubmittedVerificationTaxYears(any)
     }
 
@@ -116,7 +118,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends UnitSpec with Befor
           .url
       contentAsString(result) mustBe empty
 
-      verify(mockVerificationService).getSubmittedVerifications(eqTo(cisId))(any)
+      verify(mockVerificationService).refreshSubmittedVerifications(eqTo(cisId))(any)
     }
 
     "must show select tax year page when history has 2 tax years" in {
@@ -131,7 +133,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends UnitSpec with Befor
       redirectLocation(result) mustBe empty
       contentAsString(result) mustBe givenViewContent
 
-      verify(mockVerificationService).getSubmittedVerifications(eqTo(cisId))(any)
+      verify(mockVerificationService).refreshSubmittedVerifications(eqTo(cisId))(any)
     }
 
     "must redirect to Journey Recovery when no user answers exist and form submitted" in {
