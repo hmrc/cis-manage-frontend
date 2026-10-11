@@ -19,6 +19,7 @@ package controllers.agent
 import config.FrontendAppConfig
 import controllers.actions.IdentifierAction
 import models.agent.ClientListStatus
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import services.ConstructionIndustrySchemeService
@@ -36,7 +37,8 @@ class RetrievingClientController @Inject() (
   view: RetrievingClientView
 )(implicit appConfig: FrontendAppConfig, ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   private val MaxRetries               = 8
   private val RefreshIntervalInSeconds = 15
@@ -52,9 +54,12 @@ class RetrievingClientController @Inject() (
         case ClientListStatus.Succeeded  => Redirect(controllers.agent.routes.ClientListSearchController.onPageLoad())
         case ClientListStatus.Failed     => Redirect(controllers.agent.routes.FailedToRetrieveClientController.onPageLoad())
         case ClientListStatus.InProgress => refreshResult(nextRetry = 1)
-        case _                           => Redirect(controllers.routes.SystemErrorController.onPageLoad())
+        case other                       =>
+          logger.error(s"[RetrievingClientController][start] - unexpected client list status=$other")
+          Redirect(controllers.routes.SystemErrorController.onPageLoad())
       }
-      .recover { case _ =>
+      .recover { case ex =>
+        logger.error("[RetrievingClientController][start] - client list retrieval failed", ex)
         Redirect(controllers.routes.SystemErrorController.onPageLoad())
       }
   }
@@ -72,9 +77,12 @@ class RetrievingClientController @Inject() (
           case ClientListStatus.Succeeded  => Redirect(routes.ClientListSearchController.onPageLoad())
           case ClientListStatus.Failed     => Redirect(routes.FailedToRetrieveClientController.onPageLoad())
           case ClientListStatus.InProgress => refreshResult(nextRetry)
-          case _                           => Redirect(controllers.routes.SystemErrorController.onPageLoad())
+          case other                       =>
+            logger.error(s"[RetrievingClientController][poll] - unexpected client list status=$other")
+            Redirect(controllers.routes.SystemErrorController.onPageLoad())
         }
-        .recover { case _ =>
+        .recover { case ex =>
+          logger.error("[RetrievingClientController][poll] - client list status check failed", ex)
           Redirect(controllers.routes.SystemErrorController.onPageLoad())
         }
     }

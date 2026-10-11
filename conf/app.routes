@@ -71,10 +71,10 @@ GET   /agent/no-authorised-clients  controllers.agent.NoAuthorisedClientsControl
 GET   /agent/manage-construction-industry-scheme-account/:uniqueId                    controllers.agent.AgentLandingController.onPageLoad(uniqueId: String)
 GET   /agent/manage-construction-industry-scheme-account/:uniqueId/target/:targetKey  controllers.agent.AgentLandingController.onTargetClick(uniqueId: String, targetKey: String)
 
-GET   /agent/file-monthly-cis-returns           controllers.agent.ClientListSearchController.onPageLoad()
-POST  /agent/file-monthly-cis-returns           controllers.agent.ClientListSearchController.onSubmit()
-GET   /agent/file-monthly-cis-returns/clear     controllers.agent.ClientListSearchController.clearFilter()
-GET   /agent/file-monthly-cis-returns/download  controllers.agent.ClientListSearchController.downloadClientList()
+GET   /agent/your-clients           controllers.agent.ClientListSearchController.onPageLoad()
+POST  /agent/your-clients           controllers.agent.ClientListSearchController.onSubmit()
+GET   /agent/your-clients/clear     controllers.agent.ClientListSearchController.clearFilter()
+GET   /agent/your-clients/download  controllers.agent.ClientListSearchController.downloadClientList()
 
 # Contractor Landing
 GET  /org/manage-construction-industry-scheme-account                    controllers.contractor.ContractorLandingController.onPageLoad()

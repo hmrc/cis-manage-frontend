@@ -58,6 +58,9 @@ class DeleteSubcontractorYesNoController @Inject() (
       request.userAnswers
         .get(DeleteSubcontractorJourneyPage)
         .fold {
+          logger.error(
+            "[DeleteSubcontractorYesNoController][onPageLoad] - DeleteSubcontractorJourneyPage missing from userAnswers"
+          )
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         } { journeyData =>
           if (!journeyData.subcontractorCanBeDeleted) {
@@ -97,9 +100,12 @@ class DeleteSubcontractorYesNoController @Inject() (
             request.userAnswers
               .get(DeleteSubcontractorJourneyPage)
               .fold(
-                Future.successful(
+                Future.successful {
+                  logger.error(
+                    "[DeleteSubcontractorYesNoController][onSubmit] - DeleteSubcontractorJourneyPage missing on form error"
+                  )
                   Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                )
+                }
               ) { journeyData =>
                 Future.successful(
                   BadRequest(
@@ -122,9 +128,12 @@ class DeleteSubcontractorYesNoController @Inject() (
             } else {
               request.userAnswers
                 .get(DeleteSubcontractorJourneyPage)
-                .fold(
+                .fold {
+                  logger.error(
+                    "[DeleteSubcontractorYesNoController][onSubmit] - DeleteSubcontractorJourneyPage missing from userAnswers"
+                  )
                   Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-                ) { journeyData =>
+                } { journeyData =>
                   val foundSubcontractor  = request.userAnswers
                     .get(SubcontractorListPage)
                     .flatMap(_.subcontractors.find(_.subbieResourceRef.contains(verificationNumber)))

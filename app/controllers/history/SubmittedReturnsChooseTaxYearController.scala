@@ -21,7 +21,7 @@ import forms.history.SubmittedReturnsChooseTaxYearFormProvider
 import models.history.TaxYearSelection.{AllTaxYears, TaxYear}
 import models.history.TaxYearSelection
 import pages.history.SubmittedReturnsChooseTaxYearPage
-import play.api.i18n.Lang.logger
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -48,7 +48,8 @@ class SubmittedReturnsChooseTaxYearController @Inject() (
   manageService: ManageService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId andThen reconcileFormpRds).async {
@@ -75,8 +76,9 @@ class SubmittedReturnsChooseTaxYearController @Inject() (
               Ok(view(preparedForm, taxYearStrings))
           }
           .recover { err =>
-            logger.info(
-              "[SubmittedReturnsChooseTaxYearController] Error trying to retrieve submitted tax years"
+            logger.error(
+              "[SubmittedReturnsChooseTaxYearController][onPageLoad] - Error trying to retrieve submitted tax years",
+              err
             )
             Redirect(controllers.routes.SystemErrorController.onPageLoad())
           }
@@ -96,7 +98,13 @@ class SubmittedReturnsChooseTaxYearController @Inject() (
               val taxYearSelection: Try[TaxYearSelection] = value match {
                 case regex(start, end) =>
                   Try(TaxYear(start.toInt, end.toInt))
-                    .recover(_ => throw new Exception("Unable to parse tax year start/end"))
+                    .recover { ex =>
+                      logger.error(
+                        "[SubmittedReturnsChooseTaxYearController][onSubmit] - Unable to parse tax year start/end",
+                        ex
+                      )
+                      throw new Exception("Unable to parse tax year start/end")
+                    }
                 case "all"             => Success(AllTaxYears)
                 case _                 => Failure(Exception("unable to parse tax year selection"))
               }

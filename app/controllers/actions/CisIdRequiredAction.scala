@@ -48,7 +48,10 @@ class CisIdRequiredActionImpl @Inject() (implicit val executionContext: Executio
         )
       case None        =>
         Future.successful(
-          Left(Redirect(controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad()))
+          Left(
+            Redirect(controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad())
+              .addingToSession("userId" -> request.userId)(request)
+          )
         )
     }
 }

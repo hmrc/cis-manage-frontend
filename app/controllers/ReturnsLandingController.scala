@@ -19,7 +19,7 @@ package controllers
 import config.FrontendAppConfig
 import controllers.actions.*
 import models.UserAnswers
-import pages.ContractorNamePage
+import pages.{CisIdPage, ContractorNamePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, RequestHeader}
@@ -54,6 +54,18 @@ class ReturnsLandingController @Inject() (
       andThen getData
       andThen requireData
       andThen hasClientGuard.forInstanceId(instanceId)).async { implicit request =>
+
+      val cisAccountUrl =
+        if (!request.isAgent) {
+          appConfig.constructionIndustryOrgAccountUrl
+        } else {
+          request.userAnswers
+            .get(CisIdPage)
+            .fold(appConfig.constructionIndustryAgentAccountUrl)(cisId =>
+              s"${appConfig.constructionIndustryAgentAccountUrl}$cisId"
+            )
+        }
+
       given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       updateContractorNameFromQueryParam(request.userAnswers)
@@ -67,7 +79,8 @@ class ReturnsLandingController @Inject() (
                     context.contractorName,
                     context.standardReturnLink,
                     context.nilReturnLink,
-                    context.returnToHomeLink
+                    context.returnToHomeLink,
+                    cisAccountUrl
                   )
                 )
               case None          =>

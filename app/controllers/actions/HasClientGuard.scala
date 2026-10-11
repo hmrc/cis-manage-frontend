@@ -64,7 +64,7 @@ class HasClientGuard @Inject() (
                   Future.successful(Some(systemError))
 
                 case Some(client) =>
-                  checkClient(client.taxOfficeNumber, client.taxOfficeRef, instanceId)
+                  checkClient(client.taxOfficeNumber, client.taxOfficeRef, instanceId, request.userId)
               }
           }
       }
@@ -99,7 +99,7 @@ class HasClientGuard @Inject() (
       AgentClientsPage.findClient(request.userAnswers, instanceId) match {
 
         case Some(client) =>
-          checkClient(client.taxOfficeNumber, client.taxOfficeRef, instanceId)
+          checkClient(client.taxOfficeNumber, client.taxOfficeRef, instanceId, request.userId)
 
         case None =>
           logger.warn(s"[HasClientGuard] client not found for instanceId: $instanceId")
@@ -119,7 +119,8 @@ class HasClientGuard @Inject() (
   private def checkClient(
     taxOfficeNumber: String,
     taxOfficeReference: String,
-    instanceId: String
+    instanceId: String,
+    agentUserId: String
   )(using HeaderCarrier, Request[?]): Future[Option[Result]] =
     if taxOfficeNumber.isEmpty || taxOfficeReference.isEmpty then
       logger.warn(s"[HasClientGuard] Tax office number/reference is empty for instanceId: $instanceId")
@@ -134,7 +135,14 @@ class HasClientGuard @Inject() (
           case false =>
             logger.warn(s"[HasClientGuard] Agent no longer authorised for instanceId: $instanceId")
             auditService
-              .sendEvent(AuthFailureAuditEventModel())
+              .sendEvent(
+                AuthFailureAuditEventModel(
+                  agentUserId = agentUserId,
+                  taxOfficeNumber = taxOfficeNumber,
+                  taxOfficeReference = taxOfficeReference,
+                  clientUniqueId = instanceId
+                )
+              )
               .map(_ => Some(systemError))
               .recover { case NonFatal(ex) =>
                 logger.error(s"[HasClientGuard] failed to send authoriseServiceGuardFailure audit", ex)

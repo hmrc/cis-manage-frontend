@@ -19,6 +19,7 @@ package controllers
 import config.FrontendAppConfig
 import models.Target
 import models.Target.*
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -42,7 +43,8 @@ class SuccessfulNoRecordsFoundController @Inject() (
   appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(instanceId: String, targetKey: String): Action[AnyContent] =
     (identify
@@ -52,8 +54,12 @@ class SuccessfulNoRecordsFoundController @Inject() (
       andThen hasClientGuard.forInstanceId(instanceId)).async { implicit request =>
       service.getScheme(instanceId).map {
         case None                                                  =>
+          logger.error(s"[SuccessfulNoRecordsFoundController][onPageLoad] - no scheme found for instanceId=$instanceId")
           Redirect(routes.SystemErrorController.onPageLoad())
         case Some(scheme) if scheme.prePopSuccessful.contains("N") =>
+          logger.error(
+            s"[SuccessfulNoRecordsFoundController][onPageLoad] - prepop not successful for instanceId=$instanceId"
+          )
           Redirect(routes.JourneyRecoveryController.onPageLoad())
         case _                                                     =>
           Ok(view(instanceId, targetKey))

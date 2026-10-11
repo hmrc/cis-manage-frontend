@@ -97,7 +97,7 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
     "must return OK and the correct view for a GET" in {
       val app = appWith()
       running(app) {
-        val req               = FakeRequest(GET, "/agent/file-monthly-cis-returns")
+        val req               = FakeRequest(GET, "/agent/your-clients")
         val result            = route(app, req).value
         val view              = app.injector.instanceOf[ClientListSearchView]
         val paginationService = app.injector.instanceOf[PaginationService]

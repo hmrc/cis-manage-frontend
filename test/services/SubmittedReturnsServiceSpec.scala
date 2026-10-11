@@ -191,6 +191,41 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       row.returnType shouldBe ReturnTypeViewModel.Unknown
     }
 
+    "includes monthly returns without a matching submission as not available" in new Setup {
+      val row = singleRow(
+        data(
+          monthlyReturns = Seq(
+            monthlyReturn(id = 21L, taxYear = 2008, taxMonth = 3)
+          ),
+          submissions = Seq.empty
+        )
+      )
+
+      row.status                   shouldBe StatusViewModel.Text("history.returnHistory.status.notAvailable")
+      row.dateSubmitted            shouldBe ""
+      row.monthlyReturn.url        shouldBe controllers.history.routes.PrintSubmissionDetailsController
+        .onPageLoad(2008, 3, monthlyReturn().amendment)
+        .url
+      row.monthlyReturn.hiddenText shouldBe "Mar 2008"
+    }
+
+    "buildSingleYearViewModel includes not available returns for the selected tax year" in new Setup {
+      val testData = data(
+        monthlyReturns = Seq(
+          monthlyReturn(id = 21L, taxYear = 2008, taxMonth = 3)
+        ),
+        submissions = Seq.empty
+      )
+
+      val result = service.buildSingleYearViewModel(testData, "2007", instanceId)(Lang("en"))
+
+      result.value.selectedTaxYear                           shouldBe Some("2007")
+      result.value.taxYears.map(t => (t.fromYear, t.toYear)) shouldBe Seq(2007 -> 2008)
+      result.value.taxYears.head.rows.head.status            shouldBe StatusViewModel.Text(
+        "history.returnHistory.status.notAvailable"
+      )
+    }
+
     "returns notAvailable when acceptedTime is missing" in new Setup {
       val row = singleRow(
         data(
@@ -868,15 +903,17 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
         taxMonth = 4,
         nilReturnIndicator = "Y",
         monthlyReturnItems = Seq.empty,
-        submission = SubmittedSubmissionData(
-          submissionId = 10L,
-          submissionType = Some("Original"),
-          activeObjectId = Some(20L),
-          status = "Accepted",
-          hmrcMarkGenerated = Some("mark1"),
-          hmrcMarkGgis = Some("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"),
-          emailRecipient = Some("test@example.com"),
-          acceptedTime = Some(LocalDateTime.parse("2026-04-01T10:15:30"))
+        submission = Some(
+          SubmittedSubmissionData(
+            submissionId = 10L,
+            submissionType = Some("Original"),
+            activeObjectId = Some(20L),
+            status = "Accepted",
+            hmrcMarkGenerated = Some("mark1"),
+            hmrcMarkGgis = Some("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"),
+            emailRecipient = Some("test@example.com"),
+            acceptedTime = Some(LocalDateTime.parse("2026-04-01T10:15:30"))
+          )
         )
       )
 
@@ -893,6 +930,28 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       out.totalTaxDeducted mustBe "£0.00"
       out.subcontractors mustBe Seq.empty
 
+    }
+
+    "SubmittedReturnPrintViewModel should return correct data when there is no submission" in new Setup {
+      val input = GetSubmittedMonthlyReturnsDataResponse(
+        scheme = SubmittedSchemeData("PAL 355 Scheme", "163", "AB0063"),
+        monthlyReturnId = 3000L,
+        taxYear = 2017,
+        taxMonth = 1,
+        nilReturnIndicator = "Y",
+        monthlyReturnItems = Seq.empty,
+        submission = None
+      )
+
+      val out = service.buildSubmittedReturnPrintViewModel(input, Lang("en"))
+      out.monthYear mustBe "January 2017"
+      out.submittedTime mustBe ""
+      out.submittedDate mustBe ""
+      out.receiptReferenceNumber mustBe ""
+      out.submissionType mustBe "nil"
+      out.contractorName mustBe "PAL 355 Scheme"
+      out.payeReference mustBe "163/AB0063"
+      out.subcontractors mustBe Seq.empty
     }
 
     "SubmittedReturnPrintViewModel should return correct data with payment details" in new Setup {
@@ -928,15 +987,17 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
             itemResourceReference = None
           )
         ),
-        submission = SubmittedSubmissionData(
-          submissionId = 10L,
-          submissionType = Some("Original"),
-          activeObjectId = Some(20L),
-          status = "Accepted",
-          hmrcMarkGenerated = Some("mark1"),
-          hmrcMarkGgis = None,
-          emailRecipient = Some("test@example.com"),
-          acceptedTime = Some(LocalDateTime.parse("2026-04-01T10:15:30"))
+        submission = Some(
+          SubmittedSubmissionData(
+            submissionId = 10L,
+            submissionType = Some("Original"),
+            activeObjectId = Some(20L),
+            status = "Accepted",
+            hmrcMarkGenerated = Some("mark1"),
+            hmrcMarkGgis = None,
+            emailRecipient = Some("test@example.com"),
+            acceptedTime = Some(LocalDateTime.parse("2026-04-01T10:15:30"))
+          )
         )
       )
 

@@ -17,20 +17,36 @@
 package controllers
 
 import base.UnitSpec
+import config.FrontendAppConfig
+import play.api.i18n.Messages
+import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.SubcontractorsLandingPageView
 
 class SubcontractorsLandingPageControllerSpec extends UnitSpec {
-  import org.mockito.ArgumentMatchers.any
+  import org.mockito.ArgumentMatchers.{any, eq => eqTo}
   import org.mockito.Mockito.when
   import play.twirl.api.Html
 
-  private val stubView    = mock[SubcontractorsLandingPageView]
-  private val stubContent = "Subcontractors Landing Page"
-  when(stubView.apply()(any, any)) thenReturn Html(stubContent)
+  implicit val appConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
-  private val controllerUnderTest = new SubcontractorsLandingPageController(mockControllerComponents, stubView)
+  private val stubView      = mock[SubcontractorsLandingPageView]
+  private val stubContent   = "Subcontractors Landing Page"
+  private val cisAccountUrl = "/manage-example"
+
+  when(appConfig.constructionIndustryOrgAccountUrl)
+    .thenReturn(cisAccountUrl)
+
+  when(
+    stubView.apply(eqTo(cisAccountUrl))(
+      any[Request[_]],
+      any[Messages]
+    )
+  ).thenReturn(Html(stubContent))
+
+  private val controllerUnderTest =
+    new SubcontractorsLandingPageController(mockControllerComponents, stubView)
 
   "SubcontractorsLandingPageController" - {
 

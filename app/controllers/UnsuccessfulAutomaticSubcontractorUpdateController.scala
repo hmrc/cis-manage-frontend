@@ -17,6 +17,7 @@
 package controllers
 
 import config.FrontendAppConfig
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -39,7 +40,8 @@ class UnsuccessfulAutomaticSubcontractorUpdateController @Inject() (
   service: PrepopService
 )(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(instanceId: String): Action[AnyContent] =
     (identify
@@ -49,8 +51,14 @@ class UnsuccessfulAutomaticSubcontractorUpdateController @Inject() (
       andThen hasClientGuard.forInstanceId(instanceId)).async { implicit request =>
       service.getScheme(instanceId).map {
         case None                                                  =>
+          logger.error(
+            s"[UnsuccessfulAutomaticSubcontractorUpdateController][onPageLoad] - no scheme found for instanceId=$instanceId"
+          )
           Redirect(routes.SystemErrorController.onPageLoad())
         case Some(scheme) if scheme.prePopSuccessful.contains("Y") =>
+          logger.error(
+            s"[UnsuccessfulAutomaticSubcontractorUpdateController][onPageLoad] - prepop unexpectedly successful for instanceId=$instanceId"
+          )
           Redirect(routes.JourneyRecoveryController.onPageLoad())
         case _                                                     =>
           Ok(view(instanceId))

@@ -90,7 +90,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends UnitSpec {
 
     "must return OK when VerificationService retrieves history data and VerificationHistoryService builds view model" in new Setup {
       mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
-      when(mockVerificationService.getSubmittedVerifications(any)(any)) thenReturn
+      when(mockVerificationService.refreshSubmittedVerifications(any)(any)) thenReturn
         Future.successful(verificationHistoryData)
       when(mockVerificationHistoryService.buildSubmissionReceiptViewModel(any, any, any)(any)) thenReturn Some(
         viewModel
@@ -101,7 +101,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends UnitSpec {
       status(result) mustEqual OK
       contentAsString(result) mustEqual stubContent
 
-      mockVerify(mockVerificationService).getSubmittedVerifications(eqTo(cisId))(any)
+      mockVerify(mockVerificationService).refreshSubmittedVerifications(eqTo(cisId))(any)
       mockVerify(mockVerificationHistoryService)
         .buildSubmissionReceiptViewModel(eqTo(verificationHistoryData), eqTo(verificationBatchId), eqTo(cisId))(any)
       verifyNoMoreInteractions(mockVerificationService, mockVerificationHistoryService)
@@ -109,7 +109,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends UnitSpec {
 
     "must redirect to JourneyRecovery when verification number is not found" in new Setup {
       mockControllerComponents.setUserAnswers(Some(userAnswersWithCisId))
-      when(mockVerificationService.getSubmittedVerifications(any)(any)) thenReturn
+      when(mockVerificationService.refreshSubmittedVerifications(any)(any)) thenReturn
         Future.successful(verificationHistoryData)
       when(mockVerificationHistoryService.buildSubmissionReceiptViewModel(any, any, any)(any)) thenReturn None
 
@@ -118,7 +118,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends UnitSpec {
       status(result) mustEqual SEE_OTHER
       redirectLocation(result).value mustEqual journeyRecoveryUrl
 
-      mockVerify(mockVerificationService).getSubmittedVerifications(eqTo(cisId))(any)
+      mockVerify(mockVerificationService).refreshSubmittedVerifications(eqTo(cisId))(any)
       mockVerify(mockVerificationHistoryService)
         .buildSubmissionReceiptViewModel(eqTo(verificationHistoryData), eqTo(verificationBatchId), eqTo(cisId))(any)
       verifyNoMoreInteractions(mockVerificationService, mockVerificationHistoryService)

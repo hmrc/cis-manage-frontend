@@ -35,6 +35,15 @@ class VerificationService @Inject() (
 )(using ExecutionContext)
     extends Logging {
 
+  def refreshSubmittedVerifications(instanceId: String)(implicit hc: HeaderCarrier): Future[VerificationHistoryData] =
+    cache
+      .deleteFromCache(instanceId)
+      .recoverWith { ex =>
+        logger.warn(s"Failed to clear cache before refresh for CIS ID <$instanceId>: $ex")
+        Future.unit
+      }
+      .flatMap(_ => fetchHistoryAndPutInCache(instanceId))
+
   def getSubmittedVerifications(instanceId: String)(implicit hc: HeaderCarrier): Future[VerificationHistoryData] =
     cache
       .getFromCache(instanceId)

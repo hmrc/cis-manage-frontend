@@ -89,17 +89,17 @@ class FrontendAppConfigSpec extends SpecBase {
   }
 
   "feedbackUrl" - {
-    "must include contact-frontend host, service id and request back url" in new Setup {
+    "must include contact-frontend host and request back url" in new Setup {
       implicit val request: RequestHeader = FakeRequest("GET", "/some-path")
 
       appConfig.feedbackUrl mustBe
-        "http://localhost:9250/contact/beta-feedback?service=cis-manage-frontend&backUrl=http://localhost:6996/some-path"
+        "http://localhost:9250/contact/beta-feedback?service=construction-industry-scheme&backUrl=http://localhost:6996/some-path"
     }
   }
 
   "exitSurveyUrl" - {
     "must be built from feedback-frontend service base URL" in new Setup {
-      appConfig.exitSurveyUrl mustBe "http://localhost:9514/feedback/cis-manage-frontend"
+      appConfig.exitSurveyUrl mustBe "http://localhost:9514/feedback/construction-industry-scheme"
     }
   }
 

@@ -31,6 +31,43 @@ class LayoutWithSidebarSpec extends SpecBase {
 
   "LayoutWithSidebar" - {
 
+    "renders the user research banner when showUrBanner is true and feature flag is enabled" in {
+      implicit val req  = FakeRequest(GET, "/some-page")
+      implicit val msgs = messages(app)
+
+      val html = template(
+        pageTitle = "Test page",
+        showUrBanner = true
+      )(Html("""<p class="govuk-body">Content</p>"""))
+
+      val doc: Document = Jsoup.parse(html.body)
+
+      val recruitmentBanner = doc.select(".hmrc-user-research-banner")
+
+      recruitmentBanner.isEmpty                shouldBe false
+      recruitmentBanner.select("a").attr("href") should include(applicationConfig.userResearchUrl)
+    }
+
+    "does not render the user research banner when feature flag is disabled" in {
+      val appWithBannerDisabled: play.api.Application = applicationBuilder()
+        .configure("features.user-research-banner-enabled" -> false)
+        .build()
+
+      implicit val req: play.api.test.FakeRequest[play.api.mvc.AnyContentAsEmpty.type] = FakeRequest(GET, "/some-page")
+      implicit val msgs: play.api.i18n.Messages                                        = messages(appWithBannerDisabled)
+
+      val templateWithFlag = appWithBannerDisabled.injector.instanceOf[LayoutWithSidebar]
+
+      val html = templateWithFlag(
+        pageTitle = "Test page",
+        showUrBanner = true
+      )(Html("""<p class="govuk-body">Content</p>"""))
+
+      val doc: Document = Jsoup.parse(html.body)
+
+      doc.select(".hmrc-user-research-banner").isEmpty shouldBe true
+    }
+
     "renders title, beforeContent, main grid with content & sidebar, back link, timeout dialog and sign out when enabled" in {
       implicit val req  = FakeRequest(GET, "/some-page")
       implicit val msgs = messages(app)
