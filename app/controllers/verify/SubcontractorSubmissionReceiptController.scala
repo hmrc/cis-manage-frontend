@@ -37,7 +37,7 @@ class SubcontractorSubmissionReceiptController @Inject() (
   def onPageLoad(verificationBatchId: Long): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
       verificationService
-        .getSubmittedVerifications(request.cisId)
+        .refreshSubmittedVerifications(request.cisId)
         .map { data =>
           verificationHistoryService.buildSubmissionReceiptViewModel(data, verificationBatchId, request.cisId) match {
             case Some(vm) => Ok(view(vm))
