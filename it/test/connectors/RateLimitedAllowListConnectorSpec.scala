@@ -20,7 +20,9 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import itutil.{ApplicationWithWiremock, WireMockConstants}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
+import play.api.Application
 import play.api.http.Status.*
+import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 class RateLimitedAllowListConnectorSpec
@@ -31,10 +33,16 @@ class RateLimitedAllowListConnectorSpec
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  override val extraConfig: Map[String, Any] = super.extraConfig ++ Map(
-    "microservice.services.rate-limited-allow-list.host" -> WireMockConstants.stubHost,
-    "microservice.services.rate-limited-allow-list.port" -> WireMockConstants.stubPort
-  )
+  override lazy val app: Application = new GuiceApplicationBuilder()
+    .configure(
+      "microservice.services.auth.host"                         -> WireMockConstants.stubHost,
+      "microservice.services.auth.port"                         -> WireMockConstants.stubPort,
+      "microservice.services.construction-industry-scheme.host" -> WireMockConstants.stubHost,
+      "microservice.services.construction-industry-scheme.port" -> WireMockConstants.stubPort,
+      "microservice.services.rate-limited-allow-list.host"      -> WireMockConstants.stubHost,
+      "microservice.services.rate-limited-allow-list.port"      -> WireMockConstants.stubPort
+    )
+    .build()
 
   val connector: RateLimitedAllowListConnector = app.injector.instanceOf[RateLimitedAllowListConnector]
 
