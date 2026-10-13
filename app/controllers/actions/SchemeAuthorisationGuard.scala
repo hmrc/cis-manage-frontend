@@ -46,12 +46,12 @@ class SchemeAuthorisationGuard @Inject() (
 
       override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
         if request.isAgent then {
-          checkAgentForInstanceId(request, instanceId, unauthorised)
+          checkAgentForInstanceId(request, instanceId, unauthorisedWithSession(request))
         } else {
           val authorised = request.userAnswers.get(CisIdPage).contains(instanceId)
           Future.successful(
             if authorised then None
-            else Some(unauthorised)
+            else Some(unauthorisedWithSession(request))
           )
         }
     }
@@ -74,7 +74,7 @@ class SchemeAuthorisationGuard @Inject() (
 
         Future.successful(
           if authorised then None
-          else Some(unauthorised)
+          else Some(unauthorisedWithSession(request))
         )
       }
     }
@@ -124,7 +124,7 @@ class SchemeAuthorisationGuard @Inject() (
                     Future.successful(Some(systemError))
 
                   case Some(client) =>
-                    checkAgentClient(request, client.taxOfficeNumber, client.taxOfficeRef, instanceId)
+                    checkAgentClient(request, client.taxOfficeNumber, client.taxOfficeRef, instanceId, request.userId)
                 }
             }
         }
@@ -145,27 +145,29 @@ class SchemeAuthorisationGuard @Inject() (
         Future.successful(Some(clientNotFoundResult))
 
       case Some(client) =>
-        checkAgentClient(request, client.taxOfficeNumber, client.taxOfficeRef, instanceId)
+        checkAgentClient(request, client.taxOfficeNumber, client.taxOfficeRef, instanceId, request.userId)
     }
 
   private def checkAgentClient[A](
     request: Request[A],
     taxOfficeNumber: String,
     taxOfficeReference: String,
-    instanceId: String
+    instanceId: String,
+    agentUserId: String
   ): Future[Option[Result]] = {
 
     given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     given Request[?]    = request
 
-    checkClient(taxOfficeNumber, taxOfficeReference, instanceId)
+    checkClient(taxOfficeNumber, taxOfficeReference, instanceId, agentUserId)
 
   }
 
   private def checkClient(
     taxOfficeNumber: String,
     taxOfficeReference: String,
-    instanceId: String
+    instanceId: String,
+    agentUserId: String
   )(using HeaderCarrier, Request[?]): Future[Option[Result]] =
     if taxOfficeNumber.isEmpty || taxOfficeReference.isEmpty then {
       logger.warn(s"[SchemeAuthorisationGuard] Tax office number or reference is empty for instanceId: $instanceId")
@@ -179,7 +181,14 @@ class SchemeAuthorisationGuard @Inject() (
           case false =>
             logger.warn(s"[SchemeAuthorisationGuard] Agent does not have client for instanceId: $instanceId")
             auditService
-              .sendEvent(AuthFailureAuditEventModel())
+              .sendEvent(
+                AuthFailureAuditEventModel(
+                  agentUserId = agentUserId,
+                  taxOfficeNumber = taxOfficeNumber,
+                  taxOfficeReference = taxOfficeReference,
+                  clientUniqueId = instanceId
+                )
+              )
               .map(_ => Some(systemError))
               .recover { case NonFatal(ex) =>
                 logger.error(s"[SchemeAuthorisationGuard] Error sending audit event for instanceId: $instanceId", ex)
@@ -191,5 +200,8 @@ class SchemeAuthorisationGuard @Inject() (
           Some(systemError)
         }
     }
+
+  private def unauthorisedWithSession[A](request: DataRequest[A]): Result =
+    unauthorised.addingToSession("userId" -> request.userId)(request)
 
 }

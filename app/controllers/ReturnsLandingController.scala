@@ -64,8 +64,6 @@ class ReturnsLandingController @Inject() (
             )
         }
 
-      given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
       updateContractorNameFromQueryParam(request.userAnswers)
         .flatMap { userAnswers =>
           service

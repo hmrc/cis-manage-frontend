@@ -32,19 +32,19 @@ import viewmodels.SuccessfulAutomaticSubcontractorUpdateViewModel
 import views.html.SuccessfulAutomaticSubcontractorUpdateView
 
 import java.time.LocalDateTime
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
 
-  val mockPrepopService: PrepopService = mock[PrepopService]
-  val mockSubcontractorService: SubcontractorService              = mock[SubcontractorService]
+  val mockPrepopService: PrepopService               = mock[PrepopService]
+  val mockSubcontractorService: SubcontractorService = mock[SubcontractorService]
 
   private lazy val view = app.injector.instanceOf[SuccessfulAutomaticSubcontractorUpdateView]
 
   override def fakeApplication(): Application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
     .overrides(
-      bind[PrepopService].toInstance(mockPrepopService)
-      bind[SubcontractorService].toInstance(mockSubcontractorService),
+      bind[PrepopService].toInstance(mockPrepopService),
+      bind[SubcontractorService].toInstance(mockSubcontractorService)
     )
     .build()
 
@@ -214,9 +214,6 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
         )
       )
 
-      when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
-        .thenReturn(new FakeAuthorizedForSchemeAction)
-
       val result = route(app, request).value
 
       status(result) mustEqual OK
@@ -252,9 +249,6 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
 
       when(mockSubcontractorService.getSubcontractorList(eqTo(instanceId))(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("list failed")))
-
-      when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
-        .thenReturn(new FakeAuthorizedForSchemeAction)
 
       val result = route(app, request).value
 
