@@ -18,6 +18,7 @@ package services
 
 import connectors.ConstructionIndustrySchemeConnector
 import models.Scheme
+import play.api.Logging
 import play.api.mvc.Call
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -27,7 +28,8 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class PrepopService @Inject() (
   cisConnector: ConstructionIndustrySchemeConnector
-)(implicit ec: ExecutionContext) {
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   def prepopulateContractorKnownFacts(
     instanceId: String,
@@ -52,7 +54,8 @@ class PrepopService @Inject() (
         instanceId = instanceId
       )
       .map(_ => true)
-      .recover { case _ =>
+      .recover { case ex =>
+        logger.error(s"[PrepopService][prepopulate] - prepopulation failed for instanceId=$instanceId", ex)
         false
       }
 

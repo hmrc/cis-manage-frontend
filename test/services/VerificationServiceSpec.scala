@@ -35,6 +35,45 @@ class VerificationServiceSpec extends UnitSpec with BeforeAndAfterEach {
   private val dataBuilder      = new VerificationHistoryService
   private val serviceUnderTest = new VerificationService(cache, connector, dataBuilder)
 
+  "refreshSubmittedVerifications must clear the cache then fetch fresh history from" - {
+    val instanceId   = "900063"
+    val response     = GetSubmittedVerificationsResponse(
+      scheme = Seq.empty,
+      subcontractors = Seq.empty,
+      verificationBatches = Seq.empty,
+      verifications = Seq.empty,
+      submissions = Seq.empty
+    )
+    val expectedData = dataBuilder.toVerificationHistoryData(response)
+    val request      = GetSubmittedVerificationsRequest(instanceId)
+
+    "connector and populate the cache" in {
+      when(cache.deleteFromCache(any)) thenReturn Future.successful(())
+      when(cache.putCache(any)(any)(any)) thenReturn Future.successful(())
+      when(connector.getSubmittedVerifications(any)(any)) thenReturn Future.successful(response)
+
+      val result = serviceUnderTest.refreshSubmittedVerifications(instanceId).futureValue
+      result mustBe expectedData
+
+      verify(cache).deleteFromCache(instanceId)
+      verify(cache).putCache(eqTo(instanceId))(eqTo(expectedData))(any)
+      verify(connector).getSubmittedVerifications(eqTo(request))(any[HeaderCarrier])
+    }
+
+    "connector even when cache deletion fails" in {
+      when(cache.deleteFromCache(any)) thenReturn Future.failed(new Exception("Failed to clear cache"))
+      when(cache.putCache(any)(any)(any)) thenReturn Future.successful(())
+      when(connector.getSubmittedVerifications(any)(any)) thenReturn Future.successful(response)
+
+      val result = serviceUnderTest.refreshSubmittedVerifications(instanceId).futureValue
+      result mustBe expectedData
+
+      verify(cache).deleteFromCache(instanceId)
+      verify(cache).putCache(eqTo(instanceId))(eqTo(expectedData))(any)
+      verify(connector).getSubmittedVerifications(eqTo(request))(any[HeaderCarrier])
+    }
+  }
+
   "getSubmittedVerifications must fetch verification history from" - {
     val instanceId   = "900063"
     val response     = GetSubmittedVerificationsResponse(

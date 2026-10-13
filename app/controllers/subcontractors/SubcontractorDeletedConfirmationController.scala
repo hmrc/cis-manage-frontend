@@ -18,6 +18,7 @@ package controllers.subcontractors
 
 import controllers.actions.*
 import pages.subcontractors.DeletedSubcontractorPage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -34,13 +35,17 @@ class SubcontractorDeletedConfirmationController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: SubcontractorDeletedConfirmationView
 ) extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad: Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId) { implicit request =>
       request.userAnswers
         .get(DeletedSubcontractorPage)
         .fold {
+          logger.error(
+            "[SubcontractorDeletedConfirmationController][onPageLoad] - DeletedSubcontractorPage missing from userAnswers"
+          )
           Redirect(
             controllers.routes.JourneyRecoveryController.onPageLoad()
           )

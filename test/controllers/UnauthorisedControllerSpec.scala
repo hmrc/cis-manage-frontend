@@ -47,6 +47,7 @@ class UnauthorisedControllerSpec extends SpecBase {
 
       running(application) {
         val request = FakeRequest(GET, routes.UnauthorisedController.onPageLoad().url)
+          .withSession("userId" -> "test-user-id")
 
         val result = route(application, request).value
 

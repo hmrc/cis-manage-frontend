@@ -935,15 +935,17 @@ class ConstructionIndustrySchemeConnectorSpec
           taxMonth = 1,
           nilReturnIndicator = "N",
           monthlyReturnItems = Seq.empty,
-          submission = SubmittedSubmissionData(
-            submissionId = 10L,
-            submissionType = Some("Original"),
-            activeObjectId = Some(20L),
-            status = "Accepted",
-            hmrcMarkGenerated = Some("mark1"),
-            hmrcMarkGgis = Some("ggis1"),
-            emailRecipient = Some("test@example.com"),
-            acceptedTime = Some(LocalDateTime.parse("2025-01-01T12:00:00"))
+          submission = Some(
+            SubmittedSubmissionData(
+              submissionId = 10L,
+              submissionType = Some("Original"),
+              activeObjectId = Some(20L),
+              status = "Accepted",
+              hmrcMarkGenerated = Some("mark1"),
+              hmrcMarkGgis = Some("ggis1"),
+              emailRecipient = Some("test@example.com"),
+              acceptedTime = Some(LocalDateTime.parse("2025-01-01T12:00:00"))
+            )
           )
         )
       )

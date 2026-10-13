@@ -21,7 +21,8 @@
         govukPanel: GovukPanel,
         paragraph: Paragraph,
         h2: H2,
-        link: Link
+        link: Link,
+        appConfig: config.FrontendAppConfig
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -46,7 +47,7 @@
 
         @link(
             linkTextKey = "clientdetails.clientRefUpdateConfirmation.survey.link",
-            linkUrl = "#",
+            linkUrl = appConfig.cisFeedbackSurveyUrl,
             suffixTextKey = "clientdetails.clientRefUpdateConfirmation.survey.suffix"
         )
 }

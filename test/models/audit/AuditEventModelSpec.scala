@@ -23,12 +23,22 @@ import play.api.libs.json.{JsValue, Json}
 class AuditEventModelSpec extends SpecBase {
 
   "AuthFailureAuditEventModel" - {
-    val underTest = AuthFailureAuditEventModel()
+    val underTest = AuthFailureAuditEventModel(
+      agentUserId = "agent-123",
+      taxOfficeNumber = "123",
+      taxOfficeReference = "AB456",
+      clientUniqueId = "unique-id-789"
+    )
     "must have the correct auditType" in {
       underTest.auditType mustBe "AuthoriseServiceGuardFailure"
     }
-    "must have an empty detailJson" in {
-      underTest.detailJson mustBe Json.obj()
+    "must serialise correctly" in {
+      underTest.detailJson mustBe Json.obj(
+        "agentUserId"        -> "agent-123",
+        "taxOfficeNumber"    -> "123",
+        "taxOfficeReference" -> "AB456",
+        "clientUniqueId"     -> "unique-id-789"
+      )
     }
   }
 
@@ -55,14 +65,14 @@ class AuditEventModelSpec extends SpecBase {
       DeleteSubcontractorAuditEventModel(
         cisId = "123/AB456",
         subcontractorName = "Test Subcontractor",
-        subbieResourceRef = 42L
+        subcontractorResourceRef = 42L
       ).auditType mustBe "DeleteSubcontractor"
     }
     "must serialise correctly without typeOfSubcontractor" in {
       DeleteSubcontractorAuditEventModel(
         cisId = "123/AB456",
         subcontractorName = "Test Subcontractor",
-        subbieResourceRef = 42L
+        subcontractorResourceRef = 42L
       ).detailJson mustBe Json.obj(
         "cisId"                    -> "123/AB456",
         "subcontractorName"        -> "Test Subcontractor",
@@ -73,7 +83,7 @@ class AuditEventModelSpec extends SpecBase {
       DeleteSubcontractorAuditEventModel(
         cisId = "123/AB456",
         subcontractorName = "Test Subcontractor",
-        subbieResourceRef = 42L,
+        subcontractorResourceRef = 42L,
         typeOfSubcontractor = Some("soletrader")
       ).detailJson mustBe Json.obj(
         "cisId"                    -> "123/AB456",

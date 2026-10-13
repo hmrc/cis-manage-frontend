@@ -17,6 +17,7 @@
 package navigation
 
 import javax.inject.{Inject, Singleton}
+import play.api.Logging
 import play.api.mvc.Call
 import controllers.routes
 import pages.*
@@ -24,7 +25,7 @@ import models.*
 import pages.clientdetails.{ChangeClientReferencePage, RemoveClientYesNoPage}
 
 @Singleton
-class Navigator @Inject() () {
+class Navigator @Inject() () extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case RemoveClientYesNoPage     => userAnswers => navigatorFromRemoveClientYesNoPage(userAnswers)
@@ -52,6 +53,8 @@ class Navigator @Inject() () {
           case Some(cisId) => controllers.agent.routes.AgentLandingController.onPageLoad(cisId)
           case _           => controllers.agent.routes.ClientListSearchController.onPageLoad()
         }
-      case _           => controllers.routes.JourneyRecoveryController.onPageLoad()
+      case _           =>
+        logger.error("[Navigator][navigatorFromRemoveClientYesNoPage] - RemoveClientYesNoPage missing")
+        controllers.routes.JourneyRecoveryController.onPageLoad()
     }
 }

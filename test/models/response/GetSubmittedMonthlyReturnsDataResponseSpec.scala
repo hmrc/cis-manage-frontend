@@ -35,20 +35,35 @@ class GetSubmittedMonthlyReturnsDataResponseSpec extends AnyWordSpec with Matche
         taxMonth = 1,
         nilReturnIndicator = "Y",
         monthlyReturnItems = Seq.empty,
-        submission = SubmittedSubmissionData(
-          submissionId = 10L,
-          submissionType = Some("Original"),
-          activeObjectId = Some(20L),
-          status = "Accepted",
-          hmrcMarkGenerated = Some("mark1"),
-          hmrcMarkGgis = Some("ggis1"),
-          emailRecipient = Some("test@example.com"),
-          acceptedTime = Some(LocalDateTime.parse("2025-01-01T12:00:00"))
+        submission = Some(
+          SubmittedSubmissionData(
+            submissionId = 10L,
+            submissionType = Some("Original"),
+            activeObjectId = Some(20L),
+            status = "Accepted",
+            hmrcMarkGenerated = Some("mark1"),
+            hmrcMarkGgis = Some("ggis1"),
+            emailRecipient = Some("test@example.com"),
+            acceptedTime = Some(LocalDateTime.parse("2025-01-01T12:00:00"))
+          )
         )
       )
 
       val json = Json.toJson(model)
       json.as[GetSubmittedMonthlyReturnsDataResponse] mustBe model
+    }
+
+    "deserialize when the submission is absent" in {
+      val json = Json.obj(
+        "scheme"             -> Json.obj("name" -> "Scheme Name", "taxOfficeNumber" -> "163", "taxOfficeReference" -> "AB0063"),
+        "monthlyReturnId"    -> 3000L,
+        "taxYear"            -> 2017,
+        "taxMonth"           -> 1,
+        "nilReturnIndicator" -> "Y",
+        "monthlyReturnItems" -> Json.arr()
+      )
+
+      json.as[GetSubmittedMonthlyReturnsDataResponse].submission mustBe None
     }
   }
 }

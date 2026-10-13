@@ -16,7 +16,8 @@
 
 package controllers
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, SchemeAuthorisationGuard}
+import controllers.actions.*
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.PrepopService
@@ -37,7 +38,8 @@ class CheckSubcontractorRecordsController @Inject() (
   service: PrepopService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(
     instanceId: String,
@@ -50,8 +52,13 @@ class CheckSubcontractorRecordsController @Inject() (
       .async { implicit request =>
         service.getScheme(instanceId).map {
           case None                                                          =>
+            logger
+              .error(s"[CheckSubcontractorRecordsController][onPageLoad] - no scheme found for instanceId=$instanceId")
             Redirect(routes.SystemErrorController.onPageLoad())
           case Some(scheme) if scheme.prePopSuccessful.exists(_.equals("Y")) =>
+            logger.error(
+              s"[CheckSubcontractorRecordsController][onPageLoad] - prepop unexpectedly successful for instanceId=$instanceId"
+            )
             Redirect(routes.JourneyRecoveryController.onPageLoad())
           case _                                                             =>
             Ok(view(instanceId, targetKey))

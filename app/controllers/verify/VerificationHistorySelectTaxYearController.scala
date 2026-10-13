@@ -19,10 +19,11 @@ package controllers.verify
 import controllers.{CisController, CisControllerComponents}
 import forms.verify.TaxYearFormProvider
 import models.verify.VerificationTaxYearSelection
-import models.verify.VerificationTaxYearSelection.AllTaxYears
+import models.verify.VerificationTaxYearSelection.TaxYear
+import play.api.Logging
 import play.api.mvc.{Action, AnyContent}
 import services.{VerificationHistoryService, VerificationService}
-import views.html.verify.VerificationHistorySelectTaxYearView
+import views.html.verify.{NoVerificationHistoryView, VerificationHistorySelectTaxYearView}
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -32,22 +33,38 @@ class VerificationHistorySelectTaxYearController @Inject() (
   formProvider: TaxYearFormProvider,
   verificationService: VerificationService,
   verificationHistoryService: VerificationHistoryService,
-  view: VerificationHistorySelectTaxYearView
+  view: VerificationHistorySelectTaxYearView,
+  noHistoryView: NoVerificationHistoryView
 )(implicit ec: ExecutionContext)
-    extends CisController {
+    extends CisController
+    with Logging {
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
       verificationService
-        .getSubmittedVerifications(request.cisId)
+        .refreshSubmittedVerifications(request.cisId)
         .map { history =>
           val taxYears = verificationHistoryService.getSubmittedVerificationTaxYears(history)
 
-          if taxYears.length > 1
-          then Ok(view(formProvider(taxYears), taxYears))
-          else Redirect(routes.VerificationHistoryController.onPageLoad(AllTaxYears.toPath))
+          if taxYears.length > 1 then Ok(view(formProvider(taxYears), taxYears))
+          else
+            taxYears.headOption match
+              case Some(year) =>
+                Redirect(
+                  routes.VerificationHistoryController.onPageLoad(
+                    TaxYear(year.startYear).toPath
+                  )
+                )
+              case None       =>
+                Ok(noHistoryView(request.cisId))
         }
-        .recover(_ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        .recover { ex =>
+          logger.error(
+            "[VerificationHistorySelectTaxYearController][onPageLoad] - failed to retrieve submitted verifications",
+            ex
+          )
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
     }
 
   def onSubmit(): Action[AnyContent] =

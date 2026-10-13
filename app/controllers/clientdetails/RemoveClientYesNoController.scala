@@ -83,6 +83,9 @@ class RemoveClientYesNoController @Inject() (
             }
 
         case None =>
+          logger.error(
+            s"[RemoveClientYesNoController][onPageLoad] - no client found in AgentClientsPage for uniqueId=$uniqueId"
+          )
           Future.successful(
             Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           )
@@ -142,6 +145,9 @@ class RemoveClientYesNoController @Inject() (
             }
 
         case None =>
+          logger.error(
+            s"[RemoveClientYesNoController][onSubmit] - no client found in AgentClientsPage for uniqueId=$uniqueId"
+          )
           Future.successful(
             Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           )

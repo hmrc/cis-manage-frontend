@@ -45,12 +45,15 @@ class ClientRemovedViewSpec extends SpecBase {
     }
 
     "render paragraph text and links" in {
-      val (doc, _) = render()
+      val (doc, appConfig) = render()
 
       doc.text() should include(messages(app).apply("clientdetails.clientRemoved.p1"))
       doc.text() should include(messages(app).apply("clientdetails.clientRemoved.return.link"))
       doc.text() should include(messages(app).apply("clientdetails.clientRemoved.survey.link"))
       doc.text() should include(messages(app).apply("clientdetails.clientRemoved.survey.suffix"))
+      doc
+        .select(s"a[href='${appConfig.cisFeedbackSurveyUrl}']")
+        .text()  should include(messages(app).apply("clientdetails.clientRemoved.survey.link"))
     }
 
   }

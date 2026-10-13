@@ -569,7 +569,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
         result.value.submissionDate mustBe "6 April 2026"
         result.value.contractorName mustBe "Test Scheme"
         result.value.employerReference mustBe "123/AB456"
-        result.value.receiptReferenceNumber mustBe receiptReferenceNumber
+        result.value.receiptReferenceNumber mustBe "H4WLKLISMHJZ3QAT5HXMVHIGEUPOQEJM"
         result.value.verificationNumber mustBe "V001"
       }
     }

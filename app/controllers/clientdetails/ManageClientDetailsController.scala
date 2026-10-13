@@ -20,7 +20,7 @@ import controllers.actions.*
 import navigation.ClientListCheckNavigator
 import pages.clientdetails.ChangeClientReferencePage
 import pages.{AgentClientsPage, CisIdPage}
-import play.api.i18n.Lang.logger
+import play.api.Logging
 
 import javax.inject.{Inject, Named}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -46,7 +46,8 @@ class ManageClientDetailsController @Inject() (
   view: ManageClientDetailsView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   def onPageLoad: Action[AnyContent] =
     (identify
@@ -88,12 +89,16 @@ class ManageClientDetailsController @Inject() (
                 }
 
             case None =>
+              logger.error(
+                s"[ManageClientDetailsController][onPageLoad] - no client found in AgentClientsPage for instanceId=$instanceId"
+              )
               Future.successful(
                 Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
               )
           }
 
         case None =>
+          logger.error("[ManageClientDetailsController][onPageLoad] - CisIdPage missing from userAnswers")
           Future.successful(
             Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           )

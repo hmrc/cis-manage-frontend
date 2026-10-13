@@ -24,12 +24,13 @@ import models.requests.CisIdDataRequest
 import pages.history.SubmittedReturnsDataPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Lang, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{ManageService, SubmittedReturnsService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.history.SubmittedReturnsView
 import views.html.monthlyreturns.SubmissionSuccessView
+import viewmodels.SubmittedReturnsPageViewModel
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -57,12 +58,13 @@ class SubmittedReturnsController @Inject() (
 
       resolveSubmittedReturnsData
         .map { data =>
-          submittedReturnsService.buildSingleYearViewModel(data, taxYear, request.cisId) match {
-            case Some(vm) => Ok(view(vm))
-            case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          }
+          submittedReturnsResult(submittedReturnsService.buildSingleYearViewModel(data, taxYear, request.cisId))
         }
-        .recover { case _ =>
+        .recover { case ex =>
+          logger.error(
+            s"[SubmittedReturnsController][onPageLoadSingleYear] - failed to load submitted returns for taxYear=$taxYear",
+            ex
+          )
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }
@@ -73,14 +75,24 @@ class SubmittedReturnsController @Inject() (
 
       resolveSubmittedReturnsData
         .map { data =>
-          submittedReturnsService.buildAllYearsViewModel(data, request.cisId) match {
-            case Some(vm) => Ok(view(vm))
-            case None     => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          }
+          submittedReturnsResult(submittedReturnsService.buildAllYearsViewModel(data, request.cisId))
         }
-        .recover { case _ =>
+        .recover { case ex =>
+          logger.error("[SubmittedReturnsController][onPageLoadAllYears] - failed to load submitted returns", ex)
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
+    }
+
+  private def submittedReturnsResult(viewModel: Option[SubmittedReturnsPageViewModel])(implicit
+    request: CisIdDataRequest[AnyContent]
+  ): Result =
+    viewModel match {
+      case Some(vm) if vm.taxYears.isEmpty =>
+        Redirect(controllers.history.routes.NoReturnsSubmittedController.onPageLoad())
+      case Some(vm)                        =>
+        Ok(view(vm))
+      case None                            =>
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
 
   private def resolveSubmittedReturnsData(implicit
@@ -145,7 +157,17 @@ class SubmittedReturnsController @Inject() (
           response.monthlyReturns.find(_.monthlyReturnId == monthlyReturnId) match {
             case Some(data) if data.amendmentStatus.exists(Set("STARTED", "VALIDATED")) =>
               Redirect("#") // TODO
-            case _                                                                      =>
+            case Some(data)                                                             =>
+              logger.error(
+                s"[SubmittedReturnsController][onInProgressRedirect] - " +
+                  s"unexpected amendment status=${data.amendmentStatus.getOrElse("missing")} " +
+                  s"for monthlyReturnId=$monthlyReturnId"
+              )
+              Redirect(routes.JourneyRecoveryController.onPageLoad())
+            case None                                                                   =>
+              logger.error(
+                s"[SubmittedReturnsController][onInProgressRedirect] - no in-progress return found for monthlyReturnId=$monthlyReturnId"
+              )
               Redirect(routes.JourneyRecoveryController.onPageLoad())
           }
         }
