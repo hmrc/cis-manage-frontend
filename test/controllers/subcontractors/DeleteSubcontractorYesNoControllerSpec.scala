@@ -271,7 +271,7 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
             DeleteSubcontractorAuditEventModel(
               cisId = cisId,
               subcontractorName = subcontractorName,
-              subbieResourceRef = subbieResourceRef,
+              subcontractorResourceRef = subbieResourceRef,
               typeOfSubcontractor = None
             )
           )
@@ -361,7 +361,7 @@ class DeleteSubcontractorYesNoControllerSpec extends SpecBase with MockitoSugar 
             DeleteSubcontractorAuditEventModel(
               cisId = cisId,
               subcontractorName = subcontractorName,
-              subbieResourceRef = subbieResourceRef,
+              subcontractorResourceRef = subbieResourceRef,
               typeOfSubcontractor = Some("soletrader")
             )
           )
