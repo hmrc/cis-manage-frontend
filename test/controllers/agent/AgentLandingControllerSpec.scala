@@ -17,7 +17,6 @@
 package controllers.agent
 
 import base.SpecBase
-import models.audit.ClientDetailsRetrievedAuditEventModel
 import models.{CisTaxpayerSearchResult, Scheme, UserAnswers}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
@@ -27,13 +26,12 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.{AgentClientsPage, CisIdPage}
 import play.api.Application
 import play.api.inject.bind
-import play.api.mvc.{Call, Request}
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.{AuditService, ManageService, PrepopService}
+import services.{ManageService, PrepopService}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
-import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import viewmodels.agent.AgentLandingViewModel
 
 import scala.concurrent.Future
@@ -46,9 +44,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
   private val mockManageService     = mock[ManageService]
   private val mockSessionRepository = mock[SessionRepository]
   private val mockPrepopService     = mock[PrepopService]
-  private val mockAuditService      = mock[AuditService]
-
-  private val landingViewModel = AgentLandingViewModel(
+  private val landingViewModel      = AgentLandingViewModel(
     schemeName = "Test scheme name",
     employerRef = "123/AB456"
   )
@@ -77,8 +73,7 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
   private val commonBindings = Seq(
     bind[ManageService].toInstance(mockManageService),
     bind[SessionRepository].toInstance(mockSessionRepository),
-    bind[PrepopService].toInstance(mockPrepopService),
-    bind[AuditService].toInstance(mockAuditService)
+    bind[PrepopService].toInstance(mockPrepopService)
   )
 
   private def withApplication[T](application: Application)(block: => T): T =
@@ -88,23 +83,13 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
   override def beforeEach(): Unit = {
     super.beforeEach()
     when(mockSessionRepository.set(any[UserAnswers])).thenReturn(Future.successful(true))
-    when(
-      mockAuditService
-        .sendEvent(any[ClientDetailsRetrievedAuditEventModel])(using
-          any[HeaderCarrier],
-          any[Request[?]]
-        )
-    ).thenReturn(
-      Future.successful(AuditResult.Success)
-    )
   }
 
   override def afterEach(): Unit = {
     reset(
       mockManageService,
       mockSessionRepository,
-      mockPrepopService,
-      mockAuditService
+      mockPrepopService
     )
     super.afterEach()
   }
@@ -145,23 +130,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
 
         verify(mockManageService)
           .getAgentLandingData(eqTo(uniqueId), any[UserAnswers], eqTo(userId))(using any[HeaderCarrier])
-
-        val auditCaptor =
-          ArgumentCaptor.forClass(
-            classOf[ClientDetailsRetrievedAuditEventModel]
-          )
-
-        verify(mockAuditService)
-          .sendEvent(auditCaptor.capture())(using
-            any[HeaderCarrier],
-            any[Request[?]]
-          )
-
-        val auditEvent = auditCaptor.getValue
-
-        auditEvent.auditType mustBe "ClientDetailsRetrieved"
-        auditEvent.taxOfficeNumber mustBe "163"
-        auditEvent.taxOfficeReference mustBe "AB0063"
       }
     }
 
@@ -260,42 +228,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
       }
     }
 
-    "must still render the landing page when the clientDetailsRetrieved audit fails" in {
-
-      when(
-        mockAuditService
-          .sendEvent(any[ClientDetailsRetrievedAuditEventModel])(using
-            any[HeaderCarrier],
-            any[Request[?]]
-          )
-      ).thenReturn(Future.failed(new RuntimeException("audit failed")))
-
-      when(
-        mockManageService.getAgentLandingData(
-          eqTo(uniqueId),
-          any[UserAnswers],
-          eqTo(userId)
-        )(using any[HeaderCarrier])
-      ).thenReturn(Future.successful(landingViewModel))
-
-      val application =
-        applicationBuilder(
-          userAnswers = Some(userAnswersWithAgentClient),
-          additionalBindings = commonBindings,
-          isAgent = true
-        ).build()
-
-      withApplication(application) {
-        val request =
-          FakeRequest(
-            GET,
-            controllers.agent.routes.AgentLandingController.onPageLoad(uniqueId).url
-          )
-
-        status(route(application, request).value) mustBe OK
-      }
-    }
-
     "must redirect to JourneyRecoveryController when client is missing on page load" in {
 
       val application =
@@ -318,7 +250,6 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
         redirectLocation(result).value mustBe
           controllers.routes.JourneyRecoveryController.onPageLoad().url
 
-        verifyNoInteractions(mockAuditService)
         verifyNoInteractions(mockManageService)
       }
     }

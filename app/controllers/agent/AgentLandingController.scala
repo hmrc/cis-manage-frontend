@@ -19,7 +19,6 @@ package controllers.agent
 import config.FrontendAppConfig
 import controllers.actions.*
 import models.Target.*
-import models.audit.ClientDetailsRetrievedAuditEventModel
 import models.requests.DataRequest
 import models.{CisTaxpayerSearchResult, Target}
 import navigation.ClientListCheckNavigator
@@ -28,7 +27,7 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.*
 import repositories.SessionRepository
-import services.{AuditService, ManageService, PrepopService}
+import services.{ManageService, PrepopService}
 import uk.gov.hmrc.http.HttpVerbs.GET
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -48,7 +47,6 @@ class AgentLandingController @Inject() (
   clientListCheckNavigator: ClientListCheckNavigator,
   manageService: ManageService,
   prepopService: PrepopService,
-  auditService: AuditService,
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: AgentLandingView
@@ -104,7 +102,6 @@ class AgentLandingController @Inject() (
     )
 
     (for {
-      _                  <- auditClientDetailsRetrieved(client, uniqueId)
       updatedUserAnswers <- Future.fromTry(request.userAnswers.set(CisIdPage, uniqueId))
       _                  <- sessionRepository.set(updatedUserAnswers)
       viewModel          <- manageService.getAgentLandingData(uniqueId, updatedUserAnswers, request.userId)
@@ -122,38 +119,6 @@ class AgentLandingController @Inject() (
       Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
-
-  private def auditClientDetailsRetrieved(
-    client: CisTaxpayerSearchResult,
-    uniqueId: String
-  )(using request: DataRequest[?], hc: HeaderCarrier): Future[Unit] =
-    request.agentReference match {
-
-      case Some(agentRef) =>
-        val auditEvent = ClientDetailsRetrievedAuditEventModel(
-          agentReference = agentRef,
-          taxOfficeNumber = client.taxOfficeNumber,
-          taxOfficeReference = client.taxOfficeRef
-        )
-
-        auditService
-          .sendEvent(auditEvent)
-          .map(_ => ())
-          .recover { case NonFatal(ex) =>
-            logger.error(
-              s"[AgentLandingController] failed to send ClientDetailsRetrieved audit for uniqueId=$uniqueId",
-              ex
-            )
-            ()
-          }
-
-      case None =>
-        Future.failed(
-          new IllegalStateException(
-            s"[AgentLandingController] Missing agent reference in request for uniqueId=$uniqueId"
-          )
-        )
-    }
 
   private def resolveInputs(
     uniqueId: String,
