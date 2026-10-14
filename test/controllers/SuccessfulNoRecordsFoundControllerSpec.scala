@@ -205,33 +205,6 @@ class SuccessfulNoRecordsFoundControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to JourneyRecoveryController on submit with notices target" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(
-          bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider)
-        )
-        .build()
-
-      val instanceId = "900001"
-      val targetKey  = "newNotices"
-
-      running(application) {
-        val request = FakeRequest(
-          POST,
-          routes.SuccessfulNoRecordsFoundController.onSubmit(instanceId, targetKey).url
-        )
-
-        when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
-          .thenReturn(new FakeAuthorizedForSchemeAction)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
     "must return NotFound on submit with unknown target" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))

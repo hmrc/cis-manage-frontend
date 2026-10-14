@@ -330,24 +330,6 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
       redirectLocation(result).value mustEqual routes.ReturnsLandingController.onPageLoad(instanceId).url
     }
 
-    "must redirect to JourneyRecoveryController on submit with notices target" in {
-      val instanceId = "900001"
-      val targetKey  = "newNotices"
-
-      val request = FakeRequest(
-        POST,
-        routes.SuccessfulAutomaticSubcontractorUpdateController.onSubmit(instanceId, targetKey).url
-      )
-
-      when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
-        .thenReturn(new FakeAuthorizedForSchemeAction)
-
-      val result = route(app, request).value
-
-      status(result) mustEqual SEE_OTHER
-      redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-    }
-
     "must return NotFound on submit with unknown target" in {
       val instanceId = "900001"
       val targetKey  = "unknownTarget"

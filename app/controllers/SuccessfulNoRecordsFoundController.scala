@@ -77,7 +77,6 @@ class SuccessfulNoRecordsFoundController @Inject() (
   private def targetCall(target: Target, instanceId: String): Call =
     target match {
       case Returns                 => controllers.routes.ReturnsLandingController.onPageLoad(instanceId)
-      case Notices                 => controllers.routes.JourneyRecoveryController.onPageLoad()
       case Subcontractor           => controllers.routes.SubcontractorsLandingPageController.onPageLoad(instanceId)
       case ManageContractorDetails => Call("GET", appConfig.contractorDetailsManagementUrl)
     }

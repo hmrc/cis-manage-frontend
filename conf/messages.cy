@@ -16,10 +16,10 @@ site.govuk                                              =  GOV.UK
 site.unknown                                            =  Anhysbys
 
 site.pagination.goToPage                                =  xxxxxxxxxxxxxxxxxxxx
-site.pagination.landmark                                =  xxxxxxxxxxxxxxxxxxxx
-site.pagination.previous                                =  xxxxxxxxxxxxxxxxxxxx
-site.pagination.next                                    =  xxxxxxxxxxxxxxxxxxxx
-site.pagination.pageTitle                               =  xxxxxxxxxxxxxxxxxxxx
+site.pagination.landmark                                =  Rhifo tudalennau
+site.pagination.previous                                =  Blaenorol
+site.pagination.next                                    =  Nesaf
+site.pagination.pageTitle                               =  (tudalen {0} o {1})
 
 site.delete                                             =  Dileu
 site.or                                                 =  neu
@@ -29,7 +29,7 @@ site.saveAndContinue                                    =  Cadw a pharhau
 date.day                                                =  Diwrnod
 date.month                                              =  Mis
 date.year                                               =  Blwyddyn
-date.period                                             =  xxxxxxxxxxxxxxxxxxxx
+date.period                                             =  {0} i {1}
 
 date.error.day                                          =  diwrnod
 date.error.month                                        =  mis
@@ -46,18 +46,18 @@ error.prefix                                            =  Gwall
 
 error.summary.title                                     =  Mae problem
 
-index.title                                             =  xxxxxxxxxxxxxxxxxxxx
-index.heading                                           =  xxxxxxxxxxxxxxxxxxxx
+index.title                                             =  Cynllun y Diwydiant Adeiladu
+index.heading                                           =  Cynllun y Diwydiant Adeiladu
 index.guidance                                          =  xxxxxxxxxxxxxxxxxxxx
 
-checkYourAnswers.title                                  =  xxxxxxxxxxxxxxxxxxxx
-checkYourAnswers.heading                                =  xxxxxxxxxxxxxxxxxxxx
+checkYourAnswers.title                                  =  Gwiriwch eich atebion
+checkYourAnswers.heading                                =  Gwiriwch eich atebion
 
-journeyRecovery.continue.title                          =  xxxxxxxxxxxxxxxxxxxx
-journeyRecovery.continue.heading                        =  xxxxxxxxxxxxxxxxxxxx
-journeyRecovery.continue.guidance.p1                    =  xxxxxxxxxxxxxxxxxxxx
-journeyRecovery.continue.guidance.link                  =  xxxxxxxxxxxxxxxxxxxx
-journeyRecovery.continue.guidance.p2                    =  xxxxxxxxxxxxxxxxxxxx
+journeyRecovery.continue.title                          =  Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth hwn
+journeyRecovery.continue.heading                        =  Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth hwn
+journeyRecovery.continue.guidance.p1                    =  Mae problem gyda’r gwasanaeth hwn. Gallwch ddychwelyd er mwyn
+journeyRecovery.continue.guidance.link                  =  Cynllun y Diwydiant Adeiladu
+journeyRecovery.continue.guidance.p2                    =  neu rhowch gynnig arall arni yn nes ymlaen.
 
 journeyRecovery.startAgain.title                        =  Mae yna broblem gyda’r gwasanaeth hwn
 journeyRecovery.startAgain.heading                      =  Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth hwn
@@ -67,9 +67,9 @@ journeyRecovery.startAgain.guidance.contactHMRC.link    =  Cysylltwch â CThEF
 journeyRecovery.startAgain.guidance.contactHMRC.suffix  =  i gael rhagor o help.
 journeyRecovery.startAgain.guidance.cisAccount.link     =  Rheoli’ch cyfrif CIS
 
-signedOut.title                                         =  xxxxxxxxxxxxxxxxxxxx
-signedOut.heading                                       =  xxxxxxxxxxxxxxxxxxxx
-signedOut.guidance                                      =  xxxxxxxxxxxxxxxxxxxx
+signedOut.title                                         =  Er eich diogelwch, gwnaethom eich allgofnodi
+signedOut.heading                                       =  Er eich diogelwch, gwnaethom eich allgofnodi
+signedOut.guidance                                      =  Ni wnaethom gadw’ch atebion.
 
 # Errors & Auth
 pageNotFound.title                       =  Heb ddod o hyd i’r dudalen
@@ -182,15 +182,15 @@ returnsLanding.title                                              =  Rheoli’ch
 returnsLanding.heading                                            =  Rheoli’ch datganiad CIS
 
 returnsLanding.fileMonthlyReturn.h3.link                          =  Cyflwyno datganiad misol
-returnsLanding.fileMonthlyReturn.p1                               =  xxxxxxxxxxxxxxxxxxxx
+returnsLanding.fileMonthlyReturn.p1                               =  Cyflwyno datganiad CIS ar gyfer unrhyw is-gontractwyr a dalwyd yn ystod cyfnod y datganiad.
 
-returnsLanding.fileNilReturn.h3.link                              =  xxxxxxxxxxxxxxxxxxxx
-returnsLanding.fileNilReturn.p1                                   =  xxxxxxxxxxxxxxxxxxxx
+returnsLanding.fileNilReturn.h3.link                              =  Cyflwyno datganiad ‘dim’ a cheisiadau anactifedd
+returnsLanding.fileNilReturn.p1                                   =  Cyflwyno datganiad ’dim’ pan na chafodd unrhyw daliadau eu gwneud i is-gontractwyr mewn cyfnod y datganiad.
 
 returnsLanding.viewSubmittedReturns.h3.link                       =  Gweld datganiad a gyflwynwyd
 returnsLanding.viewSubmittedReturns.p1                            =  Gweld datganiadau misol neu ddatganiadau ‘dim’ a gyflwynwyd.
 
-returnsLanding.incompleteReturns.h3.link                          =  xxxxxxxxxxxxxxxxxxxx
+returnsLanding.incompleteReturns.h3.link                          =  Datganiadau anghyflawn ac aflwyddiannus
 returnsLanding.incompleteReturns.p1                               =  xxxxxxxxxxxxxxxxxxxx
 
 returnsLanding.manageConstructionIndustrySchemeAccount.link       =  xxxxxxxxxxxxxxxxxxxx
@@ -200,21 +200,18 @@ returnsLanding.aside.link1                                        =  Cynllun y D
 returnsLanding.aside.link2                                        =  Dod o hyd i gyflenwyr meddalwedd ar gyfer Cynllun y Diwydiant Adeiladu (CIS) - GOV.UK
 
 # Agent
-agent.agentLostAccess.title                            =  xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.heading                          =  xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.p1                               =  xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.h2                               =  xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.bullet.title                     =  xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.bullet.item.1.prefix             =  xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.bullet.item.1.link               =  xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.bullet.item.2.prefix             =  xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.bullet.item.2.link               =  xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.bullet.item.2.suffix             =  xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.p2                               =  xxxxxxxxxxxxxxxxxxxx
-agent.agentLostAccess.return.link                      =  xxxxxxxxxxxxxxxxxxxx
-
-agentLostAccess.title                                  =  xxxxxxxxxxxxxxxxxxxx
-agentLostAccess.heading                                =  xxxxxxxxxxxxxxxxxxxx
+agent.agentLostAccess.title                            =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
+agent.agentLostAccess.heading                          =  Mae’n ddrwg gennym, ond does dim modd i chi ddefnyddio’r gwasanaeth hwn
+agent.agentLostAccess.p1                               =  Nid ydych yn awdurdodedig mwyach.
+agent.agentLostAccess.h2                               =  Yr hyn y mae angen i chi ei wneud
+agent.agentLostAccess.bullet.title                     =  Gofynnwch i’ch cleient eich awdurdodi. Gall eich cleient wneud hyn drwy naill ai:
+agent.agentLostAccess.bullet.item.1.prefix             =  eich awdurdodi trwy ei
+agent.agentLostAccess.bullet.item.1.link               =  gyfrif ar-lein CThEF
+agent.agentLostAccess.bullet.item.2.prefix             =  lawrlwytho a chwblhau
+agent.agentLostAccess.bullet.item.2.link               =  ffurflen 648
+agent.agentLostAccess.bullet.item.2.suffix             =  eich awdurdodi drwy'r post
+agent.agentLostAccess.p2                               =  Gall gymryd hyd at 5 diwrnod gwaith i awdurdodiadau newydd ymddangos yn eich cyfrif.
+agent.agentLostAccess.return.link                      =  Dychwelyd i’r rhestr o gleientiaid
 
 agent.landing.title                                    =  Rheoli cyfrif Cynllun y Diwydiant Adeiladu
 agent.landing.h1                                       =  Rheoli cyfrif Cynllun y Diwydiant Adeiladu
@@ -240,12 +237,12 @@ agent.landing.yourClients.link                         =  xxxxxxxxxxxxxxxxxxxx
 agent.landing.help.link1                               =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
 agent.landing.help.link2                               =  Talu TWE y cyflogwr
 agent.landing.help.link3                               =  Cosbau am ddatganiadau hwyr (CIS) CC/FS18b
-agent.landing.agentName.noName                         =  xxxxxxxxxxxxxxxxxxxx
-agent.landing.schemeName.key.notProvided               =  xxxxxxxxxxxxxxxxxxxx
+agent.landing.agentName.noName                         =  Dim enw
+agent.landing.schemeName.key.notProvided               =  Heb roi un
 
-agent.clientListSearch.title                           =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.heading                         =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.p1                              =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.title                           =  Eich cleientiaid
+agent.clientListSearch.heading                         =  Eich cleientiaid
+agent.clientListSearch.p1                              =  Cyn cyflwyno datganiad misol, bydd angen i chi ddod o hyd i gleient a'i ddewis.
 agent.clientListSearch.searchBy.label                  =  Drwy ba ddull yr hoffech chwilio?
 agent.clientListSearch.searchBy.placeholder            =  Dewiswch opsiwn
 agent.clientListSearch.searchFilter.label              =  Nodwch eich chwiliad
@@ -264,21 +261,21 @@ agent.clientListSearch.details.2.summary               =  Gwasanaeth cyflwyno yn
 agent.clientListSearch.details.2.p1                    =  Gallwch anfon datganiadau CIS misol ar ran cleient heb gwblhau awdurdodiad ar-lein neu ffurflen FBI-2.
 agent.clientListSearch.details.2.p2                    =  Mae’r gwasanaeth hwn ar gael wrth ddefnyddio meddalwedd fasnachol yn unig.
 agent.clientListSearch.details.2.link                  =  Dewch o hyd i feddalwedd fasnachol ar gyfer datganiadau CIS
-agent.clientListSearch.td.clientName.hidden            =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchBy.error.required         =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.error.required     =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.error.length       =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.error.format       =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.cn.error.required  =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.er.error.required  =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.cr.error.required  =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.cn.error.format    =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.er.error.format    =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.cr.error.format    =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.cn.error.length    =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.er.error.length    =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.searchFilter.cr.error.length    =  xxxxxxxxxxxxxxxxxxxx
-agent.clientListSearch.noResults                       =  xxxxxxxxxxxxxxxxxxxx
+agent.clientListSearch.td.clientName.hidden            =  Dewiswch y cleient hwn
+agent.clientListSearch.searchBy.error.required         =  Nodwch enw'r Cleient, cyfeirnod y Cyflogwr neu gyfeirnod y Cleient o'r gwymplen
+agent.clientListSearch.searchFilter.error.required     =  Nodwch naill ai enw’r Cleient, cyfeirnod y Cyflogwr neu Gyfeirnod y cleient
+agent.clientListSearch.searchFilter.error.length       =  Mae’n rhaid i'r gwerth chwilio fod yn 35 o gymeriadau neu lai
+agent.clientListSearch.searchFilter.error.format       =  Mae’n rhaid i'r gwerth chwilio gynnwys llythrennau, rhifau, cysylltnodau, bylchau, comas, atalnodau llawn, ebychnodau, symbolau ampersand, tanlinellau, cromfachau ac atalnodau uwch yn unig.
+agent.clientListSearch.searchFilter.cn.error.required  =  Nodwch enw'r cleient yn y fformat cywir, fel ABC Construction
+agent.clientListSearch.searchFilter.er.error.required  =  Nodwch gyfeirnod y cyflogwr yn y fformat cywir, fel 123/AB45678 (tri rhif, '/', ac yna saith cymeriad alffaniwmerig)
+agent.clientListSearch.searchFilter.cr.error.required  =  Nodwch gyfeirnod y cleient yn y fformat cywir, fel ABC-001
+agent.clientListSearch.searchFilter.cn.error.format    =  Nodwch enw'r cleient yn y fformat cywir, fel ABC Construction
+agent.clientListSearch.searchFilter.er.error.format    =  Nodwch gyfeirnod y cyflogwr yn y fformat cywir, fel 123/AB45678 (tri rhif, '/', ac yna saith cymeriad alffaniwmerig)
+agent.clientListSearch.searchFilter.cr.error.format    =  Nodwch gyfeirnod y cleient yn y fformat cywir, fel ABC-001
+agent.clientListSearch.searchFilter.cn.error.length    =  Nodwch enw’r cleient sy'n fyrrach na 56 o nodau
+agent.clientListSearch.searchFilter.er.error.length    =  Nodwch gyfeirnod y cyflogwr gan ddefnyddio 14 o gymeriadau neu lai
+agent.clientListSearch.searchFilter.cr.error.length    =  Nodwch gyfeirnod y cleient sy'n fyrrach nag 20 o gymeriadau
+agent.clientListSearch.noResults                       =  Heb ddod o hyd i unrhyw ganlyniadau chwilio
 
 agent.noAuthorisedClients.title                        =  Nid oes gennych unrhyw gleientiaid awdurdodedig
 agent.noAuthorisedClients.heading                      =  Nid oes gennych unrhyw gleientiaid awdurdodedig
@@ -345,7 +342,7 @@ subcontractorsLandingPage.checkResults                                  =  Gwiri
 
 subcontractorsLandingPage.checkResults.p1                               =  Gweld canlyniad eich cais diweddaraf am ddilysiad.
 
-subcontractorsLandingPage.manageConstructionIndustrySchemeAccount.link  =  xxxxxxxxxxxxxxxxxxxx
+subcontractorsLandingPage.manageConstructionIndustrySchemeAccount.link  =  Rheoli cyfrif Cynllun y Diwydiant Adeiladu
 
 subcontractorsLandingPage.aside.h2                                      =  Help ac arweiniad
 subcontractorsLandingPage.aside.link1                                   =  Cynllun y Diwydiant Adeiladu: Canllaw ar gyfer contractwyr ac is-gontractwyr
@@ -386,8 +383,8 @@ successfulNoRecordsFound.p2                                             =  Gallw
 successfulNoRecordsFound.p2.link                                        =  ychwanegu is-gontractwr
 
 # Returns & Submissions
-incompleteReturns.title                      =  xxxxxxxxxxxxxxxxxxxx
-incompleteReturns.heading                    =  xxxxxxxxxxxxxxxxxxxx
+incompleteReturns.title                      =  Datganiadau anghyflawn ac aflwyddiannus
+incompleteReturns.heading                    =  Datganiadau anghyflawn ac aflwyddiannus
 
 incompleteReturns.table.returnPeriodEnd      =  Cyfnod y datganiad wedi dod i ben
 incompleteReturns.table.returnType           =  Math
@@ -402,39 +399,37 @@ incompleteReturns.action.continue.hidden     =  Parhau gyda datganiad misol ar g
 incompleteReturns.action.delete.hidden       =  Dileu datganiad misol ar gyfer {0}
 incompleteReturns.action.view.hidden         =  Gweld datganiad misol ar gyfer {0}
 
-addContractorDetails.title                   =  xxxxxxxxxxxxxxxxxxxx
-addContractorDetails.heading                 =  xxxxxxxxxxxxxxxxxxxx
-addContractorDetails.p1                      =  xxxxxxxxxxxxxxxxxxxx
+addContractorDetails.title                   =  Ychwanegwch fanylion y contractwr
+addContractorDetails.heading                 =  Ychwanegwch fanylion y contractwr
+addContractorDetails.p1                      =  Dyma dudalen dros dro ar gyfer ychwanegu manylion y contractwr.
 
-submissionConfirmation.title                 =  xxxxxxxxxxxxxxxxxxxx
+submissionConfirmation.title                 =  datganiad {0} wedi’i gyflwyno’n llwyddiannus
+submissionConfirmation.panel.heading         =  datganiad {0} wedi’i gyflwyno’n llwyddiannus
+submissionConfirmation.panel.referenceLabel  =  Cyfeirnod eich derbynneb
+submissionConfirmation.details.heading       =  Manylion y cyflwyniad
 
-submissionConfirmation.panel.heading         =  xxxxxxxxxxxxxxxxxxxx
-submissionConfirmation.panel.referenceLabel  =  xxxxxxxxxxxxxxxxxxxx
-
-submissionConfirmation.details.heading       =  xxxxxxxxxxxxxxxxxxxx
-
-submissionConfirmation.submittedOn           =  xxxxxxxxxxxxxxxxxxxx
+submissionConfirmation.submittedOn           =  Cyflwynwyd ar
 
 submissionConfirmation.submittedOn.value     =  {0} am {1}
 
-submissionConfirmation.contractorName        =  xxxxxxxxxxxxxxxxxxxx
-submissionConfirmation.payeReference         =  xxxxxxxxxxxxxxxxxxxx
-submissionConfirmation.returnPeriod          =  xxxxxxxxxxxxxxxxxxxx
-submissionConfirmation.email                 =  xxxxxxxxxxxxxxxxxxxx
+submissionConfirmation.contractorName        =  Enw’r contractwr
+submissionConfirmation.payeReference         =  Cyfeirnod TWE
+submissionConfirmation.returnPeriod          =  Cyfnod dod i ben y datganiad
+submissionConfirmation.email                 =  E-bost
 
-submissionConfirmation.whatYouCanDo.heading  =  xxxxxxxxxxxxxxxxxxxx
+submissionConfirmation.whatYouCanDo.heading  =  Yr hyn y gallwch ei wneud
 
-submissionConfirmation.noEmail               =  xxxxxxxxxxxxxxxxxxxx
-submissionConfirmation.inset                 =  xxxxxxxxxxxxxxxxxxxx
-submissionConfirmation.print                 =  xxxxxxxxxxxxxxxxxxxx
-submissionConfirmation.backToManage          =  xxxxxxxxxxxxxxxxxxxx
+submissionConfirmation.noEmail               =  Os ydych am nodi e-bost, bydd angen i chi newid eich manylion yn yr adran ynglŷn â’ch sefydliad/ffỳrm, o dan ‘Eich gwasanaethau CThEF’.
+submissionConfirmation.inset                 =  Gallwch gadw’r dudalen hon neu argraffu copi ar gyfer eich cofnodion.
+submissionConfirmation.print                 =  Argraffu’r dudalen hon
+submissionConfirmation.backToManage          =  Rheoli’ch datganiad CIS
 
-submissionConfirmation.needHelp.heading      =  xxxxxxxxxxxxxxxxxxxx
-submissionConfirmation.needHelp.p1           =  xxxxxxxxxxxxxxxxxxxx
-submissionConfirmation.needHelp.link         =  xxxxxxxxxxxxxxxxxxxx
+submissionConfirmation.needHelp.heading      =  Angen help?
+submissionConfirmation.needHelp.p1           =  Am unrhyw gwestiynau ynglŷn â'ch datganiad, cysylltwch â
+submissionConfirmation.needHelp.link         =  Ymholiadau cyffredinol am Gynllun y Diwydiant Adeiladu (yn agor tab newydd).
 
-submissionConfirmation.returnType.monthly    =  xxxxxxxxxxxxxxxxxxxx
-submissionConfirmation.returnType.nil        =  xxxxxxxxxxxxxxxxxxxx
+submissionConfirmation.returnType.monthly    =  Misol
+submissionConfirmation.returnType.nil        =  ‘Dim’
 
 # History
 history.submittedReturnsChooseTaxYear.title                                     =  Pa flwyddyn dreth ydych am fwrw golwg drosti?
@@ -527,66 +522,6 @@ amend.noReturnsSubmitted.p2.link   =  Rheoli’ch datganiad CIS
 amend.noReturnsSubmitted.p3        =  Dysgwch ragor ynghylch
 amend.noReturnsSubmitted.p3.link   =  yr hyn sydd angen i chi ei wneud fel contractwr CIS
 
-# Notices & Statements
-manageNoticesStatements.title                                   =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.heading                                 =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.intro                                   =  xxxxxxxxxxxxxxxxxxxx
-
-manageNoticesStatements.link.understandingNotices               =  xxxxxxxxxxxxxxxxxxxx
-
-manageNoticesStatements.search.heading                          =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.search.description                      =  xxxxxxxxxxxxxxxxxxxx
-
-manageNoticesStatements.noticeType.label                        =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.noticeType.all                          =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.noticeType.general                      =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.noticeType.penaltyWarnings              =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.noticeType.confirmationStatements       =  xxxxxxxxxxxxxxxxxxxx
-
-manageNoticesStatements.readStatus.label                        =  xxxxxxxxxxxxxxxxxxxx
-
-manageNoticesStatements.status.read                             =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.status.unread                           =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.status.all                              =  xxxxxxxxxxxxxxxxxxxx
-
-manageNoticesStatements.dateFilter.last7Days                    =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.dateFilter.lastMonth                    =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.dateFilter.dateRange                    =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.dateFilter.all                          =  xxxxxxxxxxxxxxxxxxxx
-
-manageNoticesStatements.search.button                           =  xxxxxxxxxxxxxxxxxxxx
-
-manageNoticesStatements.searchResults.heading                   =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.searchResults.summary                   =  xxxxxxxxxxxxxxxxxxxx
-
-manageNoticesStatements.recentNotices.heading                   =  xxxxxxxxxxxxxxxxxxxx
-
-manageNoticesStatements.details.confirmationStatements.heading  =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.details.confirmationStatements.body     =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.details.penaltyWarnings.heading         =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.details.penaltyWarnings.body            =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.details.generalNotices.heading          =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.details.generalNotices.body             =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.details.howLong.heading                 =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.details.howLong.body                    =  xxxxxxxxxxxxxxxxxxxx
-
-manageNoticesStatements.table.date                              =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.table.type                              =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.table.description                       =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.table.status                            =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.table.action                            =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.table.action.view                       =  xxxxxxxxxxxxxxxxxxxx
-
-manageNoticesStatements.description.penaltyWarning              =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.description.confirmation                =  xxxxxxxxxxxxxxxxxxxx
-
-manageNoticesStatements.sidebar.heading                         =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.sidebar.link1                           =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.sidebar.link2                           =  xxxxxxxxxxxxxxxxxxxx
-manageNoticesStatements.sidebar.link3                           =  xxxxxxxxxxxxxxxxxxxx
-
-manageNoticesStatements.searchResults.viewAll                   =  xxxxxxxxxxxxxxxxxxxx
-
 # Verify
 verify.verificationHistorySelectTaxYear.title                =  O ba flwyddyn dreth ymlaen ydych am weld ceisiadau dilysu?
 verify.verificationHistorySelectTaxYear.heading              =  O ba flwyddyn dreth ymlaen ydych am weld ceisiadau dilysu?
@@ -607,8 +542,8 @@ verify.verificationHistory.table.submissionReceipt           =  Derbynneb am gyf
 verify.verificationHistory.backToManage                      =  Rheoli’ch is-gontractwyr
 verify.verificationHistory.hidden.verificationRequest        =  Cais dilysu gyfer {0}
 verify.verificationHistory.hidden.submissionReceipt          =  Derbynneb am gyflwyno gyfer {0}
-verify.verificationHistory.taxYear.heading                   =  xxxxxxxxxxxxxxxxxxxx
-verify.verificationHistory.noHistory                         =  xxxxxxxxxxxxxxxxxxxx
+verify.verificationHistory.taxYear.heading                   =  Blwyddyn dreth {0} i {1}
+verify.verificationHistory.noHistory                         =  Heb ddod o hyd i unrhyw geisiadau dilysu.
 
 verify.verificationRequest.title                             =  Cais dilysu
 verify.verificationRequest.heading                           =  Cais dilysu
@@ -734,19 +669,19 @@ clientdetails.clientRemoved.survey.suffix                                =  (mae
 
 clientdetails.changeClientReference.hint                                 =  Nodwch y cyfeirnod yr ydych yn ei ddefnyddio nawr er mwyn adnabod eich cleient.
 clientdetails.changeClientReference.checkYourAnswersLabel                =  Newid cyfeirnod y cleient
-clientdetails.changeClientReference.change.hidden                        =  xxxxxxxxxxxxxxxxxxxx
+clientdetails.changeClientReference.change.hidden                        =  Cyfeirnod cleient
 
-subcontractors.subcontractorsList.filter.all                             =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.filter.verificationStatus.notVerified  =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.showingResults                         =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.noNameProvided                         =  xxxxxxxxxxxxxxxxxxxx
-subcontractors.subcontractorsList.showDetailsFor                         =  xxxxxxxxxxxxxxxxxxxx
+subcontractors.subcontractorsList.filter.all                             =  Pob un
+subcontractors.subcontractorsList.filter.verificationStatus.notVerified  =  Heb ei ddilysu
+subcontractors.subcontractorsList.showingResults                         =  Yn dangos canlyniad {0} i {1} allan o {2}
+subcontractors.subcontractorsList.noNameProvided                         =  Dim enw wedi'i roi
+subcontractors.subcontractorsList.showDetailsFor                         =  Dangos manylion ar gyfer {0}
 
-subcontractors.noSubcontractorsExist.title                               =  xxxxxxxxxxxxxxxxxxxx
+subcontractors.noSubcontractorsExist.title                               =  Dim is-gontractwyr i'w gweld
 
-subcontractors.cannotDeleteSubcontractor.title                           =  xxxxxxxxxxxxxxxxxxxx
+subcontractors.cannotDeleteSubcontractor.title                           =  Ni allwch ddileu'r is-gontractwr hwn.
 
-subcontractors.deleteSubcontractorYesNo.title                            =  xxxxxxxxxxxxxxxxxxxx
+subcontractors.deleteSubcontractorYesNo.title                            =  Ydych chi’n siŵr eich bod chi am ddileu’r is-gontractwr hwn?
 
 securityCheck.title                                                      =  Gwiriad awdurdodiad ar y gweill
 securityCheck.h1                                                         =  Gwiriad awdurdodiad ar y gweill

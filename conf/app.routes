@@ -138,9 +138,6 @@ GET   /no-return-submitted  controllers.history.NoReturnsSubmittedController.onP
 
 GET   /no-incomplete-returns  controllers.history.NoIncompleteReturnsController.onPageLoad()
 
-# Notices & Statements
-GET  /manage-notices-statements/:instanceId  controllers.notices.ManageNoticesStatementsController.onPageLoad(instanceId: String)
-
 # Verify
 GET   /verify/verification-request        controllers.verify.VerificationRequestController.onPageLoad(verificationBatchId: Long)
 

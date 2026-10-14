@@ -19,7 +19,6 @@ package models
 sealed trait Target
 object Target {
   case object Returns extends Target
-  case object Notices extends Target
   case object Subcontractor extends Target
   case object ManageContractorDetails extends Target
 
@@ -28,11 +27,6 @@ object Target {
     "returnHistory",
     "amendReturn",
     "manageYourCisReturn"
-  )
-
-  private val noticesKeys = Set(
-    "newNotices",
-    "noticesAndStatements"
   )
 
   private val subcontractorKeys = Set(
@@ -45,7 +39,6 @@ object Target {
 
   def fromKey(key: String): Option[Target] = key match {
     case k if returnsKeys.contains(k)                 => Some(Returns)
-    case k if noticesKeys.contains(k)                 => Some(Notices)
     case k if subcontractorKeys.contains(k)           => Some(Subcontractor)
     case k if manageContractorDetailsKeys.contains(k) => Some(ManageContractorDetails)
     case _                                            => None
