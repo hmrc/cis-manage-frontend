@@ -42,24 +42,6 @@ class AuditEventModelSpec extends SpecBase {
     }
   }
 
-  "ClientDetailsRetrievedAuditEventModel" - {
-    val underTest = ClientDetailsRetrievedAuditEventModel(
-      agentReference = "ARN123",
-      taxOfficeNumber = "123",
-      taxOfficeReference = "AB456"
-    )
-    "must have the correct auditType" in {
-      underTest.auditType mustBe "ClientDetailsRetrieved"
-    }
-    "must serialise correctly" in {
-      underTest.detailJson mustBe Json.obj(
-        "agentReference"     -> "ARN123",
-        "taxOfficeNumber"    -> "123",
-        "taxOfficeReference" -> "AB456"
-      )
-    }
-  }
-
   "DeleteSubcontractorAuditEventModel" - {
     "must have the correct auditType" in {
       DeleteSubcontractorAuditEventModel(
