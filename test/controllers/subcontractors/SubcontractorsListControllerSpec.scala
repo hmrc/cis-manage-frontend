@@ -19,7 +19,7 @@ package controllers.subcontractors
 import base.SpecBase
 import forms.subcontractors.SubcontractorsListFormProvider
 import models.response.{GetSubcontractor, GetSubcontractorListResponse}
-import models.{Mode, NormalMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.{verify, when}
@@ -40,9 +40,6 @@ import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext
 
 class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
-
-  private val instanceId = "test-instance-id"
-  private val mode: Mode = NormalMode
 
   implicit val ec: ExecutionContext = ExecutionContext.global
 
@@ -150,12 +147,16 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
   )
 
   private val cisId = "test-cis-id"
+  private val mode  = NormalMode
 
-  private def userAnswersWithSubcontractors: UserAnswers =
+  private def userAnswersWithMatchingCisId: UserAnswers =
     emptyUserAnswers
       .set(CisIdPage, cisId)
       .success
       .value
+
+  private def userAnswersWithSubcontractors: UserAnswers =
+    userAnswersWithMatchingCisId
       .set(SubcontractorListPage, listResponse)
       .success
       .value
@@ -176,7 +177,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
         val request =
           FakeRequest(
             GET,
-            routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
+            routes.SubcontractorsListController.onPageLoad(cisId, mode).url
           )
 
         val result =
@@ -216,7 +217,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val url =
           routes.SubcontractorsListController
-            .onPageLoad(instanceId, mode)
+            .onPageLoad(cisId, mode)
             .url
 
         val request =
@@ -256,7 +257,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
         val request =
           FakeRequest(
             POST,
-            routes.SubcontractorsListController.onSubmit(instanceId, mode).url
+            routes.SubcontractorsListController.onSubmit(cisId, mode).url
           ).withFormUrlEncodedBody(
             "gotoPage"           -> "2",
             "searchTerm"         -> "Alan",
@@ -275,7 +276,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
           redirectLocation(result).value
 
         redirectUrl must include(
-          routes.SubcontractorsListController.onPageLoad(instanceId, mode, 2).url
+          routes.SubcontractorsListController.onPageLoad(cisId, mode, 2).url
         )
         redirectUrl must include("searchTerm=Alan")
         redirectUrl must include("verificationStatus=verified")
@@ -292,7 +293,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
         val request =
           FakeRequest(
             POST,
-            routes.SubcontractorsListController.onSubmit(instanceId, mode).url
+            routes.SubcontractorsListController.onSubmit(cisId, mode).url
           ).withFormUrlEncodedBody(
             "searchTerm"         -> "Alan",
             "verificationStatus" -> "verified",
@@ -310,7 +311,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
           redirectLocation(result).value
 
         redirectUrl must include(
-          routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
+          routes.SubcontractorsListController.onPageLoad(cisId, mode).url
         )
         redirectUrl must include("searchTerm=Alan")
         redirectUrl must include("verificationStatus=verified")
@@ -327,7 +328,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
         val request =
           FakeRequest(
             GET,
-            routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
+            routes.SubcontractorsListController.onPageLoad(cisId, mode).url
           )
 
         val result =
@@ -341,13 +342,16 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a POST when subcontractor list data is missing" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswersWithMatchingCisId)
+        ).build()
 
       running(application) {
         val request =
           FakeRequest(
             POST,
-            routes.SubcontractorsListController.onSubmit(instanceId, mode).url
+            routes.SubcontractorsListController.onSubmit(cisId, mode).url
           ).withFormUrlEncodedBody(
             "gotoPage"   -> "2",
             "searchTerm" -> "Alan"
@@ -379,7 +383,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
         val request =
           FakeRequest(
             GET,
-            routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
+            routes.SubcontractorsListController.onPageLoad(cisId, mode).url
           )
 
         val result =
@@ -417,7 +421,7 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
         val request =
           FakeRequest(
             GET,
-            routes.SubcontractorsListController.onPageLoad(instanceId, mode).url
+            routes.SubcontractorsListController.onPageLoad(cisId, mode).url
           )
 
         val result =
@@ -606,6 +610,8 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
         running(application) {
+          val instanceId = "900001"
+
           val url =
             routes.SubcontractorsListController
               .onPageLoad(instanceId, mode)
@@ -685,6 +691,9 @@ class SubcontractorsListControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
         running(application) {
+
+          val instanceId = "900001"
+
           val url =
             routes.SubcontractorsListController
               .onPageLoad(instanceId, mode)

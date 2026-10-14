@@ -100,7 +100,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe
-          controllers.agent.routes.ClientListSearchController.onPageLoad().url
+          controllers.agent.routes.ClientListSearchController.start().url
       }
     }
 
@@ -177,7 +177,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustBe
-          routes.ClientListSearchController.onPageLoad().url
+          routes.ClientListSearchController.start().url
       }
     }
 
