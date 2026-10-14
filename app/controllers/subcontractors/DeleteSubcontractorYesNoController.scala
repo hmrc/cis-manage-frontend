@@ -148,7 +148,7 @@ class DeleteSubcontractorYesNoController @Inject() (
                         DeleteSubcontractorAuditEventModel(
                           cisId = request.cisId,
                           subcontractorName = subcontractorName,
-                          subbieResourceRef = verificationNumber,
+                          subcontractorResourceRef = verificationNumber,
                           typeOfSubcontractor = typeOfSubcontractor
                         )
                       )

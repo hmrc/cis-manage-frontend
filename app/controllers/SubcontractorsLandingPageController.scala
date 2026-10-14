@@ -33,7 +33,7 @@ class SubcontractorsLandingPageController @Inject() (
     (identify
       andThen getData
       andThen requireData
-      andThen hasClientGuard.forInstanceId(instanceId)) { implicit request =>
+      andThen schemeAuthorisationGuard.forInstanceId(instanceId)) { implicit request =>
 
       val cisAccountUrl =
         if (!request.isAgent) {

@@ -22,7 +22,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.UnsuccessfulAutomaticSubcontractorUpdateView
-import controllers.actions.{AuthorizedForSchemeActionProvider, DataRequiredAction, DataRetrievalAction, HasClientGuard, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, SchemeAuthorisationGuard}
 import services.PrepopService
 
 import javax.inject.Inject
@@ -33,10 +33,9 @@ class UnsuccessfulAutomaticSubcontractorUpdateController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  hasClientGuard: HasClientGuard,
+  schemeAuthorisationGuard: SchemeAuthorisationGuard,
   val controllerComponents: MessagesControllerComponents,
   view: UnsuccessfulAutomaticSubcontractorUpdateView,
-  requireSchemeAccess: AuthorizedForSchemeActionProvider,
   service: PrepopService
 )(implicit ec: ExecutionContext, appConfig: FrontendAppConfig)
     extends FrontendBaseController
@@ -47,8 +46,7 @@ class UnsuccessfulAutomaticSubcontractorUpdateController @Inject() (
     (identify
       andThen getData
       andThen requireData
-      andThen requireSchemeAccess(instanceId)
-      andThen hasClientGuard.forInstanceId(instanceId)).async { implicit request =>
+      andThen schemeAuthorisationGuard.forInstanceId(instanceId)).async { implicit request =>
       service.getScheme(instanceId).map {
         case None                                                  =>
           logger.error(
@@ -66,7 +64,10 @@ class UnsuccessfulAutomaticSubcontractorUpdateController @Inject() (
     }
 
   def onSubmit(instanceId: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen requireSchemeAccess(instanceId)) { implicit request =>
+    (identify
+      andThen getData
+      andThen requireData
+      andThen schemeAuthorisationGuard.validateCachedInstanceId(instanceId)) { implicit request =>
       Redirect(appConfig.contractorDetailsManagementUrl)
     }
 

@@ -16,7 +16,7 @@
 
 package controllers
 
-import controllers.actions.{AuthorizedForSchemeActionProvider, DataRequiredAction, DataRetrievalAction, HasClientGuard, IdentifierAction}
+import controllers.actions.*
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -31,9 +31,8 @@ class CheckSubcontractorRecordsController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  requireSchemeAccess: AuthorizedForSchemeActionProvider,
   requireData: DataRequiredAction,
-  hasClientGuard: HasClientGuard,
+  schemeAuthorisationGuard: SchemeAuthorisationGuard,
   val controllerComponents: MessagesControllerComponents,
   view: CheckSubcontractorRecordsView,
   service: PrepopService
@@ -43,16 +42,13 @@ class CheckSubcontractorRecordsController @Inject() (
     with Logging {
 
   def onPageLoad(
-    taxOfficeNumber: String,
-    taxOfficeReference: String,
     instanceId: String,
     targetKey: String
   ): Action[AnyContent] =
     (identify
       andThen getData
       andThen requireData
-      andThen requireSchemeAccess(taxOfficeNumber, taxOfficeReference)
-      andThen hasClientGuard.forInstanceId(instanceId))
+      andThen schemeAuthorisationGuard.forInstanceId(instanceId))
       .async { implicit request =>
         service.getScheme(instanceId).map {
           case None                                                          =>
@@ -65,20 +61,17 @@ class CheckSubcontractorRecordsController @Inject() (
             )
             Redirect(routes.JourneyRecoveryController.onPageLoad())
           case _                                                             =>
-            Ok(view(taxOfficeNumber, taxOfficeReference, instanceId, targetKey))
+            Ok(view(instanceId, targetKey))
         }
       }
 
   def onSubmit(
-    taxOfficeNumber: String,
-    taxOfficeReference: String,
     instanceId: String,
     targetKey: String
   ): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       Redirect(
-        controllers.routes.RetrievingSubcontractorsController
-          .onPageLoad(taxOfficeNumber, taxOfficeReference, instanceId, targetKey)
+        controllers.routes.RetrievingSubcontractorsController.onPageLoad(instanceId, targetKey)
       )
     }
 }

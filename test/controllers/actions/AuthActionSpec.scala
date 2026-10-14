@@ -67,14 +67,14 @@ class AuthActionSpec extends SpecBase {
 
   private val appConfigWithSplitter = applicationWithSplitter.injector.instanceOf[FrontendAppConfig]
 
-  private val mockPolicyResolver: ClientListCheckPolicyResolver = mock[ClientListCheckPolicyResolver]
-  private val mockClientListStatusGuard: ClientListStatusGuard  = mock[ClientListStatusGuard]
-  private val mockHasClientGuard: HasClientGuard                = mock[HasClientGuard]
-  private val clientListCheckEnforcer: ClientListCheckEnforcer  =
+  private val mockPolicyResolver: ClientListCheckPolicyResolver      = mock[ClientListCheckPolicyResolver]
+  private val mockClientListStatusGuard: ClientListStatusGuard       = mock[ClientListStatusGuard]
+  private val mockSchemeAuthorisationGuard: SchemeAuthorisationGuard = mock[SchemeAuthorisationGuard]
+  private val clientListCheckEnforcer: ClientListCheckEnforcer       =
     new ClientListCheckEnforcer(
       mockPolicyResolver,
       mockClientListStatusGuard,
-      mockHasClientGuard
+      mockSchemeAuthorisationGuard
     ) {
       override def apply[A](request: IdentifierRequest[A])(
         block: IdentifierRequest[A] => Future[Result]

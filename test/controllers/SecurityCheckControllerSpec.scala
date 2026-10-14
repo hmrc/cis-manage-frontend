@@ -174,7 +174,7 @@ class SecurityCheckControllerSpec extends SpecBase with MockitoSugar {
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual
-            controllers.agent.routes.ClientListSearchController.onPageLoad().url
+            controllers.agent.routes.ClientListSearchController.start().url
         }
       }
 

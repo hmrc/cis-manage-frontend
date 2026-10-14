@@ -19,7 +19,6 @@ package controllers.agent
 import config.FrontendAppConfig
 import controllers.actions.*
 import models.Target.*
-import models.audit.ClientDetailsRetrievedAuditEventModel
 import models.requests.DataRequest
 import models.{CisTaxpayerSearchResult, Target}
 import navigation.ClientListCheckNavigator
@@ -28,11 +27,10 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.*
 import repositories.SessionRepository
-import services.{AuditService, ManageService, PrepopService}
+import services.{ManageService, PrepopService}
 import uk.gov.hmrc.http.HttpVerbs.GET
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.agent.AgentLandingView
 
 import javax.inject.{Inject, Named}
@@ -45,11 +43,10 @@ class AgentLandingController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   clientListStatusGuard: ClientListStatusGuard,
-  hasClientGuard: HasClientGuard,
+  schemeAuthorisationGuard: SchemeAuthorisationGuard,
   clientListCheckNavigator: ClientListCheckNavigator,
   manageService: ManageService,
   prepopService: PrepopService,
-  auditService: AuditService,
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: AgentLandingView
@@ -63,10 +60,7 @@ class AgentLandingController @Inject() (
       andThen clientListStatusGuard.groupB(clientListCheckNavigator.agentDashboard(uniqueId))
       andThen getData
       andThen requireData
-      andThen hasClientGuard.forInstanceId(uniqueId)).async { implicit request =>
-
-      given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
+      andThen schemeAuthorisationGuard.forInstanceId(uniqueId)).async { implicit request =>
       AgentClientsPage.findClient(request.userAnswers, uniqueId) match {
         case Some(client) =>
           loadLandingPage(uniqueId, client)
@@ -81,7 +75,7 @@ class AgentLandingController @Inject() (
     (identify
       andThen getData
       andThen requireData
-      andThen hasClientGuard.forInstanceId(uniqueId)).async { implicit request =>
+      andThen schemeAuthorisationGuard.forInstanceId(uniqueId)).async { implicit request =>
       val systemErrorRedirect       = Redirect(controllers.routes.SystemErrorController.onPageLoad())
       val unauthorisedAgentRedirect = Redirect(controllers.routes.UnauthorisedAgentAffinityController.onPageLoad())
 
@@ -108,7 +102,6 @@ class AgentLandingController @Inject() (
     )
 
     (for {
-      _                  <- auditClientDetailsRetrieved(client, uniqueId)
       updatedUserAnswers <- Future.fromTry(request.userAnswers.set(CisIdPage, uniqueId))
       _                  <- sessionRepository.set(updatedUserAnswers)
       viewModel          <- manageService.getAgentLandingData(uniqueId, updatedUserAnswers, request.userId)
@@ -126,38 +119,6 @@ class AgentLandingController @Inject() (
       Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
-
-  private def auditClientDetailsRetrieved(
-    client: CisTaxpayerSearchResult,
-    uniqueId: String
-  )(using request: DataRequest[?], hc: HeaderCarrier): Future[Unit] =
-    request.agentReference match {
-
-      case Some(agentRef) =>
-        val auditEvent = ClientDetailsRetrievedAuditEventModel(
-          agentReference = agentRef,
-          taxOfficeNumber = client.taxOfficeNumber,
-          taxOfficeReference = client.taxOfficeRef
-        )
-
-        auditService
-          .sendEvent(auditEvent)
-          .map(_ => ())
-          .recover { case NonFatal(ex) =>
-            logger.error(
-              s"[AgentLandingController] failed to send ClientDetailsRetrieved audit for uniqueId=$uniqueId",
-              ex
-            )
-            ()
-          }
-
-      case None =>
-        Future.failed(
-          new IllegalStateException(
-            s"[AgentLandingController] Missing agent reference in request for uniqueId=$uniqueId"
-          )
-        )
-    }
 
   private def resolveInputs(
     uniqueId: String,
@@ -197,8 +158,6 @@ class AgentLandingController @Inject() (
     val instanceId                    = client.uniqueId
     val manageContractorDetails       = Call(GET, appConfig.contractorDetailsManagementUrl)
     val checkSubcontractorRecordsCall = controllers.routes.CheckSubcontractorRecordsController.onPageLoad(
-      client.taxOfficeNumber,
-      client.taxOfficeRef,
       instanceId,
       targetKey
     )
