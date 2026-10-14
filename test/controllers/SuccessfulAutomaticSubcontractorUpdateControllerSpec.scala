@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import controllers.actions.{AuthorizedForSchemeActionProvider, FakeAuthorizedForSchemeAction}
 import models.Scheme
 import models.response.{GetSubcontractor, GetSubcontractorListResponse}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -33,21 +32,19 @@ import viewmodels.SuccessfulAutomaticSubcontractorUpdateViewModel
 import views.html.SuccessfulAutomaticSubcontractorUpdateView
 
 import java.time.LocalDateTime
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
 
-  val mockPrepopService: PrepopService                            = mock[PrepopService]
-  val mockSubcontractorService: SubcontractorService              = mock[SubcontractorService]
-  val mockSchemeAccessProvider: AuthorizedForSchemeActionProvider = mock[AuthorizedForSchemeActionProvider]
+  val mockPrepopService: PrepopService               = mock[PrepopService]
+  val mockSubcontractorService: SubcontractorService = mock[SubcontractorService]
 
   private lazy val view = app.injector.instanceOf[SuccessfulAutomaticSubcontractorUpdateView]
 
   override def fakeApplication(): Application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
     .overrides(
       bind[PrepopService].toInstance(mockPrepopService),
-      bind[SubcontractorService].toInstance(mockSubcontractorService),
-      bind[AuthorizedForSchemeActionProvider].toInstance(mockSchemeAccessProvider)
+      bind[SubcontractorService].toInstance(mockSubcontractorService)
     )
     .build()
 
@@ -117,9 +114,6 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
         )
       )
 
-      when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
-        .thenReturn(new FakeAuthorizedForSchemeAction)
-
       val result = route(app, request).value
 
       status(result) mustEqual OK
@@ -152,9 +146,6 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
           )
         )
       )
-
-      when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
-        .thenReturn(new FakeAuthorizedForSchemeAction)
 
       val result = route(app, request).value
 
@@ -223,9 +214,6 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
         )
       )
 
-      when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
-        .thenReturn(new FakeAuthorizedForSchemeAction)
-
       val result = route(app, request).value
 
       status(result) mustEqual OK
@@ -262,9 +250,6 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
       when(mockSubcontractorService.getSubcontractorList(eqTo(instanceId))(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("list failed")))
 
-      when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
-        .thenReturn(new FakeAuthorizedForSchemeAction)
-
       val result = route(app, request).value
 
       status(result) mustEqual SEE_OTHER
@@ -284,9 +269,6 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
         Future.successful(None)
       )
 
-      when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
-        .thenReturn(new FakeAuthorizedForSchemeAction)
-
       val result = route(app, request).value
 
       status(result) mustEqual SEE_OTHER
@@ -303,9 +285,6 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
         routes.SuccessfulAutomaticSubcontractorUpdateController.onSubmit(instanceId, targetKey).url
       )
 
-      when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
-        .thenReturn(new FakeAuthorizedForSchemeAction)
-
       val result = route(app, request).value
 
       status(result) mustEqual SEE_OTHER
@@ -321,9 +300,6 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
         routes.SuccessfulAutomaticSubcontractorUpdateController.onSubmit(instanceId, targetKey).url
       )
 
-      when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
-        .thenReturn(new FakeAuthorizedForSchemeAction)
-
       val result = route(app, request).value
 
       status(result) mustEqual SEE_OTHER
@@ -338,9 +314,6 @@ class SuccessfulAutomaticSubcontractorUpdateControllerSpec extends SpecBase {
         POST,
         routes.SuccessfulAutomaticSubcontractorUpdateController.onSubmit(instanceId, targetKey).url
       )
-
-      when(mockSchemeAccessProvider.apply(eqTo(instanceId))(using any[ExecutionContext]))
-        .thenReturn(new FakeAuthorizedForSchemeAction)
 
       val result = route(app, request).value
 

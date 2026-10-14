@@ -25,9 +25,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, RequestHeader}
 import repositories.SessionRepository
 import services.ManageService
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import views.html.ReturnsLandingView
 
 import javax.inject.Inject
@@ -39,7 +37,7 @@ class ReturnsLandingController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  hasClientGuard: HasClientGuard,
+  authorisationGuard: SchemeAuthorisationGuard,
   sessionRepository: SessionRepository,
   val controllerComponents: MessagesControllerComponents,
   view: ReturnsLandingView,
@@ -53,7 +51,7 @@ class ReturnsLandingController @Inject() (
     (identify
       andThen getData
       andThen requireData
-      andThen hasClientGuard.forInstanceId(instanceId)).async { implicit request =>
+      andThen authorisationGuard.forInstanceId(instanceId)).async { implicit request =>
 
       val cisAccountUrl =
         if (!request.isAgent) {
@@ -65,8 +63,6 @@ class ReturnsLandingController @Inject() (
               s"${appConfig.constructionIndustryAgentAccountUrl}$cisId"
             )
         }
-
-      given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
       updateContractorNameFromQueryParam(request.userAnswers)
         .flatMap { userAnswers =>
