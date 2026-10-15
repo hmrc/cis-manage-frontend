@@ -232,7 +232,7 @@ class SubmittedReturnsService @Inject() (
       monthlyReturn = LinkViewModel(
         url = controllers.history.routes.PrintSubmissionDetailsController
           .onPageLoad(
-            monthlyReturn.taxYear,
+            taxYearFromYear(monthlyReturn),
             monthlyReturn.taxMonth,
             monthlyReturn.amendment,
             source.queryValue
