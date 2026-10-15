@@ -113,7 +113,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
           case 204   =>
             Future.unit
           case other =>
-            logger.warn(s"[prepopulateContractorAndSubcontractors] Unexpected status=$other body=${resp.body}")
+            logger.warn(s"[prepopulateContractorAndSubcontractors] Unexpected status=$other")
             Future.failed(UpstreamErrorResponse(resp.body, other, other))
         }
       }
@@ -132,7 +132,7 @@ class ConstructionIndustrySchemeConnector @Inject() (config: ServicesConfig, htt
             None
 
           case other =>
-            logger.warn(s"[getScheme] Unexpected status=$other body=${resp.body}")
+            logger.warn(s"[getScheme] Unexpected status=$other")
             throw UpstreamErrorResponse(resp.body, other, other)
         }
       }

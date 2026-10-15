@@ -27,7 +27,6 @@ import models.response.*
 import pages.*
 import play.api.Logging
 import play.api.i18n.Lang
-import play.api.libs.json.Json
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.DateTimeFormats
@@ -51,7 +50,6 @@ class ManageService @Inject() (
       case None        =>
         logger.info("[resolveAndStoreCisId] cache-miss: fetching CIS taxpayer from backend")
         cisConnector.getCisTaxpayer().flatMap { taxpayer =>
-          logger.info(s"[resolveAndStoreCisId] taxpayer payload:\n${Json.prettyPrint(Json.toJson(taxpayer))}")
           val cisId = taxpayer.uniqueId.trim
           if (cisId.isEmpty) {
             Future.failed(new RuntimeException("Empty cisId (uniqueId) returned from /cis/taxpayer"))

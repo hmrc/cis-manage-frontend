@@ -43,19 +43,6 @@ final case class AuthFailureAuditEventModel(
   )
 }
 
-final case class ClientDetailsRetrievedAuditEventModel(
-  agentReference: String,
-  taxOfficeNumber: String,
-  taxOfficeReference: String
-) extends AuditEventModel {
-  override val auditType: String   = "ClientDetailsRetrieved"
-  override val detailJson: JsValue = Json.obj(
-    "agentReference"     -> agentReference,
-    "taxOfficeNumber"    -> taxOfficeNumber,
-    "taxOfficeReference" -> taxOfficeReference
-  )
-}
-
 final case class DeleteSubcontractorAuditEventModel(
   cisId: String,
   subcontractorName: String,
