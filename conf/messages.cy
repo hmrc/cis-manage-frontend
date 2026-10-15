@@ -190,7 +190,7 @@ returnsLanding.viewSubmittedReturns.h3.link                       =  Gweld datga
 returnsLanding.viewSubmittedReturns.p1                            =  Gweld datganiadau misol neu ddatganiadau ‘dim’ a gyflwynwyd.
 
 returnsLanding.incompleteReturns.h3.link                          =  Datganiadau anghyflawn ac aflwyddiannus
-returnsLanding.incompleteReturns.p1                               =  xxxxxxxxxxxxxxxxxxxx
+returnsLanding.incompleteReturns.p1                               =  Rheolwch unrhyw ddatganiadau sydd ar y gweill ar hyn o bryd, a’r rhai lle na fu’r cyflwyniad cychwynnol yn llwyddiannus.
 
 returnsLanding.manageConstructionIndustrySchemeAccount.link       =  Rheoli cyfrif Cynllun y Diwydiant Adeiladu
 
