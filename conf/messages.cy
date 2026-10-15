@@ -15,7 +15,7 @@ site.signIn                                             =  Mewngofnodi
 site.govuk                                              =  GOV.UK
 site.unknown                                            =  Anhysbys
 
-site.pagination.goToPage                                =  xxxxxxxxxxxxxxxxxxxx
+site.pagination.goToPage                                =  Ewch i dudalen {0}
 site.pagination.landmark                                =  Rhifo tudalennau
 site.pagination.previous                                =  Blaenorol
 site.pagination.next                                    =  Nesaf
@@ -48,7 +48,6 @@ error.summary.title                                     =  Mae problem
 
 index.title                                             =  Cynllun y Diwydiant Adeiladu
 index.heading                                           =  Cynllun y Diwydiant Adeiladu
-index.guidance                                          =  xxxxxxxxxxxxxxxxxxxx
 
 checkYourAnswers.title                                  =  Gwiriwch eich atebion
 checkYourAnswers.heading                                =  Gwiriwch eich atebion
@@ -193,7 +192,7 @@ returnsLanding.viewSubmittedReturns.p1                            =  Gweld datga
 returnsLanding.incompleteReturns.h3.link                          =  Datganiadau anghyflawn ac aflwyddiannus
 returnsLanding.incompleteReturns.p1                               =  xxxxxxxxxxxxxxxxxxxx
 
-returnsLanding.manageConstructionIndustrySchemeAccount.link       =  xxxxxxxxxxxxxxxxxxxx
+returnsLanding.manageConstructionIndustrySchemeAccount.link       =  Rheoli cyfrif Cynllun y Diwydiant Adeiladu
 
 returnsLanding.aside.h2                                           =  Help ac arweiniad
 returnsLanding.aside.link1                                        =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
@@ -233,7 +232,7 @@ agent.landing.card.removeClient.title                  =  Dileu cleient
 agent.landing.card.removeClient.p                      =  Dileu cleient nad ydych yn ei reoli mwyach.
 agent.landing.card.noticesAndStatements.title          =  Hysbysiadau a datganiadau
 agent.landing.card.noticesAndStatements.p              =  Gweld hysbysiad gan CThEF, rhybuddion am gosb, a datganiadau cadarnhau.
-agent.landing.yourClients.link                         =  xxxxxxxxxxxxxxxxxxxx
+agent.landing.yourClients.link                         =  Eich cleientiaid
 agent.landing.help.link1                               =  Cynllun y Diwydiant Adeiladu: Arweiniad (CIS 340)
 agent.landing.help.link2                               =  Talu TWE y cyflogwr
 agent.landing.help.link3                               =  Cosbau am ddatganiadau hwyr (CIS) CC/FS18b
@@ -403,8 +402,8 @@ addContractorDetails.title                   =  Ychwanegwch fanylion y contractw
 addContractorDetails.heading                 =  Ychwanegwch fanylion y contractwr
 addContractorDetails.p1                      =  Dyma dudalen dros dro ar gyfer ychwanegu manylion y contractwr.
 
-submissionConfirmation.title                 =  datganiad {0} wedi’i gyflwyno’n llwyddiannus
-submissionConfirmation.panel.heading         =  datganiad {0} wedi’i gyflwyno’n llwyddiannus
+submissionConfirmation.title                 =  Datganiad {0} wedi’i gyflwyno’n llwyddiannus
+submissionConfirmation.panel.heading         =  Datganiad {0} wedi’i gyflwyno’n llwyddiannus
 submissionConfirmation.panel.referenceLabel  =  Cyfeirnod eich derbynneb
 submissionConfirmation.details.heading       =  Manylion y cyflwyniad
 
@@ -529,7 +528,6 @@ verify.verificationHistorySelectTaxYear.currentTaxYear       =  (blwyddyn dreth 
 verify.verificationHistorySelectTaxYear.viewAll              =  Bwrw golwg dros bob blwyddyn dreth
 verify.verificationHistorySelectTaxYear.error.required       =  Dewiswch flwyddyn dreth
 verify.verificationHistorySelectTaxYear.taxYear              =  {0} i {1}
-verify.verificationHistorySelectTaxYear.or                   =  xxxxxxxxxxxxxxxxxxxx
 
 verify.verificationHistory.allYears.title                    =  Hanes cais dilysu ar gyfer pob blwyddyn dreth
 verify.verificationHistory.allYears.heading                  =  Hanes cais dilysu ar gyfer pob blwyddyn dreth

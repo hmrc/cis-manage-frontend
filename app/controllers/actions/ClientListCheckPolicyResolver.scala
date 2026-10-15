@@ -65,7 +65,6 @@ class ClientListCheckPolicyResolver @Inject() extends Logging {
       "controllers.SuccessfulNoRecordsFoundController"                 -> "onPageLoad",
       "controllers.UnsuccessfulAutomaticSubcontractorUpdateController" -> "onPageLoad",
       "controllers.subcontractors.SubcontractorsListController"        -> "onPageLoad",
-      "controllers.notices.ManageNoticesStatementsController"          -> "onPageLoad"
     )
 
   private val exemptControllers: Set[String] =
