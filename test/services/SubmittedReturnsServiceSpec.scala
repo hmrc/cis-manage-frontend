@@ -129,7 +129,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       row.dateSubmitted            shouldBe "1 Apr 2024"
       row.monthlyReturn.url        shouldBe controllers.history.routes.PrintSubmissionDetailsController
         .onPageLoad(
-          monthlyReturn().taxYear - 1,
+          monthlyReturn().taxYear,
           monthlyReturn().taxMonth,
           monthlyReturn().amendment
         )
@@ -159,7 +159,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       result.value.taxYears.head.rows.head.monthlyReturn.url shouldBe
         controllers.history.routes.PrintSubmissionDetailsController
           .onPageLoad(
-            monthlyReturn().taxYear - 1,
+            monthlyReturn().taxYear,
             monthlyReturn().taxMonth,
             monthlyReturn().amendment,
             SingleYear.queryValue
@@ -204,7 +204,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       row.status                   shouldBe StatusViewModel.Text("history.returnHistory.status.notAvailable")
       row.dateSubmitted            shouldBe ""
       row.monthlyReturn.url        shouldBe controllers.history.routes.PrintSubmissionDetailsController
-        .onPageLoad(2007, 3, monthlyReturn().amendment)
+        .onPageLoad(2008, 3, monthlyReturn().amendment)
         .url
       row.monthlyReturn.hiddenText shouldBe "Mar 2008"
     }

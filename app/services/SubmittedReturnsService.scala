@@ -187,7 +187,7 @@ class SubmittedReturnsService @Inject() (
         .sortBy(mr => (mr.taxYear, mr.taxMonth))(Ordering.Tuple2(Ordering.Int, Ordering.Int).reverse)
         .map { monthlyReturn =>
           val submissionOpt = data.submissions.find(_.activeObjectId.contains(monthlyReturn.monthlyReturnId))
-          val fromYear      = taxYearFromYear(monthlyReturn)
+          val fromYear      = taxYearFromYear(monthlyReturn.taxYear, monthlyReturn.taxMonth)
           fromYear -> toRowViewModel(monthlyReturn, submissionOpt, source, instanceId)
         }
 
@@ -204,14 +204,14 @@ class SubmittedReturnsService @Inject() (
       }
   }
 
-  private def taxYearFromYear(monthlyReturn: SubmittedMonthlyReturnData): Int =
-    val returnPeriodDate = LocalDate.of(monthlyReturn.taxYear, monthlyReturn.taxMonth, 5)
-    val taxYearStartDate = LocalDate.of(monthlyReturn.taxYear, 4, 6)
+  def taxYearFromYear(taxYear: Int, taxMonth: Int): Int =
+    val returnPeriodDate = LocalDate.of(taxYear, taxMonth, 5)
+    val taxYearStartDate = LocalDate.of(taxYear, 4, 6)
 
     if (returnPeriodDate.isBefore(taxYearStartDate)) {
-      monthlyReturn.taxYear - 1
+      taxYear - 1
     } else {
-      monthlyReturn.taxYear
+      taxYear
     }
 
   private def toRowViewModel(
@@ -232,7 +232,7 @@ class SubmittedReturnsService @Inject() (
       monthlyReturn = LinkViewModel(
         url = controllers.history.routes.PrintSubmissionDetailsController
           .onPageLoad(
-            taxYearFromYear(monthlyReturn),
+            monthlyReturn.taxYear,
             monthlyReturn.taxMonth,
             monthlyReturn.amendment,
             source.queryValue
