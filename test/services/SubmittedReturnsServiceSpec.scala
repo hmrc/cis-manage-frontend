@@ -1020,7 +1020,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
     }
 
     "taxYearFromYear should correctly return the year if taxYear is the same as the year" in new Setup {
-      val taxYear: Int = 2026
+      val taxYear: Int  = 2026
       val taxMonth: Int = 8
 
       val result: Int = service.taxYearFromYear(taxYear, taxMonth)
@@ -1028,7 +1028,7 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
     }
 
     "taxYearFromYear should correctly return the previous year if taxMonth is in the next non-tax year" in new Setup {
-      val taxYear: Int = 2026
+      val taxYear: Int  = 2026
       val taxMonth: Int = 4
 
       val result: Int = service.taxYearFromYear(taxYear, taxMonth)
