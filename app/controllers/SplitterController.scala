@@ -65,19 +65,19 @@ class SplitterController @Inject() (
 
   def coreLandingPage(path: String): Action[AnyContent] = identify.async { implicit request =>
     checkAllowList(request).map {
-      case true  => Redirect(controllers.routes.IntroductionController.onPageLoad())
+      case true  => Redirect(routes.IntroductionController.onPageLoad())
       case false =>
-        val url = s"${config.legacyCisServiceUrl}/$path"
+        val url = s"${config.legacyCisCoreServiceUrl}/$path"
         logger.info(s"Redirecting to cis legacy service to $url")
         Redirect(url)
     }
   }
 
-  def fileLandingPage(path: String): Action[AnyContent] = identify { implicit request =>
+  def fileLandingPage(path: String): Action[AnyContent] = identify.async { implicit request =>
     checkAllowList(request).map {
-      case true  => Redirect(controllers.routes.IntroductionController.onPageLoad())
+      case true  => Redirect(routes.IntroductionController.onPageLoad())
       case false =>
-        val url = s"${config.legacyCisServiceLandingUrl}/$path"
+        val url = s"${config.legacyCisFileServiceLandingUrl}/$path"
         logger.info(s"Redirecting to cis legacy service to $url")
         Redirect(url)
     }

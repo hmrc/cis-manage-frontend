@@ -75,11 +75,11 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("features.welsh-translation")
 
-  lazy val useRateLimitedAllowList: Boolean   = configuration.get[Boolean]("features.use-rate-limited-allow-list")
-  lazy val splitterServiceName: String        = configuration.get[String]("splitter.service-name")
-  lazy val splitterAllowListName: String      = configuration.get[String]("splitter.allow-list-name")
-  lazy val legacyCisServiceUrl: String        = configuration.get[String]("urls.legacyCisService")
-  lazy val legacyCisServiceLandingUrl: String = configuration.get[String]("urls.legacyCisServiceLanding")
+  lazy val useRateLimitedAllowList: Boolean  = configuration.get[Boolean]("features.use-rate-limited-allow-list")
+  lazy val splitterServiceName: String       = configuration.get[String]("splitter.service-name")
+  lazy val splitterAllowListName: String     = configuration.get[String]("splitter.allow-list-name")
+  lazy val legacyCisCoreServiceUrl: String   = configuration.get[String]("urls.legacyCisService")
+  lazy val legacyCisFilingServiceUrl: String = configuration.get[String]("urls.legacyCisFilingService")
 
   lazy val contactHMRCUrl: String                      = configuration.get[String]("urls.contactHMRC")
   lazy val constructionIndustryAgentAccountUrl: String =
