@@ -55,9 +55,14 @@ class PrintSubmissionDetailsController @Inject() (
 
               val historyUrl = from match {
                 case "single" =>
-                  controllers.history.routes.SubmittedReturnsController.onPageLoadSingleYear(taxYear.toString).url
+                  val taxYearStart = submittedReturnsService.taxYearFromYear(taxYear, taxMonth)
+                  controllers.history.routes.SubmittedReturnsController
+                    .onPageLoadSingleYear(taxYearStart.toString)
+                    .url
                 case _        =>
-                  controllers.history.routes.SubmittedReturnsController.onPageLoadAllYears().url
+                  controllers.history.routes.SubmittedReturnsController
+                    .onPageLoadAllYears()
+                    .url
               }
               Ok(view(viewData, historyUrl))
             }
