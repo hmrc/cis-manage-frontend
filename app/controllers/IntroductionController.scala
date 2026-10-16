@@ -27,7 +27,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IntroductionView
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class IntroductionController @Inject() (
   override val messagesApi: MessagesApi,
@@ -39,8 +39,8 @@ class IntroductionController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = identify.async { implicit request =>
-    Future.successful(Ok(view()))
+  def onPageLoad: Action[AnyContent] = Action { implicit request =>
+    Ok(view())
   }
 
   def affinityGroupRouting: Action[AnyContent] = identify.async { implicit request =>
