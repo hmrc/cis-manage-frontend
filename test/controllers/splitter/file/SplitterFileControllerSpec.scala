@@ -67,7 +67,9 @@ class SplitterFileControllerSpec extends UnitSpec {
     "must redirect to the introduction page when an organisation is on the allow list" in {
       setUp(useAllowList = true)
       when(
-        connector.checkAllowList(eqTo("cis"), eqTo("allow-list"), eqTo("taxOfficeNumber/taxOfficeReference"))(using any())
+        connector.checkAllowList(eqTo("cis"), eqTo("allow-list"), eqTo("taxOfficeNumber/taxOfficeReference"))(using
+          any()
+        )
       ).thenReturn(Future.successful(true))
 
       val result = controller().fileLandingPage("some/path")(request)
