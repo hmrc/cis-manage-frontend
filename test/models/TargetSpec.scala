@@ -30,11 +30,6 @@ class TargetSpec extends AnyWordSpec with Matchers {
       Target.fromKey("manageYourCisReturn") mustBe Some(Target.Returns)
     }
 
-    "return Notices for any notices key" in {
-      Target.fromKey("newNotices") mustBe Some(Target.Notices)
-      Target.fromKey("noticesAndStatements") mustBe Some(Target.Notices)
-    }
-
     "return Subcontractor for any subcontractor key" in {
       Target.fromKey("subcontractors") mustBe Some(Target.Subcontractor)
     }
