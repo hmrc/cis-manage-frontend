@@ -1,0 +1,7 @@
+# microservice specific routes
+
+# The bare entry point has no path, so it is not matched by /*path below (that needs at least one character).
+# It is the urls.loginContinue target for users returning from login, so it must reach the splitter.
+# Must stay above /*path. Remove with the rest of the splitter after private beta.
+GET        /                                      controllers.splitter.file.SplitterFileController.fileLandingPage(path = "")
+GET        /*path                                 controllers.splitter.file.SplitterFileController.fileLandingPage(path)
