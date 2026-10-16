@@ -46,9 +46,6 @@ error.prefix                                            =  Gwall
 
 error.summary.title                                     =  Mae problem
 
-index.title                                             =  Cynllun y Diwydiant Adeiladu
-index.heading                                           =  Cynllun y Diwydiant Adeiladu
-
 checkYourAnswers.title                                  =  Gwiriwch eich atebion
 checkYourAnswers.heading                                =  Gwiriwch eich atebion
 
