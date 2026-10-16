@@ -32,35 +32,40 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-
 @Singleton
-class SplitterController @Inject()(
-                                 val controllerComponents: MessagesControllerComponents,
-                                 config: FrontendAppConfig,
-                                 rateLimitedAllowListConnector: RateLimitedAllowListConnector,
-                                 identify: IdentifierAction
-                               )(using ExecutionContext)
-  extends FrontendBaseController
+class SplitterController @Inject() (
+  val controllerComponents: MessagesControllerComponents,
+  config: FrontendAppConfig,
+  rateLimitedAllowListConnector: RateLimitedAllowListConnector,
+  identify: IdentifierAction
+)(using ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  private def checkAllowList[A](request: IdentifierRequest[A])(using HeaderCarrier): Future[Boolean] = {
+  private def checkAllowList[A](request: IdentifierRequest[A])(using HeaderCarrier): Future[Boolean] =
     if (config.useRateLimitedAllowList) {
       if (request.isAgent) {
         val identifier = request.agentReference
-        rateLimitedAllowListConnector.checkAllowList(config.splitterServiceName, config.splitterAllowListName, identifier.get)
+        rateLimitedAllowListConnector.checkAllowList(
+          config.splitterServiceName,
+          config.splitterAllowListName,
+          identifier.get
+        )
+      } else {
+        val identifier =
+          s"${request.employerReference.get.taxOfficeNumber}/${request.employerReference.get.taxOfficeReference}"
+        rateLimitedAllowListConnector.checkAllowList(
+          config.splitterServiceName,
+          config.splitterAllowListName,
+          identifier
+        )
       }
-      else {
-        val identifier = s"${request.employerReference.get.taxOfficeNumber}/${request.employerReference.get.taxOfficeReference}"
-        rateLimitedAllowListConnector.checkAllowList(config.splitterServiceName, config.splitterAllowListName, identifier)
-      }
-    }
-    else Future.successful(false)
-  }
+    } else Future.successful(false)
 
   def coreLandingPage(path: String): Action[AnyContent] = identify.async { implicit request =>
     checkAllowList(request).map {
-      case true => Redirect(controllers.routes.IntroductionController.onPageLoad())
+      case true  => Redirect(controllers.routes.IntroductionController.onPageLoad())
       case false =>
         val url = s"${config.legacyCisServiceUrl}/$path"
         logger.info(s"Redirecting to cis legacy service to $url")
@@ -70,7 +75,7 @@ class SplitterController @Inject()(
 
   def fileLandingPage(path: String): Action[AnyContent] = identify { implicit request =>
     checkAllowList(request).map {
-      case true => Redirect(controllers.routes.IntroductionController.onPageLoad())
+      case true  => Redirect(controllers.routes.IntroductionController.onPageLoad())
       case false =>
         val url = s"${config.legacyCisServiceLandingUrl}/$path"
         logger.info(s"Redirecting to cis legacy service to $url")
