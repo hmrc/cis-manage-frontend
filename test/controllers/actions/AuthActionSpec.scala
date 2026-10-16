@@ -19,7 +19,6 @@ package controllers.actions
 import base.SpecBase
 import com.google.inject.Inject
 import config.FrontendAppConfig
-import connectors.RateLimitedAllowListConnector
 import controllers.actions.TestAuthRetrievals.Ops
 import controllers.routes
 import models.requests.IdentifierRequest
@@ -50,8 +49,6 @@ class AuthActionSpec extends SpecBase {
   private val appConfig                        = application.injector.instanceOf[FrontendAppConfig]
   private val emptyEnrolments                  = Enrolments(Set.empty)
   private val id: String                       = UUID.randomUUID().toString
-
-  private val mockRateLimitedAllowListConnector: RateLimitedAllowListConnector = mock[RateLimitedAllowListConnector]
 
   private val legacyCisServiceUrl: String = "https://legacy.service/cis"
 
@@ -97,8 +94,7 @@ class AuthActionSpec extends SpecBase {
             new FakeFailingAuthConnector(new MissingBearerToken),
             appConfig,
             bodyParsers,
-            clientListCheckEnforcer,
-            mockRateLimitedAllowListConnector
+            clientListCheckEnforcer
           )
           val controller = new Harness(authAction)
           val result     = controller.onPageLoad()(FakeRequest())
@@ -116,8 +112,7 @@ class AuthActionSpec extends SpecBase {
             new FakeFailingAuthConnector(new BearerTokenExpired),
             appConfig,
             bodyParsers,
-            clientListCheckEnforcer,
-            mockRateLimitedAllowListConnector
+            clientListCheckEnforcer
           )
           val controller = new Harness(authAction)
           val result     = controller.onPageLoad()(FakeRequest())
@@ -135,8 +130,7 @@ class AuthActionSpec extends SpecBase {
             new FakeFailingAuthConnector(new InsufficientEnrolments),
             appConfig,
             bodyParsers,
-            clientListCheckEnforcer,
-            mockRateLimitedAllowListConnector
+            clientListCheckEnforcer
           )
           val controller = new Harness(authAction)
           val result     = controller.onPageLoad()(FakeRequest())
@@ -154,8 +148,7 @@ class AuthActionSpec extends SpecBase {
             new FakeFailingAuthConnector(new InsufficientConfidenceLevel),
             appConfig,
             bodyParsers,
-            clientListCheckEnforcer,
-            mockRateLimitedAllowListConnector
+            clientListCheckEnforcer
           )
           val controller = new Harness(authAction)
           val result     = controller.onPageLoad()(FakeRequest())
@@ -173,8 +166,7 @@ class AuthActionSpec extends SpecBase {
             new FakeFailingAuthConnector(new UnsupportedAuthProvider),
             appConfig,
             bodyParsers,
-            clientListCheckEnforcer,
-            mockRateLimitedAllowListConnector
+            clientListCheckEnforcer
           )
           val controller = new Harness(authAction)
           val result     = controller.onPageLoad()(FakeRequest())
@@ -192,8 +184,7 @@ class AuthActionSpec extends SpecBase {
             new FakeFailingAuthConnector(new UnsupportedAffinityGroup),
             appConfig,
             bodyParsers,
-            clientListCheckEnforcer,
-            mockRateLimitedAllowListConnector
+            clientListCheckEnforcer
           )
           val controller = new Harness(authAction)
           val result     = controller.onPageLoad()(FakeRequest())
@@ -211,8 +202,7 @@ class AuthActionSpec extends SpecBase {
             new FakeFailingAuthConnector(new UnsupportedCredentialRole),
             appConfig,
             bodyParsers,
-            clientListCheckEnforcer,
-            mockRateLimitedAllowListConnector
+            clientListCheckEnforcer
           )
           val controller = new Harness(authAction)
           val result     = controller.onPageLoad()(FakeRequest())
@@ -249,8 +239,7 @@ class AuthActionSpec extends SpecBase {
                   mockAuthConnector,
                   appConfig,
                   bodyParsers,
-                  clientListCheckEnforcer,
-                  mockRateLimitedAllowListConnector
+                  clientListCheckEnforcer
                 )
               val controller = new Harness(authAction)
               val result     = controller.onPageLoad()(FakeRequest())
@@ -271,8 +260,7 @@ class AuthActionSpec extends SpecBase {
                   mockAuthConnector,
                   appConfig,
                   bodyParsers,
-                  clientListCheckEnforcer,
-                  mockRateLimitedAllowListConnector
+                  clientListCheckEnforcer
                 )
               val controller = new Harness(authAction)
               val result     = controller.onPageLoad()(FakeRequest())
@@ -308,8 +296,7 @@ class AuthActionSpec extends SpecBase {
                   mockAuthConnector,
                   appConfig,
                   bodyParsers,
-                  clientListCheckEnforcer,
-                  mockRateLimitedAllowListConnector
+                  clientListCheckEnforcer
                 )
               val controller = new Harness(authAction)
               val result     = controller.onPageLoad()(FakeRequest())
@@ -337,8 +324,7 @@ class AuthActionSpec extends SpecBase {
               mockAuthConnector,
               appConfig,
               bodyParsers,
-              clientListCheckEnforcer,
-              mockRateLimitedAllowListConnector
+              clientListCheckEnforcer
             )
           val controller = new Harness(authAction)
           val result     = controller.onPageLoad()(FakeRequest())
@@ -363,8 +349,7 @@ class AuthActionSpec extends SpecBase {
               mockAuthConnector,
               appConfig,
               bodyParsers,
-              clientListCheckEnforcer,
-              mockRateLimitedAllowListConnector
+              clientListCheckEnforcer
             )
           val controller = new Harness(authAction)
           val result     = controller.onPageLoad()(FakeRequest())
@@ -404,8 +389,7 @@ class AuthActionSpec extends SpecBase {
                   mockAuthConnector,
                   appConfig,
                   bodyParsers,
-                  clientListCheckEnforcer,
-                  mockRateLimitedAllowListConnector
+                  clientListCheckEnforcer
                 )
               val controller = new Harness(authAction)
               val result     = controller.onPageLoad()(FakeRequest())
@@ -429,8 +413,7 @@ class AuthActionSpec extends SpecBase {
                   mockAuthConnector,
                   appConfig,
                   bodyParsers,
-                  clientListCheckEnforcer,
-                  mockRateLimitedAllowListConnector
+                  clientListCheckEnforcer
                 )
               val controller = new Harness(authAction)
               val result     = controller.onPageLoad()(FakeRequest())
@@ -469,8 +452,7 @@ class AuthActionSpec extends SpecBase {
                   mockAuthConnector,
                   appConfig,
                   bodyParsers,
-                  clientListCheckEnforcer,
-                  mockRateLimitedAllowListConnector
+                  clientListCheckEnforcer
                 )
               val controller = new Harness(authAction)
               val result     = controller.onPageLoad()(FakeRequest())
@@ -496,8 +478,7 @@ class AuthActionSpec extends SpecBase {
               mockAuthConnector,
               appConfig,
               bodyParsers,
-              clientListCheckEnforcer,
-              mockRateLimitedAllowListConnector
+              clientListCheckEnforcer
             )
           val controller = new Harness(authAction)
           val result     = controller.onPageLoad()(FakeRequest())
@@ -527,16 +508,13 @@ class AuthActionSpec extends SpecBase {
           )
           when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(id) ~ enrolments ~ Some(Organisation) ~ Some(User)))
-          when(mockRateLimitedAllowListConnector.checkAllowList(any(), any(), any())(any()))
-            .thenReturn(Future.successful(true))
           running(applicationWithSplitter) {
             val authAction =
               new AuthenticatedIdentifierAction(
                 mockAuthConnector,
                 appConfigWithSplitter,
                 bodyParsers,
-                clientListCheckEnforcer,
-                mockRateLimitedAllowListConnector
+                clientListCheckEnforcer
               )
             val controller = new Harness(authAction)
             val result     = controller.onPageLoad()(FakeRequest())
@@ -563,16 +541,13 @@ class AuthActionSpec extends SpecBase {
           )
           when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(id) ~ enrolments ~ Some(Organisation) ~ Some(User)))
-          when(mockRateLimitedAllowListConnector.checkAllowList(any(), any(), any())(any()))
-            .thenReturn(Future.successful(false))
           running(applicationWithSplitter) {
             val authAction =
               new AuthenticatedIdentifierAction(
                 mockAuthConnector,
                 appConfigWithSplitter,
                 bodyParsers,
-                clientListCheckEnforcer,
-                mockRateLimitedAllowListConnector
+                clientListCheckEnforcer
               )
             val controller = new Harness(authAction)
             val result     = controller.onPageLoad()(FakeRequest())
@@ -599,16 +574,13 @@ class AuthActionSpec extends SpecBase {
           )
           when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(id) ~ enrolments ~ Some(Agent) ~ None))
-          when(mockRateLimitedAllowListConnector.checkAllowList(any(), any(), any())(any()))
-            .thenReturn(Future.successful(true))
           running(applicationWithSplitter) {
             val authAction =
               new AuthenticatedIdentifierAction(
                 mockAuthConnector,
                 appConfigWithSplitter,
                 bodyParsers,
-                clientListCheckEnforcer,
-                mockRateLimitedAllowListConnector
+                clientListCheckEnforcer
               )
             val controller = new Harness(authAction)
             val result     = controller.onPageLoad()(FakeRequest())
@@ -634,16 +606,13 @@ class AuthActionSpec extends SpecBase {
           )
           when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(id) ~ enrolments ~ Some(Agent) ~ None))
-          when(mockRateLimitedAllowListConnector.checkAllowList(any(), any(), any())(any()))
-            .thenReturn(Future.successful(false))
           running(applicationWithSplitter) {
             val authAction =
               new AuthenticatedIdentifierAction(
                 mockAuthConnector,
                 appConfigWithSplitter,
                 bodyParsers,
-                clientListCheckEnforcer,
-                mockRateLimitedAllowListConnector
+                clientListCheckEnforcer
               )
             val controller = new Harness(authAction)
             val result     = controller.onPageLoad()(FakeRequest())
