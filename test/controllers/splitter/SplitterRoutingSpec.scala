@@ -34,7 +34,7 @@ class SplitterRoutingSpec extends SpecBase {
         val result = route(application, FakeRequest(GET, "/construction-ind-scheme/some/path")).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual "/construction-ind-scheme-legacy/some/path"
+        redirectLocation(result).value mustEqual "/construction-ind-legacy/some/path"
       }
     }
 

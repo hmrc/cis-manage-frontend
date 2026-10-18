@@ -195,7 +195,7 @@ class FrontendAppConfigSpec extends SpecBase {
     appConfig.useRateLimitedAllowList mustBe false
     appConfig.splitterServiceName mustBe "cis-management-frontend"
     appConfig.splitterAllowListName mustBe "cis-private-beta-2026"
-    appConfig.legacyCisServiceCoreUrl mustBe "/construction-ind-scheme-legacy"
+    appConfig.legacyCisServiceCoreUrl mustBe "/construction-ind-legacy"
     appConfig.legacyCisServiceFilingUrl mustBe "/cis-file-legacy"
   }
 
