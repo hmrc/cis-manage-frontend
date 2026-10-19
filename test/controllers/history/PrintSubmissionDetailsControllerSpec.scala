@@ -162,6 +162,9 @@ class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
       when(submittedReturnsService.buildSubmittedReturnPrintViewModel(any(), any()))
         .thenReturn(model)
 
+      when(submittedReturnsService.taxYearFromYear(2026, 4))
+        .thenReturn(2025)
+
       val application = applicationBuilder(userAnswers = Some(userAnswersWithCisId))
         .overrides(
           bind[ManageService].toInstance(mockManageService),
@@ -176,7 +179,7 @@ class PrintSubmissionDetailsControllerSpec extends SpecBase with MockitoSugar {
 
         val historyUrl =
           controllers.history.routes.SubmittedReturnsController
-            .onPageLoadSingleYear("2026")
+            .onPageLoadSingleYear("2025")
             .url
 
         status(result) mustEqual OK

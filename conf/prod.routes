@@ -1,3 +1,5 @@
 # Add all the application routes to the app.routes file
 ->         /construction-industry-scheme/management        app.Routes
+->         /construction-ind-scheme                        splitterCore.Routes
+->         /cis-file                                       splitterFile.Routes
 ->         /                                               health.Routes
