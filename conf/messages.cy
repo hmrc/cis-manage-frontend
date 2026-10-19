@@ -402,10 +402,6 @@ incompleteReturns.action.continue.hidden     =  Parhau gyda datganiad misol ar g
 incompleteReturns.action.delete.hidden       =  Dileu datganiad misol ar gyfer {0}
 incompleteReturns.action.view.hidden         =  Gweld datganiad misol ar gyfer {0}
 
-addContractorDetails.title                   =  xxxxxxxxxxxxxxxxxxxx
-addContractorDetails.heading                 =  xxxxxxxxxxxxxxxxxxxx
-addContractorDetails.p1                      =  xxxxxxxxxxxxxxxxxxxx
-
 submissionConfirmation.title                 =  xxxxxxxxxxxxxxxxxxxx
 
 submissionConfirmation.panel.heading         =  xxxxxxxxxxxxxxxxxxxx
