@@ -193,7 +193,7 @@ class FrontendAppConfigSpec extends SpecBase {
 
   "must contain the splitter configuration" in new Setup {
     appConfig.useRateLimitedAllowList mustBe false
-    appConfig.splitterServiceName mustBe "cis-management-frontend"
+    appConfig.splitterServiceName mustBe "cis-manage-frontend"
     appConfig.splitterAllowListName mustBe "cis-private-beta-2026"
     appConfig.legacyCisServiceCoreUrl mustBe "/construction-ind-legacy"
     appConfig.legacyCisServiceFilingUrl mustBe "/cis-file-legacy"
