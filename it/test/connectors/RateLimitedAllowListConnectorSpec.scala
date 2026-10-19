@@ -46,7 +46,7 @@ class RateLimitedAllowListConnectorSpec
 
   val connector: RateLimitedAllowListConnector = app.injector.instanceOf[RateLimitedAllowListConnector]
 
-  private val serviceName  = "cis-management-frontend"
+  private val serviceName  = "cis-manage-frontend"
   private val featureName  = "cis-private-beta-2026"
   private val identifier   = "754/EZ00047"
   private val expectedPath = s"/rate-limited-allow-list/services/$serviceName/allow-lists/$featureName"
