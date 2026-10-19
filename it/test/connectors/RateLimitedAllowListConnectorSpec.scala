@@ -49,7 +49,7 @@ class RateLimitedAllowListConnectorSpec
   private val serviceName  = "cis-management-frontend"
   private val featureName  = "cis-private-beta-2026"
   private val identifier   = "754/EZ00047"
-  private val expectedPath = s"/rate-limited-allow-list/services/$serviceName/features/$featureName"
+  private val expectedPath = s"/rate-limited-allow-list/services/$serviceName/allow-lists/$featureName"
   private val expectedBody = s"""{"identifier":"$identifier"}"""
 
   "checkAllowList" should {
@@ -121,7 +121,7 @@ class RateLimitedAllowListConnectorSpec
     "send the correct service name and feature name in the URL path" in {
       val altService  = "other-service"
       val altFeature  = "other-feature"
-      val altPath     = s"/rate-limited-allow-list/services/$altService/features/$altFeature"
+      val altPath     = s"/rate-limited-allow-list/services/$altService/allow-lists/$altFeature"
 
       stubFor(
         post(urlPathEqualTo(altPath))

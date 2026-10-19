@@ -37,7 +37,7 @@ class RateLimitedAllowListConnector @Inject() (servicesConfig: ServicesConfig, h
     hc: HeaderCarrier
   ): Future[Boolean] =
     http
-      .post(url"$baseUrl/rate-limited-allow-list/services/$serviceName/features/$featureName")
+      .post(url"$baseUrl/rate-limited-allow-list/services/$serviceName/allow-lists/$featureName")
       .withBody(Json.toJson(AllowListCheckRequest(identifier)))
       .execute[AllowListCheckResponse]
       .map(_.included)
