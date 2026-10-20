@@ -55,9 +55,9 @@ class SplitterIdentifierAction @Inject() (
     authorised(defaultPredicate)
       .retrieve(
         Retrievals.internalId and Retrievals.allEnrolments
-          and Retrievals.affinityGroup and Retrievals.credentialRole
+          and Retrievals.affinityGroup
       ) {
-        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ _ =>
+        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) =>
           hasCisOrgEnrolment(enrolments)
             .map { employerReference =>
               block(
@@ -70,10 +70,10 @@ class SplitterIdentifierAction @Inject() (
             .getOrElse(
               block(OptionalIdentifierRequest(request, None))
             )
-        case Some(internalId) ~ _ ~ Some(Individual) ~ _                        =>
+        case Some(internalId) ~ _ ~ Some(Individual)                        =>
           logger.info("EnrolmentAuthIdentifierAction - Individual login attempt")
           block(OptionalIdentifierRequest(request, None))
-        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Agent) ~ _        =>
+        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Agent)        =>
           hasCisAgentEnrolment(enrolments)
             .map { agentReference =>
               val identifierRequest = IdentifierRequest(request, internalId, None, Some(agentReference), true)
@@ -85,7 +85,7 @@ class SplitterIdentifierAction @Inject() (
                   .addingToSession("userId" -> internalId)(request)
               )
             )
-        case _                                                                  =>
+        case _                                                              =>
           logger.warn("EnrolmentAuthIdentifierAction - Unable to retrieve internal id or affinity group")
           block(OptionalIdentifierRequest(request, None))
       } recoverWith {

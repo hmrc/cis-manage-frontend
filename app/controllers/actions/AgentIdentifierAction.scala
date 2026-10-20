@@ -55,23 +55,22 @@ class AgentIdentifierAction @Inject() (
         Retrievals.internalId and
           Retrievals.allEnrolments and
           Retrievals.affinityGroup and
-          Retrievals.credentialRole and
           Retrievals.agentCode and
           Retrievals.itmpName
       ) {
-        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ _ ~ _ ~ _               =>
+        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ _ ~ _               =>
           logger.info("AgentIdentifierAction - Organisation login attempt")
           Future.successful(
             Redirect(controllers.routes.UnauthorisedController.onPageLoad())
               .addingToSession("userId" -> internalId)(request)
           )
-        case Some(internalId) ~ _ ~ Some(Individual) ~ _ ~ _ ~ _                                      =>
+        case Some(internalId) ~ _ ~ Some(Individual) ~ _ ~ _                                      =>
           logger.info("AgentIdentifierAction - Individual login attempt")
           Future.successful(
             Redirect(controllers.routes.UnauthorisedIndividualAffinityController.onPageLoad())
               .addingToSession("userId" -> internalId)(request)
           )
-        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Agent) ~ _ ~ agentCodeOpt ~ itmpNameOpt =>
+        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Agent) ~ agentCodeOpt ~ itmpNameOpt =>
           hasCisAgentEnrolment(enrolments)
             .map { agentReference =>
               val itmpFullNameOpt =
@@ -89,7 +88,7 @@ class AgentIdentifierAction @Inject() (
                   .addingToSession("userId" -> internalId)(request)
               )
             )
-        case _                                                                                        =>
+        case _                                                                                    =>
           logger.warn("AgentIdentifierAction - Unable to retrieve internal id or affinity group")
           Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
       } recover {
