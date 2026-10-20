@@ -28,3 +28,8 @@ case class IdentifierRequest[A](
   agentCode: Option[String] = None,
   itmpName: Option[String] = None
 ) extends WrappedRequest[A](request)
+
+case class OptionalIdentifierRequest[A](
+  request: Request[A],
+  identifierRequest: Option[IdentifierRequest[A]]
+) extends WrappedRequest[A](request)
