@@ -19,7 +19,7 @@ package controllers.splitter.core
 import base.UnitSpec
 import config.FrontendAppConfig
 import connectors.RateLimitedAllowListConnector
-import controllers.actions.FakeIdentifierAction
+import controllers.actions.FakeSplitterAction
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, reset, verify, when}
 import play.api.test.FakeRequest
@@ -37,7 +37,7 @@ class SplitterCoreControllerSpec extends UnitSpec {
       stubMessagesControllerComponents(),
       config,
       connector,
-      new FakeIdentifierAction(isAgent)(stubControllerComponents().parsers)
+      new FakeSplitterAction(isAgent)(stubControllerComponents().parsers)
     )
 
   private val request = FakeRequest(GET, "/some/path")

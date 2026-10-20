@@ -18,7 +18,7 @@ package controllers.splitter.file
 
 import config.FrontendAppConfig
 import connectors.RateLimitedAllowListConnector
-import controllers.actions.IdentifierAction
+import controllers.actions.OptionalIdentifierAction
 import controllers.splitter.SplitterAllowList
 import play.api.Logging
 import play.api.i18n.I18nSupport
@@ -26,14 +26,14 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SplitterFileController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   val config: FrontendAppConfig,
   val rateLimitedAllowListConnector: RateLimitedAllowListConnector,
-  identify: IdentifierAction
+  identify: OptionalIdentifierAction
 )(using ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -41,12 +41,19 @@ class SplitterFileController @Inject() (
     with Logging {
 
   def fileLandingPage(path: String): Action[AnyContent] = identify.async { implicit request =>
-    checkAllowList(request).map {
-      case true  => Redirect(controllers.routes.IntroductionController.onPageLoad())
-      case false =>
+    request.identifierRequest match {
+      case None          =>
         val url = s"${config.legacyCisServiceFilingUrl}/$path"
-        logger.info(s"Redirecting to cis legacy service to $url")
-        Redirect(url)
+        logger.warn(s"User failed authentication - sent to $url")
+        Future.successful(Redirect(url))
+      case Some(request) =>
+        checkAllowList(request).map {
+          case true  => Redirect(controllers.routes.IntroductionController.onPageLoad())
+          case false =>
+            val url = s"${config.legacyCisServiceFilingUrl}/$path"
+            logger.info(s"Redirecting to cis legacy service to $url")
+            Redirect(url)
+        }
     }
   }
 }
