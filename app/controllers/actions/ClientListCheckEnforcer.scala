@@ -17,7 +17,7 @@
 package controllers.actions
 
 import models.agent.ClientListCheckPolicy
-import models.requests.IdentifierRequest
+import models.requests.{IdentifierRequest, OptionalIdentifierRequest}
 import play.api.mvc.Result
 
 import javax.inject.{Inject, Singleton}
@@ -53,4 +53,34 @@ class ClientListCheckEnforcer @Inject() (
         case ClientListCheckPolicy.GroupB | ClientListCheckPolicy.Exempt =>
           block(request)
       }
+
+  def optionalCheck[A](
+    request: OptionalIdentifierRequest[A]
+  )(block: OptionalIdentifierRequest[A] => Future[Result]): Future[Result] =
+    request.identifierRequest match {
+      case None      => block(request)
+      case Some(req) =>
+        if !req.isAgent then block(request)
+        else
+          policyResolver.resolve(req) match {
+            case ClientListCheckPolicy.GroupA                                =>
+              clientListStatusGuard.checkGroupA(req).flatMap {
+                case Some(result) =>
+                  block(request.copy(identifierRequest = None))
+
+                case None if policyResolver.shouldRunCentralHasClient(req) =>
+                  schemeAuthorisationGuard.checkCurrentAgentClient(req).flatMap {
+                    case Some(result) =>
+                      block(request.copy(identifierRequest = None))
+                    case None         =>
+                      block(request)
+                  }
+                case None                                                  =>
+                  block(request)
+              }
+            case ClientListCheckPolicy.GroupB | ClientListCheckPolicy.Exempt =>
+              block(request)
+          }
+    }
+
 }
