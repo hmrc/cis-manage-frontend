@@ -20,15 +20,16 @@ import com.google.inject.Inject
 import models.requests.{IdentifierRequest, OptionalIdentifierRequest}
 import play.api.Logging
 import play.api.mvc.*
+import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.auth.core.*
-import uk.gov.hmrc.auth.core.AffinityGroup.{Individual, Organisation}
+import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import utils.AuthUtils.hasCisOrgEnrolment
+import utils.AuthUtils.{hasCisAgentEnrolment, hasCisOrgEnrolment}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,7 +39,8 @@ trait OptionalIdentifierAction
 
 class SplitterIdentifierAction @Inject() (
   override val authConnector: AuthConnector,
-  val parser: BodyParsers.Default
+  val parser: BodyParsers.Default,
+  clientListCheckEnforcer: ClientListCheckEnforcer
 )(implicit val executionContext: ExecutionContext)
     extends OptionalIdentifierAction
     with AuthorisedFunctions
@@ -74,6 +76,18 @@ class SplitterIdentifierAction @Inject() (
         case Some(internalId) ~ _ ~ Some(Individual) ~ _                                 =>
           logger.info("EnrolmentAuthIdentifierAction - Individual login attempt")
           block(OptionalIdentifierRequest(request, None))
+        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Agent) ~ _                 =>
+          hasCisAgentEnrolment(enrolments)
+            .map { agentReference =>
+              val identifierRequest = IdentifierRequest(request, internalId, None, Some(agentReference), true)
+              clientListCheckEnforcer.optionalCheck(OptionalIdentifierRequest(request, Some(identifierRequest)))(block)
+            }
+            .getOrElse(
+              Future.successful(
+                Redirect(controllers.routes.UnauthorisedAgentAffinityController.onPageLoad())
+                  .addingToSession("userId" -> internalId)(request)
+              )
+            )
         case _                                                                           =>
           logger.warn("EnrolmentAuthIdentifierAction - Unable to retrieve internal id or affinity group")
           block(OptionalIdentifierRequest(request, None))
