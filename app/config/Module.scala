@@ -35,6 +35,7 @@ class Module extends PlayModule {
     bind[IdentifierAction].to[AuthenticatedIdentifierAction].eagerly(),
     bind[IdentifierAction].qualifiedWith("ContractorIdentifier").to[ContractorIdentifierAction].eagerly(),
     bind[IdentifierAction].qualifiedWith("AgentIdentifier").to[AgentIdentifierAction].eagerly(),
+    bind[OptionalIdentifierAction].to[SplitterIdentifierAction].eagerly(),
     bind[DeletableReturnAction].to[DeletableReturnActionImpl].eagerly(),
     bind[Encrypter with Decrypter].toProvider[CryptoProvider],
     bind[Clock].toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC))
