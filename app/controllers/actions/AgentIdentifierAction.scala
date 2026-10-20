@@ -59,16 +59,10 @@ class AgentIdentifierAction @Inject() (
           Retrievals.agentCode and
           Retrievals.itmpName
       ) {
-        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ Some(User) ~ _ ~ _      =>
+        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ _ ~ _ ~ _               =>
           logger.info("AgentIdentifierAction - Organisation login attempt")
           Future.successful(
             Redirect(controllers.routes.UnauthorisedController.onPageLoad())
-              .addingToSession("userId" -> internalId)(request)
-          )
-        case Some(internalId) ~ _ ~ Some(Organisation) ~ Some(Assistant) ~ _ ~ _                      =>
-          logger.info("AgentIdentifierAction - Organisation: Assistant login attempt")
-          Future.successful(
-            Redirect(controllers.routes.UnauthorisedWrongRoleController.onPageLoad())
               .addingToSession("userId" -> internalId)(request)
           )
         case Some(internalId) ~ _ ~ Some(Individual) ~ _ ~ _ ~ _                                      =>

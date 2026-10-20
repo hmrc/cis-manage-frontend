@@ -57,7 +57,7 @@ class SplitterIdentifierAction @Inject() (
         Retrievals.internalId and Retrievals.allEnrolments
           and Retrievals.affinityGroup and Retrievals.credentialRole
       ) {
-        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ Some(User) =>
+        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ _ =>
           hasCisOrgEnrolment(enrolments)
             .map { employerReference =>
               block(
@@ -70,13 +70,10 @@ class SplitterIdentifierAction @Inject() (
             .getOrElse(
               block(OptionalIdentifierRequest(request, None))
             )
-        case Some(internalId) ~ _ ~ Some(Organisation) ~ Some(Assistant)                 =>
-          logger.info("EnrolmentAuthIdentifierAction - Organisation: Assistant login attempt")
-          block(OptionalIdentifierRequest(request, None))
-        case Some(internalId) ~ _ ~ Some(Individual) ~ _                                 =>
+        case Some(internalId) ~ _ ~ Some(Individual) ~ _                        =>
           logger.info("EnrolmentAuthIdentifierAction - Individual login attempt")
           block(OptionalIdentifierRequest(request, None))
-        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Agent) ~ _                 =>
+        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Agent) ~ _        =>
           hasCisAgentEnrolment(enrolments)
             .map { agentReference =>
               val identifierRequest = IdentifierRequest(request, internalId, None, Some(agentReference), true)
@@ -88,7 +85,7 @@ class SplitterIdentifierAction @Inject() (
                   .addingToSession("userId" -> internalId)(request)
               )
             )
-        case _                                                                           =>
+        case _                                                                  =>
           logger.warn("EnrolmentAuthIdentifierAction - Unable to retrieve internal id or affinity group")
           block(OptionalIdentifierRequest(request, None))
       } recoverWith {
