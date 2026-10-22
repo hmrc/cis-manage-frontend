@@ -149,6 +149,13 @@ class SubmissionSuccessViewSpec extends SpecBase {
       doc.text() should include("June 2024")
     }
 
+    "not render the contractor name row when contractor name is blank" in {
+      val doc = render(viewModelWithEmail.copy(contractorName = ""))
+
+      doc.select(".govuk-summary-list__key").eachText.toString should not include "Contractor name"
+      doc.text()                                               should include("123/AB12345")
+    }
+
     "render email row in summary list when email is present" in {
       val doc = render(viewModelWithEmail)
 

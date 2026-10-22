@@ -65,7 +65,7 @@
                     value = Value(content = Text(time))
                 )
             },
-            Some(SummaryListRow(
+            Option.when(viewModel.contractorName.trim.nonEmpty)(SummaryListRow(
                 key = Key(content = Text(messages("submissionConfirmation.contractorName"))),
                 value = Value(content = Text(viewModel.contractorName))
             )),
