@@ -330,6 +330,60 @@ class AgentLandingControllerSpec extends SpecBase with MockitoSugar with BeforeA
       }
     }
 
+    Seq(
+      "manageYourCisReturn" -> "?target=manageYourCisReturn",
+      "subcontractors"      -> "?target=subcontractors",
+      "returnDue"           -> ""
+    ).foreach { case (key, expectedQuery) =>
+      s"must pass contractor details call with target query '$expectedQuery' for targetKey $key" in {
+
+        val scheme = Scheme(
+          schemeId = 123,
+          instanceId = uniqueId,
+          utr = Some("1234567890"),
+          name = None,
+          prePopSuccessful = None,
+          subcontractorCounter = Some(1)
+        )
+
+        when(
+          mockPrepopService.prepopulateContractorKnownFacts(any[String], any[String], any[String])(any[HeaderCarrier])
+        ).thenReturn(Future.unit)
+        when(mockPrepopService.getScheme(any[String])(any[HeaderCarrier]))
+          .thenReturn(Future.successful(Some(scheme)))
+        when(
+          mockPrepopService.determineLandingDestination(any[Call], any[String], any[Scheme], any[Call], any[Call])
+        ).thenReturn(controllers.routes.ReturnsLandingController.onPageLoad(uniqueId))
+
+        val application: Application =
+          applicationBuilder(
+            userAnswers = Some(userAnswersWithAgentClient),
+            additionalBindings = commonBindings,
+            isAgent = true
+          ).build()
+
+        withApplication(application) {
+          val appConfig = application.injector.instanceOf[config.FrontendAppConfig]
+
+          val request =
+            FakeRequest(GET, controllers.agent.routes.AgentLandingController.onTargetClick(uniqueId, key).url)
+
+          status(route(application, request).value) mustBe SEE_OTHER
+
+          val captor = ArgumentCaptor.forClass(classOf[Call])
+          verify(mockPrepopService).determineLandingDestination(
+            any[Call],
+            eqTo(uniqueId),
+            eqTo(scheme),
+            captor.capture(),
+            any[Call]
+          )
+
+          captor.getValue.url mustBe s"${appConfig.contractorDetailsManagementUrl}$expectedQuery"
+        }
+      }
+    }
+
     "must redirect to SystemErrorController when prepopulateContractorKnownFacts fails with UpstreamErrorResponse" in {
 
       when(
