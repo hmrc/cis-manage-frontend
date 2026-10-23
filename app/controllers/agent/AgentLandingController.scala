@@ -156,7 +156,7 @@ class AgentLandingController @Inject() (
     systemErrorRedirect: Result
   )(implicit hc: HeaderCarrier): Future[Result] = {
     val instanceId                    = client.uniqueId
-    val manageContractorDetails       = Call(GET, appConfig.contractorDetailsManagementUrl)
+    val manageContractorDetails       = Call(GET, appConfig.contractorDetailsManagementUrlFor(targetKey))
     val checkSubcontractorRecordsCall = controllers.routes.CheckSubcontractorRecordsController.onPageLoad(
       instanceId,
       targetKey

@@ -162,4 +162,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val contractorDetailsManagementUrl: String   =
     s"$cisContractorFrontendBaseUrl${configuration.get[String]("urls.contractorDetailsManagement")}"
 
+  private val contractorDetailsTargetKeys = Set("manageYourCisReturn", "subcontractors")
+
+  def contractorDetailsManagementUrlFor(targetKey: String): String =
+    if (contractorDetailsTargetKeys.contains(targetKey)) s"$contractorDetailsManagementUrl?target=$targetKey"
+    else contractorDetailsManagementUrl
 }
