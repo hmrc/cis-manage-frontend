@@ -47,7 +47,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends UnitSpec {
       status = "SUBMITTED",
       taxYear = taxYear,
       acceptedDateTime = dateSubmitted.atStartOfDay(),
-      contractorName = "Test Scheme",
+      contractorName = Some("Test Scheme"),
       employerReference = "123PA000001",
       receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
       subcontractorsToVerify = Seq.empty
@@ -63,7 +63,7 @@ class SubcontractorSubmissionReceiptControllerSpec extends UnitSpec {
     SubcontractorSubmissionReceiptViewModel(
       submissionTime = "14:30",
       submissionDate = "06 February 2027",
-      contractorName = "Gary Construction Ltd",
+      contractorName = Some("Gary Construction Ltd"),
       employerReference = "123",
       receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
       verificationNumber = verificationNumber,

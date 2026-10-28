@@ -44,10 +44,12 @@
 
     @govukSummaryList(
         SummaryListViewModel(rows = Seq(
-            SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key1"), Value(viewModel.contractorName)),
-            SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key2"), Value(viewModel.employerReference)),
-            SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key3"), Value(viewModel.receiptReferenceNumber)),
-        ))
+            viewModel.contractorName.filter(_.trim.nonEmpty).map { name =>
+                SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key1"), Value(name))
+            },
+            Some(SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key2"), Value(viewModel.employerReference))),
+            Some(SummaryListRowViewModel(Key("verify.subcontractorSubmissionReceipt.summaryList.key3"), Value(viewModel.receiptReferenceNumber)))
+        ).flatten)
     )
 
     @paragraph(messages("verify.subcontractorSubmissionReceipt.p2"))

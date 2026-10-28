@@ -47,7 +47,7 @@ class VerificationRequestControllerSpec extends UnitSpec {
       taxYear = taxYear,
       status = "SUBMITTED",
       acceptedDateTime = dateSubmitted.atStartOfDay(),
-      contractorName = "Test Scheme",
+      contractorName = Some("Test Scheme"),
       employerReference = "123PA000001",
       receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
       subcontractorsToVerify = Seq.empty
@@ -63,7 +63,7 @@ class VerificationRequestControllerSpec extends UnitSpec {
     submittedTime = "14:30",
     submittedDate = "06 February 2027",
     verificationNumber = verificationNumber,
-    contractorName = "Gary Construction Ltd",
+    contractorName = Some("Gary Construction Ltd"),
     employerReference = "123",
     receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
     subcontractorsToVerify = Seq(

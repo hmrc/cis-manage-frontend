@@ -20,7 +20,7 @@ case class VerificationRequestPageViewModel(
   submittedTime: String,
   submittedDate: String,
   verificationNumber: String,
-  contractorName: String,
+  contractorName: Option[String],
   employerReference: String,
   receiptReferenceNumber: String,
   subcontractorsToVerify: Seq[SubcontractorRowViewModel],

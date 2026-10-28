@@ -51,7 +51,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
       status = status,
       taxYear = taxYear,
       acceptedDateTime = dateSubmitted.atStartOfDay(),
-      contractorName = "Test Scheme",
+      contractorName = Some("Test Scheme"),
       employerReference = "123/AB456",
       receiptReferenceNumber = receiptReferenceNumber,
       subcontractorsToVerify = Seq.empty
@@ -66,14 +66,14 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
     )
   )
 
-  private def submittedScheme(): GetSubmittedContractorScheme =
+  private def submittedScheme(name: Option[String] = Some("Test Scheme")): GetSubmittedContractorScheme =
     GetSubmittedContractorScheme(
       schemeId = 1,
       instanceId = instanceId,
       accountsOfficeReference = "123PA000001",
       taxOfficeNumber = "123",
       taxOfficeReference = "AB456",
-      name = Some("Test Scheme")
+      name = name
     )
 
   private def expectedRequest(
@@ -90,7 +90,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
       status = "SUBMITTED",
       taxYear = taxYear,
       acceptedDateTime = acceptedDateTime,
-      contractorName = "Test Scheme",
+      contractorName = Some("Test Scheme"),
       employerReference = "123/AB456",
       receiptReferenceNumber = receiptReferenceNumber,
       subcontractorsToVerify = subcontractorsToVerify
@@ -297,6 +297,26 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
             expectedRequest(2L, "V002", LocalDateTime.of(2026, 2, 6, 10, 0), 2025)
           )
         )
+      }
+
+      "must map a scheme with no contractor name to a request with no name" in {
+        val response = GetSubmittedVerificationsResponse(
+          scheme = Seq(submittedScheme(name = None)),
+          subcontractors = Seq.empty,
+          verificationBatches = Seq(
+            submittedVerificationBatch(
+              verificationBatchId = 1L,
+              verificationNumber = Some("V001"),
+              createDate = Some(LocalDateTime.of(2026, 4, 1, 9, 0))
+            )
+          ),
+          verifications = Seq.empty,
+          submissions = Seq(
+            submittedSubmission(activeObjectId = Some(1L), acceptedTime = Some("2026-04-06T10:00:00"))
+          )
+        )
+
+        service.toVerificationHistoryData(response).verificationRequests.map(_.contractorName) mustBe Seq(None)
       }
 
       "must throw when accepted date is missing" in {
@@ -515,7 +535,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
         result.value.submittedTime mustBe "14:30 GMT"
         result.value.submittedDate mustBe "6 April 2026"
         result.value.verificationNumber mustBe "V001"
-        result.value.contractorName mustBe "Test Scheme"
+        result.value.contractorName mustBe Some("Test Scheme")
         result.value.employerReference mustBe "123/AB456"
         result.value.receiptReferenceNumber mustBe receiptReferenceNumber
         result.value.subcontractorsToVerify mustBe Seq(
@@ -567,7 +587,7 @@ class VerificationHistoryServiceSpec extends AnyFreeSpec with Matchers with Opti
         )(Lang("en"))
         result.value.submissionTime mustBe "14:30 GMT"
         result.value.submissionDate mustBe "6 April 2026"
-        result.value.contractorName mustBe "Test Scheme"
+        result.value.contractorName mustBe Some("Test Scheme")
         result.value.employerReference mustBe "123/AB456"
         result.value.receiptReferenceNumber mustBe "H4WLKLISMHJZ3QAT5HXMVHIGEUPOQEJM"
         result.value.verificationNumber mustBe "V001"
