@@ -32,7 +32,7 @@ class VerificationRequestViewSpec extends SpecBase {
     submittedTime = "14:30",
     submittedDate = "06 February 2027",
     verificationNumber = "V0004528765",
-    contractorName = "Gary Construction Ltd",
+    contractorName = Some("Gary Construction Ltd"),
     employerReference = "123",
     receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
     subcontractorsToVerify = Seq(

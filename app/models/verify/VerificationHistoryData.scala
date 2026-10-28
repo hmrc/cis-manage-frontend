@@ -35,7 +35,7 @@ case class VerificationRequestData(
   status: String,
   taxYear: Int,
   acceptedDateTime: LocalDateTime,
-  contractorName: String,
+  contractorName: Option[String],
   employerReference: String,
   receiptReferenceNumber: String,
   subcontractorsToVerify: Seq[SubcontractorVerificationData]

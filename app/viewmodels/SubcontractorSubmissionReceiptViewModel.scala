@@ -19,7 +19,7 @@ package viewmodels
 case class SubcontractorSubmissionReceiptViewModel(
   submissionTime: String,
   submissionDate: String,
-  contractorName: String,
+  contractorName: Option[String],
   employerReference: String,
   receiptReferenceNumber: String,
   verificationNumber: String,

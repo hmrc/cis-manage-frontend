@@ -172,7 +172,7 @@ class VerificationHistoryService @Inject() () {
               status = batchStatus,
               taxYear = taxYearStart(acceptedDateTime.toLocalDate),
               acceptedDateTime = acceptedDateTime,
-              contractorName = contractorNameFor(scheme),
+              contractorName = scheme.name,
               employerReference = s"${scheme.taxOfficeNumber}/${scheme.taxOfficeReference}",
               receiptReferenceNumber = receiptReferenceNumberFor(batch.verificationBatchId, submission),
               subcontractorsToVerify = subcontractorsFor(
@@ -202,15 +202,6 @@ class VerificationHistoryService @Inject() () {
           s"Submitted verification scheme $schemeId is missing"
         )
       }
-
-  private def contractorNameFor(
-    scheme: models.response.GetSubmittedContractorScheme
-  ): String =
-    scheme.name.getOrElse {
-      throw new IllegalStateException(
-        s"Submitted verification scheme ${scheme.schemeId} is missing contractor name"
-      )
-    }
 
   private def receiptReferenceNumberFor(
     verificationBatchId: Long,

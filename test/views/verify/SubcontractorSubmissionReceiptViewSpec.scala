@@ -43,7 +43,7 @@ class SubcontractorSubmissionReceiptViewSpec extends SpecBase {
         SubcontractorSubmissionReceiptViewModel(
           submissionTime,
           submissionDate,
-          contractorName,
+          Some(contractorName),
           employerRef,
           irNumber,
           verificationNumber,
@@ -97,11 +97,30 @@ class SubcontractorSubmissionReceiptViewSpec extends SpecBase {
       doc.select("a.govuk-link").text must include(messages("verify.subcontractorSubmissionReceipt.link2.link"))
     }
 
+    "must not render the contractor name row when the contractor name is not available" in new Setup {
+      val model: SubcontractorSubmissionReceiptViewModel = SubcontractorSubmissionReceiptViewModel(
+        submissionTime = "",
+        submissionDate = "",
+        contractorName = None,
+        employerReference = "ABC12345",
+        receiptReferenceNumber = "123456",
+        verificationNumber = "V0004528765",
+        cisId = "1"
+      )
+
+      val doc: Document = Jsoup.parse(view(model).body)
+
+      val summaryText: String = doc.select(".govuk-summary-list").text()
+      summaryText must not include messages("verify.subcontractorSubmissionReceipt.summaryList.key1")
+      summaryText must include(messages("verify.subcontractorSubmissionReceipt.summaryList.key2"))
+      summaryText must include(messages("verify.subcontractorSubmissionReceipt.summaryList.key3"))
+    }
+
     "must not render the submission time paragraph when accepted time is not available" in new Setup {
       val model: SubcontractorSubmissionReceiptViewModel = SubcontractorSubmissionReceiptViewModel(
         submissionTime = "",
         submissionDate = "",
-        contractorName = "John Doe",
+        contractorName = Some("John Doe"),
         employerReference = "ABC12345",
         receiptReferenceNumber = "123456",
         verificationNumber = "V0004528765",

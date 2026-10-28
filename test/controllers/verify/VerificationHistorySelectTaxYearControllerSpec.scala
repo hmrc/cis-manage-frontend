@@ -46,7 +46,7 @@ class VerificationHistorySelectTaxYearControllerSpec extends UnitSpec with Befor
       taxYear = taxYear,
       status = "SUBMITTED",
       acceptedDateTime = dateSubmitted.atStartOfDay(),
-      contractorName = "Test Scheme",
+      contractorName = Some("Test Scheme"),
       employerReference = "123PA000001",
       receiptReferenceNumber = "Pyy1LRJh053AE+nuyp0GJR7oESw=",
       subcontractorsToVerify = Seq.empty
