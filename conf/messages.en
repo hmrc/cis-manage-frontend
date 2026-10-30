@@ -379,10 +379,6 @@ subcontractorsLandingPage.aside.link2                                   =  Email
 subcontractorsLandingPage.aside.link3                                   =  More information about construction and property management
 
 # Returns & Submissions
-addContractorDetails.title                   =  Add contractor details
-addContractorDetails.heading                 =  Add contractor details
-addContractorDetails.p1                      =  This is a placeholder page for adding contractor details.
-
 submissionConfirmation.title                 =  {0} return successfully submitted
 
 submissionConfirmation.panel.heading         =  {0} return successfully submitted

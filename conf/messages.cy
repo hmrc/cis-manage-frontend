@@ -395,9 +395,7 @@ incompleteReturns.action.continue.hidden     =  Parhau gyda datganiad misol ar g
 incompleteReturns.action.delete.hidden       =  Dileu datganiad misol ar gyfer {0}
 incompleteReturns.action.view.hidden         =  Gweld datganiad misol ar gyfer {0}
 
-addContractorDetails.title                   =  Ychwanegwch fanylion y contractwr
-addContractorDetails.heading                 =  Ychwanegwch fanylion y contractwr
-addContractorDetails.p1                      =  Dyma dudalen dros dro ar gyfer ychwanegu manylion y contractwr.
+submissionConfirmation.title                 =  xxxxxxxxxxxxxxxxxxxx
 
 submissionConfirmation.title                 =  Datganiad {0} wedi’i gyflwyno’n llwyddiannus
 submissionConfirmation.panel.heading         =  Datganiad {0} wedi’i gyflwyno’n llwyddiannus
