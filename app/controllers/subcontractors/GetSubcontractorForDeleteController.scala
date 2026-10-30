@@ -26,6 +26,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.SubcontractorService
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
@@ -63,14 +64,23 @@ class GetSubcontractorForDeleteController @Inject() (
                 redirectToNextPage(subbieResourceRef, response.subcontractorCanBeDeleted)
               }
             }
-            .recover { case ex =>
-              logger.error(
-                s"[GetSubcontractorForDeleteController] Failed to get delete status " +
-                  s"(instanceId=$instanceId, subbieResourceRef=$subbieResourceRef)",
-                ex
-              )
+            .recover {
+              case UpstreamErrorResponse(_, NOT_FOUND, _, _) =>
+                logger.warn(
+                  s"[GetSubcontractorForDeleteController] Subcontractor not found " +
+                    s"(instanceId=$instanceId, subbieResourceRef=$subbieResourceRef)"
+                )
 
-              journeyRecoveryRedirect
+                Redirect(routes.GetSubcontractorListController.onPageLoad())
+
+              case ex =>
+                logger.error(
+                  s"[GetSubcontractorForDeleteController] Failed to get delete status " +
+                    s"(instanceId=$instanceId, subbieResourceRef=$subbieResourceRef)",
+                  ex
+                )
+
+                journeyRecoveryRedirect
             }
 
         case None =>

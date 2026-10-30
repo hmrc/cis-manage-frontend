@@ -27,6 +27,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.SubcontractorService
+import uk.gov.hmrc.http.UpstreamErrorResponse
 
 import scala.concurrent.Future
 
@@ -170,6 +171,37 @@ class GetSubcontractorForDeleteControllerSpec extends SpecBase with MockitoSugar
 
         redirectLocation(result).value mustBe
           routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to the subcontractor list when the subcontractor is not found" in {
+
+      val userAnswers = emptyUserAnswers.set(CisIdPage, cisId).success.value
+
+      val mockService = mock[SubcontractorService]
+
+      when(
+        mockService.getSubcontractorDeleteStatus(
+          eqTo(cisId),
+          eqTo(subbieResourceRef)
+        )(any())
+      ).thenReturn(
+        Future.failed(UpstreamErrorResponse("Subcontractor not found", NOT_FOUND, NOT_FOUND))
+      )
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[SubcontractorService].toInstance(mockService))
+          .build()
+
+      running(application) {
+
+        val result = route(application, FakeRequest(GET, routeUrl)).value
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result).value mustBe
+          controllers.subcontractors.routes.GetSubcontractorListController.onPageLoad().url
       }
     }
 
