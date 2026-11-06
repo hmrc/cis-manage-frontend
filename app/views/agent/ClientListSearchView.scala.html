@@ -139,6 +139,7 @@ additionalCss = Some(css)) {
                 field = form(Constants.SearchFilter),
                 label = LabelViewModel(messages("agent.clientListSearch.searchFilter.label"))
             )
+            .withAutocomplete("on")
             .withHint(Hint(content = messages("agent.clientListSearch.searchFilter.label.hint")))
             .withWidth(TwoThirds)
         )
