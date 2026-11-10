@@ -149,14 +149,65 @@ class FrontendAppConfigSpec extends SpecBase {
 
   "confirmAmendmentUrl" - {
 
-    "must build a URL with handoffId query param" in new Setup {
-      val url: String = appConfig.confirmAmendmentUrl(
-        handoffId = "28c831a4-8723-4180-b625-a6d10706899f"
+    val handoffId = "28c831a4-8723-4180-b625-a6d10706899f"
+
+    val baseUrl =
+      "http://localhost:6993/construction-industry-scheme/manage-cis-return/amend-monthly-return/confirm-amendments"
+
+    "must build the legacy URL when multi-tab is disabled" in new Setup {
+      appConfig.multiTabEnabled mustBe false
+
+      val url = appConfig.confirmAmendmentUrl(
+        handoffId = handoffId,
+        cisPath = "org"
       )
 
-      url mustBe
-        "http://localhost:6993/construction-industry-scheme/manage-cis-return/amend-monthly-return/confirm-amendments" +
-        "?handoffId=28c831a4-8723-4180-b625-a6d10706899f"
+      url mustBe s"$baseUrl?handoffId=$handoffId"
+    }
+
+    "must append org to the URL when multi-tab is enabled for an organisation" in {
+      val app = applicationBuilder()
+        .configure("features.multi-tab-enabled" -> true)
+        .build()
+
+      val appConfig = app.injector.instanceOf[FrontendAppConfig]
+
+      appConfig.multiTabEnabled mustBe true
+
+      val url = appConfig.confirmAmendmentUrl(
+        handoffId = handoffId,
+        cisPath = "org"
+      )
+
+      url mustBe s"$baseUrl/org?handoffId=$handoffId"
+    }
+
+    "must append the CIS ID to the URL when multi-tab is enabled for an agent" in {
+      val app = applicationBuilder()
+        .configure("features.multi-tab-enabled" -> true)
+        .build()
+
+      val appConfig = app.injector.instanceOf[FrontendAppConfig]
+
+      appConfig.multiTabEnabled mustBe true
+
+      val cisId = "1"
+
+      val url = appConfig.confirmAmendmentUrl(
+        handoffId = handoffId,
+        cisPath = cisId
+      )
+
+      url mustBe s"$baseUrl/$cisId?handoffId=$handoffId"
+    }
+
+    "must build the legacy URL for an agent when multi-tab is disabled" in new Setup {
+      val url = appConfig.confirmAmendmentUrl(
+        handoffId = handoffId,
+        cisPath = "1"
+      )
+
+      url mustBe s"$baseUrl?handoffId=$handoffId"
     }
   }
 

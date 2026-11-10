@@ -137,7 +137,8 @@ class SubmittedReturnsController @Inject() (
             )
             .map {
               case Right(handoffId) =>
-                Redirect(appConfig.confirmAmendmentUrl(handoffId))
+                val cisPath = if (request.isAgent) request.cisId else "org"
+                Redirect(appConfig.confirmAmendmentUrl(handoffId, cisPath))
               case Left(reason)     =>
                 logger.warn(s"[startAmendment] start amendment failed: $reason")
                 Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

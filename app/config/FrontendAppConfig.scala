@@ -66,6 +66,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("features.welsh-translation")
 
+  lazy val multiTabEnabled: Boolean = configuration.get[Boolean]("features.multi-tab-enabled")
+
   lazy val useRateLimitedAllowList: Boolean  = configuration.get[Boolean]("features.use-rate-limited-allow-list")
   lazy val splitterServiceName: String       = configuration.get[String]("splitter.service-name")
   lazy val splitterAllowListName: String     = configuration.get[String]("splitter.allow-list-name")
@@ -136,6 +138,14 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   def confirmAmendmentUrl(handoffId: String): String =
     s"$cisFrontendBaseUrl$confirmAmendmentPath?handoffId=$handoffId"
+
+  def confirmAmendmentUrl(handoffId: String, cisPath: String): String = {
+    val path =
+      if multiTabEnabled then s"$confirmAmendmentPath/$cisPath"
+      else confirmAmendmentPath
+
+    s"$cisFrontendBaseUrl$path?handoffId=$handoffId"
+  }
 
   def submissionInProgressUrl(cisId: String): String = s"$cisFrontendBaseUrl$submissionInProgressPath?cisId=$cisId"
 
