@@ -129,7 +129,7 @@ class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
           fakeEmployerRef,
           fakeClientRef
         )(
-          request,
+          viewRequest(request, isAgent = true),
           messages(application)
         ).toString
       }

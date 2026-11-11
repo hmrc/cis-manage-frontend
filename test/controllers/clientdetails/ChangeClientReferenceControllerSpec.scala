@@ -87,7 +87,10 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[ChangeClientReferenceView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, uniqueId, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, uniqueId, NormalMode)(
+          viewRequest(request, isAgent = true),
+          messages(application)
+        ).toString
       }
     }
 
@@ -111,7 +114,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form.fill("answer"), uniqueId, NormalMode)(
-          request,
+          viewRequest(request, isAgent = true),
           messages(application)
         ).toString
       }
@@ -236,7 +239,10 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, uniqueId, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, uniqueId, NormalMode)(
+          viewRequest(request, isAgent = true),
+          messages(application)
+        ).toString
       }
     }
 

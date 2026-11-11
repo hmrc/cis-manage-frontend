@@ -128,7 +128,7 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
           NormalMode,
           uniqueId
         )(
-          request,
+          viewRequest(request, isAgent = true),
           messages(application)
         ).toString
       }
@@ -168,7 +168,7 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
           NormalMode,
           uniqueId
         )(
-          request,
+          viewRequest(request, isAgent = true),
           messages(application)
         ).toString
       }
@@ -267,7 +267,7 @@ class RemoveClientYesNoControllerSpec extends SpecBase with MockitoSugar {
           NormalMode,
           uniqueId
         )(
-          request,
+          viewRequest(request, isAgent = true),
           messages(application)
         ).toString
       }

@@ -1,6 +1,9 @@
 # Infrastructure
 service.name                                            =  Construction Industry Scheme
 
+site.hmrcAccount.agent                                  =  Back to agent services
+site.hmrcAccount.org                                    =  Back to business tax account
+
 site.back                                               =  Back
 site.backTo                                             =  Back to
 site.remove                                             =  Remove

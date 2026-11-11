@@ -37,7 +37,11 @@ class FailedToRetrieveClientControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[FailedToRetrieveClientView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, applicationConfig, messages(application)).toString
+        contentAsString(result) mustEqual view()(
+          viewRequest(request, isAgent = true),
+          applicationConfig,
+          messages(application)
+        ).toString
       }
     }
   }

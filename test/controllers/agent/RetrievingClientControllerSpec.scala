@@ -81,7 +81,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustBe
-          view()(request, applicationConfig, messages(application)).toString
+          view()(viewRequest(request, isAgent = true), applicationConfig, messages(application)).toString
 
         headers(result).get("Refresh") mustBe
           Some(s"0; url=${controllers.agent.routes.RetrievingClientController.start().url}")
@@ -126,7 +126,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe OK
         contentAsString(result) mustBe
-          view()(request, applicationConfig, messages(application)).toString
+          view()(viewRequest(request, isAgent = true), applicationConfig, messages(application)).toString
 
         val expectedUrl =
           controllers.agent.routes.RetrievingClientController.poll(retryCount = 1).url
@@ -212,7 +212,7 @@ class RetrievingClientControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustBe
-          view()(request, applicationConfig, messages(application)).toString
+          view()(viewRequest(request, isAgent = true), applicationConfig, messages(application)).toString
 
         headers(result).get("Refresh") mustBe
           Some(s"15; url=$expectedRefreshUrl")
