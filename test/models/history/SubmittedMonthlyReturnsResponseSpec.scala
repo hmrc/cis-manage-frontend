@@ -88,7 +88,8 @@ class SubmittedMonthlyReturnsResponseSpec extends AnyWordSpec with Matchers {
       Json.toJson(model).as[SubmittedMonthlyReturnsResponse] mustBe model
     }
     "fail when scheme is missing" in {
-      Json.obj("monthlyReturns" -> Json.arr(), "submissions" -> Json.arr())
+      Json
+        .obj("monthlyReturns" -> Json.arr(), "submissions" -> Json.arr())
         .validate[SubmittedMonthlyReturnsResponse]
         .isError mustBe true
     }

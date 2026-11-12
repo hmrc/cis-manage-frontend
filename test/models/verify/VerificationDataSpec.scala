@@ -59,12 +59,15 @@ class VerificationDataSpec extends AnyWordSpec with Matchers {
       Json.toJson(model).as[VerificationRequestDetailData] mustBe model
     }
     "fail when the date is invalid" in {
-      Json.obj(
-        "verificationNumber"         -> "V1",
-        "dateTimeSubmitted"          -> "not-a-date",
-        "subcontractorsToVerify"     -> Json.arr(),
-        "subcontractorsToReverify"   -> Json.arr()
-      ).validate[VerificationRequestDetailData].isError mustBe true
+      Json
+        .obj(
+          "verificationNumber"       -> "V1",
+          "dateTimeSubmitted"        -> "not-a-date",
+          "subcontractorsToVerify"   -> Json.arr(),
+          "subcontractorsToReverify" -> Json.arr()
+        )
+        .validate[VerificationRequestDetailData]
+        .isError mustBe true
     }
   }
 
