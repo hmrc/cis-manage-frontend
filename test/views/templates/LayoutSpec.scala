@@ -61,6 +61,13 @@ class LayoutSpec extends SpecBase {
       doc.select(".govuk-service-navigation").text must include(messages("service.name"))
     }
 
+    "must still show the language toggle alongside the account link" in new Setup {
+      private val doc = render(viewRequest(FakeRequest(), isAgent = true))
+
+      doc.select(".hmrc-service-navigation-language-select").size mustBe 1
+      doc.select(".govuk-service-navigation a:contains(Back to agent services)").size mustBe 1
+    }
+
     "must render the organisation link in Welsh when the language is Welsh" in new Setup {
       private val doc = render(FakeRequest(), Lang("cy"))
 

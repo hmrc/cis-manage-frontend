@@ -34,6 +34,13 @@ class RequestUserTypeSpec extends AnyWordSpec with Matchers {
     "be true for an agent optional data request" in {
       RequestUserType.isAgent(OptionalDataRequest(fake, "id", None, isAgent = true)) mustBe true
     }
+    "be true for a request wrapping an agent data request (e.g. DeletableReturnRequest)" in {
+      import controllers.actions.DeletableReturnRequest
+      import models.{UnsubmittedMonthlyReturnsRow, UserAnswers}
+      val dataRequest = DataRequest(fake, "id", UserAnswers("id"), isAgent = true)
+      val row         = org.mockito.Mockito.mock(classOf[UnsubmittedMonthlyReturnsRow])
+      RequestUserType.isAgent(DeletableReturnRequest(dataRequest, row)) mustBe true
+    }
     "be false for an unauthenticated request" in {
       RequestUserType.isAgent(fake) mustBe false
     }

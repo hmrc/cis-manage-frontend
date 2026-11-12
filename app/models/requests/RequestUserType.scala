@@ -16,14 +16,16 @@
 
 package models.requests
 
+import controllers.actions.DeletableReturnRequest
 import play.api.mvc.RequestHeader
 
 object RequestUserType {
 
   def isAgent(rh: RequestHeader): Boolean = rh match {
-    case r: IdentifierRequest[?]   => r.isAgent
-    case r: OptionalDataRequest[?] => r.isAgent
-    case r: DataRequestFields[?]   => r.isAgent
-    case _                         => false
+    case r: IdentifierRequest[?]      => r.isAgent
+    case r: OptionalDataRequest[?]    => r.isAgent
+    case r: DataRequestFields[?]      => r.isAgent
+    case r: DeletableReturnRequest[?] => isAgent(r.request)
+    case _                            => false
   }
 }
