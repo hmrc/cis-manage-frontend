@@ -76,7 +76,7 @@
   val nav = ServiceNavigation(
     serviceName = Some(messages("service.name")),
     serviceUrl  = Some(routes.IndexController.onPageLoad().url),
-    navigation  = Seq(ServiceNavigationItem(content = Text(linkText), href = linkUrl))
+    navigation  = if (RequestUserType.isSignedOut(rh)) Seq.empty else Seq(ServiceNavigationItem(content = Text(linkText), href = linkUrl))
   )
   if (appConfig.languageTranslationEnabled) nav.withLanguageToggle() else nav
 }

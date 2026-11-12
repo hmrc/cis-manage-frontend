@@ -17,15 +17,24 @@
 package models.requests
 
 import controllers.actions.DeletableReturnRequest
+import play.api.libs.typedmap.TypedKey
 import play.api.mvc.RequestHeader
 
 object RequestUserType {
+
+  /** Marks a request as coming from an agent on pages that are not behind an identifier action. */
+  val IsAgentKey: TypedKey[Boolean] = TypedKey[Boolean]("isAgent")
+
+  /** Marks a request on a public page as having no signed-in user, so no account link should be shown. */
+  val IsSignedOutKey: TypedKey[Boolean] = TypedKey[Boolean]("isSignedOut")
+
+  def isSignedOut(rh: RequestHeader): Boolean = rh.attrs.get(IsSignedOutKey).contains(true)
 
   def isAgent(rh: RequestHeader): Boolean = rh match {
     case r: IdentifierRequest[?]      => r.isAgent
     case r: OptionalDataRequest[?]    => r.isAgent
     case r: DataRequestFields[?]      => r.isAgent
     case r: DeletableReturnRequest[?] => isAgent(r.request)
-    case _                            => false
+    case _                            => rh.attrs.get(IsAgentKey).contains(true)
   }
 }
