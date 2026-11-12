@@ -23,6 +23,10 @@
 @import play.twirl.api.{Html, HtmlFormat}
 @import play.api.mvc.RequestHeader
 @import play.api.i18n.Messages
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.Aliases.{ServiceNavigation, ServiceNavigationItem}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import models.requests.RequestUserType
 
 @this(
   appConfig: FrontendAppConfig,
@@ -65,6 +69,18 @@
   <div class="govuk-!-margin-top-4">@hmrcReportTechnicalIssueHelper()</div>
 }
 
+@serviceNavigation = @{
+  val (linkText, linkUrl) =
+    if (RequestUserType.isAgent(rh)) (messages("site.hmrcAccount.agent"), appConfig.hmrcServicesAgentUrl)
+    else (messages("site.hmrcAccount.org"), appConfig.hmrcServicesOrgUrl)
+  val nav = ServiceNavigation(
+    serviceName = Some(messages("service.name")),
+    serviceUrl  = Some(routes.IndexController.onPageLoad().url),
+    navigation  = if (RequestUserType.isSignedOut(rh)) Seq.empty else Seq(ServiceNavigationItem(content = Text(linkText), href = linkUrl))
+  )
+  if (appConfig.languageTranslationEnabled) nav.withLanguageToggle() else nav
+}
+
 @content = {
   @contentBlock
 }
@@ -90,6 +106,7 @@
       userResearchBanner = if(appConfig.showUserResearchBannerEnabled && showUrBanner) Some(UserResearchBanner(url = appConfig.userResearchUrl)) else None
   ),
 
+  serviceNavigation = Some(serviceNavigation),
   isWelshTranslationAvailable = appConfig.languageTranslationEnabled,
   backLink = if (showBackLink) Some(BackLink.mimicsBrowserBackButtonViaJavaScript) else None
   ))(content)

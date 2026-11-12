@@ -62,7 +62,7 @@ class AgentLostAccessControllerSpec extends SpecBase {
 
           contentAsString(result) mustEqual
             view(expectedUrl)(
-              request,
+              viewRequest(request, isAgent = true),
               appConfig,
               messages(application)
             ).toString

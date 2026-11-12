@@ -123,7 +123,7 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
             Some("ascending"),
             paginationResult.currentPage,
             paginationResult.totalPages
-          )(req, messages(app)).toString
+          )(viewRequest(req, isAgent = true), messages(app)).toString
       }
     }
 
@@ -160,7 +160,7 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
             Some("ascending"),
             paginationResult.currentPage,
             paginationResult.totalPages
-          )(req, messages(app)).toString
+          )(viewRequest(req, isAgent = true), messages(app)).toString
       }
     }
 
@@ -211,7 +211,7 @@ class ClientListSearchControllerSpec extends SpecBase with MockitoSugar {
             None,
             paginationResult.currentPage,
             paginationResult.totalPages
-          )(req, messages(app)).toString
+          )(viewRequest(req, isAgent = true), messages(app)).toString
       }
     }
 

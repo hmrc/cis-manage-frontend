@@ -39,7 +39,7 @@ class NoAuthorisedClientsControllerSpec extends SpecBase {
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(expectedUrl)(
-            request,
+            viewRequest(request, isAgent = true),
             applicationConfig,
             messages(application)
           ).toString

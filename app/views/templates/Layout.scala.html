@@ -18,8 +18,12 @@
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers._
 @import uk.gov.hmrc.hmrcfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.Aliases.{ServiceNavigation, ServiceNavigationItem}
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
+@import models.requests.RequestUserType
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcAccessibleAutocompleteCss
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcAccessibleAutocompleteJavascript
 @import views.html.helper.CSPNonce
@@ -81,6 +85,20 @@
     <div class="govuk-!-margin-top-4">@hmrcReportTechnicalIssueHelper()</div>
 }
 
+@serviceNavigation = @{
+    val nav = ServiceNavigation(
+        serviceName = Some(messages("service.name")),
+        serviceUrl  = Some(routes.IndexController.onPageLoad().url),
+        navigation  = Seq(ServiceNavigationItem(content = Text(hmrcAccountLink._1), href = hmrcAccountLink._2))
+    )
+    if (appConfig.languageTranslationEnabled) nav.withLanguageToggle() else nav
+}
+
+@hmrcAccountLink = @{
+    if (RequestUserType.isAgent(rh)) (messages("site.hmrcAccount.agent"), appConfig.hmrcServicesAgentUrl)
+    else (messages("site.hmrcAccount.org"), appConfig.hmrcServicesOrgUrl)
+}
+
 @content = {
     @contentBlock
     @if(sidebar.isEmpty) {
@@ -114,6 +132,7 @@
         phaseBanner = Some(betaBanner(appConfig.feedbackUrl)),
         userResearchBanner = if(appConfig.showUserResearchBannerEnabled && showUrBanner) Some(UserResearchBanner(url = appConfig.userResearchUrl)) else None
     ),
+    serviceNavigation = Some(serviceNavigation),
     isWelshTranslationAvailable = appConfig.languageTranslationEnabled,
     backLink = if (showBackLink) Some(BackLink.mimicsBrowserBackButtonViaJavaScript) else None
 ))(content)

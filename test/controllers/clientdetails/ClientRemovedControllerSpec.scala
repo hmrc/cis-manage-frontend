@@ -37,7 +37,7 @@ class ClientRemovedControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[ClientRemovedView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view()(viewRequest(request, isAgent = true), messages(application)).toString
       }
     }
   }
