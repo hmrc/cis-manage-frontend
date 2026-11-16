@@ -66,8 +66,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val userResearchUrl: String                = configuration.get[String]("urls.userResearchUrl")
   lazy val showUserResearchBannerEnabled: Boolean = configuration.get[Boolean]("features.user-research-banner-enabled")
 
-  lazy val languageTranslationEnabled: Boolean =
-    configuration.get[Boolean]("features.welsh-translation")
+  lazy val languageTranslationEnabled: Boolean = configuration.get[Boolean]("features.welsh-translation")
+
+  lazy val multiTabEnabled: Boolean = configuration.get[Boolean]("features.multi-tab-enabled")
 
   lazy val useRateLimitedAllowList: Boolean  = configuration.get[Boolean]("features.use-rate-limited-allow-list")
   lazy val splitterServiceName: String       = configuration.get[String]("splitter.service-name")
@@ -102,6 +103,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   private lazy val continueReturnJourneyPath: String                = configuration.get[String]("urls.continueReturnJourney")
   private lazy val continueAmendReturnJourneyPath: String           = configuration.get[String]("urls.continueAmendReturnJourney")
   private lazy val confirmAmendmentPath: String                     = configuration.get[String]("urls.confirmAmendment")
+  private lazy val confirmAmendmentMultiTabPath: String             = configuration.get[String]("urls.confirmAmendmentMultiTab")
   private lazy val submissionInProgressPath: String                 = configuration.get[String]("urls.submissionInProgress")
   private lazy val submissionUnsuccessfulCannotResubmitPath: String =
     configuration.get[String]("urls.submissionUnsuccessfulCannotResubmit")
@@ -139,6 +141,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   def confirmAmendmentUrl(handoffId: String): String =
     s"$cisFrontendBaseUrl$confirmAmendmentPath?handoffId=$handoffId"
+
+  def confirmAmendmentMultiTabUrl(handoffId: String): String =
+    s"$cisFrontendBaseUrl$confirmAmendmentMultiTabPath?handoffId=$handoffId"
 
   def submissionInProgressUrl(cisId: String): String = s"$cisFrontendBaseUrl$submissionInProgressPath?cisId=$cisId"
 

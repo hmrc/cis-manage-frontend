@@ -137,7 +137,10 @@ class SubmittedReturnsController @Inject() (
             )
             .map {
               case Right(handoffId) =>
-                Redirect(appConfig.confirmAmendmentUrl(handoffId))
+                val url =
+                  if appConfig.multiTabEnabled then appConfig.confirmAmendmentMultiTabUrl(handoffId)
+                  else appConfig.confirmAmendmentUrl(handoffId)
+                Redirect(url)
               case Left(reason)     =>
                 logger.warn(s"[startAmendment] start amendment failed: $reason")
                 Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
