@@ -66,8 +66,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val userResearchUrl: String                = configuration.get[String]("urls.userResearchUrl")
   lazy val showUserResearchBannerEnabled: Boolean = configuration.get[Boolean]("features.user-research-banner-enabled")
 
-  lazy val languageTranslationEnabled: Boolean =
-    configuration.get[Boolean]("features.welsh-translation")
+  lazy val languageTranslationEnabled: Boolean = configuration.get[Boolean]("features.welsh-translation")
+
+  lazy val multiTabEnabled: Boolean = configuration.get[Boolean]("features.multi-tab-enabled")
 
   lazy val useRateLimitedAllowList: Boolean  = configuration.get[Boolean]("features.use-rate-limited-allow-list")
   lazy val splitterServiceName: String       = configuration.get[String]("splitter.service-name")
@@ -101,7 +102,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   private lazy val portalAccountBaseUrl: String                     = configuration.get[String]("portal-account.host")
   private lazy val continueReturnJourneyPath: String                = configuration.get[String]("urls.continueReturnJourney")
   private lazy val continueAmendReturnJourneyPath: String           = configuration.get[String]("urls.continueAmendReturnJourney")
+  private lazy val continueReturnJourneyMultiTabPath: String        =
+    configuration.get[String]("urls.continueReturnJourneyMultiTab")
+  private lazy val continueAmendReturnJourneyMultiTabPath: String   =
+    configuration.get[String]("urls.continueAmendReturnJourneyMultiTab")
   private lazy val confirmAmendmentPath: String                     = configuration.get[String]("urls.confirmAmendment")
+  private lazy val confirmAmendmentMultiTabPath: String             = configuration.get[String]("urls.confirmAmendmentMultiTab")
   private lazy val submissionInProgressPath: String                 = configuration.get[String]("urls.submissionInProgress")
   private lazy val submissionUnsuccessfulCannotResubmitPath: String =
     configuration.get[String]("urls.submissionUnsuccessfulCannotResubmit")
@@ -137,8 +143,25 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     s"$cisFrontendBaseUrl$continueAmendReturnJourneyPath" +
       s"?instanceId=$instanceId&taxYear=$taxYear&taxMonth=$taxMonth&isOriginalNilReturn=$isOriginalNilReturn"
 
+  // Multi-tab
+  def continueReturnJourneyMultiTabUrl(instanceId: String, taxYear: String, taxMonth: String): String =
+    s"$cisFrontendBaseUrl$continueReturnJourneyMultiTabPath" +
+      s"?instanceId=$instanceId&taxYear=$taxYear&taxMonth=$taxMonth"
+
+  def continueAmendReturnJourneyMultiTabUrl(
+    instanceId: String,
+    taxYear: String,
+    taxMonth: String,
+    isOriginalNilReturn: Boolean
+  ): String =
+    s"$cisFrontendBaseUrl$continueAmendReturnJourneyMultiTabPath" +
+      s"?instanceId=$instanceId&taxYear=$taxYear&taxMonth=$taxMonth&isOriginalNilReturn=$isOriginalNilReturn"
+
   def confirmAmendmentUrl(handoffId: String): String =
     s"$cisFrontendBaseUrl$confirmAmendmentPath?handoffId=$handoffId"
+
+  def confirmAmendmentMultiTabUrl(handoffId: String): String =
+    s"$cisFrontendBaseUrl$confirmAmendmentMultiTabPath?handoffId=$handoffId"
 
   def submissionInProgressUrl(cisId: String): String = s"$cisFrontendBaseUrl$submissionInProgressPath?cisId=$cisId"
 

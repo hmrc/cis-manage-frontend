@@ -84,11 +84,22 @@ class IncompleteReturnsController @Inject() (
     (identify andThen getData andThen requireData andThen requireCisId).async { implicit request =>
       service.checkUnsubmittedMonthlyReturnDeletion(request.userAnswers, monthlyReturnId).flatMap {
         case Deletable(record) =>
-          Future.successful(
-            Redirect(
-              appConfig.continueReturnJourneyUrl(request.cisId, record.taxYear.toString, record.taxMonth.toString)
-            )
-          )
+          val url =
+            if (appConfig.multiTabEnabled) {
+              appConfig.continueReturnJourneyMultiTabUrl(
+                request.cisId,
+                record.taxYear.toString,
+                record.taxMonth.toString
+              )
+            } else {
+              appConfig.continueReturnJourneyUrl(
+                request.cisId,
+                record.taxYear.toString,
+                record.taxMonth.toString
+              )
+            }
+
+          Future.successful(Redirect(url))
         case _                 =>
           logger
             .warn(

@@ -134,12 +134,14 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
     val mockSubmittedReturnsService: SubmittedReturnsService = mock[SubmittedReturnsService]
     val mockManageService: ManageService                     = mock[ManageService]
 
-    def application(userAnswers: UserAnswers): Application =
+    def application(userAnswers: UserAnswers, multiTabEnabled: Boolean = false): Application =
       applicationBuilder(userAnswers = Some(userAnswers))
         .configure(
-          "mongodb.timeToLiveInSeconds" -> 900,
-          "cis-frontend.host"           -> "http://localhost:6993",
-          "urls.confirmAmendment"       -> "/construction-industry-scheme/manage-cis-return/amend-monthly-return/confirm-amendments"
+          "mongodb.timeToLiveInSeconds"   -> 900,
+          "cis-frontend.host"             -> "http://localhost:6993",
+          "urls.confirmAmendment"         -> "/construction-industry-scheme/manage-cis-return/amend-monthly-return/confirm-amendments",
+          "urls.confirmAmendmentMultiTab" -> "/construction-industry-scheme/manage-cis-return/amend-monthly-return/confirm-amendments/multi-tab",
+          "features.multi-tab-enabled"    -> multiTabEnabled
         )
         .overrides(
           bind[SubmittedReturnsService].toInstance(mockSubmittedReturnsService),
@@ -240,6 +242,9 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
 
     def confirmAmendmentUrl(handoffId: String): String =
       s"http://localhost:6993/construction-industry-scheme/manage-cis-return/amend-monthly-return/confirm-amendments?handoffId=$handoffId"
+
+    def confirmAmendmentMultiTabUrl(handoffId: String): String =
+      s"http://localhost:6993/construction-industry-scheme/manage-cis-return/amend-monthly-return/confirm-amendments/multi-tab?handoffId=$handoffId"
 
     def unauthorisedUrl: String =
       controllers.routes.UnauthorisedOrganisationAffinityController.onPageLoad().url
@@ -490,6 +495,32 @@ class SubmittedReturnsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual confirmAmendmentUrl(handoffId)
+
+        verify(mockSubmittedReturnsService).createAmendmentHandoff(
+          any[SubmittedReturnsData],
+          any[String],
+          any[Int],
+          any[Int]
+        )(any[HeaderCarrier])
+
+        verifyNoInteractions(mockManageService)
+      }
+    }
+
+    "startAmendment must redirect to multi-tab confirm amendment URL when feature switch is enabled" in new Setup {
+      val userAnswers = userAnswersWithSubmittedReturnsData
+      val handoffId   = "handoff-123"
+
+      mockCreateAmendmentHandoffReturns(Right(handoffId))
+
+      val app = application(userAnswers, multiTabEnabled = true)
+
+      running(app) {
+        val request = FakeRequest(GET, routes.SubmittedReturnsController.startAmendment(2024, 3).url)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual confirmAmendmentMultiTabUrl(handoffId)
 
         verify(mockSubmittedReturnsService).createAmendmentHandoff(
           any[SubmittedReturnsData],

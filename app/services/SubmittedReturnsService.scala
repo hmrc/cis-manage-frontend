@@ -343,12 +343,21 @@ class SubmittedReturnsService @Inject() (
       case Some("STARTED") | Some("VALIDATED")                               =>
         StatusViewModel.Link(
           link = LinkViewModel(
-            url = appConfig.continueAmendReturnJourneyUrl(
-              instanceId,
-              monthlyReturn.taxYear.toString,
-              monthlyReturn.taxMonth.toString,
-              isOriginalNilReturn = monthlyReturn.nilReturnIndicator.equalsIgnoreCase("Nil")
-            ),
+            url =
+              if (appConfig.multiTabEnabled)
+                appConfig.continueAmendReturnJourneyMultiTabUrl(
+                  instanceId,
+                  monthlyReturn.taxYear.toString,
+                  monthlyReturn.taxMonth.toString,
+                  isOriginalNilReturn = monthlyReturn.nilReturnIndicator.equalsIgnoreCase("Nil")
+                )
+              else
+                appConfig.continueAmendReturnJourneyUrl(
+                  instanceId,
+                  monthlyReturn.taxYear.toString,
+                  monthlyReturn.taxMonth.toString,
+                  isOriginalNilReturn = monthlyReturn.nilReturnIndicator.equalsIgnoreCase("Nil")
+                ),
             hiddenText = buildReturnPeriodEnd(monthlyReturn)
           ),
           textKey = "history.returnHistory.status.inProgress",
