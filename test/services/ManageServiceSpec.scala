@@ -520,6 +520,59 @@ class ManageServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
       verify(connector).getUnsubmittedMonthlyReturns(any[String])(any[HeaderCarrier])
       verifyNoInteractions(sessionRepo)
     }
+
+    // Multi-tab
+    "use the multi-tab amendment URL when enabled and the legacy URL when disabled" in {
+      val (service, connector, sessionRepo) = newService()
+      val instanceId                        = "CIS-123"
+
+      val record = UnsubmittedMonthlyReturnsRow(
+        monthlyReturnId = 123L,
+        taxYear = 2025,
+        taxMonth = 1,
+        returnType = ReturnTypeViewModel.Standard,
+        status = StatusViewModel.InProgress,
+        lastUpdate = None,
+        amendment = Some("Y"),
+        deletable = true
+      )
+
+      when(connector.getUnsubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(
+          Future.successful(UnsubmittedMonthlyReturnsResponse(unsubmittedCisReturns = Seq(record)))
+        )
+
+      when(connector.getSubmittedMonthlyReturns(eqTo(instanceId))(any[HeaderCarrier]))
+        .thenReturn(
+          Future.successful(
+            SubmittedReturnsData(
+              scheme = SubmittedSchemeData(name = "Test", taxOfficeNumber = "123", taxOfficeReference = "AB456"),
+              monthlyReturns = Seq.empty,
+              submissions = Seq.empty
+            )
+          )
+        )
+
+      when(appConfig.continueAmendReturnJourneyMultiTabUrl(instanceId, "2025", "1", false))
+        .thenReturn("/amend/multi-tab")
+
+      when(appConfig.continueAmendReturnJourneyUrl(instanceId, "2025", "1", false))
+        .thenReturn("/amend")
+
+      when(appConfig.multiTabEnabled).thenReturn(true)
+
+      val multiTabRows = service.getUnsubmittedMonthlyReturnRows(instanceId).futureValue
+
+      multiTabRows.head.action.head.href mustBe "/amend/multi-tab"
+
+      when(appConfig.multiTabEnabled).thenReturn(false)
+
+      val legacyRows = service.getUnsubmittedMonthlyReturnRows(instanceId).futureValue
+
+      legacyRows.head.action.head.href mustBe "/amend"
+
+      verifyNoInteractions(sessionRepo)
+    }
   }
 
   "getSubmittedMonthlyReturns" should {

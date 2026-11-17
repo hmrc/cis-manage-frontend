@@ -102,6 +102,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   private lazy val portalAccountBaseUrl: String                     = configuration.get[String]("portal-account.host")
   private lazy val continueReturnJourneyPath: String                = configuration.get[String]("urls.continueReturnJourney")
   private lazy val continueAmendReturnJourneyPath: String           = configuration.get[String]("urls.continueAmendReturnJourney")
+  private lazy val continueReturnJourneyMultiTabPath: String        =
+    configuration.get[String]("urls.continueReturnJourneyMultiTab")
+  private lazy val continueAmendReturnJourneyMultiTabPath: String   =
+    configuration.get[String]("urls.continueAmendReturnJourneyMultiTab")
   private lazy val confirmAmendmentPath: String                     = configuration.get[String]("urls.confirmAmendment")
   private lazy val confirmAmendmentMultiTabPath: String             = configuration.get[String]("urls.confirmAmendmentMultiTab")
   private lazy val submissionInProgressPath: String                 = configuration.get[String]("urls.submissionInProgress")
@@ -137,6 +141,20 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     isOriginalNilReturn: Boolean
   ): String =
     s"$cisFrontendBaseUrl$continueAmendReturnJourneyPath" +
+      s"?instanceId=$instanceId&taxYear=$taxYear&taxMonth=$taxMonth&isOriginalNilReturn=$isOriginalNilReturn"
+
+  // Multi-tab
+  def continueReturnJourneyMultiTabUrl(instanceId: String, taxYear: String, taxMonth: String): String =
+    s"$cisFrontendBaseUrl$continueReturnJourneyMultiTabPath" +
+      s"?instanceId=$instanceId&taxYear=$taxYear&taxMonth=$taxMonth"
+
+  def continueAmendReturnJourneyMultiTabUrl(
+    instanceId: String,
+    taxYear: String,
+    taxMonth: String,
+    isOriginalNilReturn: Boolean
+  ): String =
+    s"$cisFrontendBaseUrl$continueAmendReturnJourneyMultiTabPath" +
       s"?instanceId=$instanceId&taxYear=$taxYear&taxMonth=$taxMonth&isOriginalNilReturn=$isOriginalNilReturn"
 
   def confirmAmendmentUrl(handoffId: String): String =

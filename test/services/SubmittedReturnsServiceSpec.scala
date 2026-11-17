@@ -1034,5 +1034,44 @@ class SubmittedReturnsServiceSpec extends SpecBase with MockitoSugar {
       val result: Int = service.taxYearFromYear(taxYear, taxMonth)
       result mustEqual (taxYear - 1)
     }
+
+    // Multi-tab
+    "uses multi-tab continuation URL for an in-progress amended standard return when enabled" in new Setup {
+      when(mockAppConfig.multiTabEnabled).thenReturn(true)
+
+      when(mockAppConfig.continueAmendReturnJourneyMultiTabUrl(any(), any(), any(), any()))
+        .thenReturn("/amend/multi-tab")
+
+      val row = singleRow(
+        data(
+          monthlyReturns = Seq(
+            monthlyReturn(
+              id = 6L,
+              supersededBy = Some(99L),
+              amendmentStatus = Some("STARTED")
+            )
+          ),
+          submissions = Seq(
+            submission(submissionId = 16L, activeObjectId = Some(6L))
+          )
+        )
+      )
+
+      row.status shouldBe StatusViewModel.Link(
+        link = LinkViewModel(
+          url = "/amend/multi-tab",
+          hiddenText = "Mar 2023"
+        ),
+        textKey = "history.returnHistory.status.inProgress",
+        hiddenTextKey = "history.returnHistory.hidden.status.inProgress"
+      )
+
+      verify(mockAppConfig).continueAmendReturnJourneyMultiTabUrl(
+        instanceId,
+        "2023",
+        "3",
+        isOriginalNilReturn = false
+      )
+    }
   }
 }

@@ -433,5 +433,50 @@ class IncompleteReturnsControllerSpec extends SpecBase with MockitoSugar {
           .url
       }
     }
+
+    // Multi-tab
+    "must redirect to multi-tab continue return journey when enabled" in {
+      val mockManageService            = mock[ManageService]
+      val mockSessionRepository        = mock[SessionRepository]
+      val appConfig: FrontendAppConfig = mock[FrontendAppConfig]
+
+      val record = UnsubmittedMonthlyReturnsRow(
+        monthlyReturnId = monthlyReturnId,
+        taxYear = 2026,
+        taxMonth = 4,
+        returnType = ReturnTypeViewModel.Standard,
+        status = StatusViewModel.InProgress,
+        lastUpdate = None,
+        amendment = Some("N"),
+        deletable = true
+      )
+
+      when(appConfig.multiTabEnabled).thenReturn(true)
+      when(appConfig.continueReturnJourneyMultiTabUrl(any[String], any[String], any[String]))
+        .thenReturn("/continue/multi-tab")
+
+      when(
+        mockManageService.checkUnsubmittedMonthlyReturnDeletion(any[UserAnswers], any[Long])(
+          any[HeaderCarrier]
+        )
+      ).thenReturn(Future.successful(Deletable(record)))
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswersWithCisId))
+          .overrides(
+            bind[ManageService].toInstance(mockManageService),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[FrontendAppConfig].toInstance(appConfig)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, onContinueRedirectRoute)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual "/continue/multi-tab"
+      }
+    }
   }
 }

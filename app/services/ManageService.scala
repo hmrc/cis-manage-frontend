@@ -302,8 +302,15 @@ class ManageService @Inject() (
           ActionLinkViewModel(
             textKey = "incompleteReturns.action.continue",
             href = if (isAmendment) {
-              appConfig
-                .continueAmendReturnJourneyUrl(
+              if (appConfig.multiTabEnabled)
+                appConfig.continueAmendReturnJourneyMultiTabUrl(
+                  instanceId,
+                  row.taxYear.toString,
+                  row.taxMonth.toString,
+                  isOriginalNilReturn = isOriginalNilReturn
+                )
+              else
+                appConfig.continueAmendReturnJourneyUrl(
                   instanceId,
                   row.taxYear.toString,
                   row.taxMonth.toString,
