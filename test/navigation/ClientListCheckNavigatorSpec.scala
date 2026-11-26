@@ -42,17 +42,17 @@ class ClientListCheckNavigatorSpec extends SpecBase {
           mode = None
         )
 
-      navigator.manageClientDetails mustBe
+      navigator.manageClientDetails("instance-id") mustBe
         controllers.routes.SecurityCheckController.onClientListCheck(
           returnTo = ClientListCheckReturnTarget.ManageClientDetails.key,
-          instanceId = None,
+          instanceId = Some("instance-id"),
           mode = None
         )
 
-      navigator.changeClientReference(NormalMode) mustBe
+      navigator.changeClientReference("instance-id", NormalMode) mustBe
         controllers.routes.SecurityCheckController.onClientListCheck(
           returnTo = ClientListCheckReturnTarget.ChangeClientReference.key,
-          instanceId = None,
+          instanceId = Some("instance-id"),
           mode = Some(Mode.asString(NormalMode))
         )
 

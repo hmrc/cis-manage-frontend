@@ -72,12 +72,61 @@ class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
   val request =
     FakeRequest(
       GET,
-      controllers.clientdetails.routes.ManageClientDetailsController.onPageLoad().url
+      controllers.clientdetails.routes.ManageClientDetailsController.onPageLoad("CIS-123").url
     )
 
   def onwardRoute = Call("GET", "/foo")
 
   "ManageClientDetails Controller" - {
+
+    "must redirect the legacy route to the current client-specific manage route" in {
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(CisIdPage, "CIS-123")
+        .success
+        .value
+
+      val application =
+        applicationBuilder(
+          userAnswers = Some(userAnswers),
+          isAgent = true
+        ).build()
+
+      running(application) {
+        val legacyRequest =
+          FakeRequest(
+            GET,
+            controllers.clientdetails.routes.ManageClientDetailsController.onLegacyPageLoad().url
+          )
+
+        val result = route(application, legacyRequest).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.clientdetails.routes.ManageClientDetailsController.onPageLoad("CIS-123").url
+      }
+    }
+
+    "must recover safely when the legacy route has no current client" in {
+      val application =
+        applicationBuilder(
+          userAnswers = Some(UserAnswers(userAnswersId)),
+          isAgent = true
+        ).build()
+
+      running(application) {
+        val legacyRequest =
+          FakeRequest(
+            GET,
+            controllers.clientdetails.routes.ManageClientDetailsController.onLegacyPageLoad().url
+          )
+
+        val result = route(application, legacyRequest).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
 
     "must return OK and the correct view for a GET" in {
       val mockSessionRepository = mock[SessionRepository]
@@ -88,9 +137,6 @@ class ManageClientDetailsControllerSpec extends SpecBase with MockitoSugar {
       ).thenReturn(Future.successful(okResponse))
 
       val userAnswers = UserAnswers(userAnswersId)
-        .set(CisIdPage, "CIS-123")
-        .success
-        .value
         .set(AgentClientsPage, List(clients))
         .success
         .value

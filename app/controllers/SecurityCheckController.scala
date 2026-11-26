@@ -152,7 +152,7 @@ class SecurityCheckController @Inject() (
         Some(controllers.agent.routes.ClientListSearchController.start())
 
       case ClientListCheckReturnTarget.ManageClientDetails.key =>
-        Some(controllers.clientdetails.routes.ManageClientDetailsController.onPageLoad())
+        instanceId.map(id => controllers.clientdetails.routes.ManageClientDetailsController.onPageLoad(id))
 
       case ClientListCheckReturnTarget.ChangeClientReference.key =>
         for {

@@ -95,7 +95,8 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-      val userAnswers = UserAnswers(userAnswersId).set(ChangeClientReferencePage, "answer").success.value
+      val userAnswers =
+        userAnswersWithClient.set(ChangeClientReferencePage(uniqueId), "answer").success.value
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers), isAgent = true)
@@ -114,6 +115,31 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form.fill("answer"), uniqueId, NormalMode)(
+          viewRequest(request, isAgent = true),
+          messages(application)
+        ).toString
+      }
+    }
+
+    "must not populate a draft answer saved for a different client" in {
+      val userAnswers =
+        userAnswersWithClient.set(ChangeClientReferencePage("other-client"), "other answer").success.value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers), isAgent = true)
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[ManageService].toInstance(mockManageService)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, changeClientReferenceRoute)
+        val result  = route(application, request).value
+        val view    = application.injector.instanceOf[ChangeClientReferenceView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, uniqueId, NormalMode)(
           viewRequest(request, isAgent = true),
           messages(application)
         ).toString
@@ -146,7 +172,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
               .set(AgentClientsPage, client)
               .success
               .value
-              .set(ChangeClientReferencePage, "clientOwnRef")
+              .set(ChangeClientReferencePage(uniqueId), "clientOwnRef")
               .success
               .value
           ),
@@ -198,7 +224,7 @@ class ChangeClientReferenceControllerSpec extends SpecBase with MockitoSugar {
               .set(AgentClientsPage, client)
               .success
               .value
-              .set(ChangeClientReferencePage, "clientOwnRef")
+              .set(ChangeClientReferencePage(uniqueId), "clientOwnRef")
               .success
               .value
           ),

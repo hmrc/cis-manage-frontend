@@ -105,7 +105,7 @@
     @twoColumnGrid(
         ptaCard(
             title = messages("agent.landing.card.manageClientDetails.title"),
-            link = controllers.clientdetails.routes.ManageClientDetailsController.onPageLoad().url,
+            link = controllers.clientdetails.routes.ManageClientDetailsController.onPageLoad(uniqueId).url,
             content = Html(messages("agent.landing.card.manageClientDetails.p")),
             id = Some("manage-client-details")
         ),
@@ -133,4 +133,3 @@
         prefixTextKey = "site.backTo"
     )
 }
-

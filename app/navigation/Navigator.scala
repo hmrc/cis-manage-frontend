@@ -28,10 +28,10 @@ import pages.clientdetails.{ChangeClientReferencePage, RemoveClientYesNoPage}
 class Navigator @Inject() () extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case RemoveClientYesNoPage     => userAnswers => navigatorFromRemoveClientYesNoPage(userAnswers)
-    case ChangeClientReferencePage =>
+    case RemoveClientYesNoPage        => userAnswers => navigatorFromRemoveClientYesNoPage(userAnswers)
+    case _: ChangeClientReferencePage =>
       _ => controllers.clientdetails.routes.ClientRefUpdateConfirmationController.onPageLoad()
-    case _                         => _ => routes.IndexController.onPageLoad()
+    case _                            => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = { case _ =>
