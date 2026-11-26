@@ -23,11 +23,25 @@ class ChangeClientReferencePageSpec extends SpecBase {
 
   "ChangeClientReferencePage" - {
     "have the correct path" in {
-      ChangeClientReferencePage.path mustBe (JsPath \ "clientdetails" \ "changeClientReference")
+      ChangeClientReferencePage("client-123").path mustBe
+        (JsPath \ "clientdetails" \ "changeClientReference" \ "client-123")
     }
 
     "have the correct toString" in {
-      ChangeClientReferencePage.toString mustBe "changeClientReference"
+      ChangeClientReferencePage("client-123").toString mustBe "changeClientReference"
+    }
+
+    "keep answers for separate clients independent" in {
+      val answers = emptyUserAnswers
+        .set(ChangeClientReferencePage("client-123"), "ref-123")
+        .success
+        .value
+        .set(ChangeClientReferencePage("client-456"), "ref-456")
+        .success
+        .value
+
+      answers.get(ChangeClientReferencePage("client-123")) mustBe Some("ref-123")
+      answers.get(ChangeClientReferencePage("client-456")) mustBe Some("ref-456")
     }
   }
 }

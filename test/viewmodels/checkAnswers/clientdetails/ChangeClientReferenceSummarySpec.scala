@@ -36,7 +36,7 @@ class ChangeClientReferenceSummarySpec extends AnyFreeSpec with Matchers {
     "must return a Summary List Row when the answer exists" in {
       val answers =
         UserAnswers("test-id")
-          .set(ChangeClientReferencePage, "REF-12345")
+          .set(ChangeClientReferencePage(uniqueId), "REF-12345")
           .success
           .value
 

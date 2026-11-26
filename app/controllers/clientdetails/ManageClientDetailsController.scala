@@ -49,59 +49,52 @@ class ManageClientDetailsController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad: Action[AnyContent] =
+  def onPageLoad(uniqueId: String): Action[AnyContent] =
     (identify
-      andThen clientListStatusGuard.groupB(clientListCheckNavigator.manageClientDetails)
+      andThen clientListStatusGuard.groupB(clientListCheckNavigator.manageClientDetails(uniqueId))
       andThen getData
       andThen requireData
-      andThen schemeAuthorisationGuard.currentClient).async { implicit request =>
-      request.userAnswers.get(CisIdPage) match {
-        case Some(instanceId) =>
-          request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == instanceId)) match {
-            case Some(client) =>
-              manageService
-                .getClientByEmployerReference(client.taxOfficeNumber, client.taxOfficeRef)
-                .flatMap { response =>
-                  val uniqueId: String          = response.uniqueId
-                  val clientName: String        = response.schemeName.getOrElse("")
-                  val employerReference: String = s"${response.taxOfficeNumber}/${response.taxOfficeRef}"
-                  val clientReference           = response.agentOwnRef.getOrElse("")
+      andThen schemeAuthorisationGuard.forInstanceId(uniqueId)).async { implicit request =>
+      request.userAnswers.get(AgentClientsPage).flatMap(_.find(_.uniqueId == uniqueId)) match {
+        case Some(client) =>
+          manageService
+            .getClientByEmployerReference(client.taxOfficeNumber, client.taxOfficeRef)
+            .flatMap { response =>
+              val clientName        = response.schemeName.getOrElse("")
+              val employerReference = s"${response.taxOfficeNumber}/${response.taxOfficeRef}"
+              val clientReference   = response.agentOwnRef.getOrElse("")
 
-                  for {
-                    updatedAnswers <-
-                      Future.fromTry(request.userAnswers.set(ChangeClientReferencePage, clientReference))
-                    _              <- sessionRepository.set(updatedAnswers)
-                  } yield Ok(
-                    view(
-                      uniqueId,
-                      clientName,
-                      employerReference,
-                      clientReference
-                    )
-                  )
-                }
-                .recover { case e =>
-                  logger.error(
-                    s"[ManageClientDetailsController][onPageLoad] Failed for uniqueId=$instanceId",
-                    e
-                  )
-                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-                }
-
-            case None =>
+              for {
+                updatedAnswers <-
+                  Future.fromTry(request.userAnswers.set(ChangeClientReferencePage(uniqueId), clientReference))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield Ok(view(uniqueId, clientName, employerReference, clientReference))
+            }
+            .recover { case e =>
               logger.error(
-                s"[ManageClientDetailsController][onPageLoad] - no client found in AgentClientsPage for instanceId=$instanceId"
+                s"[ManageClientDetailsController][onPageLoad] Failed for uniqueId=$uniqueId",
+                e
               )
-              Future.successful(
-                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-              )
-          }
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
 
         case None =>
-          logger.error("[ManageClientDetailsController][onPageLoad] - CisIdPage missing from userAnswers")
+          logger.error(
+            s"[ManageClientDetailsController][onPageLoad] - no client found in AgentClientsPage for uniqueId=$uniqueId"
+          )
           Future.successful(
             Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           )
+      }
+    }
+
+  def onLegacyPageLoad: Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      request.userAnswers.get(CisIdPage) match {
+        case Some(uniqueId) =>
+          Redirect(controllers.clientdetails.routes.ManageClientDetailsController.onPageLoad(uniqueId))
+        case None           =>
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
     }
 }

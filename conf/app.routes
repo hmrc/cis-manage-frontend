@@ -150,7 +150,8 @@ POST  /verify/history/select-tax-year     controllers.verify.VerificationHistory
 GET   /verify/history/:selection          controllers.verify.VerificationHistoryController.onPageLoad(selection: String)
 
 # Client Details
-GET   /client-details/manage-client-details  controllers.clientdetails.ManageClientDetailsController.onPageLoad()
+GET   /client-details/manage-client-details/:uniqueId  controllers.clientdetails.ManageClientDetailsController.onPageLoad(uniqueId: String)
+GET   /client-details/manage-client-details            controllers.clientdetails.ManageClientDetailsController.onLegacyPageLoad()
 
 GET   /client-details/client-removed  controllers.clientdetails.ClientRemovedController.onPageLoad()
 

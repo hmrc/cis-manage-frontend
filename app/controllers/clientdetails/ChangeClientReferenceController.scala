@@ -54,11 +54,11 @@ class ChangeClientReferenceController @Inject() (
 
   def onPageLoad(uniqueId: String, mode: Mode): Action[AnyContent] =
     (identify
-      andThen clientListStatusGuard.groupB(clientListCheckNavigator.changeClientReference(mode))
+      andThen clientListStatusGuard.groupB(clientListCheckNavigator.changeClientReference(uniqueId, mode))
       andThen getData
       andThen requireData
       andThen schemeAuthorisationGuard.forInstanceId(uniqueId)).async { implicit request =>
-      val preparedForm = request.userAnswers.get(ChangeClientReferencePage) match {
+      val preparedForm = request.userAnswers.get(ChangeClientReferencePage(uniqueId)) match {
         case None        => form
         case Some(value) => form.fill(value)
       }
@@ -67,7 +67,7 @@ class ChangeClientReferenceController @Inject() (
 
   def onSubmit(uniqueId: String, mode: Mode): Action[AnyContent] =
     (identify
-      andThen clientListStatusGuard.groupB(clientListCheckNavigator.changeClientReference(mode))
+      andThen clientListStatusGuard.groupB(clientListCheckNavigator.changeClientReference(uniqueId, mode))
       andThen getData
       andThen requireData
       andThen schemeAuthorisationGuard.forInstanceId(uniqueId)).async { implicit request =>
@@ -77,7 +77,7 @@ class ChangeClientReferenceController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, uniqueId, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(ChangeClientReferencePage, value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(ChangeClientReferencePage(uniqueId), value))
               _              <- manageService.updateClient(uniqueId, updatedAnswers, value)
               _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(controllers.clientdetails.routes.ClientRefUpdateConfirmationController.onPageLoad())

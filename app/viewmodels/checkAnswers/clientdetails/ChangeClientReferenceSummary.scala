@@ -28,7 +28,7 @@ import viewmodels.implicits.*
 object ChangeClientReferenceSummary {
 
   def row(answers: UserAnswers, uniqueId: String)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(ChangeClientReferencePage).map { answer =>
+    answers.get(ChangeClientReferencePage(uniqueId)).map { answer =>
       SummaryListRowViewModel(
         key = "clientdetails.changeClientReference.checkYourAnswersLabel",
         value = ValueViewModel(HtmlFormat.escape(answer).toString),

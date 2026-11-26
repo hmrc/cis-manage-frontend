@@ -39,17 +39,17 @@ class ClientListCheckNavigator @Inject() {
       mode = None
     )
 
-  def manageClientDetails: Call =
+  def manageClientDetails(uniqueId: String): Call =
     controllers.routes.SecurityCheckController.onClientListCheck(
       returnTo = ClientListCheckReturnTarget.ManageClientDetails.key,
-      instanceId = None,
+      instanceId = Some(uniqueId),
       mode = None
     )
 
-  def changeClientReference(mode: Mode): Call =
+  def changeClientReference(uniqueId: String, mode: Mode): Call =
     controllers.routes.SecurityCheckController.onClientListCheck(
       returnTo = ClientListCheckReturnTarget.ChangeClientReference.key,
-      instanceId = None,
+      instanceId = Some(uniqueId),
       mode = Some(Mode.asString(mode))
     )
 

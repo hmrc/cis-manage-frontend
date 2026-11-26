@@ -215,6 +215,43 @@ class SecurityCheckControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
+      "must redirect to Manage Client Details for the client in the request" in {
+
+        val mockCisService = mock[ConstructionIndustrySchemeService]
+
+        when(mockCisService.getClientListStatus(using any[HeaderCarrier]))
+          .thenReturn(Future.successful(ClientListStatus.Succeeded))
+
+        val application = applicationBuilder(
+          userAnswers = Some(emptyUserAnswers),
+          isAgent = true,
+          additionalBindings = Seq(
+            bind[ConstructionIndustrySchemeService].toInstance(mockCisService)
+          )
+        ).build()
+
+        running(application) {
+          val uniqueId = "123456"
+
+          val request = FakeRequest(
+            GET,
+            routes.SecurityCheckController
+              .pollClientListCheck(
+                ClientListCheckReturnTarget.ManageClientDetails.key,
+                Some(uniqueId),
+                None
+              )
+              .url
+          )
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual
+            controllers.clientdetails.routes.ManageClientDetailsController.onPageLoad(uniqueId).url
+        }
+      }
+
       "must return OK with a Refresh header when client list status is in progress" in {
 
         val mockCisService = mock[ConstructionIndustrySchemeService]

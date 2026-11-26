@@ -82,11 +82,11 @@ class NavigatorSpec extends SpecBase {
         "must go to ClientRefUpdateConfirmationController" in {
 
           val ua = emptyUserAnswers
-            .set(ChangeClientReferencePage, "client ref")
+            .set(ChangeClientReferencePage("client-123"), "client ref")
             .success
             .value
 
-          navigator.nextPage(ChangeClientReferencePage, NormalMode, ua) mustBe
+          navigator.nextPage(ChangeClientReferencePage("client-123"), NormalMode, ua) mustBe
             controllers.clientdetails.routes.ClientRefUpdateConfirmationController.onPageLoad()
         }
       }

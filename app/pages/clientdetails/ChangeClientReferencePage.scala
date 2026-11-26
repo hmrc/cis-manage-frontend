@@ -19,9 +19,9 @@ package pages.clientdetails
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object ChangeClientReferencePage extends QuestionPage[String] {
+final case class ChangeClientReferencePage(uniqueId: String) extends QuestionPage[String] {
 
-  override def path: JsPath = JsPath \ "clientdetails" \ toString
+  override def path: JsPath = JsPath \ "clientdetails" \ toString \ uniqueId
 
   override def toString: String = "changeClientReference"
 }
